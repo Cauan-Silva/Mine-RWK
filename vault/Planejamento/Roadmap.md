@@ -61,6 +61,7 @@ Spec e plano: [[2026-11-09 Núcleo dos kits]] (em `Desenvolvimento/Specs` e `Des
 - [ ] VFX no Photon2 de cada habilidade; Veil só se o domínio precisar de pós-processamento
 - [ ] SFX de cada habilidade
 - [ ] Animações do jogador de cada golpe
+- [ ] Cutscene cinemática da ultimate (Roxo 200%), com sistema de câmera reutilizável pelas outras ultimates
 - [ ] Traje (GeckoLib) com óculos, e passivas (Seis Olhos, Técnica Reversa)
 - [ ] Teste no jogo de ponta a ponta, anotado em [[Pendências]]
 - [ ] Escrever em `vault/Desenvolvimento/` o passo a passo de "como portar um personagem", com base no que o Gojo ensinou

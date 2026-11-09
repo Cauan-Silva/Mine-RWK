@@ -21,3 +21,7 @@ Voltar para [[00 Início]]. Registro do que foi decidido, quando e por quê.
 | 09/11/2026 | Habilidades instantâneas ou de segurar (força pela carga) | Pedido do autor | aprovado |
 | 09/11/2026 | Custo cobrado no disparo; interrupção dá recarga de 1/4 | Pedido do autor | aprovado |
 | 09/11/2026 | Habilidades como classes Java, números num record `Numeros` | Obras com habilidades muito diferentes | aprovado |
+| 09/11/2026 | Sem transformações (o Minezin tinha); kit inteiro ao escolher | Mais simples; o autor não vê problema | aprovado |
+| 09/11/2026 | Golpes que duram viram efeitos soltos; o jogador segue usando outras teclas | Infinito e domínio não podem travar o kit | aprovado |
+| 09/11/2026 | Roxo apaga blocos por padrão, com gamerule `minerwkApagarBlocos` | Fiel à obra, desligável no servidor | aprovado |
+| 09/11/2026 | Ultimate (R) de cada personagem tem cutscene cinemática; sistema de câmera reutilizável | Pedido do autor | aprovado, desenhar na parte visual |
