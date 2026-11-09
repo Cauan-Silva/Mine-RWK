@@ -25,3 +25,4 @@ vault/.trash/
 # Sistema
 .DS_Store
 Thumbs.db
+.superpowers/
