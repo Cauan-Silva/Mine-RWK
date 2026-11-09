@@ -100,6 +100,8 @@ public final class ContextoServidor implements Contexto {
 
     @Override
     public void apresentacao(String animacao, String efeito, String som) {
+        // Outra animação por cima da pose de descida: ao pousar, ela não é cortada.
+        if (!animacao.isEmpty()) BarreirasServidor.animacaoTrocada(jogador);
         Envio.paraQuemVe(jogador, new TocarApresentacao(jogador.getId(), animacao, efeito, som));
     }
 
@@ -438,7 +440,12 @@ public final class ContextoServidor implements Contexto {
     }
 
     @Override
-    public void descida(int ticksMax) {
+    public void descida(String animacao, int ticksMax) {
+        if (BarreirasServidor.pousado(jogador)) {
+            BarreirasServidor.pousar(jogador);
+            return;
+        }
+        apresentacao(animacao, "", "");
         BarreirasServidor.descer(jogador, ticksMax);
     }
 

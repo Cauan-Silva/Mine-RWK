@@ -42,6 +42,19 @@ Voltar para [[00 Início]].
   - **Menores da revisão que ficaram:**
     - com ping alto, o uppercut fere antes de o Gojo chegar na tela dele;
     - o GameTest `vermelhoCongelaEArremessaZumbi` falhou 2 vezes em 6 rodadas.
+- Cutscene do Vazio Roxo máximo (09/11), conferir no jogo:
+  - **Emenda:** o encantamento emenda na parte 2 sem a câmera voltar ao jogador no meio.
+  - **Planos com alvo:** atrás do ombro no avanço (FOV abrindo), uppercut de baixo, subida de lado, esferas de frente, close com o núcleo atrás e o corte para o plano aberto de longe mostrando a explosão. Depois a câmera volta suave.
+  - **Sem alvo:** a câmera segue as esferas até a mira e corta para o plano aberto.
+  - **Outro jogador como alvo:** vê a cutscene a partir do uppercut e não fica preso nela. Testar com o Gojo morrendo ou trocando de personagem no meio.
+  - **F5:** volta ao que estava.
+  - **Animações:** os quatro gestos do encantamento, o Gojo flutuando e reagindo à explosão, e a pose de descida até pousar (na água também).
+  - **Terreno:** ver se o plano aberto fica dentro de um morro em terreno alto.
+  - **Menores da revisão que ficaram:**
+    - a passagem do close no rosto (fim do encantamento) para atrás do ombro (avanço) é um corte, não um deslize;
+    - se a parte 2 chegar com mais de 1 s de atraso, a câmera volta ao jogador e a cutscene recomeça;
+    - um Gojo atingido pelo R de outro Gojo perde a própria cutscene;
+    - com o dono fora do alcance de rastreamento, o alvo vê a câmera a partir dos olhos do início.
 - HUD (09/11): funcionou no jogo. Depois das correções da revisão, conferir: HUD acima da armadura e das bolhas de ar (mergulhar com armadura), texto "Fôlego" à esquerda da barra, barra sem subir de 0 ao entrar no mundo.
 - Núcleo dos kits (09/11): escolha pelo menu, Z, X segurando e recarga **funcionaram**. Falta: morrer segurando X (não pode disparar), usar como espectador (nada acontece), ver a animação em outro jogador (2 clientes), sair e entrar mantendo o personagem.
 - Tela de escolha (09/11): **funcionou no jogo** (autor). Conferido: mundo novo abre a tela com o `teste` (emblema genérico), golpes Z e X no painel, "Escolher" → confirmação. `/rwk tela 40` mostra a grade com rolagem pela roda do mouse e emblemas do Minezin; o 15º falso usa o genérico. Testar também com a janela estreita (painel embaixo) e com escala de interface grande.

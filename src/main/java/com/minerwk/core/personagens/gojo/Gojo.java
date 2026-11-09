@@ -347,8 +347,7 @@ public final class Gojo {
 
         @Override
         public void aoAcabar(Contexto ctx) {
-            ctx.apresentacao(ANIM_R_DESCIDA, "", "");
-            ctx.descida(Roxo200.DESCIDA_MAX);
+            ctx.descida(ANIM_R_DESCIDA, Roxo200.DESCIDA_MAX);
         }
 
         @Override

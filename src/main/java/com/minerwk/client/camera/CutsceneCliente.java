@@ -38,21 +38,24 @@ import net.neoforged.neoforge.client.gui.VanillaGuiLayers;
  */
 public final class CutsceneCliente {
     /**
-     * O que cada cutscene tem: a câmera, as palavras na tela, o visual de carga que a corta e se quem não
-     * é o dono (o alvo) também assiste.
+     * O que cada cutscene tem: a câmera, as palavras na tela, o visual de carga que a corta, se quem não
+     * é o dono (o alvo) também assiste, se outra parte vem depois (as barras não fecham esperando) e o
+     * tick a partir do qual a base para de seguir o dono (plano aberto parado; -1: sempre segue).
      */
     record Roteiro(Coreografia coreografia, List<CutsceneRoxo200.Palavra> palavras, String cargaQueCorta,
-                   boolean espectador) {
+                   boolean espectador, boolean continua, int congelarDesde) {
     }
 
     private static final Map<String, Roteiro> ROTEIROS = Map.of(
-            CutsceneRoxo200.ID, new Roteiro(CutsceneRoxo200.COREOGRAFIA, CutsceneRoxo200.PALAVRAS, "gojo_roxo_200_carga", false));
+            CutsceneRoxo200.ID, new Roteiro(CutsceneRoxo200.COREOGRAFIA, CutsceneRoxo200.PALAVRAS,
+                    "gojo_roxo_200_carga", false, true, -1));
 
     private static Roteiro roteiroDe(String id) {
         Roteiro r = ROTEIROS.get(id);
         if (r != null) return r;
         return CutsceneRoxoMaximo.deId(id)
-                .map(c -> new Roteiro(c, CutsceneRoxo200.PALAVRAS_DISPARO, "", true))
+                .map(c -> new Roteiro(c, CutsceneRoxo200.PALAVRAS_DISPARO, "", true, false,
+                        c.duracao() - CutsceneRoxoMaximo.PLANO_ABERTO - CutsceneRoxoMaximo.VOLTA))
                 .orElse(null);
     }
     public static final ResourceLocation CAMADA = MineRWK.id("cutscene");
@@ -69,6 +72,8 @@ public final class CutsceneCliente {
     private static CameraType cameraAntes;
     /** Emendou numa cutscene anterior: as barras já estão na tela. */
     private static boolean emendada;
+    /** Base parada do plano aberto (o dono desce devagar; a explosão não). */
+    private static Vetor origemCongelada;
 
     private CutsceneCliente() {
     }
@@ -91,6 +96,7 @@ public final class CutsceneCliente {
             roteiro = r;
             atual = pacote;
             emendada = true;
+            origemCongelada = null;
             return;
         }
         encerrar();
@@ -129,6 +135,7 @@ public final class CutsceneCliente {
         quadro = null;
         comCamera = false;
         emendada = false;
+        origemCongelada = null;
         mundo = null;
     }
 
@@ -184,6 +191,10 @@ public final class CutsceneCliente {
         if (dono != null) {
             var olhos = dono.getEyePosition(parcial);
             origem = new Vetor(olhos.x, olhos.y, olhos.z);
+        }
+        if (roteiro.congelarDesde() >= 0 && t >= roteiro.congelarDesde()) {
+            if (origemCongelada == null) origemCongelada = origem;
+            origem = origemCongelada;
         }
         Vetor pos = Coreografia.naBase(quadro.posicao(), origem, atual.direcao());
         Vetor alvo = Coreografia.naBase(quadro.alvo(), origem, atual.direcao());
@@ -254,7 +265,8 @@ public final class CutsceneCliente {
         int altura = g.guiHeight();
         if (comCamera) {
             int fim = roteiro.coreografia().duracao();
-            int barra = (int) (altura * .12 * (emendada ? 1 : suave(t / 10)) * suave((fim - t) / 12));
+            double fecha = roteiro.continua() ? 1 : suave((fim - t) / 12);
+            int barra = (int) (altura * .12 * (emendada ? 1 : suave(t / 10)) * fecha);
             g.fill(0, 0, largura, barra, 0xFF000000);
             g.fill(0, altura - barra, largura, altura, 0xFF000000);
         }

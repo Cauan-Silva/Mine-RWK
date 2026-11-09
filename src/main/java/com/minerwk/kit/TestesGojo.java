@@ -127,13 +127,36 @@ public final class TestesGojo {
     public static void descidaDoRAcabaQuandoOGojoPousa(GameTestHelper helper) {
         ServerPlayer jogador = gojo(helper);
         jogador.setOnGround(false);
-        new ContextoServidor(jogador).descida(600);
+        new ContextoServidor(jogador).descida("gojo_roxo_maximo_descida", 600);
         helper.runAfterDelay(2, () -> {
             helper.assertTrue(BarreirasServidor.voando(jogador), "no ar, ainda voando");
             jogador.setOnGround(true);
         });
         helper.runAfterDelay(4, () -> {
             helper.assertFalse(BarreirasServidor.voando(jogador), "pousou: o voo acabou");
+            helper.succeed();
+        });
+    }
+
+    @GameTest(template = "vazio")
+    public static void descidaNoChaoNaoVoa(GameTestHelper helper) {
+        ServerPlayer jogador = gojo(helper);
+        jogador.setOnGround(true);
+        new ContextoServidor(jogador).descida("gojo_roxo_maximo_descida", 600);
+        helper.assertFalse(BarreirasServidor.voando(jogador), "já no chão: nem voo nem pose de descida");
+        helper.succeed();
+    }
+
+    @GameTest(template = "vazio")
+    public static void vooNovoNaDescidaNaoAcabaAoPousar(GameTestHelper helper) {
+        ServerPlayer jogador = gojo(helper);
+        jogador.setOnGround(false);
+        ContextoServidor ctx = new ContextoServidor(jogador);
+        ctx.descida("gojo_roxo_maximo_descida", 600);
+        ctx.voo(100); // outro R antes de pousar
+        jogador.setOnGround(true);
+        helper.runAfterDelay(3, () -> {
+            helper.assertTrue(BarreirasServidor.voando(jogador), "o voo novo não é descida: não acaba ao pousar");
             helper.succeed();
         });
     }

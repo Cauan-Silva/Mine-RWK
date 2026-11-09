@@ -56,8 +56,11 @@ public final class BarreirasServidor {
     }
 
     private static final List<Ativa> ATIVAS = new ArrayList<>();
-    /** Voo de um jogador: até o tick {@code fim}; {@code descendo}, acaba antes, ao pousar. */
-    private record Voo(ServerPlayer jogador, long fim, boolean descendo) {
+    /**
+     * Voo de um jogador: até o tick {@code fim}; {@code descendo}, acaba antes, ao pousar. {@code pose}:
+     * a pose de descida ainda é a animação dele (para quando o voo acaba).
+     */
+    private record Voo(ServerPlayer jogador, long fim, boolean descendo, boolean pose) {
     }
 
     private static final Map<UUID, Voo> VOO = new HashMap<>();
@@ -88,15 +91,34 @@ public final class BarreirasServidor {
 
     static void voar(ServerPlayer jogador, int ticks) {
         long fim = jogador.level().getGameTime() + ticks;
-        VOO.merge(jogador.getUUID(), new Voo(jogador, fim, false),
-                (a, b) -> new Voo(jogador, Math.max(a.fim(), b.fim()), a.descendo()));
+        // Um voo novo (outro golpe) nunca é descida, mesmo começando no meio de uma.
+        VOO.merge(jogador.getUUID(), new Voo(jogador, fim, false, false),
+                (a, b) -> new Voo(jogador, Math.max(a.fim(), b.fim()), false, false));
         livreNoAr(jogador);
     }
 
     /** O voo vira descida: acaba ao pousar (parando a animação) ou em {@code ticksMax}. */
     static void descer(ServerPlayer jogador, int ticksMax) {
-        VOO.put(jogador.getUUID(), new Voo(jogador, jogador.level().getGameTime() + ticksMax, true));
+        VOO.put(jogador.getUUID(), new Voo(jogador, jogador.level().getGameTime() + ticksMax, true, true));
         livreNoAr(jogador);
+    }
+
+    /** Acabou a descida: chão, água, escada, planando, voando no criativo ou montado. */
+    static boolean pousado(ServerPlayer jogador) {
+        return jogador.onGround() || jogador.isInWater() || jogador.onClimbable() || jogador.isFallFlying()
+                || jogador.getAbilities().flying || jogador.isPassenger();
+    }
+
+    /** Acaba o voo agora (pousou); a pose de descida para, se ainda for a animação dele. */
+    static void pousar(ServerPlayer jogador) {
+        Voo v = VOO.remove(jogador.getUUID());
+        if (v != null && v.pose()) new ContextoServidor(jogador).pararAnimacao();
+    }
+
+    /** O jogador tocou outra animação: a pose de descida já não é a dele. */
+    static void animacaoTrocada(ServerPlayer jogador) {
+        VOO.computeIfPresent(jogador.getUUID(),
+                (k, v) -> v.pose() ? new Voo(v.jogador(), v.fim(), v.descendo(), false) : v);
     }
 
     public static boolean voando(ServerPlayer jogador) {
@@ -160,14 +182,14 @@ public final class BarreirasServidor {
         for (Iterator<Map.Entry<UUID, Voo>> it = VOO.entrySet().iterator(); it.hasNext(); ) {
             Voo v = it.next().getValue();
             ServerPlayer jogador = v.jogador();
-            if (jogador.isRemoved() || jogador.hasDisconnected() || jogador.level().getGameTime() >= v.fim()) {
+            if (jogador.isRemoved() || jogador.hasDisconnected()) {
                 it.remove();
                 continue;
             }
-            if (v.descendo() && jogador.onGround()) {
-                // Pousou: acabou o voo e a pose de descida.
+            if (jogador.level().getGameTime() >= v.fim() || (v.descendo() && pousado(jogador))) {
+                // Pousou (ou o teto passou): acabou o voo e a pose de descida, se ainda for ela.
                 it.remove();
-                new ContextoServidor(jogador).pararAnimacao();
+                if (v.pose()) new ContextoServidor(jogador).pararAnimacao();
                 continue;
             }
             livreNoAr(jogador);

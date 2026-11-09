@@ -69,7 +69,7 @@ class GojoTest {
         public void cutscene(String id, Vetor origem, Vetor direcao) { chamadas.add("cutscene:" + id); }
         public void cutsceneParaAlvo(Object alvo, String id, Vetor origem, Vetor direcao, int passados) { chamadas.add("cutsceneAlvo:" + id); }
         public void encerrarCutscene() { chamadas.add("encerrarCutscene"); }
-        public void descida(int t) { chamadas.add("descida"); }
+        public void descida(String anim, int t) { chamadas.add("descida:" + anim); }
         public void apresentacao(String anim, String efeito, String som) { if (!anim.isEmpty()) chamadas.add("anim:" + anim); }
         public void pararAnimacao() { chamadas.add("pararAnimacao"); }
         public void apagarBlocos(Vetor c, double r) { chamadas.add("apagar"); raiosApagados.add(r); }
@@ -220,8 +220,8 @@ class GojoTest {
         assertEquals(1, ctx.conta("anim:" + Gojo.ANIM_R_UPPERCUT), "a animação do uppercut toca no soco");
         assertEquals(1, ctx.conta("cutscene:" + CutsceneRoxoMaximo.id(a)), "a parte 2 vai para o Gojo no disparo");
         assertEquals(1, ctx.conta("cutsceneAlvo:" + CutsceneRoxoMaximo.id(a)), "e para o alvo no uppercut");
-        assertEquals(1, ctx.conta("anim:" + Gojo.ANIM_R_DESCIDA), "no fim, a pose de descida");
-        assertEquals(1, ctx.conta("descida"), "o voo passa a acabar quando ele pousa");
+        assertEquals(1, ctx.conta("descida:" + Gojo.ANIM_R_DESCIDA),
+                "no fim, a descida com a pose (o servidor só toca a pose se ele estiver no ar)");
         assertEquals(List.of(RoxoMaximo.DANO_UPPERCUT, RoxoMaximo.DANO), ctx.danos,
                 "uppercut e depois a explosão, uma vez só (o alvo não leva de novo pela casca)");
         assertEquals(RoxoMaximo.inicioExplosao(a) - a, ctx.conta("suspender"), "segurado no ar até explodir");

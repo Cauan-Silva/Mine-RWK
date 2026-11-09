@@ -133,10 +133,11 @@ public interface Contexto {
     }
 
     /**
-     * O jogador desce do voo: a partir de agora o voo (sem dano de queda) acaba quando ele pousar, ou em
-     * {@code ticksMax}; ao pousar, a animação para.
+     * O jogador desce do voo: se está no ar, toca a pose {@code animacao} e o voo (sem dano de queda)
+     * passa a acabar quando ele pousar (ou cair na água, subir escada, planar...), ou em {@code ticksMax};
+     * aí a pose para, se ainda for ela. Já no chão, o voo acaba na hora, sem pose.
      */
-    default void descida(int ticksMax) {
+    default void descida(String animacao, int ticksMax) {
     }
 
     /** O golpe do jogador acertou alguém: a tela dele trava um instante (mais forte com {@code forca}). */
