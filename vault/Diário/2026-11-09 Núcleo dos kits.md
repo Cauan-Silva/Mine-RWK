@@ -6,7 +6,7 @@ tags: [diario]
 Voltar para [[Diário]].
 
 - Decidido com o autor: recurso próprio por personagem, escolha única pelo menu, habilidades instantâneas ou de segurar, custo no disparo e punição de 1/4 na interrupção, habilidades como classes Java. Spec e plano em `Desenvolvimento/`.
-- Núcleo puro em `core/kit/` (`Execucao`, `KitDoJogador`, `Recurso`, `Personagem`, `Personagens`) com 22 testes JUnit.
+- Núcleo puro em `core/kit/` (`Execucao`, `KitDoJogador`, `Recurso`, `Personagem`, `Personagens`) com 31 testes JUnit no total do projeto.
 - Servidor em `kit/`: dados no jogador (Data Attachment), tick, `/rwk trocar` (operador), contexto que causa dano e manda apresentação.
 - Rede em `rede/`: `UsarTecla`, `EscolherPersonagem`, `SincronizarKit`, `TocarApresentacao`; envio só para quem tem o canal.
 - Cliente em `client/kit/`: teclas Z X C V G R (+ K para escolher) e tela simples de escolha.
