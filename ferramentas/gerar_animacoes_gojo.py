@@ -40,6 +40,23 @@ def tremer(osso_base, t0, t1, passo, amp):
     return q
 
 
+def balancar(base, t0, t1, amp=4, passo=0.3):
+    """Pose segurada que respira: oscila devagar em volta de base (braço nunca fica congelado)."""
+    q, t, lado = [], t0 + passo, 1
+    while t < t1 - 1e-6:
+        q.append((round(t, 2), [base[0] + amp * lado, base[1], base[2] + amp * .5 * lado], S))
+        t += passo
+        lado = -lado
+    return q
+
+
+def sem_pernas(a):
+    """Golpes usados andando: tira pernas e corpo para a passada normal do jogo aparecer."""
+    for osso in ("right_leg", "left_leg", "body"):
+        a["bones"].pop(osso, None)
+    return a
+
+
 def fatia(a, inicio):
     """A mesma animação a partir de `inicio` (para pular direto para a pose do disparo)."""
     nova = {"animation_length": round(a["animation_length"] - inicio, 2), "loop": False, "bones": {}}
@@ -64,9 +81,10 @@ braco_azul = [-95, 0, 5]
 A["gojo_azul"] = anim(3.4, {
     "right_arm": {"rotation": [(0, N), (0.18, [-25, 10, 40], OUTC), (0.30, braco_azul, BACK)]
                   + tremer(braco_azul, 0.30, 3.0, 0.15, 3) + [(3.0, braco_azul), (3.4, N, C)]},
-    "left_arm": {"rotation": [(0, N), (0.18, [-15, 0, -20], OUTC), (0.32, [-55, 35, -5], BACK),
-                              (3.0, [-58, 35, -5]), (3.4, N, C)]},
-    "torso": {"rotation": [(0, N), (0.18, [0, 25, 0], OUTC), (0.30, [0, -15, 0], BACK), (3.0, [0, -12, 0]), (3.4, N, C)]},
+    "left_arm": {"rotation": [(0, N), (0.18, [-15, 0, -20], OUTC), (0.32, [-55, 35, -5], BACK)]
+                 + balancar([-56, 35, -5], 0.32, 3.0) + [(3.0, [-58, 35, -5]), (3.4, N, C)]},
+    "torso": {"rotation": [(0, N), (0.18, [0, 25, 0], OUTC), (0.30, [0, -15, 0], BACK)]
+              + balancar([0, -13, 0], 0.30, 3.0, 2, 0.5) + [(3.0, [0, -12, 0]), (3.4, N, C)]},
     "head": {"rotation": [(0, N), (0.18, [5, 12, 0], OUTC), (0.32, [-4, -8, 6], BACK), (3.0, [-4, -8, 6]), (3.4, N, C)]},
     "right_leg": {"rotation": [(0, N), (0.30, [-14, 0, 2], BACK), (3.0, [-14, 0, 2]), (3.4, N, C)]},
     "left_leg": {"rotation": [(0, N), (0.30, [10, 0, -2], BACK), (3.0, [10, 0, -2]), (3.4, N, C)]},
@@ -86,11 +104,13 @@ A["gojo_vermelho"] = anim(3.0, {
     "right_leg": {"rotation": [(0, N), (1.40, [-6, 0, 2]), (1.62, [18, 0, 3], OUTC), (2.40, [10, 0, 2], C), (3.0, N, C)]},
     "left_leg": {"rotation": [(0, N), (1.40, [6, 0, -2]), (1.62, [-12, 0, -3], OUTC), (2.40, [-6, 0, -2], C), (3.0, N, C)]},
 })
+sem_pernas(A["gojo_vermelho"])
 A["gojo_vermelho_disparo"] = fatia(A["gojo_vermelho"], 1.40)
 
 # C: Infinito. Mão esquerda de palma aberta à frente do peito, pose calma.
 A["gojo_infinito"] = anim(1.2, {
-    "left_arm": {"rotation": [(0, N), (0.25, [-80, -20, 0], BACK), (0.90, [-78, -22, 0]), (1.2, N, C)]},
+    "left_arm": {"rotation": [(0, N), (0.25, [-80, -20, 0], BACK)] + balancar([-79, -21, 0], 0.25, 0.9, 3, 0.2)
+                 + [(0.90, [-78, -22, 0]), (1.2, N, C)]},
     "right_arm": {"rotation": [(0, N), (0.25, [6, 0, 6]), (0.90, [6, 0, 6]), (1.2, N, C)]},
     "torso": {"rotation": [(0, N), (0.25, [0, 10, 0], BACK), (0.90, [0, 10, 0]), (1.2, N, C)]},
     "head": {"rotation": [(0, N), (0.30, [-8, 0, 0]), (0.90, [-8, 0, 0]), (1.2, N, C)]},
@@ -105,7 +125,8 @@ A["gojo_roxo"] = anim(3.6, {
                                (1.50, [-100, -5, 0], BACK)] + tremer([-100, -5, 0], 1.50, 3.2, 0.15, 2.5)
                   + [(3.2, [-98, -4, 0]), (3.6, N, C)]},
     "left_arm": {"rotation": [(0, N), (0.35, [-60, 0, -60], BACK), (1.30, [-85, -25, 0], Q), (1.42, [-70, -20, 0]),
-                              (1.50, [-20, 0, -25], EXPO), (3.2, [-15, 0, -20]), (3.6, N, C)]},
+                              (1.50, [-20, 0, -25], EXPO)] + balancar([-18, 0, -22], 1.50, 3.2)
+                 + [(3.2, [-15, 0, -20]), (3.6, N, C)]},
     "torso": {"rotation": [(0, N), (0.35, [-4, 0, 0]), (1.30, [0, 0, 0], Q), (1.42, [0, 20, 0], OUTC),
                            (1.50, [0, -20, 0], BACK), (3.2, [0, -16, 0]), (3.6, N, C)]},
     "head": {"rotation": [(0, N), (0.35, [-6, 0, 0]), (1.30, [6, 0, 0], Q), (1.50, [-4, 0, 0], BACK), (3.2, [-4, 0, 0]), (3.6, N, C)]},
@@ -114,10 +135,8 @@ A["gojo_roxo"] = anim(3.6, {
 })
 
 # R: Roxo 200%. Cabeça baixa, quatro gestos (um por palavra do encantamento: ticks 2, 22, 42, 62),
-# o corpo sobe 0,6 bloco ao longo da carga; disparo aos 4,0 s no tranco mais forte; desce no fim.
-SOBE = [0, 9.6, 0]
+# o Gojo sobe de verdade (o cliente o move), então o modelo não sobe; disparo aos 4,0 s no tranco mais forte.
 A["gojo_roxo_200"] = anim(7.0, {
-    "body": {"position": [(0, N), (3.8, SOBE, S), (6.2, SOBE), (7.0, N, C)]},
     "right_arm": {"rotation": [(0, N), (0.50, [-110, -30, 0], BACK), (1.0, [-108, -32, 0]),
                                (1.50, [-60, -40, 0], BACK), (2.0, [-60, -42, 0]),
                                (2.50, [-70, -45, 0], BACK), (3.0, [-72, -45, 0]),
@@ -149,6 +168,9 @@ A["gojo_vazio_infinito"] = anim(2.5, {
     "right_leg": {"rotation": [(0, N), (0.35, [0, 0, 3]), (2.0, [0, 0, 3]), (2.5, N, C)]},
     "left_leg": {"rotation": [(0, N), (0.35, [0, 0, -3]), (2.0, [0, 0, -3]), (2.5, N, C)]},
 })
+
+for nome in ("gojo_azul", "gojo_infinito", "gojo_roxo"):
+    sem_pernas(A[nome])
 
 saida = {"format_version": "1.8.0", "geckolib_format_version": 2, "animations": A}
 p = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "src/main/resources/assets/minerwk/player_animations/gojo.json")

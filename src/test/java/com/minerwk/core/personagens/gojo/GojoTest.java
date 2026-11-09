@@ -50,11 +50,17 @@ class GojoTest {
         public void arremessar(Vetor c, double r, double f, int congelar, Vetor eixo) { chamadas.add("arremessar"); }
         public int arrancarBlocos(Vetor c, double r, int maximo, float dureza) { chamadas.add("arrancar"); arrancados += maximo; return maximo; }
         public void acertou(float f) { chamadas.add("acertou"); }
-        public void pisoSolido(Vetor p, double r, int t) { chamadas.add("piso"); }
+        final List<double[]> barreiras = new ArrayList<>();
+        final List<Double> raiosApagados = new ArrayList<>();
+        final List<double[]> cascas = new ArrayList<>();
+        Vetor centroCasca;
+        public void barreira(Vetor c, double r, double chao, int t) { chamadas.add("barreira"); barreiras.add(new double[] {r, chao, t}); }
+        public void voo(int t) { chamadas.add("voo"); }
+        public void apagarCasca(Vetor c, double de, double ate) { chamadas.add("casca"); cascas.add(new double[] {de, ate}); centroCasca = c; }
         public void cutscene(String id) { chamadas.add("cutscene:" + id); }
         public void apresentacao(String anim, String efeito, String som) { if (!anim.isEmpty()) chamadas.add("anim:" + anim); }
         public void pararAnimacao() { chamadas.add("pararAnimacao"); }
-        public void apagarBlocos(Vetor c, double r) { chamadas.add("apagar"); }
+        public void apagarBlocos(Vetor c, double r) { chamadas.add("apagar"); raiosApagados.add(r); }
         public void paralisar(Vetor c, double r, int t) { chamadas.add("paralisar"); }
         public void infinito(int t) { chamadas.add("infinito"); }
         public void curar(float v) { chamadas.add("curar"); }
@@ -177,12 +183,44 @@ class GojoTest {
     }
 
     @Test
-    void roxo200Da60PassosAte120Blocos() {
+    void roxo200ColossalAnda120BlocosComRaio7EExplodeNoFim() {
         usar(Tecla.R);
-        ticks(200);
+        ticks(300);
         assertEquals(60, ctx.conta("apagar"));
+        assertTrue(ctx.raiosApagados.stream().allMatch(r -> r == 7.0));
         assertTrue(ctx.danos.stream().allMatch(d -> d == 60f));
         assertEquals(120, ctx.pontosDeDano.get(59).x(), 1e-6);
+        assertExplosaoInteira(120);
+    }
+
+    @Test
+    void roxo200ExplodeOndeBate() {
+        ctx.colideEm = v -> v.x() >= 31;
+        usar(Tecla.R);
+        ticks(300);
+        assertEquals(1, ctx.conta("fim:gojo_roxo_200"), "a massa some onde bateu");
+        assertExplosaoInteira(32);
+    }
+
+    /** As cascas cobrem de 0 a 24 sem buraco nem repetição, e a explosão aparece uma vez. */
+    private void assertExplosaoInteira(double x) {
+        assertEquals(1, ctx.conta("visual:gojo_roxo_explosao"));
+        assertEquals(x, ctx.centroCasca.x(), 1e-6);
+        double r = 0;
+        for (double[] c : ctx.cascas) {
+            assertEquals(r, c[0], 1e-9);
+            assertTrue(c[1] > c[0]);
+            r = c[1];
+        }
+        assertEquals(24, r, 1e-9);
+        assertEquals(12, ctx.cascas.size(), "cresce em 12 ticks");
+    }
+
+    @Test
+    void roxo200VoaNaCarga() {
+        usar(Tecla.R);
+        ticks(1);
+        assertEquals(1, ctx.conta("voo"));
     }
 
     @Test
@@ -293,10 +331,14 @@ class GojoTest {
     }
 
     @Test
-    void dominioCriaChaoSolido() {
+    void dominioCriaBarreiraComChaoNosPes() {
         usar(Tecla.G);
         ticks(20);
-        assertEquals(1, ctx.conta("piso"));
+        assertEquals(1, ctx.conta("barreira"));
+        double[] b = ctx.barreiras.get(0);
+        assertEquals(12, b[0], 1e-9);
+        assertEquals(-Gojo.ALTURA_OLHOS, b[1], 1e-9, "os olhos estão em 0: o chão fica nos pés");
+        assertEquals(160, b[2], 1e-9);
     }
 
     @Test

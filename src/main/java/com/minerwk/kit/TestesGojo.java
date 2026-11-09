@@ -7,7 +7,6 @@ import com.minerwk.core.kit.Tecla;
 import com.minerwk.core.kit.Vetor;
 import com.minerwk.core.personagens.gojo.Gojo;
 import com.minerwk.registro.Efeitos;
-import com.minerwk.registro.Blocos;
 import com.minerwk.registro.Regras;
 import com.mojang.authlib.GameProfile;
 import java.util.UUID;
@@ -150,14 +149,54 @@ public final class TestesGojo {
     }
 
     @GameTest(template = "vazio")
-    public static void dominioPoeChaoNoArQueSomeSozinho(GameTestHelper helper) {
+    public static void dominioSeguraZumbiNoArENaoDeixaSair(GameTestHelper helper) {
         ServerPlayer jogador = gojo(helper);
-        BlockPos noAr = new BlockPos(2, 4, 2);
-        Vetor pes = vetor(helper.absoluteVec(new Vec3(2.5, 5, 2.5)));
-        new ContextoServidor(jogador).pisoSolido(pes, 1.5, 5);
-        helper.assertBlockPresent(Blocos.pisoDominio(), noAr);
-        helper.runAfterDelay(8, () -> {
-            helper.assertBlockPresent(Blocks.AIR, noAr);
+        Vec3 centro = helper.absoluteVec(new Vec3(4.5, 7, 4.5));
+        double chao = centro.y - 1;
+        Zombie zumbi = helper.spawn(EntityType.ZOMBIE, new BlockPos(4, 6, 4));
+        zumbi.setPos(centro.x, chao, centro.z);
+        new ContextoServidor(jogador).barreira(vetor(centro), 3, chao, 100);
+        helper.runAfterDelay(20, () -> {
+            helper.assertTrue(Math.abs(zumbi.getY() - chao) < 0.2, "o zumbi deveria ficar em pé no ar, y " + (zumbi.getY() - chao));
+            zumbi.setDeltaMovement(1.5, 0, 0);
+        });
+        helper.runAfterDelay(30, () -> {
+            double d = zumbi.position().distanceTo(centro);
+            helper.assertTrue(d < 3, "o zumbi deveria continuar dentro, distância " + d);
+            helper.succeed();
+        });
+    }
+
+    @GameTest(template = "vazio")
+    public static void dominioNaoDeixaZumbiDeForaEntrar(GameTestHelper helper) {
+        ServerPlayer jogador = gojo(helper);
+        Vec3 centro = helper.absoluteVec(new Vec3(4.5, 3, 4.5));
+        Zombie zumbi = helper.spawn(EntityType.ZOMBIE, new BlockPos(8, 2, 4));
+        new ContextoServidor(jogador).barreira(vetor(centro), 3, centro.y - 1, 100);
+        helper.runAtTickTime(helper.getTick() + 1, () -> zumbi.setDeltaMovement(-1.5, 0, 0));
+        helper.runAfterDelay(10, () -> {
+            double d = zumbi.position().distanceTo(centro);
+            helper.assertTrue(d >= 3, "o zumbi de fora não deveria entrar, distância " + d);
+            helper.succeed();
+        });
+    }
+
+    @GameTest(template = "vazio")
+    public static void explosaoRoxaApagaAsCascas(GameTestHelper helper) {
+        ServerPlayer jogador = gojo(helper);
+        for (int x = 2; x <= 6; x++) {
+            for (int y = 2; y <= 6; y++) {
+                for (int z = 2; z <= 6; z++) helper.setBlock(new BlockPos(x, y, z), Blocks.STONE);
+            }
+        }
+        Vec3 centro = helper.absoluteVec(new Vec3(4.5, 4.5, 4.5));
+        ContextoServidor ctx = new ContextoServidor(jogador);
+        ctx.apagarCasca(vetor(centro), 0, 1.5);
+        ctx.apagarCasca(vetor(centro), 1.5, 3);
+        helper.runAfterDelay(3, () -> {
+            helper.assertBlockPresent(Blocks.AIR, new BlockPos(4, 4, 4));
+            helper.assertBlockPresent(Blocks.AIR, new BlockPos(6, 4, 4));
+            helper.assertBlockPresent(Blocks.STONE, new BlockPos(2, 2, 2));
             helper.succeed();
         });
     }

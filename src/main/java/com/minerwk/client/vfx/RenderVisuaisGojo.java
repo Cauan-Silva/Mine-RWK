@@ -77,10 +77,11 @@ public final class RenderVisuaisGojo {
                     palavrasNoMundo(q, v, t);
                 }
                 case "gojo_roxo" -> roxo(q, v, t, op, TrajetoriaGojo.PASSO_ROXO, 2.1);
-                case "gojo_roxo_200" -> roxo(q, v, t, op, TrajetoriaGojo.PASSO_ROXO_200, 3.5);
+                case "gojo_roxo_200" -> roxo(q, v, t, op, TrajetoriaGojo.PASSO_ROXO_200, 9.8);
+                case "gojo_roxo_explosao" -> explosaoRoxa(q, v, t);
                 case "gojo_roxo_rastro" -> tunelRoxo(q, v.origem, v.direcao, v.forca, 1.5,
                         .7f * (float) Math.pow(Math.max(0, 1 - t / v.duracao), 1.5));
-                case "gojo_roxo_200_rastro" -> tunelRoxo(q, v.origem, v.direcao, v.forca, 2.5,
+                case "gojo_roxo_200_rastro" -> tunelRoxo(q, v.origem, v.direcao, v.forca, 7,
                         .7f * (float) Math.pow(Math.max(0, 1 - t / v.duracao), 1.5));
                 case "gojo_azul_marca" -> marcaAzul(q, v, (float) (PerfilVfxGojo.suave(t / 4)
                         * Math.min(1, Math.max(0, (v.duracao - t) / PerfilVfxGojo.MARCA_AZUL))));
@@ -259,6 +260,17 @@ public final class RenderVisuaisGojo {
             p.fita(pts, .25, CARMESIM, alphas(pts.size(), alpha * (1 - f * .25f)));
         }
         p.terminar();
+    }
+
+    /** Fim do Roxo 200%: a esfera roxa cresce até o raio 24 em 12 ticks com clarão branco e se apaga. */
+    private static void explosaoRoxa(Quadro q, VisuaisAtivos.Visual v, double i) {
+        Vec3 c = q.rel(v.origem);
+        if (c.lengthSqr() > 400 * 400) return;
+        double cresce = PerfilVfxGojo.suave(i / 12);
+        float some = (float) Math.max(0, 1 - Math.max(0, i - 12) / (v.duracao - 12));
+        esfera(q, Pincel.ROXO, true, c, 2 + 22 * cresce, 0xC890FF, .85f * some);
+        esfera(q, Pincel.ROXO, true, c, 1 + 12 * cresce, 0xFFFFFF, (float) Math.exp(-i / 4));
+        brilho(q, c, 30 + 20 * cresce, 0x9A4DFF, .8f * some);
     }
 
     // ---------------------------------------------------------------- Infinito

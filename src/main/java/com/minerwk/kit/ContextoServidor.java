@@ -12,7 +12,6 @@ import com.minerwk.rede.Envio;
 import com.minerwk.rede.MostrarVisual;
 import com.minerwk.rede.TocarApresentacao;
 import com.minerwk.rede.Tremer;
-import com.minerwk.registro.Blocos;
 import com.minerwk.registro.Efeitos;
 import com.minerwk.registro.Regras;
 import java.util.List;
@@ -241,23 +240,21 @@ public final class ContextoServidor implements Contexto {
     }
 
     @Override
-    public void pisoSolido(Vetor pes, double raio, int ticks) {
+    public void barreira(Vetor centro, double raio, double chao, int ticks) {
+        BarreirasServidor.criar(jogador, centro, raio, chao, ticks);
+    }
+
+    @Override
+    public void voo(int ticks) {
+        BarreirasServidor.voar(jogador, ticks);
+    }
+
+    @Override
+    public void apagarCasca(Vetor centro, double de, double ate) {
         ServerLevel nivel = nivel();
-        // O topo do bloco fica na altura dos pés (arredondada para baixo).
-        int y = (int) Math.floor(pes.y() + 1e-4) - 1;
-        int r = (int) Math.ceil(raio);
-        int cx = (int) Math.floor(pes.x());
-        int cz = (int) Math.floor(pes.z());
-        BlockState piso = Blocos.pisoDominio().defaultBlockState();
-        for (int dx = -r; dx <= r; dx++) {
-            for (int dz = -r; dz <= r; dz++) {
-                if (dx * dx + dz * dz > raio * raio) continue;
-                BlockPos p = new BlockPos(cx + dx, y, cz + dz);
-                if (!nivel.isLoaded(p) || nivel.isOutsideBuildHeight(p) || !nivel.getBlockState(p).isAir()) continue;
-                nivel.setBlock(p, piso, Block.UPDATE_CLIENTS);
-                nivel.scheduleTick(p, piso.getBlock(), ticks);
-            }
-        }
+        if (!nivel.getGameRules().getBoolean(Regras.APAGAR_BLOCOS)) return;
+        ApagadorServidor.apagarCasca(nivel, vec(centro), de, ate,
+                (p, estado) -> nivel.mayInteract(jogador, p) && podeQuebrar(nivel, p.immutable(), estado));
     }
 
     @Override
@@ -286,6 +283,8 @@ public final class ContextoServidor implements Contexto {
         int r = (int) Math.ceil(raio);
         BlockPos base = BlockPos.containing(c);
         int apagados = 0;
+        // Massa grande (Roxo 200%): avisa só os clientes, sem atualizar vizinhos, que pesa bem menos.
+        int flags = raio > 4 ? Block.UPDATE_CLIENTS : Block.UPDATE_ALL;
         BlockPos[] sorteados = new BlockPos[DETRITOS];
         BlockState[] estados = new BlockState[DETRITOS];
         for (BlockPos p : BlockPos.betweenClosed(base.offset(-r, -r, -r), base.offset(r, r, r))) {
@@ -294,7 +293,7 @@ public final class ContextoServidor implements Contexto {
             BlockState estado = nivel.getBlockState(p);
             if (estado.isAir() || estado.getDestroySpeed(nivel, p) < 0 || estado.hasBlockEntity()
                     || !estado.getFluidState().isEmpty() || !podeQuebrar(nivel, p, estado)) continue;
-            nivel.setBlock(p, Blocks.AIR.defaultBlockState(), Block.UPDATE_ALL);
+            nivel.setBlock(p, Blocks.AIR.defaultBlockState(), flags);
             // Sorteio de reservatório: guarda DETRITOS blocos ao acaso entre os apagados.
             int vaga = apagados < DETRITOS ? apagados : nivel.random.nextInt(apagados + 1);
             if (vaga < DETRITOS) {

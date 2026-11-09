@@ -1,6 +1,6 @@
 ---
 tags: [desenvolvimento, spec]
-estado: proposto
+estado: aprovado
 ---
 # Spec e plano: domínio fechado, animações livres ao andar e Roxo 200% colossal (Fase 2, parte 5)
 

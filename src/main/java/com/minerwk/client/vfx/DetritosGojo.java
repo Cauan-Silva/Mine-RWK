@@ -62,6 +62,10 @@ public final class DetritosGojo {
     /** Um visual começou: o que acontece uma vez só. */
     public static void aoComecar(String tipo, Vetor origem) {
         ClientLevel l = Minecraft.getInstance().level;
+        if (l != null && tipo.equals("gojo_roxo_explosao")) {
+            explosaoRoxa(l, origem);
+            return;
+        }
         if (l == null || !tipo.equals("gojo_vazio_infinito") || !perto(origem)) return;
         // Anel de poeira que corre pelo chão até a borda do domínio.
         int n = qtd(36);
@@ -71,6 +75,22 @@ public final class DetritosGojo {
             double a = i * Math.PI * 2 / n;
             l.addParticle(ParticleTypes.CLOUD, origem.x() + Math.cos(a), y, origem.z() + Math.sin(a),
                     Math.cos(a) * v, .01, Math.sin(a) * v);
+        }
+    }
+
+    /** O Roxo 200% explodiu em {@code p}: estouros espalhados pela esfera e fumaça grossa. */
+    private static void explosaoRoxa(ClientLevel l, Vetor p) {
+        RandomSource rnd = l.random;
+        for (int i = 0; i < qtd(16); i++) {
+            double r = 4 + rnd.nextDouble() * 18;
+            double a = rnd.nextDouble() * Math.PI * 2, b = (rnd.nextDouble() - .5) * Math.PI;
+            double x = p.x() + Math.cos(a) * Math.cos(b) * r, y = p.y() + Math.sin(b) * r, z = p.z() + Math.sin(a) * Math.cos(b) * r;
+            l.addParticle(ParticleTypes.EXPLOSION_EMITTER, x, y, z, 0, 0, 0);
+        }
+        for (int i = 0; i < qtd(60); i++) {
+            double a = rnd.nextDouble() * Math.PI * 2;
+            l.addParticle(ParticleTypes.CAMPFIRE_COSY_SMOKE, p.x() + Math.cos(a) * 20 * rnd.nextDouble(), p.y(),
+                    p.z() + Math.sin(a) * 20 * rnd.nextDouble(), 0, .08, 0);
         }
     }
 
@@ -123,11 +143,11 @@ public final class DetritosGojo {
                     boolean maior = v.tipo.equals("gojo_roxo_200");
                     Vetor c = TrajetoriaGojo.roxo(v.origem, v.direcao, VisuaisAtivos.passoRoxo(v.tipo), t - 1);
                     if (!perto(c)) break;
-                    varias(l, FAISCA_VIOLETA, qtd(maior ? 8 : 4), new Vec3(c.x(), c.y(), c.z()), maior ? 5 : 3, .2);
+                    varias(l, FAISCA_VIOLETA, qtd(maior ? 8 : 4), new Vec3(c.x(), c.y(), c.z()), maior ? 10 : 3, .2);
                 }
                 case "gojo_roxo_rastro", "gojo_roxo_200_rastro" -> {
                     // Fumaça grossa subindo do túnel enquanto ele esfria.
-                    double raio = v.tipo.startsWith("gojo_roxo_200") ? 2.5 : 1.5;
+                    double raio = v.tipo.startsWith("gojo_roxo_200") ? 7 : 1.5;
                     for (int i = 0; i < qtd(3); i++) {
                         Vetor p = v.origem.mais(v.direcao.vezes(rnd.nextDouble() * v.forca));
                         if (!perto(p)) continue;

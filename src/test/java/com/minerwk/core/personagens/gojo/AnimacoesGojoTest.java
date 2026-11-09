@@ -10,6 +10,7 @@ import java.io.Reader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
@@ -28,6 +29,9 @@ class AnimacoesGojoTest {
             "gojo_roxo", 40,
             "gojo_roxo_200", 60,
             "gojo_vazio_infinito", 40);
+
+    /** Golpes que se usam andando: Z, X, C e V. */
+    private static final List<String> ANDAM = List.of("gojo_azul", "gojo_vermelho", "gojo_infinito", "gojo_roxo");
 
     private static JsonObject animacoes() throws IOException {
         try (Reader r = Files.newBufferedReader(ARQUIVO, StandardCharsets.UTF_8)) {
@@ -53,7 +57,20 @@ class AnimacoesGojoTest {
             for (String osso : ossos) assertTrue(OSSOS.contains(osso), e.getKey() + ": osso desconhecido " + osso);
             assertTrue(ossos.containsAll(Set.of("head", "torso", "right_arm", "left_arm")),
                     e.getKey() + " precisa mexer cabeça, tronco e os dois braços");
-            assertTrue(ossos.contains("right_leg") || ossos.contains("body"), e.getKey() + " precisa mexer pernas ou o corpo");
+            if (e.getKey().startsWith("gojo_roxo_200")) {
+                // O Gojo sobe de verdade no R: o corpo do modelo não sobe de novo por cima.
+                assertFalse(ossos.contains("body"), e.getKey() + " não pode mexer o body");
+                continue;
+            }
+            boolean andando = ANDAM.stream().anyMatch(e.getKey()::startsWith);
+            if (andando) {
+                // Usados andando: as pernas e o corpo ficam com a passada normal do jogo.
+                for (String livre : List.of("right_leg", "left_leg", "body")) {
+                    assertFalse(ossos.contains(livre), e.getKey() + " não pode prender " + livre);
+                }
+            } else {
+                assertTrue(ossos.contains("right_leg"), e.getKey() + " precisa mexer as pernas");
+            }
         }
     }
 }

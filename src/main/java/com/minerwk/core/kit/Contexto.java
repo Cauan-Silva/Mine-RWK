@@ -78,10 +78,14 @@ public interface Contexto {
     }
 
     /**
-     * Chão sólido e invisível por {@code ticks}, no nível dos pés {@code pes}, num disco de {@code raio}:
-     * só onde há ar. Some sozinho no fim.
+     * Barreira esférica por {@code ticks} (regra de {@link Barreira}): quem está dentro não sai nem desce
+     * abaixo de {@code chao}, quem está fora não entra. O próprio jogador conta como quem está dentro.
      */
-    default void pisoSolido(Vetor pes, double raio, int ticks) {
+    default void barreira(Vetor centro, double raio, double chao, int ticks) {
+    }
+
+    /** O jogador vai voar por {@code ticks} (o cliente o move): sem dano de queda e sem ser chutado por voo. */
+    default void voo(int ticks) {
     }
 
     /**
@@ -101,6 +105,13 @@ public interface Contexto {
     }
 
     /** Apaga os blocos da esfera, se a regra do servidor deixar. */
+    /**
+     * Apaga os blocos entre as esferas de raio {@code de} (exclusive) e {@code ate} (inclusive): explosões
+     * grandes crescem casca por casca. Pode ficar para os ticks seguintes se for muito bloco.
+     */
+    default void apagarCasca(Vetor centro, double de, double ate) {
+    }
+
     default void apagarBlocos(Vetor centro, double raio) {
     }
 

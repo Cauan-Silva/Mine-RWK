@@ -78,7 +78,7 @@ public final class CutsceneCliente {
             } else {
                 cameraAntes = mc.options.getCameraType();
                 mc.options.setCameraType(CameraType.FIRST_PERSON);
-                posicionar(0);
+                posicionar(0, 0);
                 mc.setCameraEntity(camera);
             }
         }
@@ -138,14 +138,18 @@ public final class CutsceneCliente {
             // F5 durante a cutscene tiraria a câmera da coreografia.
             Minecraft mc = Minecraft.getInstance();
             if (mc.options.getCameraType() != CameraType.FIRST_PERSON) mc.options.setCameraType(CameraType.FIRST_PERSON);
-            posicionar(idade(parcial));
+            posicionar(idade(parcial), parcial);
         }
     }
 
-    private static void posicionar(double t) {
+    /** A câmera segue os olhos do jogador (no Roxo 200% ele sobe), virada para onde ele olhava no início. */
+    private static void posicionar(double t, float parcial) {
         quadro = roteiro.coreografia().quadro(t);
-        Vetor pos = Coreografia.naBase(quadro.posicao(), atual.origem(), atual.direcao());
-        Vetor alvo = Coreografia.naBase(quadro.alvo(), atual.origem(), atual.direcao());
+        var jogador = Minecraft.getInstance().player;
+        var olhos = jogador.getEyePosition(parcial);
+        Vetor origem = new Vetor(olhos.x, olhos.y, olhos.z);
+        Vetor pos = Coreografia.naBase(quadro.posicao(), origem, atual.direcao());
+        Vetor alvo = Coreografia.naBase(quadro.alvo(), origem, atual.direcao());
         Vetor d = alvo.menos(pos);
         double horizontal = Math.sqrt(d.x() * d.x() + d.z() * d.z());
         float yaw = (float) Math.toDegrees(Math.atan2(-d.x(), d.z()));

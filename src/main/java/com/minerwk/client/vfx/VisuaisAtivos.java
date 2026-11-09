@@ -43,6 +43,31 @@ public final class VisuaisAtivos {
             this.inicio = inicio;
         }
 
+        public int dono() {
+            return dono;
+        }
+
+        public String tipo() {
+            return tipo;
+        }
+
+        public Vetor origem() {
+            return origem;
+        }
+
+        public int duracao() {
+            return duracao;
+        }
+
+        public long inicio() {
+            return inicio;
+        }
+
+        /** Encerrado antes da hora (golpe cortado, Roxo que bateu). */
+        public boolean encerrado() {
+            return fimEm >= 0;
+        }
+
         /** Ticks desde o começo, com a fração do quadro. */
         double idade(long agora, float parcial) {
             return Math.max(0, agora - inicio + parcial);
@@ -102,6 +127,12 @@ public final class VisuaisAtivos {
                         PerfilVfxGojo.EXPLOSAO_VERMELHO, agora));
                 ImpactoCamera.momento("gojo_vermelho_explosao", p.ponto());
                 DetritosGojo.explosao(p.ponto());
+            } else if (p.tipo().equals("gojo_roxo_200")) {
+                // A massa bateu e virou a explosão (que chega como visual próprio): o túnel fica até ali.
+                ATIVOS.remove(i);
+                float comprimento = (float) v.origem.distancia(p.ponto());
+                ATIVOS.add(new Visual(v.dono, "gojo_roxo_200_rastro", v.origem, v.direcao, comprimento,
+                        PerfilVfxGojo.RASTRO_ROXO, agora));
             } else {
                 v.fimEm = agora;
             }
