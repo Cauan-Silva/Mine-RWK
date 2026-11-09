@@ -11,6 +11,7 @@ import com.minerwk.rede.Envio;
 import com.minerwk.rede.MostrarVisual;
 import com.minerwk.rede.TocarApresentacao;
 import com.minerwk.rede.Tremer;
+import com.minerwk.registro.Blocos;
 import com.minerwk.registro.Efeitos;
 import com.minerwk.registro.Regras;
 import java.util.List;
@@ -132,6 +133,10 @@ public final class ContextoServidor implements Contexto {
                 e -> e instanceof LivingEntity || e instanceof ItemEntity || e instanceof Projectile
                         || e instanceof FallingBlockEntity && e.getTags().contains(ARRANCADO));
         for (Entity e : alvos) {
+            if (puxar && e instanceof FallingBlockEntity) {
+                orbitar(e, centro);
+                continue;
+            }
             Vec3 dir = centro.subtract(e.getBoundingBox().getCenter());
             if (dir.lengthSqr() < 0.25 && puxar) continue; // já está no centro
             Vec3 passo = dir.normalize().scale(puxar ? forca : -forca);
@@ -140,6 +145,23 @@ public final class ContextoServidor implements Contexto {
             e.hurtMarked = true; // manda a velocidade para o cliente (jogadores)
             e.hasImpulse = true; // e para as outras entidades
         }
+    }
+
+    /**
+     * Bloco arrancado pelo Azul: flutua e gira em volta de um ponto um pouco acima do centro (senão pousa
+     * logo e vira bloco de novo). Quando o campo acaba, a gravidade volta e ele cai.
+     */
+    private static void orbitar(Entity e, Vec3 centro) {
+        Vec3 alvo = centro.add(0, 1.5, 0);
+        Vec3 d = alvo.subtract(e.position());
+        double dist = d.length();
+        Vec3 ida = dist < 1e-3 ? Vec3.ZERO : d.scale(Math.min(.45, dist * .2) / dist);
+        Vec3 giro = d.cross(new Vec3(0, 1, 0));
+        giro = giro.lengthSqr() < 1e-6 ? Vec3.ZERO : giro.normalize().scale(.22);
+        // +0,04 desfaz a gravidade do bloco caindo neste tick.
+        e.setDeltaMovement(ida.add(giro).add(0, .04, 0));
+        e.hurtMarked = true;
+        e.hasImpulse = true;
     }
 
     @Override
@@ -195,7 +217,10 @@ public final class ContextoServidor implements Contexto {
             if (estado.isAir() || dureza < 0 || dureza > durezaMax || estado.hasBlockEntity()
                     || !estado.getFluidState().isEmpty() || !nivel.getBlockState(p.above()).isAir()
                     || estado.is(BlockTags.CROPS) || !podeQuebrar(nivel, p, estado)) continue;
-            FallingBlockEntity.fall(nivel, p, estado).addTag(ARRANCADO);
+            FallingBlockEntity bloco = FallingBlockEntity.fall(nivel, p, estado);
+            bloco.addTag(ARRANCADO);
+            bloco.setDeltaMovement(0, .35, 0); // sai do chão antes de começar a girar
+            bloco.hurtMarked = true;
             feitos++;
         }
         return feitos;
@@ -207,6 +232,26 @@ public final class ContextoServidor implements Contexto {
     /** Pergunta aos mods de proteção de terreno (claims) se o jogador pode quebrar aqui. */
     private boolean podeQuebrar(ServerLevel nivel, BlockPos p, BlockState estado) {
         return !NeoForge.EVENT_BUS.post(new BlockEvent.BreakEvent(nivel, p, estado, jogador)).isCanceled();
+    }
+
+    @Override
+    public void pisoSolido(Vetor pes, double raio, int ticks) {
+        ServerLevel nivel = nivel();
+        // O topo do bloco fica na altura dos pés (arredondada para baixo).
+        int y = (int) Math.floor(pes.y() + 1e-4) - 1;
+        int r = (int) Math.ceil(raio);
+        int cx = (int) Math.floor(pes.x());
+        int cz = (int) Math.floor(pes.z());
+        BlockState piso = Blocos.pisoDominio().defaultBlockState();
+        for (int dx = -r; dx <= r; dx++) {
+            for (int dz = -r; dz <= r; dz++) {
+                if (dx * dx + dz * dz > raio * raio) continue;
+                BlockPos p = new BlockPos(cx + dx, y, cz + dz);
+                if (!nivel.isLoaded(p) || nivel.isOutsideBuildHeight(p) || !nivel.getBlockState(p).isAir()) continue;
+                nivel.setBlock(p, piso, Block.UPDATE_CLIENTS);
+                nivel.scheduleTick(p, piso.getBlock(), ticks);
+            }
+        }
     }
 
     @Override

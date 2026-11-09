@@ -7,6 +7,7 @@ import com.minerwk.core.kit.Tecla;
 import com.minerwk.core.kit.Vetor;
 import com.minerwk.core.personagens.gojo.Gojo;
 import com.minerwk.registro.Efeitos;
+import com.minerwk.registro.Blocos;
 import com.minerwk.registro.Regras;
 import com.mojang.authlib.GameProfile;
 import java.util.UUID;
@@ -146,6 +147,19 @@ public final class TestesGojo {
             regra.set(true, helper.getLevel().getServer());
         }
         helper.succeed();
+    }
+
+    @GameTest(template = "vazio")
+    public static void dominioPoeChaoNoArQueSomeSozinho(GameTestHelper helper) {
+        ServerPlayer jogador = gojo(helper);
+        BlockPos noAr = new BlockPos(2, 4, 2);
+        Vetor pes = vetor(helper.absoluteVec(new Vec3(2.5, 5, 2.5)));
+        new ContextoServidor(jogador).pisoSolido(pes, 1.5, 5);
+        helper.assertBlockPresent(Blocos.pisoDominio(), noAr);
+        helper.runAfterDelay(8, () -> {
+            helper.assertBlockPresent(Blocks.AIR, noAr);
+            helper.succeed();
+        });
     }
 
     @GameTest(template = "vazio")

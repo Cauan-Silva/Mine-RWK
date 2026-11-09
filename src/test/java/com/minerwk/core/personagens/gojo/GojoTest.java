@@ -50,6 +50,7 @@ class GojoTest {
         public void arremessar(Vetor c, double r, double f, int congelar, Vetor eixo) { chamadas.add("arremessar"); }
         public int arrancarBlocos(Vetor c, double r, int maximo, float dureza) { chamadas.add("arrancar"); arrancados += maximo; return maximo; }
         public void acertou(float f) { chamadas.add("acertou"); }
+        public void pisoSolido(Vetor p, double r, int t) { chamadas.add("piso"); }
         public void apagarBlocos(Vetor c, double r) { chamadas.add("apagar"); }
         public void paralisar(Vetor c, double r, int t) { chamadas.add("paralisar"); }
         public void infinito(int t) { chamadas.add("infinito"); }
@@ -233,6 +234,13 @@ class GojoTest {
         assertEquals(1, ctx.conta("fim:gojo_vermelho"), "a explosão sai pelo visualFim");
         assertEquals(1, ctx.conta("visual:gojo_infinito"));
         assertEquals(0, ctx.conta("particulas"));
+    }
+
+    @Test
+    void dominioCriaChaoSolido() {
+        usar(Tecla.G);
+        ticks(20);
+        assertEquals(1, ctx.conta("piso"));
     }
 
     @Test

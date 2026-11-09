@@ -73,6 +73,13 @@ public interface Contexto {
         return 0;
     }
 
+    /**
+     * Chão sólido e invisível por {@code ticks}, no nível dos pés {@code pes}, num disco de {@code raio}:
+     * só onde há ar. Some sozinho no fim.
+     */
+    default void pisoSolido(Vetor pes, double raio, int ticks) {
+    }
+
     /** O golpe do jogador acertou alguém: a tela dele trava um instante (mais forte com {@code forca}). */
     default void acertou(float forca) {
     }

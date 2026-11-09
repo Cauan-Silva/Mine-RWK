@@ -74,6 +74,16 @@ public final class VisuaisAtivos {
     public static void receber(MostrarVisual p) {
         if (ATIVOS.size() >= LIMITE) ATIVOS.remove(0);
         ATIVOS.add(new Visual(p.dono(), p.tipo(), p.origem(), p.direcao(), p.forca(), p.duracao(), p.inicio()));
+        ClientLevel nivel = Minecraft.getInstance().level;
+        if (p.tipo().equals("gojo_azul") && nivel != null) {
+            // A marca no chão nasce junto com o campo e some devagar depois que ele acaba.
+            Vetor chao = chao(nivel, p.origem());
+            if (chao != null) {
+                if (ATIVOS.size() >= LIMITE) ATIVOS.remove(0);
+                ATIVOS.add(new Visual(p.dono(), "gojo_azul_marca", chao, p.direcao(), 1,
+                        p.duracao() + PerfilVfxGojo.MARCA_AZUL, p.inicio()));
+            }
+        }
         ImpactoCamera.momento(p.tipo(), p.origem());
         DetritosGojo.aoComecar(p.tipo(), p.origem());
     }
@@ -135,13 +145,6 @@ public final class VisuaisAtivos {
                     float comprimento = (float) (passoRoxo(v.tipo) * v.duracao);
                     novos.add(new Visual(v.dono, v.tipo + "_rastro", v.origem, v.direcao, comprimento,
                             PerfilVfxGojo.RASTRO_ROXO, agora));
-                }
-                case "gojo_azul" -> {
-                    v.deixouRastro = true;
-                    Vetor chao = chao(nivel, v.origem);
-                    if (chao != null) {
-                        novos.add(new Visual(v.dono, "gojo_azul_marca", chao, v.direcao, 1, PerfilVfxGojo.MARCA_AZUL, agora));
-                    }
                 }
                 default -> {
                 }

@@ -36,5 +36,6 @@
   "habilidade.minerwk.gojo_roxo_200": "Roxo 200%",
   "habilidade.minerwk.gojo_roxo_200.desc": "Encantamento completo: o Roxo com o dobro da força. Exige energia cheia.",
   "effect.minerwk.paralisia": "Paralisia",
-  "gamerule.minerwkApagarBlocos": "Golpes do Mine-RWK apagam blocos"
+  "gamerule.minerwkApagarBlocos": "Golpes do Mine-RWK apagam blocos",
+  "block.minerwk.piso_dominio": "Chão do Vazio Infinito"
 }

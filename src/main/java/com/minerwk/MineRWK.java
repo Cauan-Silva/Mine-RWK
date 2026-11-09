@@ -8,6 +8,7 @@ import com.minerwk.core.personagens.gojo.Gojo;
 import com.minerwk.kit.ArremessosServidor;
 import com.minerwk.kit.ProtecoesServidor;
 import com.minerwk.kit.ServicoKits;
+import com.minerwk.registro.Blocos;
 import com.minerwk.registro.Efeitos;
 import com.minerwk.registro.Regras;
 import com.minerwk.rede.Pacotes;
@@ -31,6 +32,7 @@ public final class MineRWK {
         Sons.REGISTRO.register(modBus);
         Anexos.REGISTRO.register(modBus);
         Efeitos.REGISTRO.register(modBus);
+        Blocos.REGISTRO.register(modBus);
         Regras.registrar();
         Personagens.registrar(PersonagemTeste.criar());
         Personagens.registrar(Gojo.criar());

@@ -77,7 +77,8 @@ public final class RenderVisuaisGojo {
                         .7f * (float) Math.pow(Math.max(0, 1 - t / v.duracao), 1.5));
                 case "gojo_roxo_200_rastro" -> tunelRoxo(q, v.origem, v.direcao, v.forca, 2.5,
                         .7f * (float) Math.pow(Math.max(0, 1 - t / v.duracao), 1.5));
-                case "gojo_azul_marca" -> marcaAzul(q, v, (float) Math.max(0, 1 - t / v.duracao));
+                case "gojo_azul_marca" -> marcaAzul(q, v, (float) (PerfilVfxGojo.suave(t / 4)
+                        * Math.min(1, Math.max(0, (v.duracao - t) / PerfilVfxGojo.MARCA_AZUL))));
                 case "gojo_vazio_infinito" -> dominio(q, v, t, op);
                 default -> {
                 }
@@ -392,7 +393,9 @@ public final class RenderVisuaisGojo {
         Pincel p = Pincel.novo().comecar(Pincel.CEU, false, q.tempo, new Vec3(0, 0, 1));
         p.esfera(c, raio, 0xFFFFFF, opDomo, q.segmentos(48));
         p.terminar();
-        Vec3 pes = c.add(0, -1.62 + .02, 0);
+        // O chão desenhado fica no topo do bloco invisível que o servidor põe (pés arredondados para baixo).
+        double yPiso = Math.floor(v.origem.y() - 1.62 + 1e-4) + .02;
+        Vec3 pes = new Vec3(c.x, yPiso - q.camera.y, c.z);
         Pincel chao = Pincel.novo().comecar(Pincel.CHAO, false, q.tempo, new Vec3(0, 1, 0));
         chao.disco(pes, raio, 0xFFFFFF, opDomo * .85f, q.segmentos(48));
         chao.terminar();

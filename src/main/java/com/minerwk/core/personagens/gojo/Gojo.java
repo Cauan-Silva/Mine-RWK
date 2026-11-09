@@ -19,6 +19,8 @@ import java.util.Map;
 public final class Gojo {
     public static final String ID = "gojo";
     private static final String SOM = "teste";
+    /** Altura dos olhos de um jogador em pé, para achar os pés a partir dos olhos. */
+    static final double ALTURA_OLHOS = 1.62;
 
     private Gojo() {
     }
@@ -319,6 +321,8 @@ public final class Gojo {
             ctx.apresentacao("gojo_dominio", "", SOM);
             ctx.tremor(0.5f, 20, 24);
             ctx.visual("gojo_vazio_infinito", ctx.olhos(), ctx.olhar(), 0f, 160);
+            // O domínio tem chão próprio: dá para ficar em pé mesmo sem bloco embaixo.
+            ctx.pisoSolido(ctx.olhos().menos(new Vetor(0, ALTURA_OLHOS, 0)), Dominio.RAIO, 160);
             ctx.criarEfeito(new Dominio(ctx.olhos()));
         }
     }

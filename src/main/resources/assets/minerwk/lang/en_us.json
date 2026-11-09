@@ -36,5 +36,6 @@
   "habilidade.minerwk.gojo_roxo_200": "200% Hollow Purple",
   "habilidade.minerwk.gojo_roxo_200.desc": "Full incantation: Hollow Purple at double power. Needs full energy.",
   "effect.minerwk.paralisia": "Paralysis",
-  "gamerule.minerwkApagarBlocos": "Mine-RWK abilities erase blocks"
+  "gamerule.minerwkApagarBlocos": "Mine-RWK abilities erase blocks",
+  "block.minerwk.piso_dominio": "Unlimited Void Floor"
 }
