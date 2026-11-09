@@ -13,11 +13,16 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.Marker;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.boss.enderdragon.EnderDragon;
+import net.minecraft.world.entity.decoration.ArmorStand;
+import net.minecraft.world.entity.projectile.AbstractArrow;
+import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.event.entity.living.LivingDeathEvent;
 import net.neoforged.neoforge.event.entity.living.LivingFallEvent;
 import net.neoforged.neoforge.event.server.ServerStoppingEvent;
 import net.neoforged.neoforge.event.tick.ServerTickEvent;
@@ -64,6 +69,8 @@ public final class BarreirasServidor {
             VOO.clear();
         });
         NeoForge.EVENT_BUS.addListener(BarreirasServidor::aoCair);
+        // Morreu no voo: quem renasce não fica sem dano de queda.
+        NeoForge.EVENT_BUS.addListener((LivingDeathEvent e) -> VOO.remove(e.getEntity().getUUID()));
     }
 
     static void criar(ServerPlayer dono, Vetor centro, double raio, double chao, int ticks) {
@@ -83,11 +90,19 @@ public final class BarreirasServidor {
 
     private static AABB caixa(Ativa a) {
         Vec3 c = new Vec3(a.centro.x(), a.centro.y(), a.centro.z());
-        return new AABB(c, c).inflate(a.raio + 3);
+        // Folga maior que o passo de um projétil rápido: quem vem de fora é visto ainda fora.
+        return new AABB(c, c).inflate(a.raio + 6);
     }
 
+    /**
+     * Só criaturas e projéteis em voo. Quadros, armor stands, displays e itens ficam de fora (mudar a
+     * posição deles os solta), e o dragão também (as partes se reposicionam sozinhas).
+     */
     private static boolean afetada(Entity e) {
-        return e.isAlive() && !e.isSpectator() && !(e instanceof Marker) && !e.isPassenger();
+        if (!e.isAlive() || e.isSpectator() || e.isPassenger()) return false;
+        // Flecha cravada (parada) fica onde está.
+        if (e instanceof Projectile) return !(e instanceof AbstractArrow && e.getDeltaMovement().lengthSqr() < 1e-4);
+        return e instanceof LivingEntity && !(e instanceof ArmorStand) && !(e instanceof EnderDragon);
     }
 
     private static Vetor pes(Entity e) {
@@ -121,7 +136,9 @@ public final class BarreirasServidor {
                     e.setOnGround(true);
                     e.resetFallDistance();
                 }
-                e.hurtMarked = true;
+                // Parado no chão, a gravidade o tira do lugar só um pouco a cada tick: aí a posição já
+                // chega pelo rastreador, sem um pacote de velocidade por tick.
+                if (desvio > .2) e.hurtMarked = true;
             }
         }
         for (Iterator<Map.Entry<UUID, Long>> it = VOO.entrySet().iterator(); it.hasNext(); ) {

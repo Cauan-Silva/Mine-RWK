@@ -155,7 +155,7 @@ public final class TestesGojo {
         double chao = centro.y - 1;
         Zombie zumbi = helper.spawn(EntityType.ZOMBIE, new BlockPos(4, 6, 4));
         zumbi.setPos(centro.x, chao, centro.z);
-        new ContextoServidor(jogador).barreira(vetor(centro), 3, chao, 100);
+        new ContextoServidor(jogador).barreira(vetor(centro), 3, chao, 40);
         helper.runAfterDelay(20, () -> {
             helper.assertTrue(Math.abs(zumbi.getY() - chao) < 0.2, "o zumbi deveria ficar em pé no ar, y " + (zumbi.getY() - chao));
             zumbi.setDeltaMovement(1.5, 0, 0);
@@ -172,7 +172,7 @@ public final class TestesGojo {
         ServerPlayer jogador = gojo(helper);
         Vec3 centro = helper.absoluteVec(new Vec3(4.5, 3, 4.5));
         Zombie zumbi = helper.spawn(EntityType.ZOMBIE, new BlockPos(8, 2, 4));
-        new ContextoServidor(jogador).barreira(vetor(centro), 3, centro.y - 1, 100);
+        new ContextoServidor(jogador).barreira(vetor(centro), 3, centro.y - 1, 20);
         helper.runAtTickTime(helper.getTick() + 1, () -> zumbi.setDeltaMovement(-1.5, 0, 0));
         helper.runAfterDelay(10, () -> {
             double d = zumbi.position().distanceTo(centro);
@@ -194,9 +194,16 @@ public final class TestesGojo {
         ctx.apagarCasca(vetor(centro), 0, 1.5);
         ctx.apagarCasca(vetor(centro), 1.5, 3);
         helper.runAfterDelay(3, () -> {
-            helper.assertBlockPresent(Blocks.AIR, new BlockPos(4, 4, 4));
-            helper.assertBlockPresent(Blocks.AIR, new BlockPos(6, 4, 4));
-            helper.assertBlockPresent(Blocks.STONE, new BlockPos(2, 2, 2));
+            // Cada bloco com o centro a até 3 do centro some; os de fora ficam (as duas cascas sem buraco).
+            for (int x = 2; x <= 6; x++) {
+                for (int y = 2; y <= 6; y++) {
+                    for (int z = 2; z <= 6; z++) {
+                        BlockPos b = new BlockPos(x, y, z);
+                        boolean dentro = helper.absoluteVec(Vec3.atCenterOf(b)).distanceTo(centro) <= 3;
+                        helper.assertBlockPresent(dentro ? Blocks.AIR : Blocks.STONE, b);
+                    }
+                }
+            }
             helper.succeed();
         });
     }

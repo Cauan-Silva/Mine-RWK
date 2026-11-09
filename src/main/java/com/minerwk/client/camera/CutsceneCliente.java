@@ -131,7 +131,7 @@ public final class CutsceneCliente {
 
     /** Antes de cada quadro: põe a câmera no lugar e segura o olhar do jogador. */
     public static void aoComecarQuadro(RenderFrameEvent.Pre evento) {
-        if (atual == null || Minecraft.getInstance().level == null) return;
+        if (atual == null || Minecraft.getInstance().level == null || Minecraft.getInstance().player == null) return;
         float parcial = evento.getPartialTick().getGameTimeDeltaPartialTick(false);
         prenderOlhar();
         if (comCamera) {

@@ -29,13 +29,20 @@ public final class MovimentoCliente {
     private static final Map<VisuaisAtivos.Visual, Boolean> LADO = new WeakHashMap<>();
     private static VisuaisAtivos.Visual voo;
     private static long quedaLentaAte = -1;
+    private static net.minecraft.world.level.Level mundo;
 
     private MovimentoCliente() {
     }
 
     public static void aoTickJogador(PlayerTickEvent.Post evento) {
         if (!(evento.getEntity() instanceof LocalPlayer jogador) || jogador != Minecraft.getInstance().player) return;
-        if (jogador.isSpectator() || jogador.getAbilities().flying) return;
+        if (jogador.level() != mundo) {
+            // Mundo novo: nada do voo de antes vale aqui.
+            mundo = jogador.level();
+            voo = null;
+            quedaLentaAte = -1;
+        }
+        if (jogador.isSpectator() || jogador.getAbilities().flying || jogador.isPassenger() || jogador.isDeadOrDying()) return;
         long agora = jogador.level().getGameTime();
         VisuaisAtivos.Visual carga = null;
         for (VisuaisAtivos.Visual v : VisuaisAtivos.ativos()) {

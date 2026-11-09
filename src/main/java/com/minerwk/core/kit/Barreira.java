@@ -8,6 +8,11 @@ package com.minerwk.core.kit;
 public final class Barreira {
     /** Distância da borda onde quem encosta fica. */
     public static final double MARGEM = 0.6;
+    /**
+     * Até quanto abaixo do chão alguém ainda é levantado (quem está caindo por ele). Mais fundo é quem
+     * está numa caverna embaixo: fica onde está, senão subiria para dentro da rocha.
+     */
+    public static final double FUNDO = 2;
     /** Quanto o Gojo sobe no encantamento do Roxo 200% e em quantos ticks. */
     public static final double ALTURA_ROXO_200 = 20;
     public static final int TICKS_SUBIDA_ROXO_200 = 60;
@@ -25,14 +30,14 @@ public final class Barreira {
 
     /**
      * Corrige posição e velocidade: quem estava {@code dentro} não passa de {@code raio - MARGEM} e não
-     * desce abaixo de {@code chao}; quem estava fora não chega a menos de {@code raio + MARGEM}.
+     * desce abaixo de {@code chao} (se não estiver bem abaixo dele); quem estava fora não chega a menos de {@code raio + MARGEM}.
      */
     public static Correcao corrigir(Vetor centro, double raio, double chao, boolean dentro, Vetor pes, Vetor vel) {
         Vetor p = pes;
         Vetor v = vel;
         boolean noChao = false;
         if (dentro) {
-            if (p.y() < chao) {
+            if (p.y() < chao && p.y() > chao - FUNDO) {
                 p = new Vetor(p.x(), chao, p.z());
                 if (v.y() < 0) v = new Vetor(v.x(), 0, v.z());
                 noChao = true;

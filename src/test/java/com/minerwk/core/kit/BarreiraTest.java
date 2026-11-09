@@ -38,6 +38,14 @@ class BarreiraTest {
     }
 
     @Test
+    void quemEstaBemAbaixoDoChaoNaoELevantadoParaDentroDaRocha() {
+        var p = new Vetor(2, CHAO - 5, 1);
+        var c = Barreira.corrigir(C, R, CHAO, true, p, Vetor.ZERO);
+        assertEquals(p.y(), c.posicao().y(), 1e-9, "numa caverna embaixo: fica onde está");
+        assertFalse(c.noChao());
+    }
+
+    @Test
     void quemEstaForaNaoEntra() {
         var c = Barreira.corrigir(C, R, CHAO, false, new Vetor(0, 64, 12), new Vetor(0, 0, -.6));
         assertEquals(R + Barreira.MARGEM, c.posicao().distancia(C), 1e-9);
