@@ -43,4 +43,14 @@ class RecargasTest {
         r.limpar();
         assertTrue(r.pronta("z", 1));
     }
+
+    @Test
+    void salvarECarregarPreservaTicks() {
+        Recargas r = new Recargas();
+        r.iniciar("z", 100, 40);
+        Recargas outra = new Recargas();
+        outra.carregar(r.salvar());
+        assertEquals(10, outra.restante("z", 130));
+        assertTrue(outra.pronta("x", 0));
+    }
 }

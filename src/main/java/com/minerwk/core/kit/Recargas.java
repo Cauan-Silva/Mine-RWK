@@ -37,6 +37,17 @@ public final class Recargas {
         return true;
     }
 
+    /** Cópia das recargas para salvar nos dados do jogador (habilidade → tick em que fica pronta). */
+    public Map<String, Long> salvar() {
+        return new HashMap<>(prontaNoTick);
+    }
+
+    /** Substitui as recargas pelas salvas. */
+    public void carregar(Map<String, Long> salvas) {
+        prontaNoTick.clear();
+        prontaNoTick.putAll(salvas);
+    }
+
     public void limpar() {
         prontaNoTick.clear();
     }
