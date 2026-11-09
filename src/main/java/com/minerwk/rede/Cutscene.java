@@ -8,10 +8,12 @@ import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 
 /**
- * Servidor → cliente (só para quem usou o golpe): começa a cutscene {@code id} a partir dos olhos
- * ({@code origem}) e do olhar ({@code direcao}) no tick {@code inicio} do servidor.
+ * Servidor → cliente: começa a cutscene {@code id} do jogador {@code dono} a partir dos olhos
+ * ({@code origem}) e do olhar ({@code direcao}) no tick {@code inicio} do servidor. Vai para quem usou o
+ * golpe e, na parte 2 do R, também para o alvo. Com {@code id} {@link #FIM}, acaba a cutscene desse dono.
  */
 public record Cutscene(String id, int dono, Vetor origem, Vetor direcao, long inicio) implements CustomPacketPayload {
+    public static final String FIM = "!fim";
     public static final Type<Cutscene> TIPO = new Type<>(MineRWK.id("cutscene"));
 
     public static final StreamCodec<ByteBuf, Cutscene> CODEC = StreamCodec.of(

@@ -117,6 +117,28 @@ public interface Contexto {
     default void cutscene(String id) {
     }
 
+    /** Como {@link #cutscene(String)}, com a base dada (a parte 2 do R vira para o alvo, não para o olhar). */
+    default void cutscene(String id, Vetor origem, Vetor direcao) {
+    }
+
+    /**
+     * Mostra a cutscene {@code id} do jogador também para o alvo marcado, se for um jogador, como se ela
+     * tivesse começado {@code passados} ticks atrás (ele entra no meio, junto com o Gojo).
+     */
+    default void cutsceneParaAlvo(Object alvo, String id, Vetor origem, Vetor direcao, int passados) {
+    }
+
+    /** Acaba na hora a cutscene do jogador (e a de quem a assiste). */
+    default void encerrarCutscene() {
+    }
+
+    /**
+     * O jogador desce do voo: a partir de agora o voo (sem dano de queda) acaba quando ele pousar, ou em
+     * {@code ticksMax}; ao pousar, a animação para.
+     */
+    default void descida(int ticksMax) {
+    }
+
     /** O golpe do jogador acertou alguém: a tela dele trava um instante (mais forte com {@code forca}). */
     default void acertou(float forca) {
     }

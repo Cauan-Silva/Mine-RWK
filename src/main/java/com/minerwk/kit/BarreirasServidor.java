@@ -56,8 +56,11 @@ public final class BarreirasServidor {
     }
 
     private static final List<Ativa> ATIVAS = new ArrayList<>();
-    /** Tick em que o voo de cada jogador acaba. */
-    private static final Map<UUID, Long> VOO = new HashMap<>();
+    /** Voo de um jogador: até o tick {@code fim}; {@code descendo}, acaba antes, ao pousar. */
+    private record Voo(ServerPlayer jogador, long fim, boolean descendo) {
+    }
+
+    private static final Map<UUID, Voo> VOO = new HashMap<>();
 
     private BarreirasServidor() {
     }
@@ -84,8 +87,21 @@ public final class BarreirasServidor {
     }
 
     static void voar(ServerPlayer jogador, int ticks) {
-        VOO.merge(jogador.getUUID(), jogador.level().getGameTime() + ticks, Math::max);
+        long fim = jogador.level().getGameTime() + ticks;
+        VOO.merge(jogador.getUUID(), new Voo(jogador, fim, false),
+                (a, b) -> new Voo(jogador, Math.max(a.fim(), b.fim()), a.descendo()));
         livreNoAr(jogador);
+    }
+
+    /** O voo vira descida: acaba ao pousar (parando a animação) ou em {@code ticksMax}. */
+    static void descer(ServerPlayer jogador, int ticksMax) {
+        VOO.put(jogador.getUUID(), new Voo(jogador, jogador.level().getGameTime() + ticksMax, true));
+        livreNoAr(jogador);
+    }
+
+    public static boolean voando(ServerPlayer jogador) {
+        Voo v = VOO.get(jogador.getUUID());
+        return v != null && jogador.level().getGameTime() < v.fim();
     }
 
     private static AABB caixa(Ativa a) {
@@ -141,11 +157,17 @@ public final class BarreirasServidor {
                 if (desvio > .2) e.hurtMarked = true;
             }
         }
-        for (Iterator<Map.Entry<UUID, Long>> it = VOO.entrySet().iterator(); it.hasNext(); ) {
-            Map.Entry<UUID, Long> v = it.next();
-            ServerPlayer jogador = servidor.getPlayerList().getPlayer(v.getKey());
-            if (jogador == null || jogador.level().getGameTime() >= v.getValue()) {
+        for (Iterator<Map.Entry<UUID, Voo>> it = VOO.entrySet().iterator(); it.hasNext(); ) {
+            Voo v = it.next().getValue();
+            ServerPlayer jogador = v.jogador();
+            if (jogador.isRemoved() || jogador.hasDisconnected() || jogador.level().getGameTime() >= v.fim()) {
                 it.remove();
+                continue;
+            }
+            if (v.descendo() && jogador.onGround()) {
+                // Pousou: acabou o voo e a pose de descida.
+                it.remove();
+                new ContextoServidor(jogador).pararAnimacao();
                 continue;
             }
             livreNoAr(jogador);
@@ -155,13 +177,12 @@ public final class BarreirasServidor {
     /** Sem queda acumulada e sem o contador que chuta quem fica muito tempo no ar. */
     private static void livreNoAr(ServerPlayer jogador) {
         jogador.resetFallDistance();
-        jogador.connection.aboveGroundTickCount = 0;
+        if (jogador.connection != null) jogador.connection.aboveGroundTickCount = 0;
     }
 
     private static void aoCair(LivingFallEvent evento) {
         if (evento.getEntity() instanceof ServerPlayer jogador) {
-            Long fim = VOO.get(jogador.getUUID());
-            if (fim != null && jogador.level().getGameTime() < fim) evento.setCanceled(true);
+            if (voando(jogador)) evento.setCanceled(true);
         }
     }
 }

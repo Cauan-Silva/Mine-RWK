@@ -124,6 +124,21 @@ public final class TestesGojo {
     }
 
     @GameTest(template = "vazio")
+    public static void descidaDoRAcabaQuandoOGojoPousa(GameTestHelper helper) {
+        ServerPlayer jogador = gojo(helper);
+        jogador.setOnGround(false);
+        new ContextoServidor(jogador).descida(600);
+        helper.runAfterDelay(2, () -> {
+            helper.assertTrue(BarreirasServidor.voando(jogador), "no ar, ainda voando");
+            jogador.setOnGround(true);
+        });
+        helper.runAfterDelay(4, () -> {
+            helper.assertFalse(BarreirasServidor.voando(jogador), "pousou: o voo acabou");
+            helper.succeed();
+        });
+    }
+
+    @GameTest(template = "vazio")
     public static void vermelhoCongelaEArremessaZumbi(GameTestHelper helper) {
         ServerPlayer jogador = gojo(helper);
         Zombie zumbi = helper.spawn(EntityType.ZOMBIE, new BlockPos(4, 2, 1));

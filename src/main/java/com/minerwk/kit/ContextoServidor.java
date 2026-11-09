@@ -421,6 +421,28 @@ public final class ContextoServidor implements Contexto {
     }
 
     @Override
+    public void cutscene(String id, Vetor origem, Vetor direcao) {
+        Envio.para(jogador, new Cutscene(id, jogador.getId(), origem, direcao, nivel().getGameTime()));
+    }
+
+    @Override
+    public void cutsceneParaAlvo(Object alvo, String id, Vetor origem, Vetor direcao, int passados) {
+        if (marcado(alvo) instanceof ServerPlayer outro) {
+            Envio.para(outro, new Cutscene(id, jogador.getId(), origem, direcao, nivel().getGameTime() - passados));
+        }
+    }
+
+    @Override
+    public void encerrarCutscene() {
+        Envio.paraQuemVe(jogador, new Cutscene(Cutscene.FIM, jogador.getId(), olhos(), olhar(), nivel().getGameTime()));
+    }
+
+    @Override
+    public void descida(int ticksMax) {
+        BarreirasServidor.descer(jogador, ticksMax);
+    }
+
+    @Override
     public void visualFim(String tipo, Vetor ponto) {
         Envio.paraQuemVe(jogador, new EncerrarVisual(jogador.getId(), tipo, ponto));
     }

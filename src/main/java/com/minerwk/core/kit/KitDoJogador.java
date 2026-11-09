@@ -113,6 +113,8 @@ public final class KitDoJogador {
         efeitos.clear();
         if (emCarga != null) emCarga.aoInterromper(contexto);
         else if (emAndamento) contexto.pararAnimacao();
+        // Uma cutscene no meio do golpe (a parte 2 do R) acaba junto.
+        if (emAndamento) contexto.encerrarCutscene();
     }
 
     public List<Execucao.Evento> tick(long agora, EstadoDoJogador estado, Contexto contexto) {

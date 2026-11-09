@@ -66,6 +66,10 @@ class GojoTest {
         public void ferir(Object alvo, float d) { chamadas.add("ferir"); danos.add(d); }
         public void apagarCasca(Vetor c, double de, double ate) { chamadas.add("casca"); cascas.add(new double[] {de, ate}); centroCasca = c; }
         public void cutscene(String id) { chamadas.add("cutscene:" + id); }
+        public void cutscene(String id, Vetor origem, Vetor direcao) { chamadas.add("cutscene:" + id); }
+        public void cutsceneParaAlvo(Object alvo, String id, Vetor origem, Vetor direcao, int passados) { chamadas.add("cutsceneAlvo:" + id); }
+        public void encerrarCutscene() { chamadas.add("encerrarCutscene"); }
+        public void descida(int t) { chamadas.add("descida"); }
         public void apresentacao(String anim, String efeito, String som) { if (!anim.isEmpty()) chamadas.add("anim:" + anim); }
         public void pararAnimacao() { chamadas.add("pararAnimacao"); }
         public void apagarBlocos(Vetor c, double r) { chamadas.add("apagar"); raiosApagados.add(r); }
@@ -198,6 +202,8 @@ class GojoTest {
         assertEquals(0, ctx.conta("ferir"));
         assertEquals(1, ctx.conta("visual:gojo_roxo_maximo_esferas"));
         assertEquals(1, ctx.conta("anim:" + Gojo.ANIM_R_SEM_ALVO), "abre as mãos e lança as esferas");
+        assertEquals(1, ctx.conta("cutscene:" + CutsceneRoxoMaximo.idSemAlvo(RoxoMaximo.ALCANCE)));
+        assertEquals(0, ctx.conta("cutsceneAlvo:" + CutsceneRoxoMaximo.idSemAlvo(RoxoMaximo.ALCANCE)));
         assertEquals(0, ctx.conta("anim:" + Gojo.ANIM_R_UPPERCUT));
         assertExplosaoInteira(new Vetor(RoxoMaximo.ALCANCE, 0, 0));
     }
@@ -212,6 +218,10 @@ class GojoTest {
         assertEquals(0, ctx.conta("apagar"));
         assertEquals(1, ctx.conta("visual:gojo_roxo_maximo"));
         assertEquals(1, ctx.conta("anim:" + Gojo.ANIM_R_UPPERCUT), "a animação do uppercut toca no soco");
+        assertEquals(1, ctx.conta("cutscene:" + CutsceneRoxoMaximo.id(a)), "a parte 2 vai para o Gojo no disparo");
+        assertEquals(1, ctx.conta("cutsceneAlvo:" + CutsceneRoxoMaximo.id(a)), "e para o alvo no uppercut");
+        assertEquals(1, ctx.conta("anim:" + Gojo.ANIM_R_DESCIDA), "no fim, a pose de descida");
+        assertEquals(1, ctx.conta("descida"), "o voo passa a acabar quando ele pousa");
         assertEquals(List.of(RoxoMaximo.DANO_UPPERCUT, RoxoMaximo.DANO), ctx.danos,
                 "uppercut e depois a explosão, uma vez só (o alvo não leva de novo pela casca)");
         assertEquals(RoxoMaximo.inicioExplosao(a) - a, ctx.conta("suspender"), "segurado no ar até explodir");
@@ -348,6 +358,14 @@ class GojoTest {
         kit.descartar(ctx);
         kit.descartar(ctx); // morto: o descartar roda todo tick, mas só avisa uma vez
         assertEquals(1, ctx.conta("pararAnimacao"));
+    }
+
+    @Test
+    void descartarNoMeioDoRAcabaACutscene() {
+        usar(Tecla.R);
+        ticks(85); // disparou: a sequência está no ar
+        kit.descartar(ctx);
+        assertEquals(1, ctx.conta("encerrarCutscene"));
     }
 
     @Test

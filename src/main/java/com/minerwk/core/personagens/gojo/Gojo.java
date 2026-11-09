@@ -22,6 +22,8 @@ public final class Gojo {
     /** Animações do R depois do avanço: o uppercut e o resto, ou só as mãos abrindo quando não há alvo. */
     public static final String ANIM_R_UPPERCUT = "gojo_roxo_maximo";
     public static final String ANIM_R_SEM_ALVO = "gojo_roxo_maximo_sem_alvo";
+    /** Pose da descida lenta depois do R, em loop até pousar. */
+    public static final String ANIM_R_DESCIDA = "gojo_roxo_maximo_descida";
     /** Altura dos olhos de um jogador em pé, para achar os pés a partir dos olhos. */
     static final double ALTURA_OLHOS = 1.62;
 
@@ -254,10 +256,13 @@ public final class Gojo {
     /** R: Roxo 200%, 4 s de encantamento; cai com golpe de 6 ou mais na carga. */
     public static final class Roxo200 extends Golpe {
         /**
-         * Ticks de voo depois da carga: a sequência mais longa e a descida lenta (até 30 s: a explosão
-         * pode abrir uma cratera bem abaixo de onde o Gojo começou).
+         * Ticks de voo depois da carga: a sequência mais longa, com folga; no fim dela o voo vira a
+         * descida ({@link Contexto#descida}), que dura até ele pousar (no máximo 30 s: a explosão pode abrir
+         * uma cratera bem abaixo de onde o Gojo começou).
          */
-        static final int VOO_DEPOIS = RoxoMaximo.fim(RoxoMaximo.AVANCO_MAX) + 600;
+        static final int VOO_DEPOIS = RoxoMaximo.fim(RoxoMaximo.AVANCO_MAX) + 20;
+        /** Teto da descida lenta; ela acaba antes, quando o Gojo pousa. */
+        static final int DESCIDA_MAX = 600;
 
         Roxo200() {
             super("gojo_roxo_200", Numeros.instantanea(80, 2, 10, 200, 6000));
@@ -305,6 +310,9 @@ public final class Gojo {
         private final java.util.Set<Object> atingidos = new HashSet<>();
         private final Vetor baseAlvo;
         private Vetor centro;
+        /** Id da parte 2 da cutscene e a base dela (frente na horizontal para o alvo, ou para a mira). */
+        private final String cutscene;
+        private final Vetor baseCutscene;
 
         ComboRoxoMaximo(Contexto ctx) {
             olhos = ctx.olhos();
@@ -317,12 +325,17 @@ public final class Gojo {
                 direcao = distancia > 1e-6 ? ate.vezes(1 / distancia) : ctx.olhar();
                 avanco = RoxoMaximo.avanco(distancia);
                 baseAlvo = onde;
+                cutscene = CutsceneRoxoMaximo.id(avanco);
+                baseCutscene = new Vetor(direcao.x(), 0, direcao.z());
             } else {
                 direcao = ctx.olhar();
                 distancia = 0;
                 avanco = 0;
                 centro = ctx.alvoAte(RoxoMaximo.ALCANCE);
                 baseAlvo = null;
+                Vetor ate = centro.menos(olhos);
+                cutscene = CutsceneRoxoMaximo.idSemAlvo(ate.comprimento());
+                baseCutscene = ate.comprimento() > 1e-6 ? ate : direcao;
             }
         }
 
@@ -333,7 +346,14 @@ public final class Gojo {
         }
 
         @Override
+        public void aoAcabar(Contexto ctx) {
+            ctx.apresentacao(ANIM_R_DESCIDA, "", "");
+            ctx.descida(Roxo200.DESCIDA_MAX);
+        }
+
+        @Override
         public void tick(Contexto ctx, int t) {
+            if (t == 0) ctx.cutscene(cutscene, olhos, baseCutscene);
             if (alvo == null) {
                 if (t == 0) {
                     ctx.apresentacao(ANIM_R_SEM_ALVO, "", "");
@@ -348,6 +368,7 @@ public final class Gojo {
             if (t == avanco) {
                 // O alvo é segurado onde o Gojo bate (a posição da mira), mesmo se correu no avanço.
                 ctx.apresentacao(ANIM_R_UPPERCUT, "", "");
+                ctx.cutsceneParaAlvo(alvo, cutscene, olhos, baseCutscene, avanco);
                 ctx.ferir(alvo, RoxoMaximo.DANO_UPPERCUT);
                 ctx.acertou(1.5f);
                 ctx.tremor(1f, 10, 32);
