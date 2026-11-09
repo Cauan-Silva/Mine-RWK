@@ -73,9 +73,11 @@ public final class RenderVisuaisGojo {
                 case "gojo_infinito" -> infinito(q, v, op);
                 case "gojo_roxo_carga" -> roxoCarga(q, v, t, op, TrajetoriaGojo.PASSO_ROXO, 30, 1);
                 case "gojo_roxo_200_carga" -> {
-                    roxoCarga(q, v, t, op, TrajetoriaGojo.PASSO_ROXO_200, 80, 1.7);
+                    encantamento(q, v, t, op);
                     palavrasNoMundo(q, v, t);
                 }
+                case "gojo_roxo_maximo" -> roxoMaximo(q, v, t, op);
+                case "gojo_roxo_maximo_esferas" -> esferasRoxoMaximo(q, v, t, op);
                 case "gojo_roxo" -> roxo(q, v, t, op, TrajetoriaGojo.PASSO_ROXO, 2.1);
                 case "gojo_roxo_200" -> roxo(q, v, t, op, TrajetoriaGojo.PASSO_ROXO_200, 9.8);
                 case "gojo_roxo_explosao" -> explosaoRoxa(q, v, t);
@@ -142,11 +144,16 @@ public final class RenderVisuaisGojo {
 
     /** Ponto na frente da mão direita do dono (o visual segue o jogador enquanto carrega). */
     private static Vec3 mao(Entity e, float parcial) {
+        return mao(e, parcial, 1);
+    }
+
+    /** Ponto na frente da mão do dono: {@code lado} 1 é a direita, -1 a esquerda. */
+    private static Vec3 mao(Entity e, float parcial, int lado) {
         Vec3 olho = e.getEyePosition(parcial);
         Vec3 olhar = e.getViewVector(parcial);
-        Vec3 lado = olhar.cross(new Vec3(0, 1, 0));
-        lado = lado.lengthSqr() < 1e-6 ? new Vec3(1, 0, 0) : lado.normalize();
-        return olho.add(olhar.scale(.7)).add(lado.scale(.35)).add(0, -.25, 0);
+        Vec3 l = olhar.cross(new Vec3(0, 1, 0));
+        l = l.lengthSqr() < 1e-6 ? new Vec3(1, 0, 0) : l.normalize();
+        return olho.add(olhar.scale(.7)).add(l.scale(.35 * lado)).add(0, -.25, 0);
     }
 
     private static void esfera(Quadro q, float modo, boolean somarLuz, Vec3 c, double raio, int cor, float alpha) {
@@ -262,15 +269,153 @@ public final class RenderVisuaisGojo {
         p.terminar();
     }
 
-    /** Fim do Roxo 200%: a esfera roxa cresce até o raio 24 em 12 ticks com clarão branco e se apaga. */
+    /**
+     * Fim do R: a esfera roxa cresce até o raio (a forca do visual) no tempo do servidor (a duração menos
+     * os 28 ticks de sumir), com clarão branco, e se apaga.
+     */
     private static void explosaoRoxa(Quadro q, VisuaisAtivos.Visual v, double i) {
         Vec3 c = q.rel(v.origem);
         if (c.lengthSqr() > 400 * 400) return;
-        double cresce = PerfilVfxGojo.suave(i / 12);
-        float some = (float) Math.max(0, 1 - Math.max(0, i - 12) / (v.duracao - 12));
-        esfera(q, Pincel.ROXO, true, c, 2 + 22 * cresce, 0xC890FF, .85f * some);
-        esfera(q, Pincel.ROXO, true, c, 1 + 12 * cresce, 0xFFFFFF, (float) Math.exp(-i / 4));
-        brilho(q, c, 30 + 20 * cresce, 0x9A4DFF, .8f * some);
+        double raio = v.forca > 1 ? v.forca : 24;
+        double cresceEm = Math.max(1, v.duracao - 28);
+        double cresce = PerfilVfxGojo.suave(i / cresceEm);
+        float some = (float) Math.max(0, 1 - Math.max(0, i - cresceEm) / (v.duracao - cresceEm));
+        esfera(q, Pincel.ROXO, true, c, 2 + (raio - 2) * cresce, 0xC890FF, .85f * some);
+        esfera(q, Pincel.ROXO, true, c, 1 + raio * .5 * cresce, 0xFFFFFF, (float) Math.exp(-i / 4));
+        brilho(q, c, raio * 1.25 + raio * .8 * cresce, 0x9A4DFF, .8f * some);
+    }
+
+    // ---------------------------------------------------------------- R (Vazio Roxo máximo)
+
+    /** No encantamento do R: o Azul na mão esquerda e o Vermelho na direita, crescendo. */
+    private static void encantamento(Quadro q, VisuaisAtivos.Visual v, double t, float op) {
+        Entity e = dono(v);
+        if (e == null) return;
+        double r = .12 + .3 * Math.min(1, t / Math.max(1, v.duracao));
+        Vec3 azul = q.rel(mao(e, q.parcial, -1));
+        Vec3 verm = q.rel(mao(e, q.parcial, 1));
+        esfera(q, Pincel.AZUL, false, azul, r, 0x0A1830, op);
+        esfera(q, Pincel.AZUL, true, azul, r * 1.8, CIANO, op * .4f);
+        brilho(q, azul, r * 4, CIANO, op * .5f);
+        esfera(q, Pincel.VERMELHO, false, verm, r, CARMESIM, op);
+        esfera(q, Pincel.VERMELHO, true, verm, r * 1.8, CARMESIM, op * .35f);
+        brilho(q, verm, r * 4, CARMESIM, op * .5f);
+    }
+
+    /** Avanço até o alvo (rastro), clarão do uppercut e o rastro do alvo subindo. */
+    private static void roxoMaximo(Quadro q, VisuaisAtivos.Visual v, double t, float op) {
+        double dist = v.forca;
+        int a = com.minerwk.core.personagens.gojo.RoxoMaximo.avanco(dist);
+        Vec3 dir = vec(v.direcao).normalize();
+        Vec3 inicio = q.rel(v.origem);
+        if (q.longe(inicio) && q.longe(inicio.add(dir.scale(dist)))) return;
+        Pincel p = Pincel.novo().comecar(Pincel.FITA, true, q.tempo, new Vec3(0, 0, 1));
+        // Rastro do avanço: vai até onde o Gojo está e some logo depois do soco.
+        float rastro = (float) Math.max(0, 1 - Math.max(0, t - a) / 8) * op;
+        if (rastro > .004f && dist > 1.5) {
+            double feito = Math.min(1, a == 0 ? 1 : t / a) * (dist - 1.5);
+            int n = 12;
+            List<Vec3> pts = new ArrayList<>(n + 1);
+            float[] al = new float[n + 1];
+            for (int k = 0; k <= n; k++) {
+                pts.add(inicio.add(dir.scale(feito * k / n)).add(0, -.6, 0));
+                al[k] = rastro * .8f * k / n;
+            }
+            p.fita(pts, .7, VIOLETA, al);
+            p.fita(pts, .25, 0xFFFFFF, al);
+        }
+        // Rastro do alvo subindo, do ponto do soco até onde ele está.
+        Vec3 soco = inicio.add(dir.scale(dist));
+        if (t >= a) {
+            double sub = t - a;
+            double alto = com.minerwk.core.personagens.gojo.RoxoMaximo.alturaAlvo(sub);
+            float a2 = (float) Math.max(0, 1 - Math.max(0, sub - 15) / 10) * op;
+            if (a2 > .004f && alto > .1) {
+                List<Vec3> pts = List.of(soco, soco.add(0, alto * .5, 0), soco.add(0, alto, 0));
+                p.fita(pts, .9, 0xE0C8FF, new float[] {0, a2 * .5f, a2 * .9f});
+            }
+        }
+        p.terminar();
+        // Clarão do uppercut.
+        if (t >= a && t < a + 12) {
+            float clarao = (float) Math.exp(-(t - a) / 2.5) * op;
+            esfera(q, Pincel.ROXO, true, soco, .6 + (t - a) * .35, 0xFFFFFF, clarao);
+            brilho(q, soco, 4 + (t - a) * .8, 0xC890FF, clarao);
+        }
+    }
+
+    /**
+     * O Azul (mão esquerda) e o Vermelho (direita) saem em arcos e se encontram no centro (a origem) em
+     * {@code forca} ticks; depois o núcleo roxo pulsa e cresce até a explosão.
+     */
+    private static void esferasRoxoMaximo(Quadro q, VisuaisAtivos.Visual v, double t, float op) {
+        Vec3 centro = q.rel(v.origem);
+        if (q.longe(centro)) return;
+        double viagem = Math.max(1, v.forca);
+        Entity e = dono(v);
+        if (t < viagem && e != null) {
+            double s = PerfilVfxGojo.suave(t / viagem);
+            Base b = Base.de(v.direcao);
+            Pincel p = Pincel.novo().comecar(Pincel.FITA, true, q.tempo, new Vec3(0, 0, 1));
+            for (int lado = -1; lado <= 1; lado += 2) {
+                Vec3 de = q.rel(mao(e, q.parcial, lado));
+                double curva = 1 + .35 * de.distanceTo(centro);
+                int cor = lado < 0 ? CIANO : CARMESIM;
+                List<Vec3> pts = new ArrayList<>();
+                int n = 10;
+                float[] al = new float[n + 1];
+                for (int k = 0; k <= n; k++) {
+                    double sk = Math.max(0, s - .35 * (n - k) / n);
+                    pts.add(arco(de, centro, b, lado, curva, sk));
+                    al[k] = op * .7f * k / n;
+                }
+                p.fita(pts, .35, cor, al);
+                Vec3 bola = arco(de, centro, b, lado, curva, s);
+                if (lado < 0) {
+                    esfera(q, Pincel.AZUL, false, bola, .45, 0x0A1830, op);
+                    esfera(q, Pincel.AZUL, true, bola, .8, CIANO, op * .45f);
+                } else {
+                    esfera(q, Pincel.VERMELHO, false, bola, .45, CARMESIM, op);
+                    esfera(q, Pincel.VERMELHO, true, bola, .8, CARMESIM, op * .4f);
+                }
+                brilho(q, bola, 2.2, cor, op * .6f);
+            }
+            p.terminar();
+            return;
+        }
+        // Fusão: clarão no encontro, núcleo roxo pulsando e anéis girando.
+        double f = t - viagem;
+        double k = Math.min(1, f / Math.max(1, v.duracao - viagem));
+        double pulso = 1 + .18 * Math.sin(f * 1.3);
+        double r = (1 + 2.5 * k) * pulso;
+        esfera(q, Pincel.ROXO, false, centro, r, VIOLETA, op);
+        esfera(q, Pincel.ROXO, true, centro, r * 1.6, 0xC890FF, op * .45f);
+        brilho(q, centro, r * 4, 0x9A4DFF, op * .8f);
+        float clarao = (float) Math.exp(-f / 2) * op;
+        esfera(q, Pincel.ROXO, true, centro, 1.5 + f * .4, 0xFFFFFF, clarao);
+        Pincel p = Pincel.novo().comecar(Pincel.FITA, true, q.tempo, new Vec3(0, 0, 1));
+        int n = q.segmentos(32);
+        for (int anel = 0; anel < 3; anel++) {
+            double giro = q.tempo * (2 + anel) + anel * 2.1;
+            Vec3 eixoA = new Vec3(Math.cos(giro), Math.sin(anel * 1.1), Math.sin(giro)).normalize();
+            Vec3 eixoB = eixoA.cross(new Vec3(0, 1, 0));
+            eixoB = eixoB.lengthSqr() < 1e-6 ? new Vec3(1, 0, 0) : eixoB.normalize();
+            Vec3 eixoC = eixoA.cross(eixoB).normalize();
+            double ra = r * (1.8 + .3 * anel);
+            List<Vec3> pts = new ArrayList<>(n + 1);
+            for (int i = 0; i <= n; i++) {
+                double ang = i * Math.PI * 2 / n;
+                pts.add(centro.add(eixoB.scale(Math.cos(ang) * ra)).add(eixoC.scale(Math.sin(ang) * ra)));
+            }
+            p.fita(pts, .12, anel == 1 ? 0xFFFFFF : 0xC890FF, alphas(pts.size(), op * .7f));
+        }
+        p.terminar();
+    }
+
+    /** Arco de {@code de} até {@code ate}: abre para o {@code lado} e sobe um pouco no meio. */
+    private static Vec3 arco(Vec3 de, Vec3 ate, Base b, int lado, double curva, double s) {
+        double bojo = Math.sin(Math.PI * s);
+        return de.lerp(ate, s).add(b.lado.scale(lado * curva * bojo)).add(b.cima.scale(curva * .4 * bojo));
     }
 
     // ---------------------------------------------------------------- Infinito

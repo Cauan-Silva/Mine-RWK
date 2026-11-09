@@ -19,6 +19,9 @@ import java.util.Map;
 public final class Gojo {
     public static final String ID = "gojo";
     private static final String SOM = "teste";
+    /** Animações do R depois do avanço: o uppercut e o resto, ou só as mãos abrindo quando não há alvo. */
+    public static final String ANIM_R_UPPERCUT = "gojo_roxo_maximo";
+    public static final String ANIM_R_SEM_ALVO = "gojo_roxo_maximo_sem_alvo";
     /** Altura dos olhos de um jogador em pé, para achar os pés a partir dos olhos. */
     static final double ALTURA_OLHOS = 1.62;
 
@@ -329,6 +332,7 @@ public final class Gojo {
         public void tick(Contexto ctx, int t) {
             if (alvo == null) {
                 if (t == 0) {
+                    ctx.apresentacao(ANIM_R_SEM_ALVO, "", "");
                     ctx.visual("gojo_roxo_maximo_esferas", centro, direcao, RoxoMaximo.TICKS_ESFERAS_SEM_ALVO,
                             RoxoMaximo.TICKS_ESFERAS_SEM_ALVO + RoxoMaximo.TICKS_FUSAO);
                 }
@@ -340,6 +344,7 @@ public final class Gojo {
             if (t == avanco) {
                 Vetor agora = ctx.posicaoDe(alvo);
                 if (agora != null) baseAlvo = agora;
+                ctx.apresentacao(ANIM_R_UPPERCUT, "", "");
                 ctx.ferir(alvo, RoxoMaximo.DANO_UPPERCUT);
                 ctx.acertou(1.5f);
                 ctx.tremor(1f, 10, 32);

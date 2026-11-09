@@ -134,30 +134,59 @@ A["gojo_roxo"] = anim(3.6, {
     "left_leg": {"rotation": [(0, N), (1.42, [-4, 0, -2]), (1.50, [15, 0, -4], BACK), (3.2, [14, 0, -4]), (3.6, N, C)]},
 })
 
-# R: Roxo 200%. Cabeça baixa, quatro gestos (um por palavra do encantamento: ticks 2, 22, 42, 62),
-# o Gojo sobe de verdade (o cliente o move), então o modelo não sobe; disparo aos 4,0 s no tranco mais forte.
-A["gojo_roxo_200"] = anim(7.0, {
+# R: Vazio Roxo máximo. Cabeça baixa, quatro gestos (um por palavra do encantamento: ticks 2, 22, 42, 62);
+# no disparo (4,0 s) o Gojo avança com o punho direito para trás (até 1 s, o avanço mais longo). O cliente
+# move o Gojo de verdade, então o modelo não mexe o body. O resto vem de gojo_roxo_maximo, que o servidor
+# toca no soco.
+A["gojo_roxo_200"] = anim(5.0, {
     "right_arm": {"rotation": [(0, N), (0.50, [-110, -30, 0], BACK), (1.0, [-108, -32, 0]),
                                (1.50, [-60, -40, 0], BACK), (2.0, [-60, -42, 0]),
                                (2.50, [-70, -45, 0], BACK), (3.0, [-72, -45, 0]),
-                               (3.50, [-120, 0, 0], BACK), (3.88, [-118, 2, 0]), (3.96, [-70, 35, 15], OUTC),
-                               (4.0, [-95, -5, 0], EXPO), (4.15, [-108, -8, 4], OUTC)]
-                  + tremer([-96, -5, 0], 4.15, 6.2, 0.1, 3) + [(6.2, [-96, -5, 0]), (7.0, N, C)]},
+                               (3.50, [-120, 0, 0], BACK), (3.88, [-118, 2, 0]),
+                               (4.0, [45, 0, 12], EXPO)] + tremer([45, 0, 12], 4.0, 5.0, 0.1, 3) + [(5.0, [45, 0, 12])]},
     "left_arm": {"rotation": [(0, N), (0.50, [-10, 0, -10]), (1.0, [-10, 0, -10]),
                               (1.50, [-90, 30, 0], BACK), (2.0, [-92, 30, 0]),
                               (2.50, [-70, 45, 0], BACK), (3.0, [-72, 45, 0]),
                               (3.50, [-30, 0, -30], BACK), (3.96, [-35, 0, -30]),
-                              (4.0, [-15, 0, -40], EXPO), (6.2, [-15, 0, -35]), (7.0, N, C)]},
+                              (4.0, [-60, 0, -10], EXPO), (5.0, [-62, 0, -10])]},
     "torso": {"rotation": [(0, N), (0.50, [4, -10, 0]), (1.50, [4, 10, 0], C), (2.50, [0, 0, 0], C),
-                           (3.50, [0, 18, 0], C), (3.96, [0, 25, 0], OUTC), (4.0, [0, -25, 0], EXPO),
-                           (6.2, [0, -20, 0]), (7.0, N, C)]},
+                           (3.50, [0, 18, 0], C), (3.96, [0, 25, 0], OUTC), (4.0, [18, 22, 0], EXPO),
+                           (5.0, [20, 22, 0])]},
     "head": {"rotation": [(0, N), (0.30, [20, 0, 0], C), (2.40, [16, 0, 0]), (3.0, [-5, 0, 0], C),
-                          (3.96, [-8, 0, 0]), (4.0, [-2, -6, 0], EXPO), (6.2, [-2, -6, 0]), (7.0, N, C)]},
-    "right_leg": {"rotation": [(0, N), (3.8, [10, 0, 4], S), (3.96, [12, 0, 4]), (4.0, [-25, 0, 8], EXPO),
-                               (6.2, [-22, 0, 8]), (7.0, N, C)]},
-    "left_leg": {"rotation": [(0, N), (3.8, [6, 0, -4], S), (3.96, [8, 0, -4]), (4.0, [20, 0, -8], EXPO),
-                              (6.2, [18, 0, -8]), (7.0, N, C)]},
+                          (3.96, [-8, 0, 0]), (4.0, [-14, -10, 0], EXPO), (5.0, [-14, -10, 0])]},
+    "right_leg": {"rotation": [(0, N), (3.8, [10, 0, 4], S), (3.96, [12, 0, 4]), (4.0, [40, 0, 4], EXPO),
+                               (5.0, [42, 0, 4])]},
+    "left_leg": {"rotation": [(0, N), (3.8, [6, 0, -4], S), (3.96, [8, 0, -4]), (4.0, [-30, 0, -4], EXPO),
+                              (5.0, [-32, 0, -4])]},
 })
+
+# Depois do soco (tempos em segundos a partir do uppercut; ticks do RoxoMaximo): uppercut com o braço
+# direito subindo (0), lá no alto as mãos se abrem para os lados e para trás, esquerda e depois direita
+# (0,75 s = esferas), fusão às costas (1,25 s) e, na explosão (1,75 s), o braço estendido com o punho
+# fechado até o fim (2,55 s).
+ABRE, FUSAO, EXPLODE, FIM = 0.75, 1.25, 1.75, 2.55
+A["gojo_roxo_maximo"] = anim(3.1, {
+    "right_arm": {"rotation": [(0, [45, 0, 12]), (0.12, [-170, 0, 8], EXPO), (0.6, [-165, 0, 10]),
+                               (ABRE + 0.2, [20, 0, 80], BACK)]
+                  + tremer([20, 0, 80], ABRE + 0.2, FUSAO + 0.4, 0.15, 3)
+                  + [(EXPLODE, [-90, 0, 0], EXPO)] + tremer([-90, 0, 0], EXPLODE, FIM, 0.1, 2)
+                  + [(FIM, [-90, 0, 0]), (3.1, N, C)]},
+    "left_arm": {"rotation": [(0, [-62, 0, -10]), (0.12, [10, 0, -20], EXPO), (0.6, [12, 0, -22]),
+                              (ABRE, [20, 0, -80], BACK)] + balancar([20, 0, -80], ABRE, FUSAO + 0.4, 3, 0.25)
+                 + [(EXPLODE, [10, 0, -30], C), (FIM, [10, 0, -28]), (3.1, N, C)]},
+    "torso": {"rotation": [(0, [20, 22, 0]), (0.12, [-12, -20, 0], EXPO), (0.6, [-10, -18, 0]),
+                           (ABRE + 0.2, [-6, 0, 0], C), (FUSAO + 0.4, [-8, 0, 0]),
+                           (EXPLODE, [4, -12, 0], EXPO), (FIM, [4, -10, 0]), (3.1, N, C)]},
+    "head": {"rotation": [(0, [-14, -10, 0]), (0.12, [-25, 0, 0], EXPO), (0.6, [-20, 0, 0]),
+                          (ABRE + 0.2, [0, 0, 0], C), (FUSAO + 0.4, [2, 0, 0]),
+                          (EXPLODE, [-4, 8, 0], EXPO), (FIM, [-4, 8, 0]), (3.1, N, C)]},
+    "right_leg": {"rotation": [(0, [42, 0, 4]), (0.12, [-35, 0, 6], EXPO), (0.6, [-10, 0, 6], C),
+                               (ABRE + 0.2, [8, 0, 6]), (FIM, [6, 0, 6]), (3.1, N, C)]},
+    "left_leg": {"rotation": [(0, [-32, 0, -4]), (0.12, [25, 0, -6], EXPO), (0.6, [12, 0, -6], C),
+                              (ABRE + 0.2, [-6, 0, -6]), (FIM, [-6, 0, -6]), (3.1, N, C)]},
+})
+# Sem alvo: as mãos abrem na hora; os tempos se ajustam (esferas 1 s, fusão 0,5 s, explosão 0,8 s).
+A["gojo_roxo_maximo_sem_alvo"] = fatia(A["gojo_roxo_maximo"], ABRE - 0.2)
 
 # G: Vazio Infinito. Mão direita à frente do rosto com os dedos cruzados; cabeça abaixa e ergue.
 A["gojo_vazio_infinito"] = anim(2.5, {

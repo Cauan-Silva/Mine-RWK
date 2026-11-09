@@ -3,6 +3,7 @@ package com.minerwk.client.kit;
 import com.minerwk.client.vfx.VisuaisAtivos;
 import com.minerwk.core.kit.Barreira;
 import com.minerwk.core.kit.Vetor;
+import com.minerwk.core.personagens.gojo.RoxoMaximo;
 import java.util.Map;
 import java.util.WeakHashMap;
 import net.minecraft.client.Minecraft;
@@ -12,16 +13,17 @@ import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.event.tick.PlayerTickEvent;
 
 /**
- * Regras de movimento do próprio jogador que vêm dos golpes: a barreira e o chão do domínio e o voo do
- * Roxo 200%. O servidor aplica a mesma regra (em {@code BarreirasServidor}); aqui ela roda no fim do
- * tick do jogador, antes de a posição ir para o servidor, então não há tranco.
+ * Regras de movimento do próprio jogador que vêm dos golpes: a barreira e o chão do domínio e a
+ * sequência do R (avanço até o alvo e subida com ele). O servidor aplica a mesma regra da barreira (em
+ * {@code BarreirasServidor}); aqui ela roda no fim do tick do jogador, antes de a posição ir para o
+ * servidor, então não há tranco.
  */
 public final class MovimentoCliente {
     private static final String DOMINIO = "gojo_vazio_infinito";
-    private static final String CARGA_ROXO_200 = "gojo_roxo_200_carga";
+    private static final String ROXO_MAXIMO = "gojo_roxo_maximo";
     /** Altura dos olhos de quem está em pé (o visual guarda os olhos; a regra usa os pés). */
     private static final double ALTURA_OLHOS = 1.62;
-    /** Ticks de queda lenta, no máximo, depois do encantamento do Roxo 200%. */
+    /** Ticks de queda lenta, no máximo, depois da sequência do R. */
     private static final int QUEDA_LENTA = 200;
     private static final double QUEDA_MAX = -0.12;
 
@@ -44,17 +46,17 @@ public final class MovimentoCliente {
         }
         if (jogador.isSpectator() || jogador.getAbilities().flying || jogador.isPassenger() || jogador.isDeadOrDying()) return;
         long agora = jogador.level().getGameTime();
-        VisuaisAtivos.Visual carga = null;
+        VisuaisAtivos.Visual sequencia = null;
         for (VisuaisAtivos.Visual v : VisuaisAtivos.ativos()) {
             if (v.encerrado() || agora - v.inicio() >= v.duracao()) continue;
             if (v.tipo().equals(DOMINIO)) dominio(jogador, v);
-            else if (v.tipo().equals(CARGA_ROXO_200) && v.dono() == jogador.getId()) carga = v;
+            else if (v.tipo().equals(ROXO_MAXIMO) && v.dono() == jogador.getId()) sequencia = v;
         }
-        if (carga != null) {
-            voo = carga;
-            subir(jogador, carga, agora);
+        if (sequencia != null) {
+            voo = sequencia;
+            seguir(jogador, sequencia, agora);
         } else if (voo != null) {
-            // O encantamento acabou (disparou ou foi cortado): desce devagar.
+            // A sequência acabou: desce devagar.
             voo = null;
             quedaLentaAte = agora + QUEDA_LENTA;
         }
@@ -85,13 +87,17 @@ public final class MovimentoCliente {
         }
     }
 
-    /** Leva o jogador até a altura da subida neste tick, parando se bater no teto. */
-    private static void subir(LocalPlayer jogador, VisuaisAtivos.Visual carga, long agora) {
-        double alvo = carga.origem().y() - ALTURA_OLHOS + Barreira.subidaRoxo200(agora - carga.inicio());
-        double dy = alvo - jogador.getY();
-        Vec3 v = jogador.getDeltaMovement();
-        jogador.setDeltaMovement(v.x * .5, 0, v.z * .5);
-        if (dy > 0) jogador.move(MoverType.SELF, new Vec3(0, dy, 0));
+    /**
+     * Leva o jogador até onde a sequência do R diz neste tick (avanço até o alvo, depois a subida junto
+     * com ele). O movimento colide com os blocos: bateu, para ali.
+     */
+    private static void seguir(LocalPlayer jogador, VisuaisAtivos.Visual v, long agora) {
+        // +1: a posição deste tick é a do fim dele (o servidor fere e segura o alvo no mesmo passo).
+        Vetor desl = RoxoMaximo.deslocamentoGojo(agora - v.inicio() + 1, v.direcao(), v.forca());
+        Vetor pes = v.origem().mais(desl).menos(new Vetor(0, ALTURA_OLHOS, 0));
+        jogador.setDeltaMovement(Vec3.ZERO);
+        jogador.move(MoverType.SELF, new Vec3(pes.x() - jogador.getX(), pes.y() - jogador.getY(), pes.z() - jogador.getZ()));
+        jogador.setDeltaMovement(Vec3.ZERO);
         jogador.resetFallDistance();
     }
 }

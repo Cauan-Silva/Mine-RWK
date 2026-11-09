@@ -81,16 +81,16 @@ public final class DetritosGojo {
     /** O Roxo 200% explodiu em {@code p}: estouros espalhados pela esfera e fumaça grossa. */
     private static void explosaoRoxa(ClientLevel l, Vetor p) {
         RandomSource rnd = l.random;
-        for (int i = 0; i < qtd(16); i++) {
-            double r = 4 + rnd.nextDouble() * 18;
+        for (int i = 0; i < qtd(24); i++) {
+            double r = 4 + rnd.nextDouble() * 34;
             double a = rnd.nextDouble() * Math.PI * 2, b = (rnd.nextDouble() - .5) * Math.PI;
             double x = p.x() + Math.cos(a) * Math.cos(b) * r, y = p.y() + Math.sin(b) * r, z = p.z() + Math.sin(a) * Math.cos(b) * r;
             l.addParticle(ParticleTypes.EXPLOSION_EMITTER, x, y, z, 0, 0, 0);
         }
         for (int i = 0; i < qtd(60); i++) {
             double a = rnd.nextDouble() * Math.PI * 2;
-            l.addParticle(ParticleTypes.CAMPFIRE_COSY_SMOKE, p.x() + Math.cos(a) * 20 * rnd.nextDouble(), p.y(),
-                    p.z() + Math.sin(a) * 20 * rnd.nextDouble(), 0, .08, 0);
+            l.addParticle(ParticleTypes.CAMPFIRE_COSY_SMOKE, p.x() + Math.cos(a) * 36 * rnd.nextDouble(), p.y(),
+                    p.z() + Math.sin(a) * 36 * rnd.nextDouble(), 0, .08, 0);
         }
     }
 

@@ -65,13 +65,4 @@ class BarreiraTest {
         assertTrue(Barreira.dentro(C, R, new Vetor(11, 64, 0)));
         assertFalse(Barreira.dentro(C, R, new Vetor(12.5, 64, 0)));
     }
-
-    @Test
-    void subidaDoRoxo200SobeSuaveAte20EPara() {
-        assertEquals(0, Barreira.subidaRoxo200(0), 1e-9);
-        assertTrue(Barreira.subidaRoxo200(30) > 5 && Barreira.subidaRoxo200(30) < 15);
-        assertEquals(20, Barreira.subidaRoxo200(60), 1e-9);
-        assertEquals(20, Barreira.subidaRoxo200(80), 1e-9);
-        for (int t = 1; t <= 60; t++) assertTrue(Barreira.subidaRoxo200(t) >= Barreira.subidaRoxo200(t - 1));
-    }
 }

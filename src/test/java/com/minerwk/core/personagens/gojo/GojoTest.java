@@ -196,6 +196,8 @@ class GojoTest {
         assertEquals(0, ctx.conta("apagar"), "o R não lança feixe");
         assertEquals(0, ctx.conta("ferir"));
         assertEquals(1, ctx.conta("visual:gojo_roxo_maximo_esferas"));
+        assertEquals(1, ctx.conta("anim:" + Gojo.ANIM_R_SEM_ALVO), "abre as mãos e lança as esferas");
+        assertEquals(0, ctx.conta("anim:" + Gojo.ANIM_R_UPPERCUT));
         assertExplosaoInteira(new Vetor(RoxoMaximo.ALCANCE, 0, 0));
     }
 
@@ -208,6 +210,7 @@ class GojoTest {
         ticks(300);
         assertEquals(0, ctx.conta("apagar"));
         assertEquals(1, ctx.conta("visual:gojo_roxo_maximo"));
+        assertEquals(1, ctx.conta("anim:" + Gojo.ANIM_R_UPPERCUT), "a animação do uppercut toca no soco");
         assertEquals(List.of(RoxoMaximo.DANO_UPPERCUT, RoxoMaximo.DANO), ctx.danos,
                 "uppercut e depois a explosão, uma vez só (o alvo não leva de novo pela casca)");
         assertEquals(RoxoMaximo.inicioExplosao(a) - a, ctx.conta("suspender"), "segurado no ar até explodir");

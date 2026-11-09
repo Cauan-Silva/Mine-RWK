@@ -13,9 +13,6 @@ public final class Barreira {
      * está numa caverna embaixo: fica onde está, senão subiria para dentro da rocha.
      */
     public static final double FUNDO = 2;
-    /** Quanto o Gojo sobe no encantamento do Roxo 200% e em quantos ticks. */
-    public static final double ALTURA_ROXO_200 = 20;
-    public static final int TICKS_SUBIDA_ROXO_200 = 60;
 
     public record Correcao(Vetor posicao, Vetor velocidade, boolean noChao) {
     }
@@ -68,11 +65,5 @@ public final class Barreira {
         double k = v.x() * n.x() + v.y() * n.y() + v.z() * n.z();
         if (paraFora ? k <= 0 : k >= 0) return v;
         return v.menos(n.vezes(k));
-    }
-
-    /** Altura acima do ponto de partida no tick {@code t} do encantamento do Roxo 200% (sobe suave e para). */
-    public static double subidaRoxo200(double t) {
-        double x = Math.max(0, Math.min(1, t / TICKS_SUBIDA_ROXO_200));
-        return ALTURA_ROXO_200 * x * x * (3 - 2 * x);
     }
 }

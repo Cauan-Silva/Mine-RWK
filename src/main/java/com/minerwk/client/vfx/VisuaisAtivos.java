@@ -59,6 +59,14 @@ public final class VisuaisAtivos {
             return duracao;
         }
 
+        public Vetor direcao() {
+            return direcao;
+        }
+
+        public float forca() {
+            return forca;
+        }
+
         public long inicio() {
             return inicio;
         }

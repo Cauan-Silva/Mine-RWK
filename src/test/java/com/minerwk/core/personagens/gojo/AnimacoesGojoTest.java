@@ -27,11 +27,21 @@ class AnimacoesGojoTest {
             "gojo_vermelho", 30,
             "gojo_infinito", 20,
             "gojo_roxo", 40,
-            "gojo_roxo_200", 60,
+            // O R só cobre o avanço; o uppercut e o resto têm animações próprias (abaixo).
+            "gojo_roxo_200", RoxoMaximo.AVANCO_MAX,
             "gojo_vazio_infinito", 40);
 
     /** Golpes que se usam andando: Z, X, C e V. */
     private static final List<String> ANDAM = List.of("gojo_azul", "gojo_vermelho", "gojo_infinito", "gojo_roxo");
+
+    @Test
+    void oRTemAnimacaoDoUppercutEDoCasoSemAlvoAteOFimDaExplosao() throws IOException {
+        JsonObject animacoes = animacoes();
+        int aposSoco = RoxoMaximo.fim(0);
+        int semAlvo = RoxoMaximo.TICKS_ESFERAS_SEM_ALVO + RoxoMaximo.TICKS_FUSAO + RoxoMaximo.TICKS_EXPLOSAO;
+        assertTrue(animacoes.getAsJsonObject(Gojo.ANIM_R_UPPERCUT).get("animation_length").getAsDouble() * 20 >= aposSoco);
+        assertTrue(animacoes.getAsJsonObject(Gojo.ANIM_R_SEM_ALVO).get("animation_length").getAsDouble() * 20 >= semAlvo);
+    }
 
     private static JsonObject animacoes() throws IOException {
         try (Reader r = Files.newBufferedReader(ARQUIVO, StandardCharsets.UTF_8)) {
@@ -57,7 +67,7 @@ class AnimacoesGojoTest {
             for (String osso : ossos) assertTrue(OSSOS.contains(osso), e.getKey() + ": osso desconhecido " + osso);
             assertTrue(ossos.containsAll(Set.of("head", "torso", "right_arm", "left_arm")),
                     e.getKey() + " precisa mexer cabeça, tronco e os dois braços");
-            if (e.getKey().startsWith("gojo_roxo_200")) {
+            if (e.getKey().startsWith("gojo_roxo_200") || e.getKey().startsWith("gojo_roxo_maximo")) {
                 // O Gojo sobe de verdade no R: o corpo do modelo não sobe de novo por cima.
                 assertFalse(ossos.contains("body"), e.getKey() + " não pode mexer o body");
                 continue;
