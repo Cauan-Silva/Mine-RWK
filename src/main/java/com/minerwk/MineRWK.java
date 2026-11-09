@@ -1,11 +1,18 @@
 package com.minerwk;
 
+import com.minerwk.core.kit.Personagens;
+import com.minerwk.core.kit.teste.PersonagemTeste;
+import com.minerwk.kit.Anexos;
+import com.minerwk.kit.ComandoTrocar;
+import com.minerwk.kit.ServicoKits;
 import com.minerwk.registro.Sons;
 import com.mojang.logging.LogUtils;
 import net.minecraft.resources.ResourceLocation;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
+import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.event.RegisterCommandsEvent;
 import org.slf4j.Logger;
 
 /** Ponto de entrada do Mine-RWK (lado comum: cliente e servidor). */
@@ -16,6 +23,10 @@ public final class MineRWK {
 
     public MineRWK(IEventBus modBus) {
         Sons.REGISTRO.register(modBus);
+        Anexos.REGISTRO.register(modBus);
+        Personagens.registrar(PersonagemTeste.criar());
+        ServicoKits.registrarEventos();
+        NeoForge.EVENT_BUS.addListener((RegisterCommandsEvent e) -> ComandoTrocar.registrar(e.getDispatcher()));
         modBus.addListener(this::commonSetup);
     }
 

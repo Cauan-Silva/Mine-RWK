@@ -1,0 +1,115 @@
+package com.minerwk.kit;
+
+import com.minerwk.core.kit.EstadoDoJogador;
+import com.minerwk.core.kit.KitDoJogador;
+import com.minerwk.core.kit.Personagem;
+import com.minerwk.core.kit.Personagens;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.player.Player;
+import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.event.entity.living.LivingDamageEvent;
+import net.neoforged.neoforge.event.entity.player.PlayerEvent;
+import net.neoforged.neoforge.event.tick.PlayerTickEvent;
+
+/** Liga o núcleo dos kits aos jogadores no servidor: carrega, roda o tick e salva. */
+public final class ServicoKits {
+    private static final double LIMIAR_PARADO = 0.01;
+    private static final int SALVAR_A_CADA = 20;
+
+    private static final Map<UUID, KitDoJogador> KITS = new HashMap<>();
+    private static final Set<UUID> APANHOU = new HashSet<>();
+    private static final Set<UUID> CAUSOU_DANO = new HashSet<>();
+
+    private ServicoKits() {
+    }
+
+    public static void registrarEventos() {
+        NeoForge.EVENT_BUS.addListener(ServicoKits::aoTick);
+        NeoForge.EVENT_BUS.addListener(ServicoKits::aoDano);
+        NeoForge.EVENT_BUS.addListener(ServicoKits::aoEntrar);
+        NeoForge.EVENT_BUS.addListener(ServicoKits::aoSair);
+        NeoForge.EVENT_BUS.addListener(ServicoKits::aoClonar);
+    }
+
+    public static DadosKit dados(Player jogador) {
+        return jogador.getData(Anexos.DADOS_KIT);
+    }
+
+    /** O kit do jogador, criado a partir dos dados salvos na primeira chamada. Vazio se ele não escolheu. */
+    public static Optional<KitDoJogador> kit(ServerPlayer jogador) {
+        KitDoJogador kit = KITS.get(jogador.getUUID());
+        if (kit != null) return Optional.of(kit);
+        DadosKit dados = dados(jogador);
+        Optional<Personagem> personagem = Personagens.porId(dados.personagem);
+        if (personagem.isEmpty()) return Optional.empty();
+        kit = new KitDoJogador(personagem.get());
+        kit.recurso().carregar(dados.recurso);
+        kit.recargas().carregar(dados.recargas);
+        KITS.put(jogador.getUUID(), kit);
+        return Optional.of(kit);
+    }
+
+    /** Define (ou troca) o personagem: recurso novo (cheio) e recargas zeradas. */
+    public static void definirPersonagem(ServerPlayer jogador, Personagem personagem) {
+        KitDoJogador antigo = KITS.remove(jogador.getUUID());
+        if (antigo != null) antigo.descartar();
+        KitDoJogador novo = new KitDoJogador(personagem);
+        KITS.put(jogador.getUUID(), novo);
+        salvar(jogador, novo);
+        Sincronizacao.enviar(jogador);
+    }
+
+    private static void salvar(ServerPlayer jogador, KitDoJogador kit) {
+        jogador.setData(Anexos.DADOS_KIT,
+                new DadosKit(kit.personagem().id(), kit.recurso().salvar(), kit.recargas().salvar()));
+    }
+
+    private static void aoTick(PlayerTickEvent.Post evento) {
+        if (!(evento.getEntity() instanceof ServerPlayer jogador)) return;
+        UUID id = jogador.getUUID();
+        boolean apanhou = APANHOU.remove(id);
+        boolean causou = CAUSOU_DANO.remove(id);
+        Optional<KitDoJogador> kit = kit(jogador);
+        if (kit.isEmpty()) return;
+        long agora = jogador.level().getGameTime();
+        boolean parado = jogador.getDeltaMovement().horizontalDistanceSqr() < LIMIAR_PARADO * LIMIAR_PARADO;
+        kit.get().tick(agora, new EstadoDoJogador(parado, apanhou, causou), new ContextoServidor(jogador));
+        if (agora % SALVAR_A_CADA == 0) salvar(jogador, kit.get());
+        Sincronizacao.aoTick(jogador, kit.get());
+    }
+
+    private static void aoDano(LivingDamageEvent.Post evento) {
+        if (evento.getEntity() instanceof ServerPlayer vitima) APANHOU.add(vitima.getUUID());
+        if (evento.getSource().getEntity() instanceof ServerPlayer atacante) CAUSOU_DANO.add(atacante.getUUID());
+    }
+
+    private static void aoEntrar(PlayerEvent.PlayerLoggedInEvent evento) {
+        if (evento.getEntity() instanceof ServerPlayer jogador) Sincronizacao.enviar(jogador);
+    }
+
+    private static void aoSair(PlayerEvent.PlayerLoggedOutEvent evento) {
+        if (!(evento.getEntity() instanceof ServerPlayer jogador)) return;
+        KitDoJogador kit = KITS.remove(jogador.getUUID());
+        if (kit != null) {
+            kit.descartar();
+            salvar(jogador, kit);
+        }
+        Sincronizacao.esquecer(jogador);
+    }
+
+    /** Morte ou volta do End: o jogador vira outra entidade. Salva antes para o copyOnDeath levar os dados atuais. */
+    private static void aoClonar(PlayerEvent.Clone evento) {
+        if (!(evento.getOriginal() instanceof ServerPlayer antigo)) return;
+        KitDoJogador kit = KITS.remove(antigo.getUUID());
+        if (kit == null) return;
+        kit.descartar();
+        salvar(antigo, kit);
+        evento.getEntity().setData(Anexos.DADOS_KIT, dados(antigo));
+    }
+}
