@@ -4,7 +4,11 @@ import com.minerwk.MineRWK;
 import com.minerwk.client.animacao.AnimacoesJogador;
 import com.minerwk.client.vfx.EfeitosVisuais;
 import com.minerwk.registro.Sons;
+import com.minerwk.client.kit.TelaEscolha;
+import com.minerwk.core.kit.Tecla;
+import com.minerwk.rede.PersonagemEscolha;
 import com.mojang.brigadier.CommandDispatcher;
+import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
@@ -14,10 +18,13 @@ import net.minecraft.commands.arguments.ResourceLocationArgument;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundSource;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Comandos de teste da prova de conceito, só no cliente (tocam apenas para quem digitou):
- * {@code /rwk fx <efeito>}, {@code /rwk anim <animação>} e {@code /rwk som}.
+ * {@code /rwk fx <efeito>}, {@code /rwk anim <animação>}, {@code /rwk som} e {@code /rwk tela <quantos>}
+ * (abre a tela de escolha com personagens falsos, para ver a grade e a rolagem; a confirmação não envia nada ao servidor).
  * Sem namespace, o id vira {@code minerwk:<nome>}.
  */
 public final class ComandosTeste {
@@ -29,7 +36,9 @@ public final class ComandosTeste {
                 .then(Commands.literal("fx").then(Commands.argument("efeito", ResourceLocationArgument.id()).executes(ComandosTeste::fx)))
                 .then(Commands.literal("anim").then(Commands.argument("animacao", ResourceLocationArgument.id()).executes(ComandosTeste::anim)))
                 .then(Commands.literal("parar").executes(ComandosTeste::parar))
-                .then(Commands.literal("som").executes(ComandosTeste::som)));
+                .then(Commands.literal("som").executes(ComandosTeste::som))
+                .then(Commands.literal("tela").then(Commands.argument("quantos", IntegerArgumentType.integer(1, 200))
+                        .executes(ComandosTeste::tela))));
     }
 
     private static ResourceLocation idDoMod(CommandContext<CommandSourceStack> ctx, String arg) {
@@ -66,6 +75,23 @@ public final class ComandosTeste {
         if (jogador == null) return 0;
         tocarSom(jogador);
         return responder(ctx, true, "Som minerwk:teste");
+    }
+
+    private static final String[] EMBLEMAS = {"gojo", "asta", "cid", "dio", "douma", "frieren", "guts", "homura",
+            "ichigo", "jinwoo", "killua", "rudeus", "subaru", "tanjiro", "sem_emblema"};
+
+    private static int tela(CommandContext<CommandSourceStack> ctx) {
+        int quantos = IntegerArgumentType.getInteger(ctx, "quantos");
+        List<PersonagemEscolha> falsos = new ArrayList<>();
+        for (int i = 0; i < quantos; i++) {
+            String id = EMBLEMAS[i % EMBLEMAS.length];
+            falsos.add(new PersonagemEscolha(id, "Falso " + (i + 1) + " (" + id + ")", "Obra de teste",
+                    List.of(new PersonagemEscolha.GolpeEscolha(Tecla.Z, "teste_golpe"),
+                            new PersonagemEscolha.GolpeEscolha(Tecla.X, "teste_carga"))));
+        }
+        // Adia para depois de o chat fechar, senão ele fecha a tela junto.
+        Minecraft.getInstance().tell(() -> Minecraft.getInstance().setScreen(new TelaEscolha(falsos, true)));
+        return 1;
     }
 
     private static void tocarSom(LocalPlayer jogador) {

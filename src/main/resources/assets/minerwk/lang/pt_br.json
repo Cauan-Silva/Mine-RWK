@@ -17,5 +17,10 @@
   "config.minerwk.vfxReduzido": "Efeitos visuais reduzidos",
   "config.minerwk.sfxAnime": "Sons das habilidades",
   "config.minerwk.mostrarHud": "Mostrar HUD do kit",
-  "minerwk.configuration.title": "Mine-RWK"
+  "minerwk.configuration.title": "Mine-RWK",
+  "tela.minerwk.escolha.escolher": "Escolher",
+  "habilidade.minerwk.teste_golpe": "Golpe de teste",
+  "habilidade.minerwk.teste_golpe.desc": "Golpe instantâneo em área curta.",
+  "habilidade.minerwk.teste_carga": "Carga de teste",
+  "habilidade.minerwk.teste_carga.desc": "Segure para carregar; mais força, mais dano e tremor."
 }

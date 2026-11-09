@@ -5,6 +5,7 @@ import com.minerwk.core.kit.KitDoJogador;
 import com.minerwk.core.kit.Personagens;
 import com.minerwk.core.kit.Tecla;
 import com.minerwk.rede.Envio;
+import com.minerwk.rede.PersonagemEscolha;
 import com.minerwk.rede.SincronizarKit;
 import com.minerwk.rede.SincronizarKit.HabilidadeHud;
 import java.util.ArrayList;
@@ -46,8 +47,7 @@ final class Sincronizacao {
                     k.recurso().atual(), k.recurso().maximo(), habilidades, emUso, List.of());
             ULTIMO.put(jogador.getUUID(), new Enviado(k.recurso().atual(), prontas, emUso));
         } else {
-            List<String> lista = Personagens.escolhiveis().stream()
-                    .map(p -> p.id() + "|" + p.nome() + "|" + p.obra()).toList();
+            List<PersonagemEscolha> lista = Personagens.escolhiveis().stream().map(PersonagemEscolha::de).toList();
             pacote = new SincronizarKit("", "", 0, 0, 0, List.of(), "", lista);
             ULTIMO.remove(jogador.getUUID());
         }
