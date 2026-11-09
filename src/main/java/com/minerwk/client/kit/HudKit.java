@@ -22,8 +22,8 @@ public final class HudKit {
     private static final int LADO = 16;
     private static final int ESPACO = 2;
     private static final int ALTURA_BARRA = 4;
-    /** Altura dos corações/fome acima da base da tela (barra de itens 22 + corações ~17). */
-    private static final int ACIMA_DA_VIDA = 49;
+    /** Folga acima da pilha vanilla (vida, armadura, fome, montaria, ar). */
+    private static final int FOLGA = 2;
 
     private static final int FUNDO = 0xAA000000;
     private static final int SOMBRA_RECARGA = 0xB0000000;
@@ -32,18 +32,26 @@ public final class HudKit {
     private static final int TEXTO = 0xFFFFFFFF;
     private static final int TEXTO_SEM_RECURSO = 0xFFFF5555;
 
-    /** Valor mostrado da barra, que desliza até o recebido. */
+    /** Valor mostrado da barra, que desliza até o recebido; -1 = pular direto para o valor. */
     private static double recursoMostrado = -1;
+    private static String personagemMostrado = "";
 
     private HudKit() {
     }
 
     public static void registrar(RegisterGuiLayersEvent evento) {
-        evento.registerAbove(VanillaGuiLayers.FOOD_LEVEL, CAMADA, HudKit::desenhar);
+        evento.registerAbove(VanillaGuiLayers.AIR_LEVEL, CAMADA, HudKit::desenhar);
     }
 
     public static void aoTick(ClientTickEvent.Post evento) {
-        double alvo = RecepcaoKit.estado().recurso();
+        SincronizarKit s = RecepcaoKit.estado();
+        if (s.personagem().isEmpty() || !s.personagem().equals(personagemMostrado)) {
+            // Saiu do mundo, entrou ou trocou de personagem: a barra não desliza a partir de um valor velho.
+            personagemMostrado = s.personagem();
+            recursoMostrado = -1;
+            if (s.personagem().isEmpty()) return;
+        }
+        double alvo = s.recurso();
         if (recursoMostrado < 0 || Math.abs(alvo - recursoMostrado) < 0.05) recursoMostrado = alvo;
         else recursoMostrado += (alvo - recursoMostrado) * 0.35;
     }
@@ -62,7 +70,9 @@ public final class HudKit {
         long agora = mc.level.getGameTime();
         int larguraTotal = habilidades.size() * (LADO + ESPACO) - ESPACO;
         int x0 = (g.guiWidth() - larguraTotal) / 2;
-        int yBarra = g.guiHeight() - ACIMA_DA_VIDA - ALTURA_BARRA;
+        // A pilha vanilla (vida, armadura, fome, montaria, ar) já desenhou e diz até onde subiu.
+        int pilha = Math.max(mc.gui.leftHeight, mc.gui.rightHeight);
+        int yBarra = g.guiHeight() - pilha - FOLGA - ALTURA_BARRA;
         int yQuadros = yBarra - 2 - LADO;
 
         for (int i = 0; i < habilidades.size(); i++) {
@@ -73,6 +83,8 @@ public final class HudKit {
             g.fill(x, yQuadros, x + LADO, yQuadros + LADO, FUNDO);
 
             long restante = h.prontaNoTick() - agora;
+            // Relógio do cliente atrasado não mostra mais tempo que a recarga tem.
+            if (h.duracao() > 0) restante = Math.min(restante, h.duracao());
             float fracao = LogicaHud.fracao(h.prontaNoTick(), h.duracao(), agora);
             if (restante > 0) {
                 int alturaSombra = Math.round(LADO * (fracao > 0 ? fracao : 1f));
@@ -93,6 +105,6 @@ public final class HudKit {
         g.fill(xb - 1, yBarra - 1, xb + larguraBarra + 1, yBarra + ALTURA_BARRA + 1, FUNDO);
         g.fill(xb, yBarra, xb + cheio, yBarra + ALTURA_BARRA, 0xFF000000 | s.corRecurso());
         String texto = s.nomeRecurso() + " " + (int) Math.floor(s.recurso()) + "/" + (int) maximo;
-        g.drawString(fonte, texto, xb + larguraBarra + 4, yBarra - 2, TEXTO, true);
+        g.drawString(fonte, texto, xb - fonte.width(texto) - 4, yBarra - 2, TEXTO, true);
     }
 }
