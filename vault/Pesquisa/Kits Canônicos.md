@@ -22,6 +22,7 @@ Ver [[Modelo de Personagem]].
 ## Andamento
 | Personagem | Pesquisa | Revisão do kit |
 | --- | --- | --- |
-| (todos) | pendente | pendente |
+| [[Gojo]] | feita (09/11) | aprovado (09/11) |
+| (demais) | pendente | pendente |
 
 Ordem sugerida em [[Roadmap]].
