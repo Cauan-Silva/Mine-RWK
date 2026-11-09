@@ -2,13 +2,13 @@ package com.minerwk.kit;
 
 import com.minerwk.core.kit.KitDoJogador;
 import com.minerwk.core.kit.Personagens;
+import com.minerwk.rede.Envio;
 import com.minerwk.rede.SincronizarKit;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import net.minecraft.server.level.ServerPlayer;
-import net.neoforged.neoforge.network.PacketDistributor;
 
 /**
  * Manda ao jogador o estado do kit: na entrada, ao escolher/trocar, quando uma recarga começa
@@ -40,7 +40,7 @@ final class Sincronizacao {
             pacote = new SincronizarKit("", 0, 0, Map.of(), lista);
             ULTIMO.remove(jogador.getUUID());
         }
-        PacketDistributor.sendToPlayer(jogador, pacote);
+        Envio.para(jogador, pacote);
     }
 
     static void aoTick(ServerPlayer jogador, KitDoJogador kit) {

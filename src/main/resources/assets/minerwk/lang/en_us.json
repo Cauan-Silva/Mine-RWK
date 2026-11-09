@@ -1,1 +1,16 @@
-{ "subtitles.minerwk.teste": "Mine-RWK test sound" }
+{
+  "subtitles.minerwk.teste": "Mine-RWK test sound",
+  "key.categories.minerwk": "Mine-RWK",
+  "key.minerwk.z": "Ability Z",
+  "key.minerwk.x": "Ability X",
+  "key.minerwk.c": "Ability C",
+  "key.minerwk.v": "Ability V",
+  "key.minerwk.g": "Ability G",
+  "key.minerwk.r": "Ultimate (R)",
+  "key.minerwk.escolher": "Choose character",
+  "tela.minerwk.escolha": "Choose your character",
+  "tela.minerwk.escolha.confirmar": "Choose %s?",
+  "tela.minerwk.escolha.definitiva": "This choice is permanent.",
+  "tela.minerwk.escolha.sim": "Confirm",
+  "tela.minerwk.escolha.nao": "Back"
+}

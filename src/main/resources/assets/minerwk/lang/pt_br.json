@@ -1,1 +1,16 @@
-{ "subtitles.minerwk.teste": "Som de teste do Mine-RWK" }
+{
+  "subtitles.minerwk.teste": "Som de teste do Mine-RWK",
+  "key.categories.minerwk": "Mine-RWK",
+  "key.minerwk.z": "Habilidade Z",
+  "key.minerwk.x": "Habilidade X",
+  "key.minerwk.c": "Habilidade C",
+  "key.minerwk.v": "Habilidade V",
+  "key.minerwk.g": "Habilidade G",
+  "key.minerwk.r": "Ultimate (R)",
+  "key.minerwk.escolher": "Escolher personagem",
+  "tela.minerwk.escolha": "Escolha seu personagem",
+  "tela.minerwk.escolha.confirmar": "Escolher %s?",
+  "tela.minerwk.escolha.definitiva": "A escolha é definitiva.",
+  "tela.minerwk.escolha.sim": "Confirmar",
+  "tela.minerwk.escolha.nao": "Voltar"
+}

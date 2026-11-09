@@ -1,10 +1,10 @@
 package com.minerwk.kit;
 
 import com.minerwk.core.kit.Contexto;
+import com.minerwk.rede.Envio;
 import com.minerwk.rede.TocarApresentacao;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.LivingEntity;
-import net.neoforged.neoforge.network.PacketDistributor;
 
 /** O {@link Contexto} do núcleo, executado no servidor em nome de um jogador. */
 public final class ContextoServidor implements Contexto {
@@ -30,7 +30,6 @@ public final class ContextoServidor implements Contexto {
 
     @Override
     public void apresentacao(String animacao, String efeito, String som) {
-        PacketDistributor.sendToPlayersTrackingEntityAndSelf(jogador,
-                new TocarApresentacao(jogador.getId(), animacao, efeito, som));
+        Envio.paraQuemVe(jogador, new TocarApresentacao(jogador.getId(), animacao, efeito, som));
     }
 }

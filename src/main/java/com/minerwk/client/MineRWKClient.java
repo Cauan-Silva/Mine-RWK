@@ -3,19 +3,26 @@ package com.minerwk.client;
 import com.minerwk.MineRWK;
 import com.minerwk.client.animacao.AnimacoesJogador;
 import com.minerwk.client.comando.ComandosTeste;
+import com.minerwk.client.kit.RecepcaoKit;
+import com.minerwk.client.kit.TeclasKit;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
+import net.neoforged.neoforge.client.event.ClientPlayerNetworkEvent;
 import net.neoforged.neoforge.client.event.RegisterClientCommandsEvent;
 import net.neoforged.neoforge.common.NeoForge;
 
-/** Ponto de entrada do lado do cliente: animações do jogador e VFX. */
+/** Ponto de entrada do lado do cliente: animações do jogador, VFX, teclas e tela de escolha. */
 @Mod(value = MineRWK.MOD_ID, dist = Dist.CLIENT)
 public final class MineRWKClient {
 
     public MineRWKClient(IEventBus modBus) {
         modBus.addListener(this::clientSetup);
+        modBus.addListener(TeclasKit::registrar);
+        RecepcaoKit.ligar();
+        NeoForge.EVENT_BUS.addListener(TeclasKit::aoTick);
+        NeoForge.EVENT_BUS.addListener((ClientPlayerNetworkEvent.LoggingOut e) -> RecepcaoKit.esquecer());
         NeoForge.EVENT_BUS.addListener((RegisterClientCommandsEvent e) -> ComandosTeste.registrar(e.getDispatcher()));
     }
 
