@@ -69,15 +69,25 @@ public final class KitDoJogador {
 
     /** Atordoado: se a habilidade ainda está em carga, é cancelada com recarga de punição. */
     public void atordoar(long agora) {
+        atordoar(agora, Contexto.NULO);
+    }
+
+    /** Como {@link #atordoar(long)}, avisando a habilidade para desfazer o visual da carga. */
+    public void atordoar(long agora, Contexto contexto) {
         if (execucao == null || execucao.fase() != Execucao.Fase.CARGA) return;
-        Numeros n = execucao.habilidade().numeros();
-        recargas.iniciar(execucao.habilidade().id(), agora, n.recarga() / 4);
+        Habilidade h = execucao.habilidade();
+        recargas.iniciar(h.id(), agora, h.numeros().recarga() / 4);
         limpar();
+        h.aoInterromper(contexto);
     }
 
     /** Levou um golpe: se a habilidade em carga não aguenta esse dano, é interrompida como em {@link #atordoar}. */
     public void levouDano(float dano, long agora) {
-        if (execucao != null && dano >= execucao.habilidade().danoQueInterrompe()) atordoar(agora);
+        levouDano(dano, agora, Contexto.NULO);
+    }
+
+    public void levouDano(float dano, long agora, Contexto contexto) {
+        if (execucao != null && dano >= execucao.habilidade().danoQueInterrompe()) atordoar(agora, contexto);
     }
 
     /** Começa um efeito solto; ele roda a partir do próximo tick. */
@@ -91,8 +101,15 @@ public final class KitDoJogador {
 
     /** Cancela sem cobrar nem punir e encerra os efeitos sem {@code aoAcabar} (jogador saiu ou morreu). */
     public void descartar() {
+        descartar(Contexto.NULO);
+    }
+
+    /** Como {@link #descartar()}, avisando a habilidade em carga para desfazer o visual. */
+    public void descartar(Contexto contexto) {
+        Habilidade emCarga = execucao != null && execucao.fase() == Execucao.Fase.CARGA ? execucao.habilidade() : null;
         limpar();
         efeitos.clear();
+        if (emCarga != null) emCarga.aoInterromper(contexto);
     }
 
     public List<Execucao.Evento> tick(long agora, EstadoDoJogador estado, Contexto contexto) {
@@ -113,6 +130,7 @@ public final class KitDoJogador {
                 // Sem recurso na hora do disparo: conta como interrupção na carga.
                 recargas.iniciar(h.id(), agora, n.recarga() / 4);
                 limpar();
+                h.aoInterromper(contexto);
                 return eventos;
             }
             recurso.gastar(n.custo());

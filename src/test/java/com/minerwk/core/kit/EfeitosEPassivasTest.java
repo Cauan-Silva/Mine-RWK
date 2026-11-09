@@ -108,6 +108,36 @@ class EfeitosEPassivasTest {
         assertEquals(100, k.recargas().restante("r", 2));
     }
 
+    /** Conta quantas vezes a carga foi interrompida (o Gojo apaga o visual da carga aí). */
+    static final class Avisada extends KitDoJogadorTest.Falsa {
+        int interrompida;
+        Avisada(double custo) { super("a", Numeros.instantanea(10, 0, 0, custo, 100)); }
+        public void aoInterromper(Contexto c) { interrompida++; }
+    }
+
+    @Test
+    void cargaSemRecursoNoDisparoAvisaAInterrupcao() {
+        var a = new Avisada(50);
+        var k = kit(a, a, List.of());
+        assertTrue(k.apertar(Tecla.Z, 0));
+        k.recurso().gastar(60); // a energia acaba durante a carga
+        for (int i = 0; i < 15; i++) k.tick(i, ESTADO, CTX);
+        assertTrue(k.execucao().isEmpty());
+        assertEquals(1, a.interrompida);
+    }
+
+    @Test
+    void descartarNaCargaAvisaAInterrupcao() {
+        var a = new Avisada(1);
+        var k = kit(a, a, List.of());
+        k.apertar(Tecla.Z, 0);
+        k.tick(0, ESTADO, CTX);
+        k.descartar(CTX);
+        assertEquals(1, a.interrompida);
+        k.descartar(CTX);
+        assertEquals(1, a.interrompida, "sem carga, nada a avisar");
+    }
+
     @Test
     void semLimiteDanoNaoInterrompe() {
         var golpe = new KitDoJogadorTest.Falsa("z", Numeros.instantanea(40, 0, 0, 0, 0));

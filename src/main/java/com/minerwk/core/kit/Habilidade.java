@@ -16,6 +16,10 @@ public interface Habilidade {
     default void aoTerminar(Contexto contexto) {
     }
 
+    /** A carga foi interrompida (atordoamento ou golpe forte); serve para desfazer o visual da carga. */
+    default void aoInterromper(Contexto contexto) {
+    }
+
     /** Dano mínimo de um golpe recebido que cancela a carga; infinito (padrão) = nada cancela. */
     default float danoQueInterrompe() {
         return Float.POSITIVE_INFINITY;

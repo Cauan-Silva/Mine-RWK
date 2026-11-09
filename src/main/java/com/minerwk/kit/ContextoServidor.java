@@ -4,7 +4,9 @@ import com.minerwk.core.kit.Contexto;
 import com.minerwk.core.kit.Efeito;
 import com.minerwk.core.kit.KitDoJogador;
 import com.minerwk.core.kit.Vetor;
+import com.minerwk.rede.EncerrarVisual;
 import com.minerwk.rede.Envio;
+import com.minerwk.rede.MostrarVisual;
 import com.minerwk.rede.TocarApresentacao;
 import com.minerwk.rede.Tremer;
 import com.minerwk.registro.Efeitos;
@@ -13,6 +15,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.particles.BlockParticleOption;
+import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.core.particles.SimpleParticleType;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
@@ -155,6 +159,9 @@ public final class ContextoServidor implements Contexto {
                 e -> afetavel(e) && e.getBoundingBox().inflate(0.3).clip(a, b).isPresent()).isEmpty();
     }
 
+    /** Blocos apagados que soltam pedaços, por chamada. */
+    private static final int DETRITOS = 12;
+
     @Override
     public void apagarBlocos(Vetor centro, double raio) {
         ServerLevel nivel = nivel();
@@ -162,6 +169,9 @@ public final class ContextoServidor implements Contexto {
         Vec3 c = vec(centro);
         int r = (int) Math.ceil(raio);
         BlockPos base = BlockPos.containing(c);
+        int apagados = 0;
+        BlockPos[] sorteados = new BlockPos[DETRITOS];
+        BlockState[] estados = new BlockState[DETRITOS];
         for (BlockPos p : BlockPos.betweenClosed(base.offset(-r, -r, -r), base.offset(r, r, r))) {
             if (p.getCenter().distanceToSqr(c) > raio * raio) continue;
             if (!nivel.isLoaded(p) || nivel.isOutsideBuildHeight(p) || !nivel.mayInteract(jogador, p)) continue;
@@ -169,6 +179,19 @@ public final class ContextoServidor implements Contexto {
             if (estado.isAir() || estado.getDestroySpeed(nivel, p) < 0 || estado.hasBlockEntity()
                     || !estado.getFluidState().isEmpty()) continue;
             nivel.setBlock(p, Blocks.AIR.defaultBlockState(), Block.UPDATE_ALL);
+            // Sorteio de reservatório: guarda DETRITOS blocos ao acaso entre os apagados.
+            int vaga = apagados < DETRITOS ? apagados : nivel.random.nextInt(apagados + 1);
+            if (vaga < DETRITOS) {
+                sorteados[vaga] = p.immutable();
+                estados[vaga] = estado;
+            }
+            apagados++;
+        }
+        // Pedaços do bloco de verdade voam: no máximo DETRITOS pacotes por chamada.
+        for (int i = 0; i < Math.min(apagados, DETRITOS); i++) {
+            BlockPos p = sorteados[i];
+            nivel.sendParticles(new BlockParticleOption(ParticleTypes.BLOCK, estados[i]),
+                    p.getX() + .5, p.getY() + .5, p.getZ() + .5, 4, .4, .4, .4, .15);
         }
     }
 
@@ -212,6 +235,17 @@ public final class ContextoServidor implements Contexto {
     @Override
     public void criarEfeito(Efeito efeito) {
         kit().ifPresent(k -> k.adicionarEfeito(efeito));
+    }
+
+    @Override
+    public void visual(String tipo, Vetor origem, Vetor direcao, float forca, int duracao) {
+        Envio.paraQuemVe(jogador, new MostrarVisual(jogador.getId(), tipo, origem, direcao, forca, duracao,
+                nivel().getGameTime()));
+    }
+
+    @Override
+    public void visualFim(String tipo, Vetor ponto) {
+        Envio.paraQuemVe(jogador, new EncerrarVisual(jogador.getId(), tipo, ponto));
     }
 
     @Override

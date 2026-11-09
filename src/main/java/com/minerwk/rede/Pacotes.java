@@ -14,12 +14,14 @@ public final class Pacotes {
     public static volatile Consumer<SincronizarKit> aoSincronizar = p -> { };
     public static volatile Consumer<TocarApresentacao> aoTocar = p -> { };
     public static volatile Consumer<Tremer> aoTremer = p -> { };
+    public static volatile Consumer<MostrarVisual> aoMostrarVisual = p -> { };
+    public static volatile Consumer<EncerrarVisual> aoEncerrarVisual = p -> { };
 
     private Pacotes() {
     }
 
     public static void registrar(RegisterPayloadHandlersEvent evento) {
-        PayloadRegistrar r = evento.registrar("1");
+        PayloadRegistrar r = evento.registrar("2");
         r.playToServer(UsarTecla.TIPO, UsarTecla.CODEC, (p, ctx) -> {
             if (ctx.player() instanceof ServerPlayer jogador) ServicoKits.usarTecla(jogador, p.tecla(), p.apertou());
         });
@@ -29,5 +31,7 @@ public final class Pacotes {
         r.playToClient(SincronizarKit.TIPO, SincronizarKit.CODEC, (p, ctx) -> aoSincronizar.accept(p));
         r.playToClient(TocarApresentacao.TIPO, TocarApresentacao.CODEC, (p, ctx) -> aoTocar.accept(p));
         r.playToClient(Tremer.TIPO, Tremer.CODEC, (p, ctx) -> aoTremer.accept(p));
+        r.playToClient(MostrarVisual.TIPO, MostrarVisual.CODEC, (p, ctx) -> aoMostrarVisual.accept(p));
+        r.playToClient(EncerrarVisual.TIPO, EncerrarVisual.CODEC, (p, ctx) -> aoEncerrarVisual.accept(p));
     }
 }

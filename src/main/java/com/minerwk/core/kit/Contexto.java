@@ -2,6 +2,10 @@ package com.minerwk.core.kit;
 
 /** O que uma habilidade pode pedir ao jogo. A camada do Minecraft implementa; cresce conforme os personagens pedirem. */
 public interface Contexto {
+    /** Contexto que não faz nada, para quando não há jogo por perto (testes, interrupção sem contexto). */
+    Contexto NULO = new Contexto() {
+    };
+
     /** Causa {@code dano} a todas as criaturas num raio em volta do jogador, menos ele. */
     default void danoEmArea(double raio, float dano) {
     }
@@ -72,6 +76,17 @@ public interface Contexto {
 
     /** Começa um efeito solto no kit do jogador. */
     default void criarEfeito(Efeito efeito) {
+    }
+
+    /**
+     * Começa um visual de golpe para o jogador e quem o vê. O cliente desenha sozinho a partir da origem,
+     * da direção e da duração (ver {@code core/vfx}).
+     */
+    default void visual(String tipo, Vetor origem, Vetor direcao, float forca, int duracao) {
+    }
+
+    /** Acaba um visual antes da hora, ou no ponto em que terminou (ex.: onde a esfera bateu). */
+    default void visualFim(String tipo, Vetor ponto) {
     }
 
     /** Partículas vanilla, provisórias até os VFX; {@code tipo} é o id vanilla (ex.: "portal"). */

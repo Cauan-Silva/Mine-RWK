@@ -5,6 +5,7 @@ import com.minerwk.client.ConfigCliente;
 import com.minerwk.client.animacao.AnimacoesJogador;
 import com.minerwk.client.camera.TremorCamera;
 import com.minerwk.client.vfx.EfeitosVisuais;
+import com.minerwk.client.vfx.VisuaisAtivos;
 import com.minerwk.rede.Pacotes;
 import com.minerwk.rede.SincronizarKit;
 import com.minerwk.rede.TocarApresentacao;
@@ -25,6 +26,8 @@ public final class RecepcaoKit {
         Pacotes.aoSincronizar = RecepcaoKit::aoSincronizar;
         Pacotes.aoTocar = RecepcaoKit::aoTocar;
         Pacotes.aoTremer = TremorCamera::receber;
+        Pacotes.aoMostrarVisual = VisuaisAtivos::receber;
+        Pacotes.aoEncerrarVisual = VisuaisAtivos::encerrar;
     }
 
     /** O último estado recebido (o HUD do 1.4 lê daqui). */

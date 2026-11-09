@@ -12,3 +12,5 @@ Voltar para [[00 Início]].
 - [[2026-11-09 HUD e cliente]]
 - [[2026-11-09 Tela de escolha]]
 - [[2026-11-09 Gojo mecânica]]
+- [[2026-11-09 Gojo VFX]]
+- [[2026-11-09 Gojo impacto]]

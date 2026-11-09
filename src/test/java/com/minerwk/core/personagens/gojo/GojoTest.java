@@ -45,6 +45,9 @@ class GojoTest {
         public boolean gastarRecurso(double q) { return temRecurso; }
         public void criarEfeito(Efeito e) { kit.adicionarEfeito(e); }
         public void tremor(float f, int d, double r) { chamadas.add("tremor"); }
+        public void visual(String tipo, Vetor o, Vetor d, float f, int dur) { chamadas.add("visual:" + tipo); }
+        public void visualFim(String tipo, Vetor p) { chamadas.add("fim:" + tipo); }
+        public void particulas(String tipo, Vetor p, int n) { chamadas.add("particulas"); }
     }
 
     private final Falso ctx = new Falso();
@@ -158,7 +161,7 @@ class GojoTest {
     void roxo200CaiComGolpeForteNaCarga() {
         usar(Tecla.R);
         ticks(10);
-        kit.levouDano(6f, agora);
+        kit.levouDano(6f, agora, ctx);
         ticks(100);
         assertEquals(0, ctx.conta("apagar"));
     }
@@ -190,5 +193,55 @@ class GojoTest {
         p.tick(ctx, APANHOU);
         for (int i = 0; i < 99; i++) p.tick(ctx, PARADO);
         assertEquals(2, ctx.conta("curar"));
+    }
+
+    @Test
+    void cadaGolpeMostraSeuVisualSemParticulasVanilla() {
+        usar(Tecla.Z);
+        ticks(60);
+        usar(Tecla.X);
+        ticks(80);
+        usar(Tecla.C);
+        ticks(150);
+        assertEquals(1, ctx.conta("visual:gojo_azul"));
+        assertEquals(1, ctx.conta("visual:gojo_vermelho_carga"));
+        assertEquals(1, ctx.conta("visual:gojo_vermelho"));
+        assertEquals(1, ctx.conta("fim:gojo_vermelho"), "a explosão sai pelo visualFim");
+        assertEquals(1, ctx.conta("visual:gojo_infinito"));
+        assertEquals(0, ctx.conta("particulas"));
+    }
+
+    @Test
+    void roxoEDominioMostramCargaEDisparo() {
+        usar(Tecla.V);
+        ticks(100);
+        assertEquals(1, ctx.conta("visual:gojo_roxo_carga"));
+        assertEquals(1, ctx.conta("visual:gojo_roxo"));
+        var ctx2 = new Falso();
+        var kit2 = new KitDoJogador(Gojo.criar());
+        ctx2.kit = kit2;
+        kit2.apertar(Tecla.G, 0);
+        for (int i = 0; i < 30; i++) kit2.tick(i, PARADO, ctx2);
+        assertEquals(1, ctx2.conta("visual:gojo_vazio_infinito"));
+    }
+
+    @Test
+    void cargaInterrompidaEncerraOVisualDaCarga() {
+        usar(Tecla.R);
+        ticks(10);
+        assertEquals(1, ctx.conta("visual:gojo_roxo_200_carga"));
+        kit.levouDano(6f, agora, ctx);
+        assertEquals(1, ctx.conta("fim:gojo_roxo_200_carga"));
+        ticks(100);
+        assertEquals(0, ctx.conta("visual:gojo_roxo_200"));
+    }
+
+    @Test
+    void infinitoSemEnergiaEncerraOVisual() {
+        usar(Tecla.C);
+        ticks(10);
+        ctx.temRecurso = false;
+        ticks(5);
+        assertEquals(1, ctx.conta("fim:gojo_infinito"));
     }
 }
