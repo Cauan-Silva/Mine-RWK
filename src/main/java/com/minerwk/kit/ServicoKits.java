@@ -52,7 +52,7 @@ public final class ServicoKits {
         if (personagem.isEmpty()) return Optional.empty();
         kit = new KitDoJogador(personagem.get());
         kit.recurso().carregar(dados.recurso);
-        kit.recargas().carregar(dados.recargas);
+        kit.recargas().carregar(dados.recargas, jogador.level().getGameTime());
         KITS.put(jogador.getUUID(), kit);
         return Optional.of(kit);
     }

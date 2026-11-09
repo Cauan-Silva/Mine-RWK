@@ -57,6 +57,7 @@ public final class PersonagemTeste {
         public void aoDisparar(Contexto contexto, float forca) {
             contexto.danoEmArea(5, 4 + 8 * forca);
             contexto.apresentacao("gojo_roxo", "", "teste");
+            contexto.tremor(0.3f + 0.7f * forca, 15, 12);
         }
     }
 }

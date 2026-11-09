@@ -13,6 +13,7 @@ import net.neoforged.neoforge.network.registration.PayloadRegistrar;
 public final class Pacotes {
     public static volatile Consumer<SincronizarKit> aoSincronizar = p -> { };
     public static volatile Consumer<TocarApresentacao> aoTocar = p -> { };
+    public static volatile Consumer<Tremer> aoTremer = p -> { };
 
     private Pacotes() {
     }
@@ -27,5 +28,6 @@ public final class Pacotes {
         });
         r.playToClient(SincronizarKit.TIPO, SincronizarKit.CODEC, (p, ctx) -> aoSincronizar.accept(p));
         r.playToClient(TocarApresentacao.TIPO, TocarApresentacao.CODEC, (p, ctx) -> aoTocar.accept(p));
+        r.playToClient(Tremer.TIPO, Tremer.CODEC, (p, ctx) -> aoTremer.accept(p));
     }
 }

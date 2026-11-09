@@ -49,11 +49,12 @@ public final class Recargas {
         return new HashMap<>(prontaNoTick);
     }
 
-    /** Substitui as recargas pelas salvas. */
-    public void carregar(Map<String, Long> salvas) {
+    /** Substitui as recargas pelas salvas. A duração (para o HUD) vira o que falta a partir de {@code agora}. */
+    public void carregar(Map<String, Long> salvas, long agora) {
         prontaNoTick.clear();
         prontaNoTick.putAll(salvas);
         duracoes.clear();
+        salvas.forEach((h, pronta) -> duracoes.put(h, (int) Math.max(0, Math.min(Integer.MAX_VALUE, pronta - agora))));
     }
 
     public void limpar() {

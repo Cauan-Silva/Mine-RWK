@@ -49,8 +49,19 @@ class RecargasTest {
         Recargas r = new Recargas();
         r.iniciar("z", 100, 40);
         Recargas outra = new Recargas();
-        outra.carregar(r.salvar());
+        outra.carregar(r.salvar(), 0);
         assertEquals(10, outra.restante("z", 130));
         assertTrue(outra.pronta("x", 0));
+    }
+
+    @Test
+    void carregarUsaORestanteComoDuracao() {
+        Recargas r = new Recargas();
+        r.iniciar("z", 100, 40);
+        Recargas outra = new Recargas();
+        outra.carregar(r.salvar(), 120);
+        assertEquals(20, outra.duracao("z"));
+        outra.carregar(r.salvar(), 500);
+        assertEquals(0, outra.duracao("z"));
     }
 }

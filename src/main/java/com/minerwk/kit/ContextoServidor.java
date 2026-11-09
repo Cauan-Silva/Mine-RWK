@@ -3,6 +3,7 @@ package com.minerwk.kit;
 import com.minerwk.core.kit.Contexto;
 import com.minerwk.rede.Envio;
 import com.minerwk.rede.TocarApresentacao;
+import com.minerwk.rede.Tremer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.LivingEntity;
 
@@ -31,5 +32,15 @@ public final class ContextoServidor implements Contexto {
     @Override
     public void apresentacao(String animacao, String efeito, String som) {
         Envio.paraQuemVe(jogador, new TocarApresentacao(jogador.getId(), animacao, efeito, som));
+    }
+
+    @Override
+    public void tremor(float forca, int duracao, double raio) {
+        for (ServerPlayer outro : jogador.serverLevel().players()) {
+            double d = Math.sqrt(outro.distanceToSqr(jogador));
+            if (d > raio) continue;
+            float f = (float) (forca * (1 - d / raio));
+            if (f > 0) Envio.para(outro, new Tremer(f, duracao));
+        }
     }
 }

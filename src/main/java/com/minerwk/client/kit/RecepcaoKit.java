@@ -15,7 +15,7 @@ import net.minecraft.sounds.SoundSource;
 
 /** Recebe no cliente o estado do kit e os pedidos de apresentação (animação, efeito e som). */
 public final class RecepcaoKit {
-    private static SincronizarKit ultimo = new SincronizarKit("", 0, 0, Map.of(), List.of());
+    private static SincronizarKit ultimo = SincronizarKit.VAZIO;
     private static boolean telaJaAberta;
 
     private RecepcaoKit() {
@@ -43,7 +43,7 @@ public final class RecepcaoKit {
 
     /** Ao sair do mundo, para a tela abrir de novo na próxima entrada. */
     public static void esquecer() {
-        ultimo = new SincronizarKit("", 0, 0, Map.of(), List.of());
+        ultimo = SincronizarKit.VAZIO;
         telaJaAberta = false;
     }
 

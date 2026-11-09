@@ -12,4 +12,8 @@ public interface Contexto {
      */
     default void apresentacao(String animacao, String efeito, String som) {
     }
+
+    /** Treme a tela dos jogadores a até {@code raio} blocos; mais longe, mais fraco. */
+    default void tremor(float forca, int duracao, double raio) {
+    }
 }
