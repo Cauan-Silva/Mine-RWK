@@ -1,5 +1,6 @@
 package com.minerwk.core.kit.teste;
 
+import com.minerwk.core.kit.Contexto;
 import com.minerwk.core.kit.Habilidade;
 import com.minerwk.core.kit.Numeros;
 import com.minerwk.core.kit.Personagem;
@@ -30,6 +31,12 @@ public final class PersonagemTeste {
         public Numeros numeros() {
             return NUMEROS;
         }
+
+        @Override
+        public void aoDisparar(Contexto contexto, float forca) {
+            contexto.danoEmArea(3, 4);
+            contexto.apresentacao("gojo_azul", "", "teste");
+        }
     }
 
     /** Segura para carregar; o dano cresce com a força. */
@@ -44,6 +51,12 @@ public final class PersonagemTeste {
         @Override
         public Numeros numeros() {
             return NUMEROS;
+        }
+
+        @Override
+        public void aoDisparar(Contexto contexto, float forca) {
+            contexto.danoEmArea(5, 4 + 8 * forca);
+            contexto.apresentacao("gojo_roxo", "", "teste");
         }
     }
 }

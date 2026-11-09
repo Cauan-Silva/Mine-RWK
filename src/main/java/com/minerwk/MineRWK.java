@@ -5,6 +5,7 @@ import com.minerwk.core.kit.teste.PersonagemTeste;
 import com.minerwk.kit.Anexos;
 import com.minerwk.kit.ComandoTrocar;
 import com.minerwk.kit.ServicoKits;
+import com.minerwk.rede.Pacotes;
 import com.minerwk.registro.Sons;
 import com.mojang.logging.LogUtils;
 import net.minecraft.resources.ResourceLocation;
@@ -27,6 +28,7 @@ public final class MineRWK {
         Personagens.registrar(PersonagemTeste.criar());
         ServicoKits.registrarEventos();
         NeoForge.EVENT_BUS.addListener((RegisterCommandsEvent e) -> ComandoTrocar.registrar(e.getDispatcher()));
+        modBus.addListener(Pacotes::registrar);
         modBus.addListener(this::commonSetup);
     }
 

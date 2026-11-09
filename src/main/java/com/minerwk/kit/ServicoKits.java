@@ -1,6 +1,8 @@
 package com.minerwk.kit;
 
+import com.minerwk.MineRWK;
 import com.minerwk.core.kit.EstadoDoJogador;
+import com.minerwk.core.kit.Tecla;
 import com.minerwk.core.kit.KitDoJogador;
 import com.minerwk.core.kit.Personagem;
 import com.minerwk.core.kit.Personagens;
@@ -63,6 +65,32 @@ public final class ServicoKits {
         KITS.put(jogador.getUUID(), novo);
         salvar(jogador, novo);
         Sincronizacao.enviar(jogador);
+    }
+
+    /** Tecla apertada ou solta no cliente. Sem personagem, nada acontece. */
+    public static void usarTecla(ServerPlayer jogador, Tecla tecla, boolean apertou) {
+        kit(jogador).ifPresent(k -> {
+            if (apertou) k.apertar(tecla, jogador.level().getGameTime());
+            else k.soltar(tecla);
+        });
+    }
+
+    /**
+     * Escolha feita no menu. Só vale se o jogador ainda não tem personagem e o id está entre os escolhíveis.
+     * Devolve se aceitou.
+     */
+    public static boolean escolher(ServerPlayer jogador, String id) {
+        if (dados(jogador).temPersonagem()) {
+            MineRWK.LOGGER.debug("{} tentou escolher {} mas já tem personagem", jogador.getName().getString(), id);
+            return false;
+        }
+        Optional<Personagem> personagem = Personagens.escolhiveis().stream().filter(p -> p.id().equals(id)).findFirst();
+        if (personagem.isEmpty()) {
+            MineRWK.LOGGER.debug("{} tentou escolher personagem inválido: {}", jogador.getName().getString(), id);
+            return false;
+        }
+        definirPersonagem(jogador, personagem.get());
+        return true;
     }
 
     private static void salvar(ServerPlayer jogador, KitDoJogador kit) {
