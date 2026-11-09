@@ -23,6 +23,12 @@ Técnica herdada: **Ilimitado** (無下限呪術 *Mukagen Jujutsu*), que traz o 
 | Técnica Reversa (passiva) | 反転術式 *Hanten Jutsushiki* | Cura a si mesmo; é a energia positiva que permite Vermelho e Roxo. Usa sem parar para manter o cérebro descansado com o Infinito ligado. | Despertar no cap. 75 / ep. 28 | Fandom: Satoru Gojo |
 | Seis Olhos (passiva) | 六眼 *Rikugan* | Percepção enorme e controle preciso da energia; quase nenhuma perda ao usar técnicas, por isso parece nunca cansar. Enxerga pelo fluxo de energia mesmo vendado. | Vários; vol. 2 | Fandom: Satoru Gojo |
 
+## Roxo 200%: a cena do cap. 223
+- **Encantamento** (que o Gojo normalmente omite): 〝九綱〟〝偏光〟〝烏と声明〟〝表裏の間〟, *Kukō, Henkō, Karasu to Shōmyō, Hyōri no Hazama*. Em português: "Nove Cordas", "Luz Polarizada", "Corvo e Declaração", "Entre a Frente e o Verso". Com o encantamento e os gestos, a saída do Roxo dobra (200%).
+- **Gesto:** indicador e mindinho estendidos, os outros dobrados; depois pinça com indicador e polegar e o médio estendido, e os dedos se abrem de uma vez no disparo.
+- **Cena:** ataque surpresa de Shibuya a Shinjuku, escondido por uma barreira do Ijichi e reforçado pela Utahime; arrasou uns 4 km de prédios e destruiu os braços reforçados do Sukuna (cap. 223, pp. 9 a 18). No fim da luta (cap. 235) o Roxo sai como explosão em todas as direções.
+- Fonte: Jujutsu Kaisen Wiki (Fandom), "Hollow Technique: Purple": https://jujutsu-kaisen.fandom.com/wiki/Hollow_Technique:_Purple (lido em 09/11/2026), que cita o cap. 223 e o Fanbook oficial (p. 158).
+
 ## Aparência e som
 - **Azul:** esfera azul pequena; partículas e destroços sendo sugados para o ponto.
 - **Vermelho:** esfera vermelha pequena na ponta dos dedos; estouro de repulsão com onda de choque.
