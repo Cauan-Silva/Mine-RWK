@@ -24,7 +24,7 @@ import java.util.List;
 /**
  * Comandos de teste da prova de conceito, só no cliente (tocam apenas para quem digitou):
  * {@code /rwk fx <efeito>}, {@code /rwk anim <animação>}, {@code /rwk som} e {@code /rwk tela <quantos>}
- * (abre a tela de escolha com personagens falsos, para ver a grade e a rolagem; escolher um falso não faz nada).
+ * (abre a tela de escolha com personagens falsos, para ver a grade e a rolagem; a confirmação não envia nada ao servidor).
  * Sem namespace, o id vira {@code minerwk:<nome>}.
  */
 public final class ComandosTeste {
@@ -90,7 +90,7 @@ public final class ComandosTeste {
                             new PersonagemEscolha.GolpeEscolha(Tecla.X, "teste_carga"))));
         }
         // Adia para depois de o chat fechar, senão ele fecha a tela junto.
-        Minecraft.getInstance().tell(() -> Minecraft.getInstance().setScreen(new TelaEscolha(falsos)));
+        Minecraft.getInstance().tell(() -> Minecraft.getInstance().setScreen(new TelaEscolha(falsos, true)));
         return 1;
     }
 

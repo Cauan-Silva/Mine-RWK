@@ -29,14 +29,21 @@ public final class TelaEscolha extends Screen {
     private static final Map<String, ResourceLocation> EMBLEMAS = new HashMap<>();
 
     private final List<PersonagemEscolha> personagens;
+    /** Aberta pelo {@code /rwk tela}: só para ver, nunca envia a escolha ao servidor. */
+    private final boolean demonstracao;
     private LayoutEscolha layout;
     private int rolagem;
     private int selecionado;
     private boolean confirmando;
 
     public TelaEscolha(List<PersonagemEscolha> personagens) {
+        this(personagens, false);
+    }
+
+    public TelaEscolha(List<PersonagemEscolha> personagens, boolean demonstracao) {
         super(Component.translatable("tela.minerwk.escolha"));
         this.personagens = List.copyOf(personagens);
+        this.demonstracao = demonstracao;
     }
 
     @Override
@@ -71,7 +78,7 @@ public final class TelaEscolha extends Screen {
 
     private void enviar() {
         PersonagemEscolha p = atual();
-        if (p != null) PacketDistributor.sendToServer(new EscolherPersonagem(p.id()));
+        if (p != null && !demonstracao) PacketDistributor.sendToServer(new EscolherPersonagem(p.id()));
         onClose();
     }
 

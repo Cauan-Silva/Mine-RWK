@@ -6,7 +6,7 @@ atualizado: 2026-11-08
 
 Voltar para [[00 Início]]. Marque `[x]` ao concluir e registre no [[Diário]]. Decisões novas vão em [[Decisões]]; o que precisa de teste no jogo vai em [[Pendências]].
 
-**Onde estamos:** Fase 1, item 1.4, parte 2 (tela de escolha bonita). A parte 1 (HUD e cliente) está pronta; o áudio fica para o começo da Fase 2. O 1.2 ainda tem o `.fx` de teste e o Iris pendentes.
+**Onde estamos:** Fase 2 (Gojo), começando pela pesquisa canônica e pelo pipeline de áudio (parte 3 do 1.4, adiada para cá). As partes 1 (HUD e cliente) e 2 (tela de escolha) do 1.4 estão prontas. O 1.2 ainda tem o `.fx` de teste e o Iris pendentes.
 
 ## Como trabalhar em outro PC
 1. `git clone https://github.com/Cauan-Silva/Mine-RWK.git` (ou `git pull` se já tiver).
@@ -52,7 +52,7 @@ Spec e plano: [[2026-11-09 Núcleo dos kits]] (em `Desenvolvimento/Specs` e `Des
 - [x] Configuração do cliente (`minerwk-client.toml`: tremor, VFX reduzido, sons, HUD)
 - [x] Tremor de tela próprio (`core/camera/Tremor`, pacote `Tremer`)
 - [x] HUD de recargas e recurso (os ícones vêm com o Gojo)
-- [ ] Tela de seleção de personagem (a simples já existe no 1.3: `client/kit/TelaEscolha`; falta retratos, descrição e rolagem)
+- [x] Tela de seleção de personagem: grade de emblemas com rolagem e painel com golpes (`core/hud/LayoutEscolha`, `client/kit/TelaEscolha`)
 
 ## Fase 2: Gojo completo (primeiro personagem, vira o modelo dos outros)
 - [ ] Pesquisa canônica na nota do Gojo seguindo [[Kits Canônicos]] e [[Modelo de Personagem]]
