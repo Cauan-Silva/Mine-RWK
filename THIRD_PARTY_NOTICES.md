@@ -9,3 +9,8 @@
 | Arquivo | Origem |
 | --- | --- |
 | `assets/minerwk/player_animations/gojo.json` | Minezin (mesmo autor) |
+
+## Shaders
+| Arquivo | Origem |
+| --- | --- |
+| `assets/minerwk/shaders/core/gojo_energy*` | Minezin (mesmo autor) |

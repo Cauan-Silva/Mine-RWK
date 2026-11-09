@@ -6,7 +6,7 @@ tags: [planejamento]
 Voltar para [[00 Início]].
 
 ## Para conferir
-- `vfxReduzido` ainda não é lido: ligar ao Photon quando houver efeitos. `LogicaHud.teclasVisiveis` não é usada (a sincronização já manda só as teclas existentes).
+- `vfxReduzido` já reduz faixas e segmentos do VFX do Gojo; os emissores de brilho do Photon (`GolpesGojoPhoton` do Minezin) ficaram de fora: a API do Photon2 mudou e o shader já carrega o visual. Retomar se faltar brilho. `LogicaHud.teclasVisiveis` não é usada (a sincronização já manda só as teclas existentes).
 - O tremor continua decaindo com o jogo pausado (até 15 ticks): irrelevante por ora.
 - Animações do Minezin estão travadas na Player Animation Library: refazer/suavizar no Blockbench na Fase 2 (Gojo).
 - O som de teste (robô) e a falta de VFX nos golpes do `teste` são provisórios: somem com o Gojo.
@@ -24,6 +24,7 @@ Voltar para [[00 Início]].
 
 ## Para testar no jogo
 - Gojo (09/11): **as seis teclas funcionaram no jogo sem erro** (autor). Ainda vale conferir com calma, mundo novo escolhendo o Gojo: Z puxa mobs para o ponto à frente; X segurando lança a esfera que explode e empurra; C faz flechas pararem no ar e mobs não encostarem (some depois de ~6 s ou sem energia); V abre um túnel de 40 blocos; G paralisa mobs num raio de 12 por 8 s; R (energia cheia) carrega 4 s e abre um túnel de 120 blocos, e um golpe forte na carga cancela. Técnica Reversa: vida volta sozinha depois de 5 s sem dano. Conferir `/gamerule minerwkApagarBlocos false`. Ver também a TPS com o Roxo 200%.
+- Gojo VFX (09/11), conferir no jogo: Z esfera escura com filamentos ciano puxando; X carga vermelha na mão, esfera viajando e explosão em anéis no ponto do impacto; C bolha azulada em volta do jogador; V e R duas esferas (azul e vermelha) se juntando à frente e a massa roxa com coroa e rastro seguindo o túnel; G domo escuro de raio 12 com chão estrelado, linhas coloridas e neblina escura só dentro. Ver de outro jogador também (os visuais vão para quem vê). Conferir FPS, o `VFX reduzido` na config e com Iris ligado. Se o shader não carregar, o log avisa e o desenho sai só com cor.
 - HUD (09/11): funcionou no jogo. Depois das correções da revisão, conferir: HUD acima da armadura e das bolhas de ar (mergulhar com armadura), texto "Fôlego" à esquerda da barra, barra sem subir de 0 ao entrar no mundo.
 - Núcleo dos kits (09/11): escolha pelo menu, Z, X segurando e recarga **funcionaram**. Falta: morrer segurando X (não pode disparar), usar como espectador (nada acontece), ver a animação em outro jogador (2 clientes), sair e entrar mantendo o personagem.
 - Tela de escolha (09/11): **funcionou no jogo** (autor). Conferido: mundo novo abre a tela com o `teste` (emblema genérico), golpes Z e X no painel, "Escolher" → confirmação. `/rwk tela 40` mostra a grade com rolagem pela roda do mouse e emblemas do Minezin; o 15º falso usa o genérico. Testar também com a janela estreita (painel embaixo) e com escala de interface grande.
