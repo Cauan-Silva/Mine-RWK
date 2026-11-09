@@ -1,6 +1,6 @@
 ---
 tags: [desenvolvimento, spec]
-estado: proposto
+estado: aprovado
 ---
 # Spec e plano: animações dos golpes do Gojo (Fase 2, parte 4)
 
