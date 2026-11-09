@@ -170,6 +170,8 @@ public final class ContextoServidor implements Contexto {
         int r = (int) Math.ceil(raio);
         BlockPos base = BlockPos.containing(c);
         int apagados = 0;
+        BlockPos[] sorteados = new BlockPos[DETRITOS];
+        BlockState[] estados = new BlockState[DETRITOS];
         for (BlockPos p : BlockPos.betweenClosed(base.offset(-r, -r, -r), base.offset(r, r, r))) {
             if (p.getCenter().distanceToSqr(c) > raio * raio) continue;
             if (!nivel.isLoaded(p) || nivel.isOutsideBuildHeight(p) || !nivel.mayInteract(jogador, p)) continue;
@@ -177,12 +179,19 @@ public final class ContextoServidor implements Contexto {
             if (estado.isAir() || estado.getDestroySpeed(nivel, p) < 0 || estado.hasBlockEntity()
                     || !estado.getFluidState().isEmpty()) continue;
             nivel.setBlock(p, Blocks.AIR.defaultBlockState(), Block.UPDATE_ALL);
-            // Pedaços do bloco de verdade voam; no máximo DETRITOS blocos por chamada, sorteados.
-            apagados++;
-            if (apagados <= DETRITOS || nivel.random.nextInt(apagados) < DETRITOS) {
-                nivel.sendParticles(new BlockParticleOption(ParticleTypes.BLOCK, estado),
-                        p.getX() + .5, p.getY() + .5, p.getZ() + .5, 4, .4, .4, .4, .15);
+            // Sorteio de reservatório: guarda DETRITOS blocos ao acaso entre os apagados.
+            int vaga = apagados < DETRITOS ? apagados : nivel.random.nextInt(apagados + 1);
+            if (vaga < DETRITOS) {
+                sorteados[vaga] = p.immutable();
+                estados[vaga] = estado;
             }
+            apagados++;
+        }
+        // Pedaços do bloco de verdade voam: no máximo DETRITOS pacotes por chamada.
+        for (int i = 0; i < Math.min(apagados, DETRITOS); i++) {
+            BlockPos p = sorteados[i];
+            nivel.sendParticles(new BlockParticleOption(ParticleTypes.BLOCK, estados[i]),
+                    p.getX() + .5, p.getY() + .5, p.getZ() + .5, 4, .4, .4, .4, .15);
         }
     }
 

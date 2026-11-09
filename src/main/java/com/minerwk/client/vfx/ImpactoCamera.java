@@ -73,7 +73,8 @@ public final class ImpactoCamera {
 
     public static void aoCalcularFov(ViewportEvent.ComputeFov evento) {
         Minecraft mc = Minecraft.getInstance();
-        if (mc.level == null || ATIVOS.isEmpty()) return;
+        // Só o FOV do mundo; o da mão fica parado.
+        if (mc.level == null || ATIVOS.isEmpty() || !evento.usedConfiguredFov()) return;
         long agora = mc.level.getGameTime();
         float parcial = (float) evento.getPartialTick();
         double escala = mc.options.fovEffectScale().get();

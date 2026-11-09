@@ -59,6 +59,7 @@ Spec e plano: [[2026-11-09 Núcleo dos kits]] (em `Desenvolvimento/Specs` e `Des
 - [x] Kit aprovado (tecla, dano, recarga) antes de programar: ver [[Gojo]]
 - [x] Habilidades: Azul, Vermelho, Infinito, Roxo, Vazio Infinito (domínio), Roxo 200% (o teleporte ficou de fora do kit). Mecânica no servidor com apresentação provisória; ver [[2026-11-09 Gojo mecânica]]
 - [x] VFX dos seis golpes (shader `gojo_energy` + geometria, sem Photon por enquanto); ver [[2026-11-09 Gojo VFX]]
+- [x] Impacto dos golpes: câmera reage (tremor, clarão, FOV), detritos e brilho; ver [[2026-11-09 Gojo impacto]]
 - [ ] VFX no Photon2 de cada habilidade; Veil só se o domínio precisar de pós-processamento
 - [ ] SFX de cada habilidade
 - [ ] Animações do jogador de cada golpe
