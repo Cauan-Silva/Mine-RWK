@@ -5,6 +5,7 @@ import com.minerwk.client.ConfigCliente;
 import com.minerwk.core.camera.Coreografia;
 import com.minerwk.core.kit.Vetor;
 import com.minerwk.core.personagens.gojo.CutsceneRoxo200;
+import com.minerwk.core.personagens.gojo.CutsceneRoxoMaximo;
 import com.minerwk.rede.Cutscene;
 import com.minerwk.rede.EncerrarVisual;
 import java.util.List;
@@ -29,17 +30,31 @@ import net.neoforged.neoforge.client.event.ViewportEvent;
 import net.neoforged.neoforge.client.gui.VanillaGuiLayers;
 
 /**
- * Cutscene de ultimate no cliente de quem usou o golpe. A câmera vira uma entidade só do cliente que
- * segue a {@link Coreografia}; barras de cinema, HUD e mão escondidas, andar bloqueado e o olhar do
- * jogador preso (o golpe sai para onde ele olhava). Acaba sozinha, ou na hora se a carga for cortada.
+ * Cutscene de ultimate no cliente de quem usou o golpe (e, na parte 2 do R, do alvo, que assiste com a
+ * câmera na base do Gojo). A câmera vira uma entidade só do cliente que segue a {@link Coreografia};
+ * barras de cinema, HUD e mão escondidas, andar bloqueado e o olhar do jogador preso (o golpe sai para
+ * onde ele olhava). Uma cutscene do mesmo dono que chega com outra ativa emenda sem corte. Acaba
+ * sozinha, se a carga for cortada, se o dono morrer ou se o servidor mandar {@link Cutscene#FIM}.
  */
 public final class CutsceneCliente {
-    /** O que cada cutscene tem: a câmera, as palavras na tela e o visual de carga que a corta. */
-    record Roteiro(Coreografia coreografia, List<CutsceneRoxo200.Palavra> palavras, String cargaQueCorta) {
+    /**
+     * O que cada cutscene tem: a câmera, as palavras na tela, o visual de carga que a corta e se quem não
+     * é o dono (o alvo) também assiste.
+     */
+    record Roteiro(Coreografia coreografia, List<CutsceneRoxo200.Palavra> palavras, String cargaQueCorta,
+                   boolean espectador) {
     }
 
     private static final Map<String, Roteiro> ROTEIROS = Map.of(
-            CutsceneRoxo200.ID, new Roteiro(CutsceneRoxo200.COREOGRAFIA, CutsceneRoxo200.PALAVRAS, "gojo_roxo_200_carga"));
+            CutsceneRoxo200.ID, new Roteiro(CutsceneRoxo200.COREOGRAFIA, CutsceneRoxo200.PALAVRAS, "gojo_roxo_200_carga", false));
+
+    private static Roteiro roteiroDe(String id) {
+        Roteiro r = ROTEIROS.get(id);
+        if (r != null) return r;
+        return CutsceneRoxoMaximo.deId(id)
+                .map(c -> new Roteiro(c, CutsceneRoxo200.PALAVRAS_DISPARO, "", true))
+                .orElse(null);
+    }
     public static final ResourceLocation CAMADA = MineRWK.id("cutscene");
 
     private static Roteiro roteiro;
@@ -52,6 +67,8 @@ public final class CutsceneCliente {
     private static Coreografia.Quadro quadro;
     /** Tipo de câmera de antes (F5): a cutscene força a primeira pessoa e devolve no fim. */
     private static CameraType cameraAntes;
+    /** Emendou numa cutscene anterior: as barras já estão na tela. */
+    private static boolean emendada;
 
     private CutsceneCliente() {
     }
@@ -62,8 +79,20 @@ public final class CutsceneCliente {
 
     public static void receber(Cutscene pacote) {
         Minecraft mc = Minecraft.getInstance();
-        Roteiro r = ROTEIROS.get(pacote.id());
-        if (mc.level == null || mc.player == null || r == null || pacote.dono() != mc.player.getId()) return;
+        if (pacote.id().equals(Cutscene.FIM)) {
+            if (atual != null && atual.dono() == pacote.dono()) encerrar();
+            return;
+        }
+        Roteiro r = roteiroDe(pacote.id());
+        if (mc.level == null || mc.player == null || r == null) return;
+        if (pacote.dono() != mc.player.getId() && !r.espectador()) return;
+        if (atual != null && atual.dono() == pacote.dono() && (!comCamera || camera != null)) {
+            // Continuação (a parte 2 do R): troca o roteiro sem soltar a câmera.
+            roteiro = r;
+            atual = pacote;
+            emendada = true;
+            return;
+        }
         encerrar();
         roteiro = r;
         atual = pacote;
@@ -99,6 +128,7 @@ public final class CutsceneCliente {
         camera = null;
         quadro = null;
         comCamera = false;
+        emendada = false;
         mundo = null;
     }
 
@@ -125,7 +155,8 @@ public final class CutsceneCliente {
         if (atual == null) return;
         prenderOlhar();
         Minecraft mc = Minecraft.getInstance();
-        if (mc.level != mundo || mc.player == null || !mc.player.isAlive()
+        Entity dono = mc.level == null ? null : mc.level.getEntity(atual.dono());
+        if (mc.level != mundo || mc.player == null || !mc.player.isAlive() || (dono != null && !dono.isAlive())
                 || idade(0) > roteiro.coreografia().duracao()) encerrar();
     }
 
@@ -142,12 +173,18 @@ public final class CutsceneCliente {
         }
     }
 
-    /** A câmera segue os olhos do jogador (no Roxo 200% ele sobe), virada para onde ele olhava no início. */
+    /**
+     * A câmera segue os olhos do dono do golpe (no R ele avança e sobe), virada para a direção do
+     * pacote. Longe demais para o cliente ver o dono, usa os olhos de quando a cutscene começou.
+     */
     private static void posicionar(double t, float parcial) {
         quadro = roteiro.coreografia().quadro(t);
-        var jogador = Minecraft.getInstance().player;
-        var olhos = jogador.getEyePosition(parcial);
-        Vetor origem = new Vetor(olhos.x, olhos.y, olhos.z);
+        Entity dono = Minecraft.getInstance().level.getEntity(atual.dono());
+        Vetor origem = atual.origem();
+        if (dono != null) {
+            var olhos = dono.getEyePosition(parcial);
+            origem = new Vetor(olhos.x, olhos.y, olhos.z);
+        }
         Vetor pos = Coreografia.naBase(quadro.posicao(), origem, atual.direcao());
         Vetor alvo = Coreografia.naBase(quadro.alvo(), origem, atual.direcao());
         Vetor d = alvo.menos(pos);
@@ -217,7 +254,7 @@ public final class CutsceneCliente {
         int altura = g.guiHeight();
         if (comCamera) {
             int fim = roteiro.coreografia().duracao();
-            int barra = (int) (altura * .12 * suave(t / 10) * suave((fim - t) / 12));
+            int barra = (int) (altura * .12 * (emendada ? 1 : suave(t / 10)) * suave((fim - t) / 12));
             g.fill(0, 0, largura, barra, 0xFF000000);
             g.fill(0, altura - barra, largura, altura, 0xFF000000);
         }
