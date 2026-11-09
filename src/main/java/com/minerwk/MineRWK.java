@@ -4,7 +4,11 @@ import com.minerwk.core.kit.Personagens;
 import com.minerwk.core.kit.teste.PersonagemTeste;
 import com.minerwk.kit.Anexos;
 import com.minerwk.kit.ComandoTrocar;
+import com.minerwk.core.personagens.gojo.Gojo;
+import com.minerwk.kit.ProtecoesServidor;
 import com.minerwk.kit.ServicoKits;
+import com.minerwk.registro.Efeitos;
+import com.minerwk.registro.Regras;
 import com.minerwk.rede.Pacotes;
 import com.minerwk.registro.Sons;
 import com.mojang.logging.LogUtils;
@@ -25,8 +29,12 @@ public final class MineRWK {
     public MineRWK(IEventBus modBus) {
         Sons.REGISTRO.register(modBus);
         Anexos.REGISTRO.register(modBus);
+        Efeitos.REGISTRO.register(modBus);
+        Regras.registrar();
         Personagens.registrar(PersonagemTeste.criar());
+        Personagens.registrar(Gojo.criar());
         ServicoKits.registrarEventos();
+        ProtecoesServidor.registrarEventos();
         NeoForge.EVENT_BUS.addListener((RegisterCommandsEvent e) -> ComandoTrocar.registrar(e.getDispatcher()));
         modBus.addListener(Pacotes::registrar);
         modBus.addListener(this::commonSetup);

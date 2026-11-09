@@ -75,7 +75,7 @@ public final class ServicoKits {
     /** Tecla apertada ou solta no cliente. Sem personagem, nada acontece. */
     public static void usarTecla(ServerPlayer jogador, Tecla tecla, boolean apertou) {
         kit(jogador).ifPresent(k -> {
-            if (apertou && podeAgir(jogador)) k.apertar(tecla, jogador.level().getGameTime());
+            if (apertou && podeAgir(jogador) && !ProtecoesServidor.paralisado(jogador)) k.apertar(tecla, jogador.level().getGameTime());
             else k.soltar(tecla);
         });
     }
@@ -120,6 +120,8 @@ public final class ServicoKits {
             return;
         }
         long agora = jogador.level().getGameTime();
+        // Paralisado (Vazio Infinito): a carga em andamento cai, como num atordoamento.
+        if (ProtecoesServidor.paralisado(jogador)) kit.get().atordoar(agora);
         boolean parado = jogador.getDeltaMovement().horizontalDistanceSqr() < LIMIAR_PARADO * LIMIAR_PARADO;
         kit.get().tick(agora, new EstadoDoJogador(parado, apanhou, causou), new ContextoServidor(jogador));
         if (agora % SALVAR_A_CADA == 0) salvar(jogador, kit.get());
@@ -127,7 +129,10 @@ public final class ServicoKits {
     }
 
     private static void aoDano(LivingDamageEvent.Post evento) {
-        if (evento.getEntity() instanceof ServerPlayer vitima) APANHOU.add(vitima.getUUID());
+        if (evento.getEntity() instanceof ServerPlayer vitima) {
+            APANHOU.add(vitima.getUUID());
+            kit(vitima).ifPresent(k -> k.levouDano(evento.getNewDamage(), vitima.level().getGameTime()));
+        }
         if (evento.getSource().getEntity() instanceof ServerPlayer atacante) CAUSOU_DANO.add(atacante.getUUID());
     }
 
