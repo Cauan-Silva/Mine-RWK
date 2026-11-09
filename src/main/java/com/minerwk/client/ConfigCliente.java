@@ -31,6 +31,10 @@ public final class ConfigCliente {
         return SPEC.isLoaded() ? INTENSIDADE_TREMOR.get() : INTENSIDADE_TREMOR.getDefault();
     }
 
+    public static boolean vfxReduzido() {
+        return SPEC.isLoaded() ? VFX_REDUZIDO.get() : VFX_REDUZIDO.getDefault();
+    }
+
     public static boolean sfxAnime() {
         return SPEC.isLoaded() ? SFX_ANIME.get() : SFX_ANIME.getDefault();
     }
