@@ -1,0 +1,52 @@
+package com.minerwk.core.hud;
+
+import static org.junit.jupiter.api.Assertions.*;
+
+import com.minerwk.core.kit.Recargas;
+import com.minerwk.core.kit.Tecla;
+import java.util.EnumSet;
+import java.util.List;
+import org.junit.jupiter.api.Test;
+
+class LogicaHudTest {
+
+    @Test
+    void segundosSeguemARegraDoSpec() {
+        assertEquals("4", LogicaHud.segundos(61));
+        assertEquals("1", LogicaHud.segundos(20));
+        assertEquals("0.9", LogicaHud.segundos(19));
+        assertEquals("0.3", LogicaHud.segundos(7));
+        assertEquals("0.1", LogicaHud.segundos(1));
+        assertEquals("", LogicaHud.segundos(0));
+        assertEquals("", LogicaHud.segundos(-5));
+    }
+
+    @Test
+    void fracaoFicaEntreZeroEUm() {
+        assertEquals(0.5f, LogicaHud.fracao(100, 40, 80), 1e-6);
+        assertEquals(0f, LogicaHud.fracao(100, 40, 130));
+        assertEquals(1f, LogicaHud.fracao(100, 40, 10));
+        assertEquals(0f, LogicaHud.fracao(100, 0, 50));
+    }
+
+    @Test
+    void punicaoUsaADuracaoDaPropriaRecarga() {
+        Recargas r = new Recargas();
+        r.iniciar("x", 0, 10);
+        assertEquals(10, r.duracao("x"));
+        assertEquals(0.5f, LogicaHud.fracao(10, r.duracao("x"), 5), 1e-6);
+        assertEquals(0, r.duracao("nunca"));
+    }
+
+    @Test
+    void semRecursoQuandoAtualMenorQueCusto() {
+        assertTrue(LogicaHud.semRecurso(10, 20));
+        assertFalse(LogicaHud.semRecurso(20, 20));
+    }
+
+    @Test
+    void teclasVisiveisNaOrdemSoAsExistentes() {
+        assertEquals(List.of(Tecla.Z, Tecla.X, Tecla.R), LogicaHud.teclasVisiveis(EnumSet.of(Tecla.R, Tecla.X, Tecla.Z)));
+        assertEquals(List.of(), LogicaHud.teclasVisiveis(EnumSet.noneOf(Tecla.class)));
+    }
+}

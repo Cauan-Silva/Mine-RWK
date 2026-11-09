@@ -12,6 +12,16 @@ public final class RecursoFolego implements Recurso {
     private double atual = MAXIMO;
 
     @Override
+    public String nome() {
+        return "Fôlego";
+    }
+
+    @Override
+    public int cor() {
+        return 0x1D9E75;
+    }
+
+    @Override
     public double atual() {
         return atual;
     }

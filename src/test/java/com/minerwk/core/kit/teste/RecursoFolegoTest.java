@@ -47,4 +47,11 @@ class RecursoFolegoTest {
         r.gastar(10);
         assertEquals(0, r.atual());
     }
+
+    @Test
+    void nomeECor() {
+        RecursoFolego r = new RecursoFolego();
+        assertEquals("Fôlego", r.nome());
+        assertEquals(0x1D9E75, r.cor());
+    }
 }

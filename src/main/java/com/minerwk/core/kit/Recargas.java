@@ -9,6 +9,7 @@ import java.util.Map;
  */
 public final class Recargas {
     private final Map<String, Long> prontaNoTick = new HashMap<>();
+    private final Map<String, Integer> duracoes = new HashMap<>();
 
     /** Começa a recarga de {@code habilidade}: fica indisponível por {@code duracao} ticks a partir de {@code agora}. */
     public void iniciar(String habilidade, long agora, int duracao) {
@@ -16,6 +17,7 @@ public final class Recargas {
             throw new IllegalArgumentException("duração negativa: " + duracao);
         }
         prontaNoTick.put(habilidade, agora + duracao);
+        duracoes.put(habilidade, duracao);
     }
 
     public boolean pronta(String habilidade, long agora) {
@@ -37,6 +39,11 @@ public final class Recargas {
         return true;
     }
 
+    /** Duração total da última recarga iniciada (para a fração no HUD); 0 se nunca começou nesta sessão. */
+    public int duracao(String habilidade) {
+        return duracoes.getOrDefault(habilidade, 0);
+    }
+
     /** Cópia das recargas para salvar nos dados do jogador (habilidade → tick em que fica pronta). */
     public Map<String, Long> salvar() {
         return new HashMap<>(prontaNoTick);
@@ -46,9 +53,11 @@ public final class Recargas {
     public void carregar(Map<String, Long> salvas) {
         prontaNoTick.clear();
         prontaNoTick.putAll(salvas);
+        duracoes.clear();
     }
 
     public void limpar() {
         prontaNoTick.clear();
+        duracoes.clear();
     }
 }

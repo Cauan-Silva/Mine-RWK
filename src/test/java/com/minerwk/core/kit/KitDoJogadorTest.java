@@ -15,6 +15,8 @@ class KitDoJogadorTest {
     static final class RecursoFixo implements Recurso {
         double atual;
         RecursoFixo(double v) { atual = v; }
+        public String nome() { return "Fixo"; }
+        public int cor() { return 0; }
         public double atual() { return atual; }
         public double maximo() { return 100; }
         public boolean pode(double c) { return atual >= c; }

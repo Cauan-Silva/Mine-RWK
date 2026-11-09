@@ -5,6 +5,12 @@ package com.minerwk.core.kit;
  * Cada personagem tem a sua implementação, com regras próprias de ganho em {@link #tick}.
  */
 public interface Recurso {
+    /** Nome mostrado no HUD (ex.: "Fôlego", "Energia amaldiçoada"). */
+    String nome();
+
+    /** Cor da barra no HUD, em RGB (0xRRGGBB). */
+    int cor();
+
     double atual();
 
     double maximo();
