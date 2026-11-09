@@ -102,6 +102,53 @@ public final class TestesGojo {
     }
 
     @GameTest(template = "vazio")
+    public static void vermelhoCongelaEArremessaZumbi(GameTestHelper helper) {
+        ServerPlayer jogador = gojo(helper);
+        Zombie zumbi = helper.spawn(EntityType.ZOMBIE, new BlockPos(4, 2, 1));
+        Vec3 inicio = zumbi.position();
+        Vetor centro = vetor(helper.absoluteVec(new Vec3(2.5, 2.5, 1.5)));
+        new ContextoServidor(jogador).arremessar(centro, 4, 3, 3, null);
+        helper.assertTrue(ArremessosServidor.emArremesso(zumbi), "o zumbi deveria estar sendo arremessado");
+        helper.runAfterDelay(2, () -> {
+            helper.assertTrue(zumbi.position().distanceTo(inicio) < 0.3, "congelado não anda: " + zumbi.position());
+            helper.assertTrue(zumbi.isNoAi(), "congelado fica sem IA");
+        });
+        helper.runAfterDelay(8, () -> {
+            helper.assertTrue(zumbi.position().x - inicio.x > 2, "deveria ter voado para longe: " + zumbi.position());
+            helper.assertFalse(zumbi.isNoAi(), "a IA volta depois do lançamento");
+            helper.succeed();
+        });
+    }
+
+    @GameTest(template = "vazio")
+    public static void azulArrancaTerraMasNaoPedra(GameTestHelper helper) {
+        ServerPlayer jogador = gojo(helper);
+        var regra = helper.getLevel().getGameRules().getRule(Regras.APAGAR_BLOCOS);
+        for (int x = 2; x <= 4; x++) {
+            for (int z = 2; z <= 4; z++) helper.setBlock(new BlockPos(x, 1, z), (x + z) % 2 == 0 ? Blocks.DIRT : Blocks.STONE);
+        }
+        Vetor centro = vetor(helper.absoluteVec(new Vec3(3.5, 2.5, 3.5)));
+        ContextoServidor ctx = new ContextoServidor(jogador);
+        try {
+            regra.set(false, helper.getLevel().getServer());
+            for (int i = 0; i < 40; i++) ctx.arrancarBlocos(centro, 2, 2, .6f);
+            helper.assertBlockPresent(Blocks.DIRT, new BlockPos(3, 1, 3));
+            regra.set(true, helper.getLevel().getServer());
+            int total = 0;
+            for (int i = 0; i < 40; i++) total += ctx.arrancarBlocos(centro, 2, 2, .6f);
+            helper.assertTrue(total > 0, "deveria ter arrancado alguma terra");
+            for (int x = 2; x <= 4; x++) {
+                for (int z = 2; z <= 4; z++) {
+                    if ((x + z) % 2 != 0) helper.assertBlockPresent(Blocks.STONE, new BlockPos(x, 1, z));
+                }
+            }
+        } finally {
+            regra.set(true, helper.getLevel().getServer());
+        }
+        helper.succeed();
+    }
+
+    @GameTest(template = "vazio")
     public static void dominioParalisaZumbi(GameTestHelper helper) {
         ServerPlayer jogador = gojo(helper);
         Zombie zumbi = helper.spawn(EntityType.ZOMBIE, new BlockPos(3, 2, 1));

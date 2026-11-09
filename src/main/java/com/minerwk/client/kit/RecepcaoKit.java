@@ -28,6 +28,7 @@ public final class RecepcaoKit {
         Pacotes.aoTremer = TremorCamera::receber;
         Pacotes.aoMostrarVisual = VisuaisAtivos::receber;
         Pacotes.aoEncerrarVisual = VisuaisAtivos::encerrar;
+        Pacotes.aoAcertar = com.minerwk.client.vfx.ImpactoCamera::acertou;
     }
 
     /** O último estado recebido (o HUD do 1.4 lê daqui). */

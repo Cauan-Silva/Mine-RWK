@@ -44,6 +44,7 @@ public final class MineRWKClient {
         NeoForge.EVENT_BUS.addListener(RenderVisuaisGojo::aoRenderizar);
         NeoForge.EVENT_BUS.addListener(RenderVisuaisGojo::aoCorDaNeblina);
         NeoForge.EVENT_BUS.addListener(ImpactoCamera::aoCalcularFov);
+        NeoForge.EVENT_BUS.addListener(ImpactoCamera::aoCalcularAngulos);
         modBus.addListener((RegisterGuiLayersEvent e) -> e.registerAbove(VanillaGuiLayers.CAMERA_OVERLAYS,
                 com.minerwk.MineRWK.id("clarao_gojo"), ImpactoCamera::desenharClarao));
         NeoForge.EVENT_BUS.addListener((ClientPlayerNetworkEvent.LoggingOut e) -> VisuaisAtivos.limpar());

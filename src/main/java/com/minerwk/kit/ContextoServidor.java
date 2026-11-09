@@ -1,9 +1,11 @@
 package com.minerwk.kit;
 
+import com.minerwk.core.kit.Arremessos;
 import com.minerwk.core.kit.Contexto;
 import com.minerwk.core.kit.Efeito;
 import com.minerwk.core.kit.KitDoJogador;
 import com.minerwk.core.kit.Vetor;
+import com.minerwk.rede.Acertou;
 import com.minerwk.rede.EncerrarVisual;
 import com.minerwk.rede.Envio;
 import com.minerwk.rede.MostrarVisual;
@@ -13,6 +15,7 @@ import com.minerwk.registro.Efeitos;
 import com.minerwk.registro.Regras;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Predicate;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.BlockParticleOption;
@@ -26,6 +29,7 @@ import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.OwnableEntity;
+import net.minecraft.world.entity.item.FallingBlockEntity;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.Projectile;
@@ -122,7 +126,8 @@ public final class ContextoServidor implements Contexto {
 
     private void mover(Vec3 centro, double raio, double forca, boolean puxar) {
         List<Entity> alvos = naEsfera(Entity.class, centro, raio,
-                e -> e instanceof LivingEntity || e instanceof ItemEntity || e instanceof Projectile);
+                e -> e instanceof LivingEntity || e instanceof ItemEntity || e instanceof Projectile
+                        || e instanceof FallingBlockEntity);
         for (Entity e : alvos) {
             Vec3 dir = centro.subtract(e.getBoundingBox().getCenter());
             if (dir.lengthSqr() < 0.25 && puxar) continue; // já está no centro
@@ -130,6 +135,7 @@ public final class ContextoServidor implements Contexto {
             if (!puxar) passo = passo.add(0, 0.1 * forca, 0);
             e.setDeltaMovement(e.getDeltaMovement().add(passo));
             e.hurtMarked = true; // manda a velocidade para o cliente (jogadores)
+            e.hasImpulse = true; // e para as outras entidades
         }
     }
 
@@ -147,6 +153,53 @@ public final class ContextoServidor implements Contexto {
     public void danoEm(Vetor centro, double raio, float dano) {
         var fonte = jogador.damageSources().playerAttack(jogador);
         for (LivingEntity alvo : naEsfera(LivingEntity.class, vec(centro), raio, e -> true)) alvo.hurt(fonte, dano);
+    }
+
+    @Override
+    public int danoUmaVez(Vetor centro, double raio, float dano, Set<Object> atingidos) {
+        var fonte = jogador.damageSources().playerAttack(jogador);
+        int feridos = 0;
+        for (LivingEntity alvo : naEsfera(LivingEntity.class, vec(centro), raio, e -> true)) {
+            if (atingidos.add(alvo.getUUID()) && alvo.hurt(fonte, dano)) feridos++;
+        }
+        return feridos;
+    }
+
+    @Override
+    public void arremessar(Vetor centro, double raio, double forca, int congelar, Vetor eixo) {
+        for (LivingEntity alvo : naEsfera(LivingEntity.class, vec(centro), raio, e -> true)) {
+            Vetor v = Arremessos.velocidade(centro, vetor(alvo.getBoundingBox().getCenter()), forca, eixo);
+            ArremessosServidor.iniciar(alvo, v, congelar);
+        }
+    }
+
+    @Override
+    public int arrancarBlocos(Vetor centro, double raio, int maximo, float durezaMax) {
+        ServerLevel nivel = nivel();
+        if (maximo <= 0 || !nivel.getGameRules().getBoolean(Regras.APAGAR_BLOCOS)) return 0;
+        Vec3 c = vec(centro);
+        int feitos = 0;
+        // Sorteia pontos na esfera; só sai o que está exposto por cima (o chão, não o que está enterrado).
+        for (int tentativa = 0; tentativa < maximo * 8 && feitos < maximo; tentativa++) {
+            double dx = (nivel.random.nextDouble() * 2 - 1) * raio;
+            double dy = (nivel.random.nextDouble() * 2 - 1) * raio;
+            double dz = (nivel.random.nextDouble() * 2 - 1) * raio;
+            if (dx * dx + dy * dy + dz * dz > raio * raio) continue;
+            BlockPos p = BlockPos.containing(c.x + dx, c.y + dy, c.z + dz);
+            if (!nivel.isLoaded(p) || nivel.isOutsideBuildHeight(p) || !nivel.mayInteract(jogador, p)) continue;
+            BlockState estado = nivel.getBlockState(p);
+            float dureza = estado.getDestroySpeed(nivel, p);
+            if (estado.isAir() || dureza < 0 || dureza > durezaMax || estado.hasBlockEntity()
+                    || !estado.getFluidState().isEmpty() || !nivel.getBlockState(p.above()).isAir()) continue;
+            FallingBlockEntity.fall(nivel, p, estado);
+            feitos++;
+        }
+        return feitos;
+    }
+
+    @Override
+    public void acertou(float forca) {
+        Envio.para(jogador, new Acertou(forca));
     }
 
     @Override
