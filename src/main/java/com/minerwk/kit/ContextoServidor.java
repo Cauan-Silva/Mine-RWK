@@ -4,7 +4,9 @@ import com.minerwk.core.kit.Contexto;
 import com.minerwk.core.kit.Efeito;
 import com.minerwk.core.kit.KitDoJogador;
 import com.minerwk.core.kit.Vetor;
+import com.minerwk.rede.EncerrarVisual;
 import com.minerwk.rede.Envio;
+import com.minerwk.rede.MostrarVisual;
 import com.minerwk.rede.TocarApresentacao;
 import com.minerwk.rede.Tremer;
 import com.minerwk.registro.Efeitos;
@@ -212,6 +214,17 @@ public final class ContextoServidor implements Contexto {
     @Override
     public void criarEfeito(Efeito efeito) {
         kit().ifPresent(k -> k.adicionarEfeito(efeito));
+    }
+
+    @Override
+    public void visual(String tipo, Vetor origem, Vetor direcao, float forca, int duracao) {
+        Envio.paraQuemVe(jogador, new MostrarVisual(jogador.getId(), tipo, origem, direcao, forca, duracao,
+                nivel().getGameTime()));
+    }
+
+    @Override
+    public void visualFim(String tipo, Vetor ponto) {
+        Envio.paraQuemVe(jogador, new EncerrarVisual(jogador.getId(), tipo, ponto));
     }
 
     @Override

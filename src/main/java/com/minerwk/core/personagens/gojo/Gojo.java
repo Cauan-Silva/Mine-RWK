@@ -7,6 +7,7 @@ import com.minerwk.core.kit.Numeros;
 import com.minerwk.core.kit.Personagem;
 import com.minerwk.core.kit.Tecla;
 import com.minerwk.core.kit.Vetor;
+import com.minerwk.core.vfx.TrajetoriaGojo;
 import java.util.List;
 import java.util.Map;
 
@@ -58,7 +59,9 @@ public final class Gojo {
         @Override
         public void aoDisparar(Contexto ctx, float forca) {
             ctx.apresentacao("gojo_azul", "", SOM);
-            ctx.criarEfeito(new CampoAzul(ctx.alvoAte(6)));
+            Vetor centro = ctx.alvoAte(6);
+            ctx.visual("gojo_azul", centro, ctx.olhar(), 1f, CampoAzul.DURACAO);
+            ctx.criarEfeito(new CampoAzul(centro));
         }
     }
 
@@ -69,16 +72,17 @@ public final class Gojo {
             this.centro = centro;
         }
 
+        static final int DURACAO = 30;
+
         @Override
         public int duracao() {
-            return 30;
+            return DURACAO;
         }
 
         @Override
         public void tick(Contexto ctx, int t) {
             ctx.puxar(centro, 5, 0.25);
             if (t % 10 == 0) ctx.danoEm(centro, 2, 2f);
-            ctx.particulas("portal", centro, 8);
         }
     }
 
@@ -91,24 +95,35 @@ public final class Gojo {
         @Override
         public void aoIniciarCarga(Contexto ctx) {
             ctx.apresentacao("gojo_vermelho", "", "");
+            ctx.visual("gojo_vermelho_carga", ctx.olhos(), ctx.olhar(), 0f, numeros().cargaMax());
+        }
+
+        @Override
+        public void aoInterromper(Contexto ctx) {
+            ctx.visualFim("gojo_vermelho_carga", ctx.olhos());
         }
 
         @Override
         public void aoDisparar(Contexto ctx, float forca) {
             ctx.apresentacao("", "", SOM);
             Vetor dir = ctx.olhar();
-            ctx.criarEfeito(new EsferaVermelha(ctx.olhos().mais(dir), dir, forca));
+            Vetor inicio = ctx.olhos().mais(dir);
+            ctx.visualFim("gojo_vermelho_carga", ctx.olhos());
+            ctx.visual("gojo_vermelho", inicio, dir, forca, EsferaVermelha.DURACAO);
+            ctx.criarEfeito(new EsferaVermelha(inicio, dir, forca));
         }
     }
 
     static final class EsferaVermelha implements Efeito {
-        static final double VELOCIDADE = 1.5;
+        static final int DURACAO = 20; // 30 blocos a 1,5 por tick
+        private final Vetor inicio;
         private final Vetor direcao;
         private final float forca;
         private Vetor posicao;
         private boolean colidiu;
 
         EsferaVermelha(Vetor inicio, Vetor direcao, float forca) {
+            this.inicio = inicio;
             this.posicao = inicio;
             this.direcao = direcao;
             this.forca = forca;
@@ -116,15 +131,14 @@ public final class Gojo {
 
         @Override
         public int duracao() {
-            return 20; // 30 blocos
+            return DURACAO;
         }
 
         @Override
         public void tick(Contexto ctx, int t) {
-            Vetor proxima = posicao.mais(direcao.vezes(VELOCIDADE));
+            Vetor proxima = TrajetoriaGojo.vermelho(inicio, direcao, t + 1);
             colidiu = ctx.colide(posicao, proxima);
             posicao = proxima;
-            ctx.particulas("flame", posicao, 6);
         }
 
         @Override
@@ -137,7 +151,7 @@ public final class Gojo {
             ctx.danoEm(posicao, 3, 6 + 8 * forca);
             ctx.empurrar(posicao, 4, 1.5 + 1.5 * forca);
             ctx.tremor(0.3f + 0.5f * forca, 12, 16);
-            ctx.particulas("explosion", posicao, 1);
+            ctx.visualFim("gojo_vermelho", posicao);
         }
     }
 
@@ -150,29 +164,31 @@ public final class Gojo {
         @Override
         public void aoDisparar(Contexto ctx, float forca) {
             ctx.apresentacao("gojo_infinito", "", SOM);
+            ctx.visual("gojo_infinito", ctx.olhos(), ctx.olhar(), 0f, InfinitoAtivo.DURACAO);
             ctx.criarEfeito(new InfinitoAtivo());
         }
     }
 
     static final class InfinitoAtivo implements Efeito {
         static final double DRENO = 1.5;
+        static final int DURACAO = 120;
         private boolean semEnergia;
 
         @Override
         public int duracao() {
-            return 120;
+            return DURACAO;
         }
 
         @Override
         public void tick(Contexto ctx, int t) {
             if (!ctx.gastarRecurso(DRENO)) {
                 semEnergia = true;
+                ctx.visualFim("gojo_infinito", ctx.olhos());
                 return;
             }
             // Renova por 2 ticks: se o efeito acabar, o Infinito cai logo em seguida.
             ctx.infinito(2);
             ctx.empurrar(ctx.olhos(), 2, 0.3);
-            if (t % 5 == 0) ctx.particulas("end_rod", ctx.olhos(), 2);
         }
 
         @Override
@@ -190,12 +206,19 @@ public final class Gojo {
         @Override
         public void aoIniciarCarga(Contexto ctx) {
             ctx.apresentacao("gojo_roxo", "", "");
+            ctx.visual("gojo_roxo_carga", ctx.olhos(), ctx.olhar(), 0f, numeros().cargaMax());
+        }
+
+        @Override
+        public void aoInterromper(Contexto ctx) {
+            ctx.visualFim("gojo_roxo_carga", ctx.olhos());
         }
 
         @Override
         public void aoDisparar(Contexto ctx, float forca) {
             ctx.apresentacao("", "", SOM);
             ctx.tremor(0.6f, 15, 24);
+            ctx.visual("gojo_roxo", ctx.olhos(), ctx.olhar(), 1f, 20);
             ctx.criarEfeito(new FeixeRoxo(ctx.olhos(), ctx.olhar(), 2, 20, 1.5, 30f));
         }
     }
@@ -214,12 +237,19 @@ public final class Gojo {
         @Override
         public void aoIniciarCarga(Contexto ctx) {
             ctx.apresentacao("gojo_roxo", "", "");
+            ctx.visual("gojo_roxo_200_carga", ctx.olhos(), ctx.olhar(), 0f, numeros().cargaMax());
+        }
+
+        @Override
+        public void aoInterromper(Contexto ctx) {
+            ctx.visualFim("gojo_roxo_200_carga", ctx.olhos());
         }
 
         @Override
         public void aoDisparar(Contexto ctx, float forca) {
             ctx.apresentacao("", "", SOM);
             ctx.tremor(1.2f, 30, 64);
+            ctx.visual("gojo_roxo_200", ctx.olhos(), ctx.olhar(), 2f, 30);
             ctx.criarEfeito(new FeixeRoxo(ctx.olhos(), ctx.olhar(), 4, 30, 2.5, 60f));
         }
     }
@@ -249,10 +279,9 @@ public final class Gojo {
 
         @Override
         public void tick(Contexto ctx, int t) {
-            Vetor ponto = origem.mais(direcao.vezes(passo * (t + 1)));
+            Vetor ponto = TrajetoriaGojo.roxo(origem, direcao, passo, t);
             ctx.apagarBlocos(ponto, raio);
             ctx.danoEm(ponto, raio, dano);
-            ctx.particulas("witch", ponto, 12);
         }
     }
 
@@ -266,6 +295,7 @@ public final class Gojo {
         public void aoDisparar(Contexto ctx, float forca) {
             ctx.apresentacao("gojo_dominio", "", SOM);
             ctx.tremor(0.5f, 20, 24);
+            ctx.visual("gojo_vazio_infinito", ctx.olhos(), ctx.olhar(), 0f, 160);
             ctx.criarEfeito(new Dominio(ctx.olhos()));
         }
     }
@@ -286,7 +316,6 @@ public final class Gojo {
         @Override
         public void tick(Contexto ctx, int t) {
             ctx.paralisar(centro, RAIO, 5);
-            if (t % 10 == 0) ctx.particulas("end_rod", centro, 40);
         }
     }
 }
