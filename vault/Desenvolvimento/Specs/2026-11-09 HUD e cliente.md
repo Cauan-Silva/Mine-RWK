@@ -14,7 +14,7 @@ Mostrar recurso e recargas na tela, dar ao jogador opções de cliente e ter um 
 - Só aparecem as teclas que o personagem tem. Sem personagem, nada aparece. Escondido com `mostrarHud = false` ou com a interface oculta (F1).
 - Quadradinho:
   - Pronto: letra da tecla.
-  - Em recarga: escurecido de cima para baixo pela fração restante e os segundos restantes (`3`, `2`, `0.4`: inteiro arredondado para cima a partir de 1 s, uma casa abaixo de 1 s).
+  - Em recarga: escurecido de cima para baixo pela fração restante e os segundos restantes (a partir de 1 s: inteiro arredondado para cima; abaixo de 1 s: uma casa arredondada para baixo, mínimo `0.1`).
   - Sem recurso para o custo: letra vermelha.
   - Em uso (carga ou disparo): borda clara.
 - Barra do recurso: cor do personagem e texto pequeno "Nome atual/máximo" (ex.: "Fôlego 70/100", inteiros).
@@ -43,7 +43,7 @@ Mostrar recurso e recargas na tela, dar ao jogador opções de cliente e ter um 
 `teste_carga` (X) chama `tremor(0.3 + 0.7 × força, 15, 12)` no disparo.
 
 ## Testes
-- JUnit: `LogicaHud` (fração, segundos: 61 ticks → "4", 19 ticks → "1.0", 7 ticks → "0.4", 0 → pronto; vermelho; teclas na ordem e só as existentes), `Tremor` (decai a zero, soma limitada, intensidade 0 → 0, dois tremores somam), `RecursoFolego` nome e cor.
+- JUnit: `LogicaHud` (fração, segundos: 61 ticks → "4", 19 ticks → "0.9", 7 ticks → "0.3", 1 tick → "0.1", 0 → pronto; vermelho; teclas na ordem e só as existentes), `Tremor` (decai a zero, soma limitada, intensidade 0 → 0, dois tremores somam), `RecursoFolego` nome e cor.
 - GameTest: o golpe X do `teste` não falha ao pedir tremor (jogador falso sem canal).
 - No jogo: HUD aparece só depois de escolher; recarga conta; letra fica vermelha sem fôlego; X treme a tela; opção 0 tira o tremor; `mostrarHud` esconde.
 
