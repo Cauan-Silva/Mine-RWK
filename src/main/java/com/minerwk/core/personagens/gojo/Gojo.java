@@ -8,6 +8,7 @@ import com.minerwk.core.kit.Personagem;
 import com.minerwk.core.kit.Tecla;
 import com.minerwk.core.kit.Vetor;
 import com.minerwk.core.vfx.TrajetoriaGojo;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -50,10 +51,10 @@ public final class Gojo {
         }
     }
 
-    /** Z: ponto de atração a 6 blocos (ou no primeiro bloco), por 1,5 s. */
+    /** Z: ponto de atração a 6 blocos (ou no primeiro bloco), por 3 s; arranca blocos leves do chão. */
     public static final class Azul extends Golpe {
         Azul() {
-            super("gojo_azul", Numeros.instantanea(4, 2, 4, 20, 120));
+            super("gojo_azul", Numeros.instantanea(4, 2, 4, 20, 160));
         }
 
         @Override
@@ -72,7 +73,12 @@ public final class Gojo {
             this.centro = centro;
         }
 
-        static final int DURACAO = 30;
+        static final int DURACAO = 60;
+        static final double RAIO = 6;
+        /** Blocos arrancados por tick e no campo inteiro. */
+        static final int ARRANCA_POR_TICK = 2, ARRANCA_MAX = 40;
+        static final float DUREZA_MAX = .6f;
+        private int arrancados;
 
         @Override
         public int duracao() {
@@ -81,8 +87,10 @@ public final class Gojo {
 
         @Override
         public void tick(Contexto ctx, int t) {
-            ctx.puxar(centro, 5, 0.25);
-            if (t % 10 == 0) ctx.danoEm(centro, 2, 2f);
+            ctx.puxar(centro, RAIO, 0.25);
+            if (t % 15 == 0) ctx.danoEm(centro, 2, 2f);
+            int vez = Math.min(ARRANCA_POR_TICK, ARRANCA_MAX - arrancados);
+            if (vez > 0) arrancados += Math.max(0, ctx.arrancarBlocos(centro, RAIO, vez, DUREZA_MAX));
         }
     }
 
@@ -115,7 +123,7 @@ public final class Gojo {
     }
 
     static final class EsferaVermelha implements Efeito {
-        static final int DURACAO = 20; // 30 blocos a 1,5 por tick
+        static final int DURACAO = 30; // 30 blocos a 1 por tick
         private final Vetor inicio;
         private final Vetor direcao;
         private final float forca;
@@ -148,8 +156,9 @@ public final class Gojo {
 
         @Override
         public void aoAcabar(Contexto ctx) {
-            ctx.danoEm(posicao, 3, 6 + 8 * forca);
-            ctx.empurrar(posicao, 4, 1.5 + 1.5 * forca);
+            int feridos = ctx.danoUmaVez(posicao, 3, 6 + 8 * forca, new HashSet<>());
+            ctx.arremessar(posicao, 4, 2.5 + 1.5 * forca, 3, null);
+            if (feridos > 0) ctx.acertou(.5f + .5f * forca);
             ctx.tremor(0.3f + 0.5f * forca, 12, 16);
             ctx.visualFim("gojo_vermelho", posicao);
         }
@@ -197,7 +206,7 @@ public final class Gojo {
         }
     }
 
-    /** V: Roxo, 1,5 s de carga; avança 40 blocos apagando o caminho. */
+    /** V: Roxo, 1,5 s de carga; avança 40 blocos em 2 s apagando o caminho. */
     public static final class Roxo extends Golpe {
         Roxo() {
             super("gojo_roxo", Numeros.instantanea(30, 2, 8, 90, 900));
@@ -218,8 +227,8 @@ public final class Gojo {
         public void aoDisparar(Contexto ctx, float forca) {
             ctx.apresentacao("", "", SOM);
             ctx.tremor(0.6f, 15, 24);
-            ctx.visual("gojo_roxo", ctx.olhos(), ctx.olhar(), 1f, 20);
-            ctx.criarEfeito(new FeixeRoxo(ctx.olhos(), ctx.olhar(), 2, 20, 1.5, 30f));
+            ctx.visual("gojo_roxo", ctx.olhos(), ctx.olhar(), 1f, 40);
+            ctx.criarEfeito(new FeixeRoxo(ctx.olhos(), ctx.olhar(), TrajetoriaGojo.PASSO_ROXO, 40, 1.5, 30f, 2, 4));
         }
     }
 
@@ -249,12 +258,15 @@ public final class Gojo {
         public void aoDisparar(Contexto ctx, float forca) {
             ctx.apresentacao("", "", SOM);
             ctx.tremor(1.2f, 30, 64);
-            ctx.visual("gojo_roxo_200", ctx.olhos(), ctx.olhar(), 2f, 30);
-            ctx.criarEfeito(new FeixeRoxo(ctx.olhos(), ctx.olhar(), 4, 30, 2.5, 60f));
+            ctx.visual("gojo_roxo_200", ctx.olhos(), ctx.olhar(), 2f, 60);
+            ctx.criarEfeito(new FeixeRoxo(ctx.olhos(), ctx.olhar(), TrajetoriaGojo.PASSO_ROXO_200, 60, 2.5, 60f, 3, 6));
         }
     }
 
-    /** A massa do Roxo: a cada tick avança {@code passo} blocos, apaga e fere em volta do ponto. */
+    /**
+     * A massa do Roxo: a cada tick avança {@code passo} blocos, apaga e fere em volta do ponto. Cada alvo
+     * leva o dano uma vez só; quem sobrevive é jogado para fora do caminho.
+     */
     static final class FeixeRoxo implements Efeito {
         private final Vetor origem;
         private final Vetor direcao;
@@ -262,14 +274,20 @@ public final class Gojo {
         private final int passos;
         private final double raio;
         private final float dano;
+        private final double arremesso;
+        private final int congelar;
+        private final java.util.Set<Object> atingidos = new HashSet<>();
 
-        FeixeRoxo(Vetor origem, Vetor direcao, double passo, int passos, double raio, float dano) {
+        FeixeRoxo(Vetor origem, Vetor direcao, double passo, int passos, double raio, float dano,
+                  double arremesso, int congelar) {
             this.origem = origem;
             this.direcao = direcao;
             this.passo = passo;
             this.passos = passos;
             this.raio = raio;
             this.dano = dano;
+            this.arremesso = arremesso;
+            this.congelar = congelar;
         }
 
         @Override
@@ -281,7 +299,10 @@ public final class Gojo {
         public void tick(Contexto ctx, int t) {
             Vetor ponto = TrajetoriaGojo.roxo(origem, direcao, passo, t);
             ctx.apagarBlocos(ponto, raio);
-            ctx.danoEm(ponto, raio, dano);
+            if (ctx.danoUmaVez(ponto, raio, dano, atingidos) > 0) {
+                ctx.arremessar(ponto, raio, arremesso, congelar, direcao);
+                ctx.acertou(dano >= 60 ? 1.5f : 1f);
+            }
         }
     }
 

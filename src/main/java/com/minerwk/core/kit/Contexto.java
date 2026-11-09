@@ -49,6 +49,34 @@ public interface Contexto {
     default void danoEm(Vetor centro, double raio, float dano) {
     }
 
+    /**
+     * Fere quem está no raio e ainda não está em {@code atingidos} (e anota quem feriu ali).
+     * Para golpes que passam vários ticks pelo mesmo alvo. Devolve quantos foram feridos agora.
+     */
+    default int danoUmaVez(Vetor centro, double raio, float dano, java.util.Set<Object> atingidos) {
+        return 0;
+    }
+
+    /**
+     * Quem está no raio para no ar por {@code congelar} ticks e depois sai voando com {@code forca}
+     * (ver {@link Arremessos}). Com {@code eixo} não nulo, sai para o lado do caminho. Quem já está
+     * sendo arremessado é ignorado.
+     */
+    default void arremessar(Vetor centro, double raio, double forca, int congelar, Vetor eixo) {
+    }
+
+    /**
+     * Arranca até {@code maximo} blocos leves (dureza até {@code durezaMax}) no raio, que viram blocos
+     * caindo, se a regra do servidor deixar. Devolve quantos arrancou.
+     */
+    default int arrancarBlocos(Vetor centro, double raio, int maximo, float durezaMax) {
+        return 0;
+    }
+
+    /** O golpe do jogador acertou alguém: a tela dele trava um instante (mais forte com {@code forca}). */
+    default void acertou(float forca) {
+    }
+
     /** Se há bloco sólido ou criatura no segmento. */
     default boolean colide(Vetor de, Vetor ate) {
         return false;

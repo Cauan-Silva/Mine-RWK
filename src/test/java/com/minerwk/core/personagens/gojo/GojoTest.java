@@ -26,6 +26,9 @@ class GojoTest {
         final List<Float> danos = new ArrayList<>();
         final List<Vetor> pontosDeDano = new ArrayList<>();
         Predicate<Vetor> colideEm = v -> false;
+        /** Um alvo parado aqui (ou null): o danoUmaVez só o fere se estiver no raio. */
+        Vetor alvoEm;
+        int arrancados;
         boolean temRecurso = true;
 
         int conta(String nome) {
@@ -38,6 +41,15 @@ class GojoTest {
         public void empurrar(Vetor c, double r, double f) { chamadas.add("empurrar"); }
         public void danoEm(Vetor c, double r, float d) { chamadas.add("dano"); danos.add(d); pontosDeDano.add(c); }
         public boolean colide(Vetor de, Vetor ate) { return colideEm.test(ate); }
+        public int danoUmaVez(Vetor c, double r, float d, java.util.Set<Object> atingidos) {
+            chamadas.add("dano"); pontosDeDano.add(c);
+            boolean pega = alvoEm == null || c.distancia(alvoEm) <= r;
+            if (pega && atingidos.add("alvo")) { danos.add(d); return 1; }
+            return 0;
+        }
+        public void arremessar(Vetor c, double r, double f, int congelar, Vetor eixo) { chamadas.add("arremessar"); }
+        public int arrancarBlocos(Vetor c, double r, int maximo, float dureza) { chamadas.add("arrancar"); arrancados += maximo; return maximo; }
+        public void acertou(float f) { chamadas.add("acertou"); }
         public void apagarBlocos(Vetor c, double r) { chamadas.add("apagar"); }
         public void paralisar(Vetor c, double r, int t) { chamadas.add("paralisar"); }
         public void infinito(int t) { chamadas.add("infinito"); }
@@ -90,12 +102,14 @@ class GojoTest {
     }
 
     @Test
-    void azulPuxa30VezesEDaDano3Vezes() {
+    void azulPuxa60VezesDaDano4VezesEArrancaAte40Blocos() {
         usar(Tecla.Z);
-        ticks(60);
-        assertEquals(30, ctx.conta("puxar"));
-        assertEquals(3, ctx.conta("dano"));
-        assertEquals(List.of(2f, 2f, 2f), ctx.danos);
+        ticks(100);
+        assertEquals(60, ctx.conta("puxar"));
+        assertEquals(4, ctx.conta("dano"));
+        assertEquals(List.of(2f, 2f, 2f, 2f), ctx.danos);
+        assertEquals(40, ctx.arrancados, "no máximo 40 blocos por campo");
+        assertEquals(160, Gojo.criar().naTecla(Tecla.Z).orElseThrow().numeros().recarga());
     }
 
     @Test
@@ -108,13 +122,14 @@ class GojoTest {
         assertEquals(1, ctx.conta("dano"));
         assertEquals(6f, ctx.danos.get(0), 0.5);
         assertTrue(ctx.pontosDeDano.get(0).x() < 8);
-        assertEquals(1, ctx.conta("empurrar"));
+        assertEquals(1, ctx.conta("arremessar"));
+        assertEquals(1, ctx.conta("acertou"), "acertou alguém: a tela de quem bateu trava");
     }
 
     @Test
     void vermelhoSemColisaoExplodeNoLimiteComForcaMaxima() {
         usar(Tecla.X);
-        ticks(80); // segurou até o máximo
+        ticks(90); // segurou até o máximo; a esfera leva 30 ticks
         assertEquals(1, ctx.conta("dano"));
         assertEquals(14f, ctx.danos.get(0), 1e-6);
         assertEquals(31, ctx.pontosDeDano.get(0).x(), 1e-6, "30 blocos a partir de 1 bloco à frente");
@@ -139,22 +154,31 @@ class GojoTest {
     }
 
     @Test
-    void roxoDa20PassosApagandoEComDano30() {
+    void roxoDa40PassosDeUmBlocoComDano30() {
         usar(Tecla.V);
-        ticks(100);
-        assertEquals(20, ctx.conta("apagar"));
-        assertEquals(20, ctx.conta("dano"));
+        ticks(120);
+        assertEquals(40, ctx.conta("apagar"));
+        assertEquals(40, ctx.conta("dano"));
         assertTrue(ctx.danos.stream().allMatch(d -> d == 30f));
-        assertEquals(40, ctx.pontosDeDano.get(19).x(), 1e-6);
+        assertEquals(40, ctx.pontosDeDano.get(39).x(), 1e-6);
     }
 
     @Test
-    void roxo200Da30PassosAte120Blocos() {
+    void roxoFereCadaAlvoUmaVezSo() {
+        ctx.alvoEm = new Vetor(10, 0, 0); // fica uns 3 ticks dentro da massa
+        usar(Tecla.V);
+        ticks(120);
+        assertEquals(List.of(30f), ctx.danos);
+        assertEquals(1, ctx.conta("acertou"));
+    }
+
+    @Test
+    void roxo200Da60PassosAte120Blocos() {
         usar(Tecla.R);
-        ticks(150);
-        assertEquals(30, ctx.conta("apagar"));
+        ticks(200);
+        assertEquals(60, ctx.conta("apagar"));
         assertTrue(ctx.danos.stream().allMatch(d -> d == 60f));
-        assertEquals(120, ctx.pontosDeDano.get(29).x(), 1e-6);
+        assertEquals(120, ctx.pontosDeDano.get(59).x(), 1e-6);
     }
 
     @Test
