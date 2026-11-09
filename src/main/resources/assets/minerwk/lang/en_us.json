@@ -37,5 +37,16 @@
   "habilidade.minerwk.gojo_roxo_200.desc": "Full incantation: Hollow Purple at double power. Needs full energy.",
   "effect.minerwk.paralisia": "Paralysis",
   "gamerule.minerwkApagarBlocos": "Mine-RWK abilities erase blocks",
-  "block.minerwk.piso_dominio": "Unlimited Void Floor"
+  "block.minerwk.piso_dominio": "Unlimited Void Floor",
+  "cutscene.minerwk.gojo_roxo_200.1": "Nine Ropes",
+  "cutscene.minerwk.gojo_roxo_200.1.jp": "九綱",
+  "cutscene.minerwk.gojo_roxo_200.2": "Polarized Light",
+  "cutscene.minerwk.gojo_roxo_200.2.jp": "偏光",
+  "cutscene.minerwk.gojo_roxo_200.3": "Crow and Declaration",
+  "cutscene.minerwk.gojo_roxo_200.3.jp": "烏と声明",
+  "cutscene.minerwk.gojo_roxo_200.4": "Between Front and Back",
+  "cutscene.minerwk.gojo_roxo_200.4.jp": "表裏の間",
+  "cutscene.minerwk.gojo_roxo_200.5": "Hollow Technique: Purple",
+  "cutscene.minerwk.gojo_roxo_200.5.jp": "虚式「茈」",
+  "config.minerwk.cutscenes": "Ultimate cutscenes"
 }

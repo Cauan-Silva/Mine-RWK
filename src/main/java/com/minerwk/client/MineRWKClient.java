@@ -6,6 +6,7 @@ import com.minerwk.client.comando.ComandosTeste;
 import com.minerwk.client.camera.TremorCamera;
 import com.minerwk.client.kit.HudKit;
 import com.minerwk.client.kit.RecepcaoKit;
+import com.minerwk.client.camera.CutsceneCliente;
 import com.minerwk.client.vfx.ImpactoCamera;
 import com.minerwk.client.vfx.Pincel;
 import net.neoforged.neoforge.client.event.RegisterGuiLayersEvent;
@@ -45,6 +46,15 @@ public final class MineRWKClient {
         NeoForge.EVENT_BUS.addListener(RenderVisuaisGojo::aoCorDaNeblina);
         NeoForge.EVENT_BUS.addListener(ImpactoCamera::aoCalcularFov);
         NeoForge.EVENT_BUS.addListener(ImpactoCamera::aoCalcularAngulos);
+        NeoForge.EVENT_BUS.addListener(CutsceneCliente::aoTick);
+        NeoForge.EVENT_BUS.addListener(CutsceneCliente::aoComecarQuadro);
+        NeoForge.EVENT_BUS.addListener(CutsceneCliente::aoCalcularAngulos);
+        NeoForge.EVENT_BUS.addListener(CutsceneCliente::aoCalcularFov);
+        NeoForge.EVENT_BUS.addListener(CutsceneCliente::aoEntrada);
+        NeoForge.EVENT_BUS.addListener(CutsceneCliente::aoCamadaGui);
+        NeoForge.EVENT_BUS.addListener(CutsceneCliente::aoMao);
+        NeoForge.EVENT_BUS.addListener((ClientPlayerNetworkEvent.LoggingOut e) -> CutsceneCliente.encerrar());
+        modBus.addListener((RegisterGuiLayersEvent e) -> e.registerAboveAll(CutsceneCliente.CAMADA, CutsceneCliente::desenhar));
         modBus.addListener((RegisterGuiLayersEvent e) -> e.registerAbove(VanillaGuiLayers.CAMERA_OVERLAYS,
                 com.minerwk.MineRWK.id("clarao_gojo"), ImpactoCamera::desenharClarao));
         NeoForge.EVENT_BUS.addListener((ClientPlayerNetworkEvent.LoggingOut e) -> VisuaisAtivos.limpar());

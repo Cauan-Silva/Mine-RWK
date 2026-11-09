@@ -9,6 +9,7 @@ public final class ConfigCliente {
     public static final ModConfigSpec.BooleanValue VFX_REDUZIDO;
     public static final ModConfigSpec.BooleanValue SFX_ANIME;
     public static final ModConfigSpec.BooleanValue MOSTRAR_HUD;
+    public static final ModConfigSpec.BooleanValue CUTSCENES;
 
     static {
         ModConfigSpec.Builder b = new ModConfigSpec.Builder();
@@ -20,6 +21,8 @@ public final class ConfigCliente {
                 .translation("config.minerwk.sfxAnime").define("sfxAnime", true);
         MOSTRAR_HUD = b.comment("Mostrar o HUD de recurso e recargas")
                 .translation("config.minerwk.mostrarHud").define("mostrarHud", true);
+        CUTSCENES = b.comment("Cutscenes das ultimates (desligadas, aparece só o encantamento na tela)")
+                .translation("config.minerwk.cutscenes").define("cutscenes", true);
         SPEC = b.build();
     }
 
@@ -37,6 +40,10 @@ public final class ConfigCliente {
 
     public static boolean sfxAnime() {
         return SPEC.isLoaded() ? SFX_ANIME.get() : SFX_ANIME.getDefault();
+    }
+
+    public static boolean cutscenes() {
+        return SPEC.isLoaded() ? CUTSCENES.get() : CUTSCENES.getDefault();
     }
 
     public static boolean mostrarHud() {

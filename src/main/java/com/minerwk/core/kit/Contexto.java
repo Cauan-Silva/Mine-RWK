@@ -80,6 +80,13 @@ public interface Contexto {
     default void pisoSolido(Vetor pes, double raio, int ticks) {
     }
 
+    /**
+     * Começa a cutscene {@code id} só para o jogador (a partir dos olhos e do olhar de agora). Ela acaba
+     * sozinha ou quando o visual de carga do golpe é encerrado.
+     */
+    default void cutscene(String id) {
+    }
+
     /** O golpe do jogador acertou alguém: a tela dele trava um instante (mais forte com {@code forca}). */
     default void acertou(float forca) {
     }

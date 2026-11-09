@@ -1,6 +1,6 @@
 ---
 tags: [desenvolvimento, spec]
-estado: aguardando revisão
+estado: aprovado
 ---
 # Spec e plano: encantamento e cutscene do Roxo 200% (Fase 2, parte 3)
 

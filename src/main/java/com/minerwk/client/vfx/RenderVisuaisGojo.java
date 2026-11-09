@@ -2,6 +2,7 @@ package com.minerwk.client.vfx;
 
 import com.minerwk.client.ConfigCliente;
 import com.minerwk.core.kit.Vetor;
+import com.minerwk.core.personagens.gojo.CutsceneRoxo200;
 import com.minerwk.core.vfx.CoroaRoxoGojo;
 import com.minerwk.core.vfx.DescargaVermelhoGojo;
 import com.minerwk.core.vfx.FluxoAzulGojo;
@@ -70,7 +71,10 @@ public final class RenderVisuaisGojo {
                 case "gojo_vermelho_explosao" -> explosao(q, v, t);
                 case "gojo_infinito" -> infinito(q, v, op);
                 case "gojo_roxo_carga" -> roxoCarga(q, v, t, op, TrajetoriaGojo.PASSO_ROXO, 30, 1);
-                case "gojo_roxo_200_carga" -> roxoCarga(q, v, t, op, TrajetoriaGojo.PASSO_ROXO_200, 80, 1.7);
+                case "gojo_roxo_200_carga" -> {
+                    roxoCarga(q, v, t, op, TrajetoriaGojo.PASSO_ROXO_200, 80, 1.7);
+                    palavrasNoMundo(q, v, t);
+                }
                 case "gojo_roxo" -> roxo(q, v, t, op, TrajetoriaGojo.PASSO_ROXO, 2.1);
                 case "gojo_roxo_200" -> roxo(q, v, t, op, TrajetoriaGojo.PASSO_ROXO_200, 3.5);
                 case "gojo_roxo_rastro" -> tunelRoxo(q, v.origem, v.direcao, v.forca, 1.5,
@@ -377,6 +381,38 @@ public final class RenderVisuaisGojo {
         p.terminar();
     }
 
+    /**
+     * Para quem vê o Gojo de fora: as palavras do encantamento girando em volta dele. Quem está na
+     * cutscene já as vê na tela.
+     */
+    private static void palavrasNoMundo(Quadro q, VisuaisAtivos.Visual v, double t) {
+        Minecraft mc = Minecraft.getInstance();
+        if (mc.player != null && v.dono == mc.player.getId()) return;
+        Entity e = dono(v);
+        if (e == null) return;
+        Vec3 olhos = e.getEyePosition(q.parcial);
+        if (q.longe(q.rel(olhos)) || q.rel(olhos).lengthSqr() > 48 * 48) return;
+        net.minecraft.client.gui.Font fonte = mc.font;
+        var buffers = mc.renderBuffers().bufferSource();
+        var camera = mc.gameRenderer.getMainCamera();
+        for (CutsceneRoxo200.Palavra p : CutsceneRoxo200.PALAVRAS) {
+            if (t < p.inicio() || t > p.fim()) continue;
+            double alpha = PerfilVfxGojo.suave((t - p.inicio()) / 4) * PerfilVfxGojo.suave((p.fim() - t) / 4);
+            if (alpha < .03) continue;
+            double ang = t * .06 + p.inicio();
+            Vec3 pos = q.rel(olhos.add(Math.cos(ang) * 1.8, .7, Math.sin(ang) * 1.8));
+            var pose = new com.mojang.blaze3d.vertex.PoseStack();
+            pose.translate(pos.x, pos.y, pos.z);
+            pose.mulPose(camera.rotation());
+            pose.scale(.035f, -.035f, .035f);
+            net.minecraft.network.chat.Component texto = net.minecraft.network.chat.Component.translatable(p.chave() + ".jp");
+            int cor = ((int) (alpha * 255) << 24) | 0xE8D8FF;
+            fonte.drawInBatch(texto, -fonte.width(texto) / 2f, 0, cor, false, pose.last().pose(), buffers,
+                    net.minecraft.client.gui.Font.DisplayMode.NORMAL, 0, 0xF000F0);
+        }
+        buffers.endBatch();
+    }
+
     // ---------------------------------------------------------------- Vazio Infinito
 
     private static void dominio(Quadro q, VisuaisAtivos.Visual v, double t, float op) {
@@ -454,6 +490,13 @@ public final class RenderVisuaisGojo {
             if (!v.tipo.equals("gojo_vazio_infinito") || v.fimEm >= 0) continue;
             double d = camera.distanceTo(vec(v.origem));
             maior = Math.max(maior, PerfilVfxGojo.presencaDominio(v.idade(agora, parcial), d));
+        }
+        // O céu escurece em volta do Gojo na segunda metade do encantamento do Roxo 200%.
+        for (VisuaisAtivos.Visual v : VisuaisAtivos.ativos()) {
+            if (!v.tipo.equals("gojo_roxo_200_carga") || v.fimEm >= 0) continue;
+            double d = camera.distanceTo(vec(v.origem));
+            double k = PerfilVfxGojo.suave((v.idade(agora, parcial) - 40) / 20) * Math.max(0, 1 - d / 32) * .85;
+            maior = Math.max(maior, k);
         }
         return maior;
     }

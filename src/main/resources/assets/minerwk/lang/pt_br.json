@@ -37,5 +37,16 @@
   "habilidade.minerwk.gojo_roxo_200.desc": "Encantamento completo: o Roxo com o dobro da força. Exige energia cheia.",
   "effect.minerwk.paralisia": "Paralisia",
   "gamerule.minerwkApagarBlocos": "Golpes do Mine-RWK apagam blocos",
-  "block.minerwk.piso_dominio": "Chão do Vazio Infinito"
+  "block.minerwk.piso_dominio": "Chão do Vazio Infinito",
+  "cutscene.minerwk.gojo_roxo_200.1": "Nove Cordas",
+  "cutscene.minerwk.gojo_roxo_200.1.jp": "九綱",
+  "cutscene.minerwk.gojo_roxo_200.2": "Luz Polarizada",
+  "cutscene.minerwk.gojo_roxo_200.2.jp": "偏光",
+  "cutscene.minerwk.gojo_roxo_200.3": "Corvo e Declaração",
+  "cutscene.minerwk.gojo_roxo_200.3.jp": "烏と声明",
+  "cutscene.minerwk.gojo_roxo_200.4": "Entre a Frente e o Verso",
+  "cutscene.minerwk.gojo_roxo_200.4.jp": "表裏の間",
+  "cutscene.minerwk.gojo_roxo_200.5": "Técnica Vazia: Roxo",
+  "cutscene.minerwk.gojo_roxo_200.5.jp": "虚式「茈」",
+  "config.minerwk.cutscenes": "Cutscenes das ultimates"
 }

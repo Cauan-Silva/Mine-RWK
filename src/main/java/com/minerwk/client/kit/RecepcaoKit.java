@@ -27,7 +27,11 @@ public final class RecepcaoKit {
         Pacotes.aoTocar = RecepcaoKit::aoTocar;
         Pacotes.aoTremer = TremorCamera::receber;
         Pacotes.aoMostrarVisual = VisuaisAtivos::receber;
-        Pacotes.aoEncerrarVisual = VisuaisAtivos::encerrar;
+        Pacotes.aoEncerrarVisual = p -> {
+            VisuaisAtivos.encerrar(p);
+            com.minerwk.client.camera.CutsceneCliente.aoEncerrarVisual(p);
+        };
+        Pacotes.aoCutscene = com.minerwk.client.camera.CutsceneCliente::receber;
         Pacotes.aoAcertar = com.minerwk.client.vfx.ImpactoCamera::acertou;
     }
 

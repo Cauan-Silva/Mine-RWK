@@ -249,6 +249,7 @@ public final class Gojo {
         public void aoIniciarCarga(Contexto ctx) {
             ctx.apresentacao("gojo_roxo", "", "");
             ctx.visual("gojo_roxo_200_carga", ctx.olhos(), ctx.olhar(), 0f, numeros().cargaMax());
+            ctx.cutscene(CutsceneRoxo200.ID);
         }
 
         @Override

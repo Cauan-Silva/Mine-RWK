@@ -6,6 +6,7 @@ import com.minerwk.core.kit.Efeito;
 import com.minerwk.core.kit.KitDoJogador;
 import com.minerwk.core.kit.Vetor;
 import com.minerwk.rede.Acertou;
+import com.minerwk.rede.Cutscene;
 import com.minerwk.rede.EncerrarVisual;
 import com.minerwk.rede.Envio;
 import com.minerwk.rede.MostrarVisual;
@@ -351,6 +352,11 @@ public final class ContextoServidor implements Contexto {
     public void visual(String tipo, Vetor origem, Vetor direcao, float forca, int duracao) {
         Envio.paraQuemVe(jogador, new MostrarVisual(jogador.getId(), tipo, origem, direcao, forca, duracao,
                 nivel().getGameTime()));
+    }
+
+    @Override
+    public void cutscene(String id) {
+        Envio.para(jogador, new Cutscene(id, jogador.getId(), olhos(), olhar(), nivel().getGameTime()));
     }
 
     @Override
