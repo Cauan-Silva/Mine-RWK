@@ -10,9 +10,13 @@ import java.util.List;
 public final class Coreografia {
     /**
      * Um quadro-chave. {@code posicao} e {@code alvo} na base do golpe; {@code fov} multiplica o FOV do
-     * jogador; {@code inclinacao} em graus.
+     * jogador; {@code inclinacao} em graus. Com {@code corte}, a câmera não desliza até ele: segura o
+     * quadro anterior e pula no tick dele (corte seco de cinema).
      */
-    public record Quadro(int tick, Vetor posicao, Vetor alvo, double fov, double inclinacao) {
+    public record Quadro(int tick, Vetor posicao, Vetor alvo, double fov, double inclinacao, boolean corte) {
+        public Quadro(int tick, Vetor posicao, Vetor alvo, double fov, double inclinacao) {
+            this(tick, posicao, alvo, fov, inclinacao, false);
+        }
     }
 
     private final List<Quadro> quadros;
@@ -39,6 +43,7 @@ public final class Coreografia {
             Quadro b = quadros.get(i);
             if (t > b.tick()) continue;
             Quadro a = quadros.get(i - 1);
+            if (b.corte() && t < b.tick()) return a;
             double k = suave((t - a.tick()) / (b.tick() - a.tick()));
             return new Quadro((int) t, mistura(a.posicao(), b.posicao(), k), mistura(a.alvo(), b.alvo(), k),
                     a.fov() + (b.fov() - a.fov()) * k, a.inclinacao() + (b.inclinacao() - a.inclinacao()) * k);

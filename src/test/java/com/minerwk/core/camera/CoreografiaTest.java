@@ -60,12 +60,24 @@ class CoreografiaTest {
     }
 
     @Test
-    void roxo200Dura110TicksEVoltaAosOlhos() {
+    void corteSecoSeguraOQuadroAnteriorEPulaNoTick() {
+        Coreografia c = new Coreografia(List.of(
+                new Coreografia.Quadro(0, Vetor.ZERO, new Vetor(0, 0, 1), 1, 0),
+                new Coreografia.Quadro(10, new Vetor(50, 0, 0), new Vetor(0, 0, 1), 1, 0, true)));
+        assertEquals(Vetor.ZERO, c.quadro(9.9).posicao(), "até o corte, nada se mexe");
+        assertEquals(new Vetor(50, 0, 0), c.quadro(10).posicao());
+    }
+
+    @Test
+    void encantamentoDoRTerminaNoDisparoESeguraAteAParte2Chegar() {
         Coreografia c = CutsceneRoxo200.COREOGRAFIA;
-        assertEquals(110, c.duracao());
-        assertEquals(Vetor.ZERO, c.quadro(110).posicao(), "termina nos olhos: a volta ao jogador não dá salto");
-        assertEquals(1, c.quadro(110).fov(), 1e-9);
-        assertEquals(5, CutsceneRoxo200.PALAVRAS.size(), "quatro palavras e o nome do golpe");
+        assertEquals(CutsceneRoxo200.FIM_ENCANTAMENTO + CutsceneRoxo200.ESPERA, c.duracao());
+        Coreografia.Quadro disparo = c.quadro(CutsceneRoxo200.FIM_ENCANTAMENTO);
+        Coreografia.Quadro fim = c.quadro(c.duracao());
+        assertEquals(disparo.posicao(), fim.posicao(), "segura o último plano");
+        assertEquals(disparo.alvo(), fim.alvo());
+        assertEquals(disparo.fov(), fim.fov(), 1e-9);
+        assertEquals(4, CutsceneRoxo200.PALAVRAS.size(), "as quatro palavras; o nome do golpe vai para a parte 2");
         for (int i = 1; i < CutsceneRoxo200.PALAVRAS.size(); i++) {
             assertTrue(CutsceneRoxo200.PALAVRAS.get(i).inicio() >= CutsceneRoxo200.PALAVRAS.get(i - 1).fim(), "uma de cada vez");
         }

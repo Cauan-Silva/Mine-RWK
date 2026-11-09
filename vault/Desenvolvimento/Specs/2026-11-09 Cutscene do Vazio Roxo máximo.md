@@ -1,6 +1,6 @@
 ---
 tags: [desenvolvimento, spec]
-estado: aguardando revisão
+estado: aprovado
 ---
 # Spec e plano: cutscene do Vazio Roxo máximo e mais animações do R (Fase 2, parte 7)
 
