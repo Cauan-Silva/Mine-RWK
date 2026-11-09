@@ -14,10 +14,10 @@ import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
  * @param personagem  id do personagem, vazio se ainda não escolheu
  * @param habilidades uma por tecla, com custo e recarga
  * @param emUso       id da habilidade em carga ou disparo, vazio se nenhuma
- * @param escolhiveis só preenchido sem personagem: {@code "id|nome|obra"}
+ * @param escolhiveis só preenchido sem personagem: nome, obra e golpes de cada personagem
  */
 public record SincronizarKit(String personagem, String nomeRecurso, int corRecurso, double recurso, double maximo,
-                             List<HabilidadeHud> habilidades, String emUso, List<String> escolhiveis)
+                             List<HabilidadeHud> habilidades, String emUso, List<PersonagemEscolha> escolhiveis)
         implements CustomPacketPayload {
     public static final Type<SincronizarKit> TIPO = new Type<>(MineRWK.id("sincronizar_kit"));
 
@@ -36,7 +36,8 @@ public record SincronizarKit(String personagem, String nomeRecurso, int corRecur
 
     private static final StreamCodec<ByteBuf, List<HabilidadeHud>> HABILIDADES =
             HabilidadeHud.CODEC.apply(ByteBufCodecs.list());
-    private static final StreamCodec<ByteBuf, List<String>> TEXTOS = ByteBufCodecs.STRING_UTF8.apply(ByteBufCodecs.list());
+    private static final StreamCodec<ByteBuf, List<PersonagemEscolha>> ESCOLHIVEIS =
+            PersonagemEscolha.CODEC.apply(ByteBufCodecs.list());
 
     public static final StreamCodec<ByteBuf, SincronizarKit> CODEC = StreamCodec.of(
             (buf, p) -> {
@@ -47,7 +48,7 @@ public record SincronizarKit(String personagem, String nomeRecurso, int corRecur
                 ByteBufCodecs.DOUBLE.encode(buf, p.maximo);
                 HABILIDADES.encode(buf, p.habilidades);
                 ByteBufCodecs.STRING_UTF8.encode(buf, p.emUso);
-                TEXTOS.encode(buf, p.escolhiveis);
+                ESCOLHIVEIS.encode(buf, p.escolhiveis);
             },
             buf -> new SincronizarKit(
                     ByteBufCodecs.STRING_UTF8.decode(buf),
@@ -57,7 +58,7 @@ public record SincronizarKit(String personagem, String nomeRecurso, int corRecur
                     ByteBufCodecs.DOUBLE.decode(buf),
                     HABILIDADES.decode(buf),
                     ByteBufCodecs.STRING_UTF8.decode(buf),
-                    TEXTOS.decode(buf)));
+                    ESCOLHIVEIS.decode(buf)));
 
     @Override
     public Type<SincronizarKit> type() {

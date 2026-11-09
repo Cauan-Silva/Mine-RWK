@@ -17,5 +17,10 @@
   "config.minerwk.vfxReduzido": "Reduced visual effects",
   "config.minerwk.sfxAnime": "Ability sounds",
   "config.minerwk.mostrarHud": "Show kit HUD",
-  "minerwk.configuration.title": "Mine-RWK"
+  "minerwk.configuration.title": "Mine-RWK",
+  "tela.minerwk.escolha.escolher": "Choose",
+  "habilidade.minerwk.teste_golpe": "Test strike",
+  "habilidade.minerwk.teste_golpe.desc": "Instant strike in a short area.",
+  "habilidade.minerwk.teste_carga": "Test charge",
+  "habilidade.minerwk.teste_carga.desc": "Hold to charge; more power, more damage and shake."
 }
