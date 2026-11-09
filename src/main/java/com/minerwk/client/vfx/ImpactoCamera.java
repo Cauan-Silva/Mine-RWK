@@ -84,6 +84,7 @@ public final class ImpactoCamera {
         if (mc.level == null) return;
         float f = Math.max(0, Math.min(2, pacote.forca()));
         long agora = mc.level.getGameTime();
+        if (agora < travaAte) return; // já travada por outro acerto
         travaAte = agora + TRAVA;
         angulosTravados = null;
         TremorCamera.receber(new Tremer(.25f * f, 4));

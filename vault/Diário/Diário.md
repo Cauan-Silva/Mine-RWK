@@ -14,3 +14,4 @@ Voltar para [[00 Início]].
 - [[2026-11-09 Gojo mecânica]]
 - [[2026-11-09 Gojo VFX]]
 - [[2026-11-09 Gojo impacto]]
+- [[2026-11-09 Gojo peso]]

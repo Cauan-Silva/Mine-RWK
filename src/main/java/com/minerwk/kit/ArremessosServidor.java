@@ -13,21 +13,22 @@ import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.server.ServerStoppingEvent;
 import net.neoforged.neoforge.event.tick.ServerTickEvent;
 
-/** Aplica os {@link Arremessos} nas entidades: congela, lança e gira. Só na thread do servidor. */
+/**
+ * Aplica os {@link Arremessos} nas entidades: congela, lança e gira. Só na thread do servidor.
+ * O congelamento segura a posição a cada tick em vez de mexer em NoAI/NoGravity, que iriam para o
+ * disco: um mob salvo no meio do golpe voltaria parado para sempre.
+ */
 public final class ArremessosServidor {
     /** Graus por tick do giro no ar. */
     private static final float GIRO = 36;
 
     private static final class Ativo {
         final Arremessos.Estado estado;
-        final boolean tinhaIa;
-        final boolean tinhaGravidade;
-        boolean solto;
+        final Vec3 parado;
 
         Ativo(Arremessos.Estado estado, LivingEntity alvo) {
             this.estado = estado;
-            this.tinhaIa = alvo instanceof Mob m && !m.isNoAi();
-            this.tinhaGravidade = !alvo.isNoGravity();
+            this.parado = alvo.position();
         }
     }
 
@@ -38,10 +39,7 @@ public final class ArremessosServidor {
 
     public static void registrarEventos() {
         NeoForge.EVENT_BUS.addListener((ServerTickEvent.Post e) -> tick());
-        NeoForge.EVENT_BUS.addListener((ServerStoppingEvent e) -> {
-            for (Map.Entry<LivingEntity, Ativo> a : ATIVOS.entrySet()) soltar(a.getKey(), a.getValue());
-            ATIVOS.clear();
-        });
+        NeoForge.EVENT_BUS.addListener((ServerStoppingEvent e) -> ATIVOS.clear());
     }
 
     public static boolean emArremesso(LivingEntity alvo) {
@@ -56,19 +54,13 @@ public final class ArremessosServidor {
         if (congelar > 0) congelar(alvo, a);
     }
 
+    /** Segura o alvo onde foi atingido, sem velocidade nem caminho. */
     private static void congelar(LivingEntity alvo, Ativo a) {
-        if (alvo instanceof Mob m) m.setNoAi(true);
-        alvo.setNoGravity(true);
+        if (alvo instanceof Mob m) m.getNavigation().stop();
         alvo.setDeltaMovement(Vec3.ZERO);
+        alvo.teleportTo(a.parado.x, a.parado.y, a.parado.z);
         alvo.hurtMarked = true;
-    }
-
-    /** Devolve IA e gravidade como estavam. */
-    private static void soltar(LivingEntity alvo, Ativo a) {
-        if (a.solto) return;
-        a.solto = true;
-        if (alvo instanceof Mob m && a.tinhaIa) m.setNoAi(false);
-        if (a.tinhaGravidade) alvo.setNoGravity(false);
+        alvo.hasImpulse = true;
     }
 
     static void tick() {
@@ -78,17 +70,16 @@ public final class ArremessosServidor {
             LivingEntity alvo = e.getKey();
             Ativo a = e.getValue();
             if (!alvo.isAlive() || alvo.isRemoved()) {
-                soltar(alvo, a);
                 it.remove();
                 continue;
             }
             switch (a.estado.tick(alvo.onGround())) {
                 case CONGELAR -> congelar(alvo, a);
                 case LANCAR -> {
-                    soltar(alvo, a);
                     Vetor v = a.estado.velocidade();
                     alvo.setDeltaMovement(v.x(), v.y(), v.z());
                     alvo.hurtMarked = true;
+                    alvo.hasImpulse = true;
                 }
                 case GIRAR -> {
                     // Jogadores não giram: a câmera viraria junto.
@@ -99,10 +90,7 @@ public final class ArremessosServidor {
                         alvo.setYHeadRot(giro);
                     }
                 }
-                case FIM -> {
-                    soltar(alvo, a);
-                    it.remove();
-                }
+                case FIM -> it.remove();
             }
         }
     }

@@ -18,6 +18,9 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Predicate;
 import net.minecraft.core.BlockPos;
+import net.minecraft.tags.BlockTags;
+import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.event.level.BlockEvent;
 import net.minecraft.core.particles.BlockParticleOption;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.core.particles.SimpleParticleType;
@@ -127,7 +130,7 @@ public final class ContextoServidor implements Contexto {
     private void mover(Vec3 centro, double raio, double forca, boolean puxar) {
         List<Entity> alvos = naEsfera(Entity.class, centro, raio,
                 e -> e instanceof LivingEntity || e instanceof ItemEntity || e instanceof Projectile
-                        || e instanceof FallingBlockEntity);
+                        || e instanceof FallingBlockEntity && e.getTags().contains(ARRANCADO));
         for (Entity e : alvos) {
             Vec3 dir = centro.subtract(e.getBoundingBox().getCenter());
             if (dir.lengthSqr() < 0.25 && puxar) continue; // já está no centro
@@ -190,11 +193,20 @@ public final class ContextoServidor implements Contexto {
             BlockState estado = nivel.getBlockState(p);
             float dureza = estado.getDestroySpeed(nivel, p);
             if (estado.isAir() || dureza < 0 || dureza > durezaMax || estado.hasBlockEntity()
-                    || !estado.getFluidState().isEmpty() || !nivel.getBlockState(p.above()).isAir()) continue;
-            FallingBlockEntity.fall(nivel, p, estado);
+                    || !estado.getFluidState().isEmpty() || !nivel.getBlockState(p.above()).isAir()
+                    || estado.is(BlockTags.CROPS) || !podeQuebrar(nivel, p, estado)) continue;
+            FallingBlockEntity.fall(nivel, p, estado).addTag(ARRANCADO);
             feitos++;
         }
         return feitos;
+    }
+
+    /** Etiqueta dos blocos que o Azul arrancou: só esses são puxados (não a areia caindo dos outros). */
+    static final String ARRANCADO = "minerwk_arrancado";
+
+    /** Pergunta aos mods de proteção de terreno (claims) se o jogador pode quebrar aqui. */
+    private boolean podeQuebrar(ServerLevel nivel, BlockPos p, BlockState estado) {
+        return !NeoForge.EVENT_BUS.post(new BlockEvent.BreakEvent(nivel, p, estado, jogador)).isCanceled();
     }
 
     @Override
@@ -230,7 +242,7 @@ public final class ContextoServidor implements Contexto {
             if (!nivel.isLoaded(p) || nivel.isOutsideBuildHeight(p) || !nivel.mayInteract(jogador, p)) continue;
             BlockState estado = nivel.getBlockState(p);
             if (estado.isAir() || estado.getDestroySpeed(nivel, p) < 0 || estado.hasBlockEntity()
-                    || !estado.getFluidState().isEmpty()) continue;
+                    || !estado.getFluidState().isEmpty() || !podeQuebrar(nivel, p, estado)) continue;
             nivel.setBlock(p, Blocks.AIR.defaultBlockState(), Block.UPDATE_ALL);
             // Sorteio de reservatório: guarda DETRITOS blocos ao acaso entre os apagados.
             int vaga = apagados < DETRITOS ? apagados : nivel.random.nextInt(apagados + 1);

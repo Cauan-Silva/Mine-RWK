@@ -277,6 +277,7 @@ public final class Gojo {
         private final double arremesso;
         private final int congelar;
         private final java.util.Set<Object> atingidos = new HashSet<>();
+        private boolean avisouAcerto;
 
         FeixeRoxo(Vetor origem, Vetor direcao, double passo, int passos, double raio, float dano,
                   double arremesso, int congelar) {
@@ -301,7 +302,8 @@ public final class Gojo {
             ctx.apagarBlocos(ponto, raio);
             if (ctx.danoUmaVez(ponto, raio, dano, atingidos) > 0) {
                 ctx.arremessar(ponto, raio, arremesso, congelar, direcao);
-                ctx.acertou(dano >= 60 ? 1.5f : 1f);
+                if (!avisouAcerto) ctx.acertou(dano >= 60 ? 1.5f : 1f);
+                avisouAcerto = true;
             }
         }
     }

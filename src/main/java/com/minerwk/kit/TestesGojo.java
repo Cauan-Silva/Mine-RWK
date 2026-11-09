@@ -111,7 +111,7 @@ public final class TestesGojo {
         helper.assertTrue(ArremessosServidor.emArremesso(zumbi), "o zumbi deveria estar sendo arremessado");
         helper.runAfterDelay(2, () -> {
             helper.assertTrue(zumbi.position().distanceTo(inicio) < 0.3, "congelado não anda: " + zumbi.position());
-            helper.assertTrue(zumbi.isNoAi(), "congelado fica sem IA");
+            helper.assertFalse(zumbi.isNoAi() || zumbi.isNoGravity(), "congelar não pode gravar NoAI/NoGravity no mob");
         });
         helper.runAfterDelay(8, () -> {
             helper.assertTrue(zumbi.position().x - inicio.x > 2, "deveria ter voado para longe: " + zumbi.position());
