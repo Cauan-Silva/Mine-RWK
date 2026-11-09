@@ -1,4 +1,9 @@
-"""Gera assets/minerwk/player_animations/gojo.json (formato GeckoLib/Bedrock, abre no Blockbench).
+"""Gera src/main/resources/assets/minerwk/player_animations/gojo.json.
+
+Rodar: python ferramentas/gerar_animacoes_gojo.py. Se o JSON for ajustado no Blockbench, o
+Blockbench passa a ser a fonte e este script não deve ser rodado de novo por cima.
+
+Formato (formato GeckoLib/Bedrock, abre no Blockbench).
 
 Convenções do modelo do jogador: braço com X negativo vai para a frente; Z do braço direito positivo
 abre para fora (o esquerdo é o espelho, Z negativo); Y do tronco gira a cintura. Posição em pixels
@@ -146,7 +151,7 @@ A["gojo_vazio_infinito"] = anim(2.5, {
 })
 
 saida = {"format_version": "1.8.0", "geckolib_format_version": 2, "animations": A}
-p = os.path.join(r"C:\Users\MAIS INTERNET\Documents\Mine-RWK", "src/main/resources/assets/minerwk/player_animations/gojo.json")
+p = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "src/main/resources/assets/minerwk/player_animations/gojo.json")
 with open(p, "w", encoding="utf-8") as f:
     json.dump(saida, f, ensure_ascii=False, indent=1)
     f.write("\n")
