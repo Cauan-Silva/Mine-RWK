@@ -29,6 +29,7 @@ public final class RenderVisuaisGojo {
     private static final int BRANCO_AZULADO = 0x8CCCFF;
     /** Visuais mais longe que isso da câmera não são desenhados. */
     private static final double ALCANCE = 160;
+    private static final com.mojang.blaze3d.vertex.ByteBufferBuilder BUFFER_TEXTO = new com.mojang.blaze3d.vertex.ByteBufferBuilder(1536);
 
     private RenderVisuaisGojo() {
     }
@@ -393,7 +394,8 @@ public final class RenderVisuaisGojo {
         Vec3 olhos = e.getEyePosition(q.parcial);
         if (q.longe(q.rel(olhos)) || q.rel(olhos).lengthSqr() > 48 * 48) return;
         net.minecraft.client.gui.Font fonte = mc.font;
-        var buffers = mc.renderBuffers().bufferSource();
+        // Buffer próprio: descarregar o principal aqui adiantaria o que outros renders deixaram pendente.
+        var buffers = net.minecraft.client.renderer.MultiBufferSource.immediate(BUFFER_TEXTO);
         var camera = mc.gameRenderer.getMainCamera();
         for (CutsceneRoxo200.Palavra p : CutsceneRoxo200.PALAVRAS) {
             if (t < p.inicio() || t > p.fim()) continue;

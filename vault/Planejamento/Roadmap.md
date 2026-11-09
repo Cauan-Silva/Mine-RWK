@@ -6,7 +6,7 @@ atualizado: 2026-11-08
 
 Voltar para [[00 Início]]. Marque `[x]` ao concluir e registre no [[Diário]]. Decisões novas vão em [[Decisões]]; o que precisa de teste no jogo vai em [[Pendências]].
 
-**Onde estamos:** Fase 2 (Gojo), mecânica das seis habilidades pronta (apresentação provisória); VFX dos seis golpes feito (shader portado do Minezin, falta o teste no jogo); impacto de câmera, detritos e brilho feito; o autor ainda acha os golpes simples. Reação do alvo e ritmo feitos (falta o teste no jogo). Próximo, nessa ordem: animações, som, efeitos desenhados no Photon (referência: Gojo x Sukuna no mangá), depois a cutscene da ultimate e o pipeline de áudio (parte 3 do 1.4, adiada para cá). As partes 1 (HUD e cliente) e 2 (tela de escolha) do 1.4 estão prontas. O 1.2 ainda tem o `.fx` de teste e o Iris pendentes.
+**Onde estamos:** Fase 2 (Gojo), mecânica das seis habilidades pronta (apresentação provisória); VFX dos seis golpes feito (shader portado do Minezin, falta o teste no jogo); impacto de câmera, detritos e brilho feito; o autor ainda acha os golpes simples. Reação do alvo, ritmo e a cutscene do Roxo 200% feitos (falta o teste no jogo). Próximo, nessa ordem: animações, som, efeitos desenhados no Photon (referência: Gojo x Sukuna no mangá), depois a cutscene da ultimate e o pipeline de áudio (parte 3 do 1.4, adiada para cá). As partes 1 (HUD e cliente) e 2 (tela de escolha) do 1.4 estão prontas. O 1.2 ainda tem o `.fx` de teste e o Iris pendentes.
 
 ## Como trabalhar em outro PC
 1. `git clone https://github.com/Cauan-Silva/Mine-RWK.git` (ou `git pull` se já tiver).
@@ -61,6 +61,7 @@ Spec e plano: [[2026-11-09 Núcleo dos kits]] (em `Desenvolvimento/Specs` e `Des
 - [x] VFX dos seis golpes (shader `gojo_energy` + geometria, sem Photon por enquanto); ver [[2026-11-09 Gojo VFX]]
 - [x] Impacto dos golpes: câmera reage (tremor, clarão, FOV), detritos e brilho; ver [[2026-11-09 Gojo impacto]]
 - [x] Reação do alvo e ritmo: golpes mais longos, arremesso com congelamento, Azul arranca blocos, tela de quem acerta trava, rastros no mundo; ver [[2026-11-09 Gojo peso]]
+- [x] Roxo 200%: cutscene (sistema de câmera reutilizável) e encantamento visível; ver [[2026-11-09 Roxo 200 cutscene]]
 - [ ] VFX no Photon2 de cada habilidade; Veil só se o domínio precisar de pós-processamento
 - [ ] SFX de cada habilidade
 - [ ] Animações do jogador de cada golpe

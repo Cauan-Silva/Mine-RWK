@@ -15,3 +15,4 @@ Voltar para [[00 Início]].
 - [[2026-11-09 Gojo VFX]]
 - [[2026-11-09 Gojo impacto]]
 - [[2026-11-09 Gojo peso]]
+- [[2026-11-09 Roxo 200 cutscene]]

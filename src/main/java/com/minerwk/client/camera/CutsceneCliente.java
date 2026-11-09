@@ -9,6 +9,7 @@ import com.minerwk.rede.Cutscene;
 import com.minerwk.rede.EncerrarVisual;
 import java.util.List;
 import java.util.Map;
+import net.minecraft.client.CameraType;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
@@ -19,11 +20,13 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.neoforged.neoforge.client.event.ClientTickEvent;
+import net.neoforged.neoforge.client.event.InputEvent;
 import net.neoforged.neoforge.client.event.MovementInputUpdateEvent;
 import net.neoforged.neoforge.client.event.RenderFrameEvent;
 import net.neoforged.neoforge.client.event.RenderGuiLayerEvent;
 import net.neoforged.neoforge.client.event.RenderHandEvent;
 import net.neoforged.neoforge.client.event.ViewportEvent;
+import net.neoforged.neoforge.client.gui.VanillaGuiLayers;
 
 /**
  * Cutscene de ultimate no cliente de quem usou o golpe. A câmera vira uma entidade só do cliente que
@@ -47,6 +50,8 @@ public final class CutsceneCliente {
     private static Entity camera;
     private static float yawJogador, pitchJogador;
     private static Coreografia.Quadro quadro;
+    /** Tipo de câmera de antes (F5): a cutscene força a primeira pessoa e devolve no fim. */
+    private static CameraType cameraAntes;
 
     private CutsceneCliente() {
     }
@@ -71,6 +76,8 @@ public final class CutsceneCliente {
             if (camera == null) {
                 comCamera = false;
             } else {
+                cameraAntes = mc.options.getCameraType();
+                mc.options.setCameraType(CameraType.FIRST_PERSON);
                 posicionar(0);
                 mc.setCameraEntity(camera);
             }
@@ -85,6 +92,8 @@ public final class CutsceneCliente {
     public static void encerrar() {
         Minecraft mc = Minecraft.getInstance();
         if (comCamera && mc.player != null) mc.setCameraEntity(mc.player);
+        if (cameraAntes != null) mc.options.setCameraType(cameraAntes);
+        cameraAntes = null;
         atual = null;
         roteiro = null;
         camera = null;
@@ -97,8 +106,24 @@ public final class CutsceneCliente {
         return Minecraft.getInstance().level.getGameTime() - atual.inicio() + parcial;
     }
 
+    /** Antes do tick do jogador: o olhar enviado ao servidor continua o do começo (o golpe sai para lá). */
+    public static void aoTickAntes(ClientTickEvent.Pre evento) {
+        if (atual != null) prenderOlhar();
+    }
+
+    private static void prenderOlhar() {
+        var jogador = Minecraft.getInstance().player;
+        if (jogador == null) return;
+        jogador.setYRot(yawJogador);
+        jogador.setXRot(pitchJogador);
+        jogador.yRotO = yawJogador;
+        jogador.xRotO = pitchJogador;
+        jogador.setYHeadRot(yawJogador);
+    }
+
     public static void aoTick(ClientTickEvent.Post evento) {
         if (atual == null) return;
+        prenderOlhar();
         Minecraft mc = Minecraft.getInstance();
         if (mc.level != mundo || mc.player == null || !mc.player.isAlive()
                 || idade(0) > roteiro.coreografia().duracao()) encerrar();
@@ -108,14 +133,13 @@ public final class CutsceneCliente {
     public static void aoComecarQuadro(RenderFrameEvent.Pre evento) {
         if (atual == null || Minecraft.getInstance().level == null) return;
         float parcial = evento.getPartialTick().getGameTimeDeltaPartialTick(false);
-        var jogador = Minecraft.getInstance().player;
-        if (jogador != null) {
-            jogador.setYRot(yawJogador);
-            jogador.setXRot(pitchJogador);
-            jogador.yRotO = yawJogador;
-            jogador.xRotO = pitchJogador;
+        prenderOlhar();
+        if (comCamera) {
+            // F5 durante a cutscene tiraria a câmera da coreografia.
+            Minecraft mc = Minecraft.getInstance();
+            if (mc.options.getCameraType() != CameraType.FIRST_PERSON) mc.options.setCameraType(CameraType.FIRST_PERSON);
+            posicionar(idade(parcial));
         }
-        if (comCamera) posicionar(idade(parcial));
     }
 
     private static void posicionar(double t) {
@@ -159,9 +183,17 @@ public final class CutsceneCliente {
         e.shiftKeyDown = false;
     }
 
-    /** Com a câmera de cinema, só a camada da cutscene aparece. */
+    /** Com a câmera de cinema, só a camada da cutscene e o chat aparecem. */
     public static void aoCamadaGui(RenderGuiLayerEvent.Pre evento) {
-        if (atual != null && comCamera && !evento.getName().equals(CAMADA)) evento.setCanceled(true);
+        if (atual != null && comCamera && !evento.getName().equals(CAMADA)
+                && !evento.getName().equals(VanillaGuiLayers.CHAT)) evento.setCanceled(true);
+    }
+
+    /** Atacar, usar e escolher bloco ficam desligados: a mira seguiria a câmera de cinema. */
+    public static void aoInteragir(InputEvent.InteractionKeyMappingTriggered evento) {
+        if (atual == null) return;
+        evento.setCanceled(true);
+        evento.setSwingHand(false);
     }
 
     public static void aoMao(RenderHandEvent evento) {

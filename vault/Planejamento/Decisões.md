@@ -24,5 +24,5 @@ Voltar para [[00 Início]]. Registro do que foi decidido, quando e por quê.
 | 09/11/2026 | Sem transformações (o Minezin tinha); kit inteiro ao escolher | Mais simples; o autor não vê problema | aprovado |
 | 09/11/2026 | Golpes que duram viram efeitos soltos; o jogador segue usando outras teclas | Infinito e domínio não podem travar o kit | aprovado |
 | 09/11/2026 | Roxo apaga blocos por padrão, com gamerule `minerwkApagarBlocos` | Fiel à obra, desligável no servidor | aprovado |
-| 09/11/2026 | Ultimate (R) de cada personagem tem cutscene cinemática; sistema de câmera reutilizável | Pedido do autor | aprovado, desenhar na parte visual |
+| 09/11/2026 | Ultimate (R) de cada personagem tem cutscene cinemática; sistema de câmera reutilizável | Pedido do autor | feito: `core/camera/Coreografia` + `client/camera/CutsceneCliente` (Roxo 200% primeiro) |
 | 09/11/2026 | Peso dos golpes vem de animação, reação do alvo, som e efeitos desenhados, nessa ordem; referência: Gojo x Sukuna no mangá | O autor achou os golpes simples mesmo com tremor e brilho; código geométrico sozinho não dá impacto | aprovado |
