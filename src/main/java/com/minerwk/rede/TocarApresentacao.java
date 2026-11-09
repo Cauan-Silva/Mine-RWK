@@ -8,6 +8,8 @@ import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 
 /** Servidor → clientes próximos: tocar animação, efeito e som num jogador (ids do mod; vazio = nada). */
 public record TocarApresentacao(int entidade, String animacao, String efeito, String som) implements CustomPacketPayload {
+    /** Animação especial: para a animação do kit que estiver tocando. */
+    public static final String PARAR = "!parar";
     public static final Type<TocarApresentacao> TIPO = new Type<>(MineRWK.id("tocar_apresentacao"));
 
     public static final StreamCodec<ByteBuf, TocarApresentacao> CODEC = StreamCodec.composite(

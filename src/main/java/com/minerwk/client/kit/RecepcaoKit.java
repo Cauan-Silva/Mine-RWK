@@ -67,7 +67,8 @@ public final class RecepcaoKit {
     private static void aoTocar(TocarApresentacao p) {
         Minecraft mc = Minecraft.getInstance();
         if (mc.level == null || !(mc.level.getEntity(p.entidade()) instanceof AbstractClientPlayer jogador)) return;
-        if (!p.animacao().isEmpty()) AnimacoesJogador.tocar(jogador, MineRWK.id(p.animacao()));
+        if (TocarApresentacao.PARAR.equals(p.animacao())) AnimacoesJogador.parar(jogador);
+        else if (!p.animacao().isEmpty()) AnimacoesJogador.tocar(jogador, MineRWK.id(p.animacao()));
         if (!p.efeito().isEmpty()) EfeitosVisuais.naEntidade(MineRWK.id(p.efeito()), mc.level, jogador);
         if (!p.som().isEmpty() && ConfigCliente.sfxAnime()) {
             BuiltInRegistries.SOUND_EVENT.getOptional(MineRWK.id(p.som())).ifPresent(som ->

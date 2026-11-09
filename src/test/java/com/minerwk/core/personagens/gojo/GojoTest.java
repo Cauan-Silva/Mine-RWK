@@ -52,6 +52,8 @@ class GojoTest {
         public void acertou(float f) { chamadas.add("acertou"); }
         public void pisoSolido(Vetor p, double r, int t) { chamadas.add("piso"); }
         public void cutscene(String id) { chamadas.add("cutscene:" + id); }
+        public void apresentacao(String anim, String efeito, String som) { if (!anim.isEmpty()) chamadas.add("anim:" + anim); }
+        public void pararAnimacao() { chamadas.add("pararAnimacao"); }
         public void apagarBlocos(Vetor c, double r) { chamadas.add("apagar"); }
         public void paralisar(Vetor c, double r, int t) { chamadas.add("paralisar"); }
         public void infinito(int t) { chamadas.add("infinito"); }
@@ -245,6 +247,40 @@ class GojoTest {
         assertEquals(1, ctx.conta("cutscene:" + CutsceneRoxo200.ID));
         kit.levouDano(10f, agora, ctx);
         assertEquals(1, ctx.conta("fim:gojo_roxo_200_carga"), "o corte da carga encerra a cutscene no cliente");
+    }
+
+    @Test
+    void cadaGolpeTocaASuaAnimacaoNoComecoDaCarga() {
+        kit.recurso().carregar(10000);
+        java.util.Map<Tecla, String> ids = java.util.Map.of(Tecla.Z, "gojo_azul", Tecla.X, "gojo_vermelho",
+                Tecla.C, "gojo_infinito", Tecla.V, "gojo_roxo", Tecla.G, "gojo_vazio_infinito", Tecla.R, "gojo_roxo_200");
+        for (var e : ids.entrySet()) {
+            KitDoJogador k = new KitDoJogador(Gojo.criar());
+            ctx.kit = k;
+            k.recurso().carregar(10000);
+            ctx.chamadas.clear();
+            assertTrue(k.apertar(e.getKey(), agora));
+            k.tick(agora, PARADO, ctx);
+            assertEquals(1, ctx.conta("anim:" + e.getValue()), "animação de " + e.getKey() + " no 1º tick da carga");
+        }
+    }
+
+    @Test
+    void vermelhoSoltoCedoPulaParaAPoseDoDisparo() {
+        usar(Tecla.X);
+        ticks(5);
+        kit.soltar(Tecla.X);
+        ticks(3);
+        assertEquals(1, ctx.conta("anim:gojo_vermelho_disparo"));
+    }
+
+    @Test
+    void cargaCortadaParaAAnimacao() {
+        kit.recurso().carregar(200);
+        usar(Tecla.R);
+        ticks(1);
+        kit.levouDano(10f, agora, ctx);
+        assertEquals(1, ctx.conta("pararAnimacao"));
     }
 
     @Test

@@ -100,6 +100,11 @@ public final class ContextoServidor implements Contexto {
     }
 
     @Override
+    public void pararAnimacao() {
+        Envio.paraQuemVe(jogador, new TocarApresentacao(jogador.getId(), TocarApresentacao.PARAR, "", ""));
+    }
+
+    @Override
     public void tremor(float forca, int duracao, double raio) {
         for (ServerPlayer outro : nivel().players()) {
             double d = Math.sqrt(outro.distanceToSqr(jogador));

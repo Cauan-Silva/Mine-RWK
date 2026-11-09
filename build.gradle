@@ -88,6 +88,8 @@ dependencies {
 
     testImplementation platform('org.junit:junit-bom:5.11.4')
     testImplementation 'org.junit.jupiter:junit-jupiter'
+    // Ler os JSON de animação nos testes do núcleo (a mesma versão do Minecraft 1.21.1)
+    testImplementation 'com.google.code.gson:gson:2.11.0'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 

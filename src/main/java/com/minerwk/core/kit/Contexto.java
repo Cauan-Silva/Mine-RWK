@@ -10,6 +10,10 @@ public interface Contexto {
     default void danoEmArea(double raio, float dano) {
     }
 
+    /** Para a animação do kit no jogador (a carga foi cortada). */
+    default void pararAnimacao() {
+    }
+
     /**
      * Toca animação, efeito e som no jogador, para ele e para quem está perto.
      * Os ids são do mod ({@code gojo_azul} vira {@code minerwk:gojo_azul}); vazio = nada.

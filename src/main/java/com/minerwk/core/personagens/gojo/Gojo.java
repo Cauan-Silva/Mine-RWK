@@ -51,6 +51,17 @@ public final class Gojo {
         public Numeros numeros() {
             return numeros;
         }
+
+        /** A animação do golpe (mesmo id) começa com a carga e cobre o golpe inteiro. */
+        @Override
+        public void aoIniciarCarga(Contexto ctx) {
+            ctx.apresentacao(id, "", "");
+        }
+
+        @Override
+        public void aoInterromper(Contexto ctx) {
+            ctx.pararAnimacao();
+        }
     }
 
     /** Z: ponto de atração a 6 blocos (ou no primeiro bloco), por 3 s; arranca blocos leves do chão. */
@@ -61,7 +72,7 @@ public final class Gojo {
 
         @Override
         public void aoDisparar(Contexto ctx, float forca) {
-            ctx.apresentacao("gojo_azul", "", SOM);
+            ctx.apresentacao("", "", SOM);
             Vetor centro = ctx.alvoAte(6);
             ctx.visual("gojo_azul", centro, ctx.olhar(), 1f, CampoAzul.DURACAO);
             ctx.criarEfeito(new CampoAzul(centro));
@@ -104,18 +115,20 @@ public final class Gojo {
 
         @Override
         public void aoIniciarCarga(Contexto ctx) {
-            ctx.apresentacao("gojo_vermelho", "", "");
+            super.aoIniciarCarga(ctx);
             ctx.visual("gojo_vermelho_carga", ctx.olhos(), ctx.olhar(), 0f, numeros().cargaMax());
         }
 
         @Override
         public void aoInterromper(Contexto ctx) {
+            super.aoInterromper(ctx);
             ctx.visualFim("gojo_vermelho_carga", ctx.olhos());
         }
 
         @Override
         public void aoDisparar(Contexto ctx, float forca) {
-            ctx.apresentacao("", "", SOM);
+            // A carga tem tamanho variável: o disparo sempre pula para a pose do coice.
+            ctx.apresentacao("gojo_vermelho_disparo", "", SOM);
             Vetor dir = ctx.olhar();
             Vetor inicio = ctx.olhos().mais(dir);
             ctx.visualFim("gojo_vermelho_carga", ctx.olhos());
@@ -174,7 +187,7 @@ public final class Gojo {
 
         @Override
         public void aoDisparar(Contexto ctx, float forca) {
-            ctx.apresentacao("gojo_infinito", "", SOM);
+            ctx.apresentacao("", "", SOM);
             ctx.visual("gojo_infinito", ctx.olhos(), ctx.olhar(), 0f, InfinitoAtivo.DURACAO);
             ctx.criarEfeito(new InfinitoAtivo());
         }
@@ -216,12 +229,13 @@ public final class Gojo {
 
         @Override
         public void aoIniciarCarga(Contexto ctx) {
-            ctx.apresentacao("gojo_roxo", "", "");
+            super.aoIniciarCarga(ctx);
             ctx.visual("gojo_roxo_carga", ctx.olhos(), ctx.olhar(), 0f, numeros().cargaMax());
         }
 
         @Override
         public void aoInterromper(Contexto ctx) {
+            super.aoInterromper(ctx);
             ctx.visualFim("gojo_roxo_carga", ctx.olhos());
         }
 
@@ -247,13 +261,14 @@ public final class Gojo {
 
         @Override
         public void aoIniciarCarga(Contexto ctx) {
-            ctx.apresentacao("gojo_roxo", "", "");
+            super.aoIniciarCarga(ctx);
             ctx.visual("gojo_roxo_200_carga", ctx.olhos(), ctx.olhar(), 0f, numeros().cargaMax());
             ctx.cutscene(CutsceneRoxo200.ID);
         }
 
         @Override
         public void aoInterromper(Contexto ctx) {
+            super.aoInterromper(ctx);
             ctx.visualFim("gojo_roxo_200_carga", ctx.olhos());
         }
 
@@ -319,7 +334,7 @@ public final class Gojo {
 
         @Override
         public void aoDisparar(Contexto ctx, float forca) {
-            ctx.apresentacao("gojo_dominio", "", SOM);
+            ctx.apresentacao("", "", SOM);
             ctx.tremor(0.5f, 20, 24);
             ctx.visual("gojo_vazio_infinito", ctx.olhos(), ctx.olhar(), 0f, 160);
             // O domínio tem chão próprio: dá para ficar em pé mesmo sem bloco embaixo.
