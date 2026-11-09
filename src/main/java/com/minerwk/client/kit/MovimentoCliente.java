@@ -23,8 +23,8 @@ public final class MovimentoCliente {
     private static final String ROXO_MAXIMO = "gojo_roxo_maximo";
     /** Altura dos olhos de quem está em pé (o visual guarda os olhos; a regra usa os pés). */
     private static final double ALTURA_OLHOS = 1.62;
-    /** Ticks de queda lenta, no máximo, depois da sequência do R. */
-    private static final int QUEDA_LENTA = 200;
+    /** Ticks de queda lenta, no máximo, depois da sequência do R (o voo do servidor cobre o mesmo). */
+    private static final int QUEDA_LENTA = 600;
     private static final double QUEDA_MAX = -0.12;
 
     /** Lado do jogador em cada domínio, decidido quando o domínio aparece. */

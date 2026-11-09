@@ -33,6 +33,8 @@ import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.OwnableEntity;
+import net.minecraft.world.entity.boss.enderdragon.EnderDragon;
+import net.minecraft.world.entity.boss.wither.WitherBoss;
 import net.minecraft.world.entity.decoration.ArmorStand;
 import net.minecraft.world.entity.item.FallingBlockEntity;
 import net.minecraft.world.entity.item.ItemEntity;
@@ -49,6 +51,8 @@ import net.minecraft.world.phys.Vec3;
 
 /** O {@link Contexto} do núcleo, executado no servidor em nome de um jogador. Nada aqui afeta o próprio jogador. */
 public final class ContextoServidor implements Contexto {
+    /** Marca do projétil que o Infinito já parou (o toque aparece uma vez só). */
+    private static final String PARADO_PELO_INFINITO = "minerwk_parado_infinito";
     private final ServerPlayer jogador;
 
     public ContextoServidor(ServerPlayer jogador) {
@@ -254,7 +258,7 @@ public final class ContextoServidor implements Contexto {
         double melhorFora = Double.MAX_VALUE;
         double melhorLonge = Double.MAX_VALUE;
         for (LivingEntity e : nivel().getEntitiesOfClass(LivingEntity.class, caixa,
-                e -> afetavel(e) && !(e instanceof ArmorStand))) {
+                e -> afetavel(e) && !(e instanceof ArmorStand) && !(e instanceof EnderDragon) && !(e instanceof WitherBoss))) {
             Vec3 c = e.getBoundingBox().getCenter();
             Vec3 ate = c.subtract(olhos);
             double longe = ate.dot(dir);
@@ -376,8 +380,8 @@ public final class ContextoServidor implements Contexto {
         // Projéteis que chegam perto param no ar e caem.
         for (Projectile p : nivel().getEntitiesOfClass(Projectile.class, jogador.getBoundingBox().inflate(1.5),
                 p -> p.getOwner() != jogador)) {
-            // Só o que ainda vinha andando é um toque novo (o que já parou fica parado a cada tick).
-            if (p.getDeltaMovement().lengthSqr() > 1e-3) ProtecoesServidor.toque(jogador, p.position(), true);
+            // Só a primeira parada é um toque (o que já parou volta a ganhar um pouco de queda a cada tick).
+            if (p.addTag(PARADO_PELO_INFINITO)) ProtecoesServidor.toque(jogador, p.position(), true);
             p.setDeltaMovement(Vec3.ZERO);
             p.hurtMarked = true;
         }

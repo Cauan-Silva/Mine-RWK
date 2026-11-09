@@ -104,15 +104,26 @@ public final class VisuaisAtivos {
         return ATIVOS;
     }
 
+    /** Abre espaço tirando o mais antigo, menos os que movem o jogador (domínio e sequência do R). */
+    private static void despejar() {
+        for (int i = 0; i < ATIVOS.size(); i++) {
+            String tipo = ATIVOS.get(i).tipo;
+            if (!tipo.equals("gojo_vazio_infinito") && !tipo.equals("gojo_roxo_maximo")) {
+                ATIVOS.remove(i);
+                return;
+            }
+        }
+    }
+
     public static void receber(MostrarVisual p) {
-        if (ATIVOS.size() >= LIMITE) ATIVOS.remove(0);
+        if (ATIVOS.size() >= LIMITE) despejar();
         ATIVOS.add(new Visual(p.dono(), p.tipo(), p.origem(), p.direcao(), p.forca(), p.duracao(), p.inicio()));
         ClientLevel nivel = Minecraft.getInstance().level;
         if (p.tipo().equals("gojo_azul") && nivel != null) {
             // A marca no chão nasce junto com o campo e some devagar depois que ele acaba.
             Vetor chao = chao(nivel, p.origem());
             if (chao != null) {
-                if (ATIVOS.size() >= LIMITE) ATIVOS.remove(0);
+                if (ATIVOS.size() >= LIMITE) despejar();
                 ATIVOS.add(new Visual(p.dono(), "gojo_azul_marca", chao, p.direcao(), 1,
                         p.duracao() + PerfilVfxGojo.MARCA_AZUL, p.inicio()));
             }
@@ -190,7 +201,7 @@ public final class VisuaisAtivos {
             }
         }
         for (Visual n : novos) {
-            if (ATIVOS.size() >= LIMITE) ATIVOS.remove(0);
+            if (ATIVOS.size() >= LIMITE) despejar();
             ATIVOS.add(n);
         }
     }

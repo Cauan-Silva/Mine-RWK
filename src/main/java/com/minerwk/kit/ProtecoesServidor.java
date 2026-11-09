@@ -55,9 +55,12 @@ public final class ProtecoesServidor {
      */
     static void toque(ServerPlayer dono, Vec3 de, boolean projetil) {
         long agora = dono.level().getGameTime();
-        Long ultimo = ULTIMO_TOQUE.get(dono.getUUID());
-        if (ultimo != null && agora - ultimo < INTERVALO_TOQUE && agora >= ultimo) return;
-        ULTIMO_TOQUE.put(dono.getUUID(), agora);
+        // Projétil sempre passa (já aparece uma vez só); golpes seguidos se limitam.
+        if (!projetil) {
+            Long ultimo = ULTIMO_TOQUE.get(dono.getUUID());
+            if (ultimo != null && agora - ultimo < INTERVALO_TOQUE && agora >= ultimo) return;
+            ULTIMO_TOQUE.put(dono.getUUID(), agora);
+        }
         Vec3 centro = dono.getBoundingBox().getCenter();
         Vec3 d = de.subtract(centro);
         d = d.lengthSqr() < 1e-6 ? dono.getLookAngle() : d.normalize();

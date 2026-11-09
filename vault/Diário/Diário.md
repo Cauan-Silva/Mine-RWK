@@ -18,3 +18,4 @@ Voltar para [[00 Início]].
 - [[2026-11-09 Roxo 200 cutscene]]
 - [[2026-11-09 Gojo animações]]
 - [[2026-11-09 Gojo domínio, movimento e R colossal]]
+- [[2026-11-09 Vazio Roxo máximo e VFX do Azul e do Infinito]]

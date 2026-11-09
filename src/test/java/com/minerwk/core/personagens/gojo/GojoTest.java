@@ -61,7 +61,8 @@ class GojoTest {
         Vetor posAlvo;
         public Object marcarAlvo(double alcance, double largura) { return alvoMarcado; }
         public Vetor posicaoDe(Object alvo) { return posAlvo; }
-        public void suspender(Object alvo, Vetor ponto, int t) { chamadas.add("suspender"); }
+        final List<Vetor> suspensos = new ArrayList<>();
+        public void suspender(Object alvo, Vetor ponto, int t) { chamadas.add("suspender"); suspensos.add(ponto); }
         public void ferir(Object alvo, float d) { chamadas.add("ferir"); danos.add(d); }
         public void apagarCasca(Vetor c, double de, double ate) { chamadas.add("casca"); cascas.add(new double[] {de, ate}); centroCasca = c; }
         public void cutscene(String id) { chamadas.add("cutscene:" + id); }
@@ -216,6 +217,18 @@ class GojoTest {
         assertEquals(RoxoMaximo.inicioExplosao(a) - a, ctx.conta("suspender"), "segurado no ar até explodir");
         // Os olhos do falso ficam em 0 olhando para +x: a fusão fica 4 atrás.
         assertExplosaoInteira(new Vetor(-RoxoMaximo.ATRAS, 0, 0));
+    }
+
+    @Test
+    void uppercutPuxaOAlvoParaOndeOGojoBateMesmoSeEleAndou() {
+        ctx.alvoMarcado = "alvo";
+        ctx.posAlvo = new Vetor(31.5, 0, 0);
+        usar(Tecla.R);
+        ticks(85); // disparou; o avanço (10 ticks) ainda não acabou
+        ctx.posAlvo = new Vetor(36, 0, 0); // o alvo correu
+        ticks(300);
+        assertFalse(ctx.suspensos.isEmpty());
+        for (Vetor p : ctx.suspensos) assertEquals(31.5, p.x(), 1e-9, "segurado onde o Gojo bate, não onde correu");
     }
 
     /** As cascas cobrem de 0 ao raio 40 sem buraco nem repetição, e a explosão aparece uma vez. */

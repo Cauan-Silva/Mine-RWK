@@ -37,6 +37,9 @@ public final class SuspensosServidor {
     /** Segura {@code alvo} com o centro em {@code centro} por {@code ticks} (renova se já estava segurado). */
     static void suspender(LivingEntity alvo, Vec3 centro, int ticks) {
         if (!(alvo.level() instanceof ServerLevel nivel) || !alvo.isAlive()) return;
+        // Montado ou com passageiro, o veículo brigaria com o teleporte a cada tick.
+        alvo.stopRiding();
+        alvo.ejectPassengers();
         ATIVOS.put(alvo.getUUID(), new Suspenso(nivel, centro, nivel.getGameTime() + ticks));
         segurar(alvo, centro);
     }
