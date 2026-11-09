@@ -6,7 +6,7 @@ atualizado: 2026-11-08
 
 Voltar para [[00 Início]]. Marque `[x]` ao concluir e registre no [[Diário]]. Decisões novas vão em [[Decisões]]; o que precisa de teste no jogo vai em [[Pendências]].
 
-**Onde estamos:** Fase 2 (Gojo), mecânica das seis habilidades pronta (apresentação provisória); VFX dos seis golpes feito (shader portado do Minezin, falta o teste no jogo); próximo: animações, cutscene da ultimate e o pipeline de áudio (parte 3 do 1.4, adiada para cá). As partes 1 (HUD e cliente) e 2 (tela de escolha) do 1.4 estão prontas. O 1.2 ainda tem o `.fx` de teste e o Iris pendentes.
+**Onde estamos:** Fase 2 (Gojo), mecânica das seis habilidades pronta (apresentação provisória); VFX dos seis golpes feito (shader portado do Minezin, falta o teste no jogo); impacto de câmera, detritos e brilho feito; o autor ainda acha os golpes simples. Próximo, nessa ordem: reação do alvo (congelar no acerto, mobs voando), animações, som, efeitos desenhados no Photon (referência: Gojo x Sukuna no mangá), depois a cutscene da ultimate e o pipeline de áudio (parte 3 do 1.4, adiada para cá). As partes 1 (HUD e cliente) e 2 (tela de escolha) do 1.4 estão prontas. O 1.2 ainda tem o `.fx` de teste e o Iris pendentes.
 
 ## Como trabalhar em outro PC
 1. `git clone https://github.com/Cauan-Silva/Mine-RWK.git` (ou `git pull` se já tiver).
