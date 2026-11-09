@@ -3,6 +3,7 @@ package com.minerwk.client.vfx;
 import com.minerwk.client.ConfigCliente;
 import com.minerwk.core.kit.Vetor;
 import com.minerwk.core.personagens.gojo.CutsceneRoxo200;
+import com.minerwk.core.vfx.BolhaInfinitoGojo;
 import com.minerwk.core.vfx.CoroaRoxoGojo;
 import com.minerwk.core.vfx.DescargaVermelhoGojo;
 import com.minerwk.core.vfx.FluxoAzulGojo;
@@ -71,6 +72,7 @@ public final class RenderVisuaisGojo {
                 case "gojo_vermelho" -> vermelho(q, v, t, op);
                 case "gojo_vermelho_explosao" -> explosao(q, v, t);
                 case "gojo_infinito" -> infinito(q, v, op);
+                case "gojo_infinito_toque" -> toqueInfinito(q, v, t, op);
                 case "gojo_roxo_carga" -> roxoCarga(q, v, t, op, TrajetoriaGojo.PASSO_ROXO, 30, 1);
                 case "gojo_roxo_200_carga" -> {
                     encantamento(q, v, t, op);
@@ -207,7 +209,48 @@ public final class RenderVisuaisGojo {
             for (int k = 0; k <= passos * 2; k++) pts.add(c.add(Base.direto(FluxoAzulGojo.arco(f, (double) k / (passos * 2), t))));
             p.fita(pts, .05, BRANCO_AZULADO, alphas(pts.size(), op * .6f));
         }
+        // Espirais de vento entrando no núcleo, apertando a cada volta.
+        int ns = passos * 2;
+        for (int f = 0; f < 4; f++) {
+            List<Vec3> pts = new ArrayList<>(ns + 1);
+            float[] a = new float[ns + 1];
+            for (int k = 0; k <= ns; k++) {
+                double s = (double) k / ns;
+                pts.add(c.add(Base.direto(FluxoAzulGojo.espiral(f, s, t))));
+                a[k] = op * .55f * (float) Math.sin(Math.PI * s);
+            }
+            p.fita(pts, .07, f % 2 == 0 ? 0xFFFFFF : BRANCO_AZULADO, a);
+        }
+        // Anéis de sucção: nascem largos e se fecham no núcleo.
+        int na = q.segmentos(32);
+        for (int k = 0; k < 3; k++) {
+            double r = FluxoAzulGojo.anelSuccao(k, t);
+            float a = op * .5f * (float) FluxoAzulGojo.alphaAnel(k, t);
+            if (a <= .004f) continue;
+            double incl = .35 + k * .9;
+            List<Vec3> pts = new ArrayList<>(na + 1);
+            for (int i = 0; i <= na; i++) {
+                double ang = i * Math.PI * 2 / na;
+                double y = Math.sin(ang) * r;
+                pts.add(c.add(Math.cos(ang) * r, y * Math.sin(incl) * .5, y * Math.cos(incl)));
+            }
+            p.fita(pts, .06, CIANO, alphas(pts.size(), a));
+        }
+        // Espaço dobrando: um anel de frente para a câmera que ondula em volta do núcleo.
+        Vec3 f = c.lengthSqr() < 1e-6 ? new Vec3(0, 0, 1) : c.normalize();
+        Vec3 u = f.cross(new Vec3(0, 1, 0));
+        u = u.lengthSqr() < 1e-6 ? new Vec3(1, 0, 0) : u.normalize();
+        Vec3 w = u.cross(f).normalize();
+        List<Vec3> dobra = new ArrayList<>(na + 1);
+        for (int i = 0; i <= na; i++) {
+            double ang = i * Math.PI * 2 / na;
+            double r = ra * 2.4 * (1 + .09 * Math.sin(ang * 6 + t * .45));
+            dobra.add(c.add(u.scale(Math.cos(ang) * r)).add(w.scale(Math.sin(ang) * r)));
+        }
+        p.fita(dobra, .18, 0x1A3A70, alphas(dobra.size(), op * .35f));
         p.terminar();
+        // O núcleo "engole a luz": centro escuro dentro da borda ciano, pulsando.
+        esfera(q, Pincel.AZUL, false, c, ra * (.5 + .06 * Math.sin(t * .6)), 0x000000, op);
     }
 
     // ---------------------------------------------------------------- Vermelho
@@ -424,7 +467,86 @@ public final class RenderVisuaisGojo {
         Entity e = dono(v);
         if (e == null) return;
         Vec3 c = q.rel(e.getPosition(q.parcial).add(0, e.getBbHeight() / 2, 0));
-        esfera(q, Pincel.INFINITO, true, c, 1.4, 0x8CCCFF, op * .9f);
+        double raio = BolhaInfinitoGojo.RAIO;
+        esfera(q, Pincel.INFINITO, true, c, raio, 0x8CCCFF, op * .9f);
+        if (q.longe(c)) return;
+        Pincel p = Pincel.novo().comecar(Pincel.FITA, true, q.tempo, new Vec3(0, 0, 1));
+        int n = q.segmentos(32);
+        // Brilho correndo pela bolha: duas faixas em círculos máximos que giram.
+        for (int b = 0; b < 2; b++) {
+            double g = q.tempo * (1.1 + b * .4) + b * 1.7;
+            Vec3 eixo = new Vec3(Math.cos(g), .6 - b * 1.2, Math.sin(g)).normalize();
+            Vec3 u = perpendicular(eixo);
+            Vec3 w = eixo.cross(u).normalize();
+            List<Vec3> pts = new ArrayList<>(n / 2 + 1);
+            float[] a = new float[n / 2 + 1];
+            for (int i = 0; i <= n / 2; i++) {
+                double ang = i * Math.PI / (n / 2) + q.tempo * 2.5;
+                pts.add(c.add(u.scale(Math.cos(ang) * raio)).add(w.scale(Math.sin(ang) * raio)));
+                a[i] = op * .35f * (float) Math.sin(Math.PI * i / (n / 2));
+            }
+            p.fita(pts, .05, 0xFFFFFF, a);
+        }
+        // Hexágonos sutis que acendem e apagam pela superfície.
+        double giro = q.tempo * .2;
+        for (int i = 0; i < BolhaInfinitoGojo.HEXAGONOS; i++) {
+            float a = op * .3f * (float) BolhaInfinitoGojo.brilhoHexagono(i, q.tempo);
+            if (a <= .01f) continue;
+            Vetor d0 = BolhaInfinitoGojo.direcaoHexagono(i);
+            Vec3 d = new Vec3(d0.x() * Math.cos(giro) - d0.z() * Math.sin(giro), d0.y(),
+                    d0.x() * Math.sin(giro) + d0.z() * Math.cos(giro));
+            Vec3 centro = c.add(d.scale(raio));
+            Vec3 u = perpendicular(d);
+            Vec3 w = d.cross(u).normalize();
+            List<Vec3> hex = new ArrayList<>(7);
+            for (int k = 0; k <= 6; k++) {
+                double ang = k * Math.PI / 3;
+                hex.add(centro.add(u.scale(Math.cos(ang) * .22)).add(w.scale(Math.sin(ang) * .22)));
+            }
+            p.fita(hex, .025, 0xBFE8FF, alphas(hex.size(), a));
+        }
+        p.terminar();
+    }
+
+    /** O Infinito parou algo: ondas pela bolha a partir do ponto e, se foi um projétil, um halo tremendo nele. */
+    private static void toqueInfinito(Quadro q, VisuaisAtivos.Visual v, double t, float op) {
+        Entity e = dono(v);
+        if (e != null) {
+            Vec3 c = q.rel(e.getPosition(q.parcial).add(0, e.getBbHeight() / 2, 0));
+            if (!q.longe(c)) {
+                Vec3 d = vec(v.direcao).lengthSqr() < 1e-8 ? new Vec3(0, 1, 0) : vec(v.direcao).normalize();
+                Vec3 u = perpendicular(d);
+                Vec3 w = d.cross(u).normalize();
+                double raio = BolhaInfinitoGojo.RAIO;
+                int n = q.segmentos(24);
+                Pincel p = Pincel.novo().comecar(Pincel.FITA, true, q.tempo, new Vec3(0, 0, 1));
+                for (int k = 0; k < BolhaInfinitoGojo.ONDAS; k++) {
+                    float a = (float) BolhaInfinitoGojo.alphaOnda(k, t) * .8f;
+                    if (a <= .004f) continue;
+                    double th = Math.max(.05, BolhaInfinitoGojo.angulo(k, t));
+                    List<Vec3> pts = new ArrayList<>(n + 1);
+                    for (int i = 0; i <= n; i++) {
+                        double ang = i * Math.PI * 2 / n;
+                        Vec3 lado = u.scale(Math.cos(ang)).add(w.scale(Math.sin(ang)));
+                        pts.add(c.add(d.scale(Math.cos(th) * raio)).add(lado.scale(Math.sin(th) * raio)));
+                    }
+                    p.fita(pts, .06, 0xBFE8FF, alphas(pts.size(), a));
+                }
+                p.terminar();
+                brilho(q, c.add(d.scale(raio)), .9, CIANO, (float) Math.exp(-t / 3) * .8f);
+            }
+        }
+        if (v.forca > 1) {
+            // Projétil parado: treme no ar com um halo azul até cair.
+            Vec3 h = q.rel(v.origem).add(Math.sin(t * 9) * .04, Math.cos(t * 11) * .04, Math.sin(t * 13) * .04);
+            esfera(q, Pincel.INFINITO, true, h, .28, 0x8CCCFF, op * .8f);
+            brilho(q, h, .9, CIANO, op * .6f);
+        }
+    }
+
+    private static Vec3 perpendicular(Vec3 d) {
+        Vec3 u = d.cross(new Vec3(0, 1, 0));
+        return (u.lengthSqr() < 1e-6 ? d.cross(new Vec3(1, 0, 0)) : u).normalize();
     }
 
     // ---------------------------------------------------------------- Roxo

@@ -20,6 +20,8 @@ import org.joml.Vector3f;
 public final class DetritosGojo {
     private static final double ALCANCE = 64;
     private static final DustParticleOptions FAISCA_VERMELHA = new DustParticleOptions(new Vector3f(1f, .15f, .12f), 1.6f);
+    private static final BlockParticleOption FOLHA = new BlockParticleOption(ParticleTypes.BLOCK,
+            net.minecraft.world.level.block.Blocks.OAK_LEAVES.defaultBlockState());
     private static final DustParticleOptions FAISCA_VIOLETA = new DustParticleOptions(new Vector3f(.75f, .4f, 1f), 1.4f);
 
     private DetritosGojo() {
@@ -137,6 +139,25 @@ public final class DetritosGojo {
                         double y = chao.getY() + 1.1;
                         Vec3 puxa = new Vec3(v.origem.x() - x, v.origem.y() - y, v.origem.z() - z).scale(.12);
                         bloco(l, chao, x, y, z, puxa.x, puxa.y + .1, puxa.z);
+                    }
+                    // Poeira e folhas sugadas pelo ar até o núcleo.
+                    for (int i = 0; i < qtd(3); i++) {
+                        Vec3 de = new Vec3(v.origem.x(), v.origem.y(), v.origem.z())
+                                .add((rnd.nextDouble() - .5) * 8, (rnd.nextDouble() - .5) * 4, (rnd.nextDouble() - .5) * 8);
+                        Vec3 puxa = new Vec3(v.origem.x() - de.x, v.origem.y() - de.y, v.origem.z() - de.z).scale(.09);
+                        l.addParticle(i == 0 ? FOLHA : ParticleTypes.WHITE_ASH, de.x, de.y, de.z, puxa.x, puxa.y, puxa.z);
+                    }
+                }
+                case "gojo_infinito" -> {
+                    // Poeira que entra devagar perto do Gojo e quase para: o tempo fica lento ali.
+                    net.minecraft.world.entity.Entity e = l.getEntity(v.dono);
+                    if (e == null || !perto(new Vetor(e.getX(), e.getY(), e.getZ()))) break;
+                    Vec3 c = e.position().add(0, e.getBbHeight() / 2, 0);
+                    for (int i = 0; i < qtd(2); i++) {
+                        double a = rnd.nextDouble() * Math.PI * 2, y = (rnd.nextDouble() - .5) * 2;
+                        Vec3 p = c.add(Math.cos(a) * 2.6, y, Math.sin(a) * 2.6);
+                        Vec3 vel = c.subtract(p).scale(.02);
+                        l.addParticle(ParticleTypes.WHITE_ASH, p.x, p.y, p.z, vel.x, vel.y, vel.z);
                     }
                 }
                 case "gojo_roxo", "gojo_roxo_200" -> {

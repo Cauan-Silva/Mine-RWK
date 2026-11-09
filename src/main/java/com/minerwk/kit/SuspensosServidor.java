@@ -53,7 +53,7 @@ public final class SuspensosServidor {
         alvo.setDeltaMovement(Vec3.ZERO);
         // Sem queda acumulada: ao ser solto, o dano de queda conta só a partir daqui.
         alvo.resetFallDistance();
-        if (alvo instanceof ServerPlayer jogador) {
+        if (alvo instanceof ServerPlayer jogador && jogador.connection != null) {
             jogador.connection.teleport(x, y, z, jogador.getYRot(), jogador.getXRot());
             jogador.connection.aboveGroundTickCount = 0;
         } else {

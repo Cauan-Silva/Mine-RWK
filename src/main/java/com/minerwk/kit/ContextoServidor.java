@@ -376,6 +376,8 @@ public final class ContextoServidor implements Contexto {
         // Projéteis que chegam perto param no ar e caem.
         for (Projectile p : nivel().getEntitiesOfClass(Projectile.class, jogador.getBoundingBox().inflate(1.5),
                 p -> p.getOwner() != jogador)) {
+            // Só o que ainda vinha andando é um toque novo (o que já parou fica parado a cada tick).
+            if (p.getDeltaMovement().lengthSqr() > 1e-3) ProtecoesServidor.toque(jogador, p.position(), true);
             p.setDeltaMovement(Vec3.ZERO);
             p.hurtMarked = true;
         }
