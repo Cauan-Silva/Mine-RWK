@@ -24,7 +24,9 @@ import org.joml.Matrix4f;
  */
 public final class Pincel {
     /** Modos do shader {@code gojo_energy.fsh}. */
-    public static final float AZUL = 0, VERMELHO = 1, ROXO = 2, INFINITO = 3, FITA = 5, CEU = 40, CHAO = 41;
+    public static final float AZUL = 0, VERMELHO = 1, ROXO = 2, INFINITO = 3, FITA = 5, CEU = 40, CHAO = 41, BRILHO = 42;
+    /** Fitas 1,5× mais largas que no Minezin (spec do impacto). */
+    private static final double LARGURA_FITA = 1.5;
 
     private static ShaderInstance base;
     private static ShaderInstance aditivo;
@@ -154,7 +156,7 @@ public final class Pincel {
         for (int k = 0; k < n - 1; k++) {
             Vec3 a = pontos.get(k);
             Vec3 b = pontos.get(k + 1);
-            Vec3 lado = lado(a, b, largura);
+            Vec3 lado = lado(a, b, largura * LARGURA_FITA);
             float ua = (float) k / (n - 1);
             float ub = (float) (k + 1) / (n - 1);
             vertice(a.x - lado.x, a.y - lado.y, a.z - lado.z, cor, alphas[k], ua, 0);
@@ -172,6 +174,19 @@ public final class Pincel {
         if (l.lengthSqr() < 1e-10) l = tangente.cross(new Vec3(0, 1, 0));
         if (l.lengthSqr() < 1e-10) l = new Vec3(1, 0, 0);
         return l.normalize().scale(largura / 2);
+    }
+
+    /** Brilho: quadrado virado para a câmera (na origem) em volta de {@code c}; o modo {@link #BRILHO} faz a queda. */
+    public void brilho(Vec3 c, double raio, int cor, float alpha) {
+        Vec3 frente = c.lengthSqr() < 1e-8 ? new Vec3(0, 0, 1) : c.normalize();
+        Vec3 lado = frente.cross(new Vec3(0, 1, 0));
+        if (lado.lengthSqr() < 1e-6) lado = new Vec3(1, 0, 0);
+        lado = lado.normalize().scale(raio);
+        Vec3 cima = lado.cross(frente).normalize().scale(raio);
+        vertice(c.x - lado.x - cima.x, c.y - lado.y - cima.y, c.z - lado.z - cima.z, cor, alpha, 0, 0);
+        vertice(c.x + lado.x - cima.x, c.y + lado.y - cima.y, c.z + lado.z - cima.z, cor, alpha, 1, 0);
+        vertice(c.x + lado.x + cima.x, c.y + lado.y + cima.y, c.z + lado.z + cima.z, cor, alpha, 1, 1);
+        vertice(c.x - lado.x + cima.x, c.y - lado.y + cima.y, c.z - lado.z + cima.z, cor, alpha, 0, 1);
     }
 
     /** Disco horizontal (chão do domínio): u = ângulo, v = 0,5 no centro até 1 na borda. */

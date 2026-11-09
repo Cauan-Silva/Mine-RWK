@@ -71,6 +71,8 @@ public final class VisuaisAtivos {
     public static void receber(MostrarVisual p) {
         if (ATIVOS.size() >= LIMITE) ATIVOS.remove(0);
         ATIVOS.add(new Visual(p.dono(), p.tipo(), p.origem(), p.direcao(), p.forca(), p.duracao(), p.inicio()));
+        ImpactoCamera.momento(p.tipo(), p.origem());
+        DetritosGojo.aoComecar(p.tipo(), p.origem());
     }
 
     public static void encerrar(EncerrarVisual p) {
@@ -85,6 +87,8 @@ public final class VisuaisAtivos {
                 ATIVOS.remove(i);
                 ATIVOS.add(new Visual(v.dono, "gojo_vermelho_explosao", p.ponto(), v.direcao, v.forca,
                         PerfilVfxGojo.EXPLOSAO_VERMELHO, agora));
+                ImpactoCamera.momento("gojo_vermelho_explosao", p.ponto());
+                DetritosGojo.explosao(p.ponto());
             } else {
                 v.fimEm = agora;
             }
@@ -102,10 +106,13 @@ public final class VisuaisAtivos {
         if (nivel == null) return;
         long agora = nivel.getGameTime();
         ATIVOS.removeIf(v -> v.acabou(agora));
+        ImpactoCamera.tick();
+        DetritosGojo.tick();
     }
 
     public static void limpar() {
         ATIVOS.clear();
+        ImpactoCamera.limpar();
         mundo = null;
     }
 }

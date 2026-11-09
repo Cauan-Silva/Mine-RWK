@@ -257,6 +257,13 @@ void main(){
         color+=vec3(.10,.14,.22)*exp(-r*r*14.);
         alpha=vertexColor.a;
     }
+    if(mode>=41.5&&mode<42.5){
+        // Brilho (Mine-RWK): quadrado virado para a camera com queda radial suave, no lugar do bloom.
+        float d=length(energyUV-vec2(.5))*2.;
+        float g=pow(max(0.,1.-d),2.2)*.75+exp(-d*d*14.)*.5;
+        color=vertexColor.rgb*(1.+exp(-d*d*30.)*.6);
+        alpha=vertexColor.a*g;
+    }
     if(alpha<.004) discard;
     fragColor=vec4(color,alpha);
 }

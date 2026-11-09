@@ -69,8 +69,8 @@ public final class RenderVisuaisGojo {
                 case "gojo_infinito" -> infinito(q, v, op);
                 case "gojo_roxo_carga" -> roxoCarga(q, v, t, op, 2, 30, 1);
                 case "gojo_roxo_200_carga" -> roxoCarga(q, v, t, op, 4, 80, 1.7);
-                case "gojo_roxo" -> roxo(q, v, t, op, 2, 1.9);
-                case "gojo_roxo_200" -> roxo(q, v, t, op, 4, 3.2);
+                case "gojo_roxo" -> roxo(q, v, t, op, 2, 2.1);
+                case "gojo_roxo_200" -> roxo(q, v, t, op, 4, 3.5);
                 case "gojo_vazio_infinito" -> dominio(q, v, t, op);
                 default -> {
                 }
@@ -143,6 +143,16 @@ public final class RenderVisuaisGojo {
         p.terminar();
     }
 
+    /** Brilho aditivo em volta de uma esfera (metade no VFX reduzido). */
+    private static void brilho(Quadro q, Vec3 c, double raio, int cor, float alpha) {
+        if (q.longe(c)) return;
+        if (q.detalhe.faixas() < 64) alpha *= .5f;
+        if (alpha <= .004f) return;
+        Pincel p = Pincel.novo().comecar(Pincel.BRILHO, true, q.tempo, new Vec3(0, 0, 1));
+        p.brilho(c, raio, cor, alpha);
+        p.terminar();
+    }
+
     private static float[] alphas(int n, float alpha) {
         float[] a = new float[n];
         java.util.Arrays.fill(a, alpha);
@@ -154,8 +164,10 @@ public final class RenderVisuaisGojo {
     private static void azul(Quadro q, VisuaisAtivos.Visual v, double t, float op) {
         Vec3 c = q.rel(v.origem);
         if (q.longe(c)) return;
-        esfera(q, Pincel.AZUL, false, c, FluxoAzulGojo.raio(t), 0x0A1830, op);
-        esfera(q, Pincel.AZUL, true, c, FluxoAzulGojo.raio(t) * 1.6, CIANO, op * .35f);
+        double ra = FluxoAzulGojo.raio(t) * 1.3;
+        esfera(q, Pincel.AZUL, false, c, ra, 0x0A1830, op);
+        esfera(q, Pincel.AZUL, true, c, ra * 1.6, CIANO, op * .35f);
+        brilho(q, c, ra * 3.5, CIANO, op * .55f);
         int faixas = Math.max(6, q.detalhe.faixas() / 4);
         int passos = q.detalhe.passos();
         Pincel p = Pincel.novo().comecar(Pincel.FITA, true, q.tempo, new Vec3(0, 0, 1));
@@ -183,9 +195,10 @@ public final class RenderVisuaisGojo {
         Entity e = dono(v);
         if (e == null) return;
         Vec3 c = q.rel(mao(e, q.parcial));
-        double r = DescargaVermelhoGojo.raioCarga(t);
+        double r = DescargaVermelhoGojo.raioCarga(t) * 1.4;
         esfera(q, Pincel.VERMELHO, false, c, r, CARMESIM, op);
         esfera(q, Pincel.VERMELHO, true, c, r * 2.2, CARMESIM, op * .3f);
+        brilho(q, c, r * 4, CARMESIM, op * .6f);
         Base b = Base.de(new Vetor(e.getViewVector(q.parcial).x, e.getViewVector(q.parcial).y, e.getViewVector(q.parcial).z));
         Pincel p = Pincel.novo().comecar(Pincel.FITA, true, q.tempo, new Vec3(0, 0, 1));
         int passos = q.detalhe.passos();
@@ -199,9 +212,10 @@ public final class RenderVisuaisGojo {
 
     private static void vermelho(Quadro q, VisuaisAtivos.Visual v, double t, float op) {
         Vec3 c = q.rel(TrajetoriaGojo.vermelho(v.origem, v.direcao, t));
-        double r = .35 + .15 * v.forca;
+        double r = .55 + .25 * v.forca;
         esfera(q, Pincel.VERMELHO, false, c, r, CARMESIM, op);
         esfera(q, Pincel.VERMELHO, true, c, r * 2, CARMESIM, op * .35f);
+        brilho(q, c, r * 4, CARMESIM, op * .7f);
         // Rastro curto atrás da esfera.
         Vec3 atras = vec(v.direcao).scale(-1);
         List<Vec3> pts = new ArrayList<>();
@@ -221,13 +235,14 @@ public final class RenderVisuaisGojo {
         if (q.longe(c)) return;
         float clarao = (float) Math.exp(-i / 3);
         esfera(q, Pincel.VERMELHO, true, c, .8 + i * .25, 0xFFD0C0, clarao);
+        brilho(q, c, 6 + i * .5, 0xFF5040, (float) Math.max(0, 1 - i / 8) * .9f);
         float alpha = (float) DescargaVermelhoGojo.alphaOnda(i);
         Base b = Base.de(v.direcao);
         int passos = q.detalhe.passos() * 3;
         Pincel p = Pincel.novo().comecar(Pincel.FITA, true, q.tempo, new Vec3(0, 0, 1));
         for (int f = 0; f < 3; f++) {
             List<Vec3> pts = new ArrayList<>(passos + 1);
-            for (int k = 0; k <= passos; k++) pts.add(c.add(b.aplicar(DescargaVermelhoGojo.onda(f, (double) k / passos, i))));
+            for (int k = 0; k <= passos; k++) pts.add(c.add(b.aplicar(DescargaVermelhoGojo.onda(f, (double) k / passos, i)).scale(1.5)));
             p.fita(pts, .25, CARMESIM, alphas(pts.size(), alpha * (1 - f * .25f)));
         }
         p.terminar();
@@ -260,8 +275,13 @@ public final class RenderVisuaisGojo {
         esfera(q, Pincel.AZUL, true, azul, r * 1.7, CIANO, op * .4f);
         esfera(q, Pincel.VERMELHO, false, verm, r, CARMESIM, op);
         esfera(q, Pincel.VERMELHO, true, verm, r * 1.7, CARMESIM, op * .35f);
+        brilho(q, azul, r * 3.5, CIANO, op * .5f);
+        brilho(q, verm, r * 3.5, CARMESIM, op * .5f);
         double forma = CoroaRoxoGojo.formacao(t, carga);
-        if (forma > 0) esfera(q, Pincel.ROXO, false, centro, .9 * escala * forma, VIOLETA, op * (float) forma);
+        if (forma > 0) {
+            esfera(q, Pincel.ROXO, false, centro, .9 * escala * forma, VIOLETA, op * (float) forma);
+            brilho(q, centro, 3.5 * escala * forma, VIOLETA, op * (float) forma * .7f);
+        }
         int passos = q.detalhe.passos();
         Pincel p = Pincel.novo().comecar(Pincel.FITA, true, q.tempo, new Vec3(0, 0, 1));
         for (int f = 0; f < 3; f++) {
@@ -278,6 +298,8 @@ public final class RenderVisuaisGojo {
         if (q.longe(c)) return;
         esfera(q, Pincel.ROXO, false, c, raio, VIOLETA, op);
         esfera(q, Pincel.ROXO, true, c, raio * 1.35, VIOLETA, op * .3f);
+        float pulso = (float) (.8 + .2 * Math.sin(t * .9));
+        brilho(q, c, raio * 3.5 * pulso, VIOLETA, op * .75f);
         Base b = Base.de(v.direcao);
         int passos = q.detalhe.passos() * 2;
         Pincel p = Pincel.novo().comecar(Pincel.FITA, true, q.tempo, new Vec3(0, 0, 1));

@@ -15,6 +15,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.particles.BlockParticleOption;
+import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.core.particles.SimpleParticleType;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
@@ -157,6 +159,9 @@ public final class ContextoServidor implements Contexto {
                 e -> afetavel(e) && e.getBoundingBox().inflate(0.3).clip(a, b).isPresent()).isEmpty();
     }
 
+    /** Blocos apagados que soltam pedaços, por chamada. */
+    private static final int DETRITOS = 12;
+
     @Override
     public void apagarBlocos(Vetor centro, double raio) {
         ServerLevel nivel = nivel();
@@ -164,6 +169,7 @@ public final class ContextoServidor implements Contexto {
         Vec3 c = vec(centro);
         int r = (int) Math.ceil(raio);
         BlockPos base = BlockPos.containing(c);
+        int apagados = 0;
         for (BlockPos p : BlockPos.betweenClosed(base.offset(-r, -r, -r), base.offset(r, r, r))) {
             if (p.getCenter().distanceToSqr(c) > raio * raio) continue;
             if (!nivel.isLoaded(p) || nivel.isOutsideBuildHeight(p) || !nivel.mayInteract(jogador, p)) continue;
@@ -171,6 +177,12 @@ public final class ContextoServidor implements Contexto {
             if (estado.isAir() || estado.getDestroySpeed(nivel, p) < 0 || estado.hasBlockEntity()
                     || !estado.getFluidState().isEmpty()) continue;
             nivel.setBlock(p, Blocks.AIR.defaultBlockState(), Block.UPDATE_ALL);
+            // Pedaços do bloco de verdade voam; no máximo DETRITOS blocos por chamada, sorteados.
+            apagados++;
+            if (apagados <= DETRITOS || nivel.random.nextInt(apagados) < DETRITOS) {
+                nivel.sendParticles(new BlockParticleOption(ParticleTypes.BLOCK, estado),
+                        p.getX() + .5, p.getY() + .5, p.getZ() + .5, 4, .4, .4, .4, .15);
+            }
         }
     }
 
