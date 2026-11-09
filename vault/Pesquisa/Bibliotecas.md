@@ -96,3 +96,7 @@ Compatibilidade: testar com **Sound Physics Remastered** 1.5.0 (só cliente), qu
 - Iris NeoForge 1.21.1: https://www.curseforge.com/minecraft/mc-mods/irisshaders/files/5910090
 - Sound Physics Remastered 1.21.1: https://modrinth.com/mod/sound-physics-remastered/version/neoforge-1.21.1-1.5.0
 - Sonniss GDC 2026: https://rekkerd.org/sonniss-releases-gdc-2026-game-audio-bundle/ · https://bedroomproducersblog.com/2026/03/16/sonniss-gdc-2026-bundle/
+
+
+## Efeitos do Minezin (09/11/2026)
+O Minezin não tem arquivos `.fx`: usava o Photon 1.1.17 só pelo código (emissores de bloom criados em Java) e shaders próprios. Não há nada para importar; os efeitos do Mine-RWK serão feitos no editor do Photon2 e salvos em `assets/minerwk/fx/`.

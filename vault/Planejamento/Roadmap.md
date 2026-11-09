@@ -29,10 +29,11 @@ Voltar para [[00 Início]]. Marque `[x]` ao concluir e registre no [[Diário]]. 
 - [x] Photon2, LDLib2, GeckoLib e Player Animation Library carregando no cliente e no servidor
 
 ### 1.2 Prova de conceito
-- [ ] Trazer um efeito `.fx` do Minezin e ver se abre no editor do Photon2 (anotar em [[Bibliotecas]] se precisa refazer)
-- [ ] Comando de teste `/rwk fx <efeito>` que toca o efeito na posição do jogador
-- [ ] Uma animação JSON do Blockbench em `assets/minerwk/player_animations/` tocando com `/rwk anim <animação>`
-- [ ] Um som de teste registrado (`sounds.json`) tocando junto
+- [x] Trazer um efeito `.fx` do Minezin: **não existe nenhum**; o Minezin usava o Photon 1 pelo código. Os efeitos serão feitos do zero no editor do Photon2 (anotado em [[Bibliotecas]])
+- [x] Comando de teste `/rwk fx <efeito>` que toca o efeito na posição do jogador
+- [x] Uma animação JSON do Blockbench em `assets/minerwk/player_animations/` tocando com `/rwk anim <animação>` (`gojo.json` do Minezin: `gojo_azul`, `gojo_vermelho`, `gojo_infinito`, `gojo_roxo`, `gojo_dominio`)
+- [x] Um som de teste registrado (`sounds.json`) tocando junto (`/rwk som`, e toca junto com `/rwk anim`)
+- [ ] Criar um `.fx` de teste no editor do Photon2 em `assets/minerwk/fx/` e tocar com `/rwk fx`
 - [ ] Conferir com Iris + um shaderpack que o efeito continua visível
 
 ### 1.3 Núcleo dos kits

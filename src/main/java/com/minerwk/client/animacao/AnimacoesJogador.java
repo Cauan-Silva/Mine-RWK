@@ -25,7 +25,7 @@ public final class AnimacoesJogador {
                 player -> new PlayerAnimationController(player, (controller, state, animSetter) -> PlayState.STOP));
     }
 
-    /** Toca a animação {@code animacao} no jogador. Devolve false se ela não existir. */
+    /** Toca a animação {@code animacao} no jogador (só aparece em terceira pessoa). Devolve false se ela não existir. */
     public static boolean tocar(AbstractClientPlayer jogador, ResourceLocation animacao) {
         if (PlayerAnimationAccess.getPlayerAnimationLayer(jogador, CAMADA_KIT) instanceof PlayerAnimationController controle) {
             return controle.triggerAnimation(animacao);

@@ -1,5 +1,6 @@
 package com.minerwk;
 
+import com.minerwk.registro.Sons;
 import com.mojang.logging.LogUtils;
 import net.minecraft.resources.ResourceLocation;
 import net.neoforged.bus.api.IEventBus;
@@ -14,6 +15,7 @@ public final class MineRWK {
     public static final Logger LOGGER = LogUtils.getLogger();
 
     public MineRWK(IEventBus modBus) {
+        Sons.REGISTRO.register(modBus);
         modBus.addListener(this::commonSetup);
     }
 

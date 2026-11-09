@@ -1,0 +1,84 @@
+package com.minerwk.client.comando;
+
+import com.minerwk.MineRWK;
+import com.minerwk.client.animacao.AnimacoesJogador;
+import com.minerwk.client.vfx.EfeitosVisuais;
+import com.minerwk.registro.Sons;
+import com.mojang.brigadier.CommandDispatcher;
+import com.mojang.brigadier.context.CommandContext;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.commands.Commands;
+import net.minecraft.commands.arguments.ResourceLocationArgument;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.sounds.SoundSource;
+
+/**
+ * Comandos de teste da prova de conceito, só no cliente (tocam apenas para quem digitou):
+ * {@code /rwk fx <efeito>}, {@code /rwk anim <animação>} e {@code /rwk som}.
+ * Sem namespace, o id vira {@code minerwk:<nome>}.
+ */
+public final class ComandosTeste {
+    private ComandosTeste() {
+    }
+
+    public static void registrar(CommandDispatcher<CommandSourceStack> d) {
+        d.register(Commands.literal("rwk")
+                .then(Commands.literal("fx").then(Commands.argument("efeito", ResourceLocationArgument.id()).executes(ComandosTeste::fx)))
+                .then(Commands.literal("anim").then(Commands.argument("animacao", ResourceLocationArgument.id()).executes(ComandosTeste::anim)))
+                .then(Commands.literal("parar").executes(ComandosTeste::parar))
+                .then(Commands.literal("som").executes(ComandosTeste::som)));
+    }
+
+    private static ResourceLocation idDoMod(CommandContext<CommandSourceStack> ctx, String arg) {
+        ResourceLocation id = ResourceLocationArgument.getId(ctx, arg);
+        // O argumento põe "minecraft:" quando não tem namespace; aqui o padrão é o do mod.
+        return id.getNamespace().equals("minecraft") && !ctx.getInput().contains("minecraft:") ? MineRWK.id(id.getPath()) : id;
+    }
+
+    private static int fx(CommandContext<CommandSourceStack> ctx) {
+        LocalPlayer jogador = Minecraft.getInstance().player;
+        if (jogador == null) return 0;
+        ResourceLocation efeito = idDoMod(ctx, "efeito");
+        boolean ok = EfeitosVisuais.noBloco(efeito, jogador.level(), jogador.blockPosition());
+        return responder(ctx, ok, "Efeito " + efeito);
+    }
+
+    private static int anim(CommandContext<CommandSourceStack> ctx) {
+        LocalPlayer jogador = Minecraft.getInstance().player;
+        if (jogador == null) return 0;
+        ResourceLocation animacao = idDoMod(ctx, "animacao");
+        boolean ok = AnimacoesJogador.tocar(jogador, animacao);
+        if (ok) tocarSom(jogador);
+        return responder(ctx, ok, "Animação " + animacao);
+    }
+
+    private static int parar(CommandContext<CommandSourceStack> ctx) {
+        LocalPlayer jogador = Minecraft.getInstance().player;
+        if (jogador != null) AnimacoesJogador.parar(jogador);
+        return 1;
+    }
+
+    private static int som(CommandContext<CommandSourceStack> ctx) {
+        LocalPlayer jogador = Minecraft.getInstance().player;
+        if (jogador == null) return 0;
+        tocarSom(jogador);
+        return responder(ctx, true, "Som minerwk:teste");
+    }
+
+    private static void tocarSom(LocalPlayer jogador) {
+        jogador.level().playLocalSound(jogador.getX(), jogador.getY(), jogador.getZ(),
+                Sons.TESTE.get(), SoundSource.PLAYERS, 1.0f, 1.0f, false);
+    }
+
+    private static int responder(CommandContext<CommandSourceStack> ctx, boolean ok, String oQue) {
+        if (ok) {
+            ctx.getSource().sendSuccess(() -> Component.literal(oQue + " tocando"), false);
+            return 1;
+        }
+        ctx.getSource().sendFailure(Component.literal(oQue + " não encontrado(a)"));
+        return 0;
+    }
+}

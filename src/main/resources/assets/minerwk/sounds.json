@@ -1,0 +1,6 @@
+{
+  "teste": {
+    "subtitle": "subtitles.minerwk.teste",
+    "sounds": [{ "name": "minerwk:teste/teste", "attenuation_distance": 32 }]
+  }
+}
