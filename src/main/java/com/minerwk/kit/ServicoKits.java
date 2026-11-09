@@ -37,6 +37,7 @@ public final class ServicoKits {
         NeoForge.EVENT_BUS.addListener(ServicoKits::aoEntrar);
         NeoForge.EVENT_BUS.addListener(ServicoKits::aoSair);
         NeoForge.EVENT_BUS.addListener(ServicoKits::aoClonar);
+        NeoForge.EVENT_BUS.addListener(ServicoKits::aoMudarDeDimensao);
     }
 
     public static DadosKit dados(Player jogador) {
@@ -148,6 +149,14 @@ public final class ServicoKits {
             salvar(jogador, kit);
         }
         Sincronizacao.esquecer(jogador);
+    }
+
+    /** Os efeitos guardam coordenadas da dimensão antiga: acabam na troca (o domínio não segue para o Nether). */
+    private static void aoMudarDeDimensao(PlayerEvent.PlayerChangedDimensionEvent evento) {
+        if (evento.getEntity() instanceof ServerPlayer jogador) {
+            KitDoJogador kit = KITS.get(jogador.getUUID());
+            if (kit != null) kit.descartar();
+        }
     }
 
     /** Morte ou volta do End: o jogador vira outra entidade. Salva antes para o copyOnDeath levar os dados atuais. */

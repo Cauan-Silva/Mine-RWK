@@ -19,6 +19,7 @@ import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.animal.Wolf;
 import net.minecraft.world.entity.monster.Zombie;
 import net.minecraft.world.entity.projectile.Arrow;
 import net.minecraft.world.level.block.Blocks;
@@ -126,6 +127,33 @@ public final class TestesGojo {
         helper.assertTrue(jogador.getHealth() == vida, "com Infinito a flecha não deveria ferir");
         jogador.hurt(helper.getLevel().damageSources().fall(), 2);
         helper.assertTrue(jogador.getHealth() < vida, "queda continua ferindo");
+        helper.succeed();
+    }
+
+    @GameTest(template = "vazio")
+    public static void golpesNaoAtingemOLoboDoGojo(GameTestHelper helper) {
+        ServerPlayer jogador = gojo(helper);
+        Wolf lobo = helper.spawn(EntityType.WOLF, new BlockPos(2, 2, 1));
+        lobo.tame(jogador);
+        Zombie zumbi = helper.spawn(EntityType.ZOMBIE, new BlockPos(1, 2, 2));
+        float vidaLobo = lobo.getHealth();
+        ContextoServidor ctx = new ContextoServidor(jogador);
+        ctx.danoEm(vetor(jogador.position()), 5, 4);
+        ctx.paralisar(vetor(jogador.position()), 5, 20);
+        helper.assertTrue(lobo.getHealth() == vidaLobo, "o lobo do Gojo não deveria tomar dano");
+        helper.assertFalse(lobo.hasEffect(Efeitos.PARALISIA), "o lobo do Gojo não deveria ser paralisado");
+        helper.assertTrue(zumbi.hasEffect(Efeitos.PARALISIA), "o zumbi sim");
+        helper.succeed();
+    }
+
+    @GameTest(template = "vazio")
+    public static void paralisadoAindaSeFereSozinho(GameTestHelper helper) {
+        ServerPlayer jogador = gojo(helper);
+        Zombie zumbi = helper.spawn(EntityType.ZOMBIE, new BlockPos(3, 2, 1));
+        new ContextoServidor(jogador).paralisar(vetor(jogador.position()), 12, 40);
+        float vida = zumbi.getHealth();
+        zumbi.hurt(helper.getLevel().damageSources().mobAttack(zumbi), 3);
+        helper.assertTrue(zumbi.getHealth() < vida, "dano causado em si mesmo não deveria ser cancelado");
         helper.succeed();
     }
 }

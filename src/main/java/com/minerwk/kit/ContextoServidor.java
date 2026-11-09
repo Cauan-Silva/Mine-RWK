@@ -21,6 +21,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.OwnableEntity;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.Projectile;
@@ -57,9 +58,15 @@ public final class ContextoServidor implements Contexto {
         return new Vetor(v.x, v.y, v.z);
     }
 
-    /** Quem os golpes atingem: vivo, não espectador, não o próprio jogador; outros jogadores só com PvP. */
+    /**
+     * Quem os golpes atingem: vivo, não espectador; nunca o próprio jogador, os bichos dele, a montaria
+     * ou os projéteis que ele lançou; outros jogadores só com PvP.
+     */
     private boolean afetavel(Entity e) {
         if (e == jogador || !e.isAlive() || e.isSpectator()) return false;
+        if (e == jogador.getVehicle() || e.getVehicle() == jogador) return false;
+        if (e instanceof OwnableEntity dono && jogador.getUUID().equals(dono.getOwnerUUID())) return false;
+        if (e instanceof Projectile p && p.getOwner() == jogador) return false;
         if (e instanceof Player p) return !p.isCreative() && jogador.server.isPvpAllowed();
         return true;
     }
@@ -168,7 +175,7 @@ public final class ContextoServidor implements Contexto {
     @Override
     public void paralisar(Vetor centro, double raio, int ticks) {
         for (LivingEntity alvo : naEsfera(LivingEntity.class, vec(centro), raio, e -> true)) {
-            alvo.addEffect(new MobEffectInstance(Efeitos.PARALISIA, ticks, 0, false, false, true), jogador);
+            alvo.addEffect(new MobEffectInstance(Efeitos.PARALISIA, ticks, 0, false, false, false), jogador);
             alvo.setDeltaMovement(0, Math.min(0, alvo.getDeltaMovement().y), 0);
             alvo.hurtMarked = true;
         }

@@ -6,7 +6,7 @@ atualizado: 2026-11-08
 
 Voltar para [[00 Início]]. Marque `[x]` ao concluir e registre no [[Diário]]. Decisões novas vão em [[Decisões]]; o que precisa de teste no jogo vai em [[Pendências]].
 
-**Onde estamos:** Fase 2 (Gojo), kit aprovado; próximo: mecânica das habilidades no servidor e o pipeline de áudio (parte 3 do 1.4, adiada para cá). As partes 1 (HUD e cliente) e 2 (tela de escolha) do 1.4 estão prontas. O 1.2 ainda tem o `.fx` de teste e o Iris pendentes.
+**Onde estamos:** Fase 2 (Gojo), mecânica das seis habilidades pronta (apresentação provisória); próximo: parte visual (VFX, animações, cutscene da ultimate) e o pipeline de áudio (parte 3 do 1.4, adiada para cá). As partes 1 (HUD e cliente) e 2 (tela de escolha) do 1.4 estão prontas. O 1.2 ainda tem o `.fx` de teste e o Iris pendentes.
 
 ## Como trabalhar em outro PC
 1. `git clone https://github.com/Cauan-Silva/Mine-RWK.git` (ou `git pull` se já tiver).
@@ -57,7 +57,7 @@ Spec e plano: [[2026-11-09 Núcleo dos kits]] (em `Desenvolvimento/Specs` e `Des
 ## Fase 2: Gojo completo (primeiro personagem, vira o modelo dos outros)
 - [x] Pesquisa canônica na nota do Gojo seguindo [[Kits Canônicos]] e [[Modelo de Personagem]]
 - [x] Kit aprovado (tecla, dano, recarga) antes de programar: ver [[Gojo]]
-- [ ] Habilidades: Azul, Vermelho, Infinito, Roxo, Vazio Infinito (domínio), Roxo 200% (o teleporte ficou de fora do kit)
+- [x] Habilidades: Azul, Vermelho, Infinito, Roxo, Vazio Infinito (domínio), Roxo 200% (o teleporte ficou de fora do kit). Mecânica no servidor com apresentação provisória; ver [[2026-11-09 Gojo mecânica]]
 - [ ] VFX no Photon2 de cada habilidade; Veil só se o domínio precisar de pós-processamento
 - [ ] SFX de cada habilidade
 - [ ] Animações do jogador de cada golpe

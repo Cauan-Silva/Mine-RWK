@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
@@ -44,8 +45,9 @@ public final class ProtecoesServidor {
 
     private static void aoReceberDano(LivingIncomingDamageEvent evento) {
         Entity atacante = evento.getSource().getEntity();
-        // Paralisado não ataca: o golpe dele não chega.
-        if (atacante instanceof LivingEntity vivo && paralisado(vivo)) {
+        // Paralisado não ataca: o golpe dele nos outros não chega (Espinhos e dano em si mesmo continuam).
+        if (atacante instanceof LivingEntity vivo && vivo != evento.getEntity() && paralisado(vivo)
+                && !evento.getSource().is(DamageTypes.THORNS)) {
             evento.setCanceled(true);
             return;
         }
