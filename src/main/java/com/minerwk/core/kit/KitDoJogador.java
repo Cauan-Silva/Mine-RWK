@@ -107,9 +107,12 @@ public final class KitDoJogador {
     /** Como {@link #descartar()}, avisando a habilidade em carga para desfazer o visual. */
     public void descartar(Contexto contexto) {
         Habilidade emCarga = execucao != null && execucao.fase() == Execucao.Fase.CARGA ? execucao.habilidade() : null;
+        // A animação cobre o golpe inteiro, não só a carga: havendo golpe ou efeito no ar, ela para.
+        boolean emAndamento = execucao != null || !efeitos.isEmpty();
         limpar();
         efeitos.clear();
         if (emCarga != null) emCarga.aoInterromper(contexto);
+        else if (emAndamento) contexto.pararAnimacao();
     }
 
     public List<Execucao.Evento> tick(long agora, EstadoDoJogador estado, Contexto contexto) {

@@ -61,7 +61,8 @@ public final class ServicoKits {
     /** Define (ou troca) o personagem: recurso novo (cheio) e recargas zeradas. */
     public static void definirPersonagem(ServerPlayer jogador, Personagem personagem) {
         KitDoJogador antigo = KITS.remove(jogador.getUUID());
-        if (antigo != null) antigo.descartar();
+        // Com o contexto do jogador: a carga em andamento desfaz o visual e para a animação.
+        if (antigo != null) antigo.descartar(new ContextoServidor(jogador));
         KitDoJogador novo = new KitDoJogador(personagem);
         KITS.put(jogador.getUUID(), novo);
         salvar(jogador, novo);

@@ -275,6 +275,15 @@ class GojoTest {
     }
 
     @Test
+    void descartarDepoisDoDisparoParaAAnimacaoUmaVez() {
+        usar(Tecla.Z);
+        ticks(10); // já disparou; o campo do Azul segue como efeito
+        kit.descartar(ctx);
+        kit.descartar(ctx); // morto: o descartar roda todo tick, mas só avisa uma vez
+        assertEquals(1, ctx.conta("pararAnimacao"));
+    }
+
+    @Test
     void cargaCortadaParaAAnimacao() {
         kit.recurso().carregar(200);
         usar(Tecla.R);
