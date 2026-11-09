@@ -117,7 +117,7 @@ public final class ServicoKits {
         if (kit.isEmpty()) return;
         if (!podeAgir(jogador)) {
             // Morto ou espectador: o golpe em andamento some sem cobrar nem punir, e nada mais roda.
-            kit.get().descartar();
+            kit.get().descartar(new ContextoServidor(jogador));
             return;
         }
         long agora = jogador.level().getGameTime();
@@ -147,7 +147,7 @@ public final class ServicoKits {
         if (!(evento.getEntity() instanceof ServerPlayer jogador)) return;
         KitDoJogador kit = KITS.remove(jogador.getUUID());
         if (kit != null) {
-            kit.descartar();
+            kit.descartar(new ContextoServidor(jogador));
             salvar(jogador, kit);
         }
         Sincronizacao.esquecer(jogador);
@@ -157,7 +157,7 @@ public final class ServicoKits {
     private static void aoMudarDeDimensao(PlayerEvent.PlayerChangedDimensionEvent evento) {
         if (evento.getEntity() instanceof ServerPlayer jogador) {
             KitDoJogador kit = KITS.get(jogador.getUUID());
-            if (kit != null) kit.descartar();
+            if (kit != null) kit.descartar(new ContextoServidor(jogador));
         }
     }
 
@@ -166,7 +166,7 @@ public final class ServicoKits {
         if (!(evento.getOriginal() instanceof ServerPlayer antigo)) return;
         KitDoJogador kit = KITS.remove(antigo.getUUID());
         if (kit == null) return;
-        kit.descartar();
+        kit.descartar(new ContextoServidor(antigo));
         salvar(antigo, kit);
         evento.getEntity().setData(Anexos.DADOS_KIT, dados(antigo));
     }

@@ -101,8 +101,15 @@ public final class KitDoJogador {
 
     /** Cancela sem cobrar nem punir e encerra os efeitos sem {@code aoAcabar} (jogador saiu ou morreu). */
     public void descartar() {
+        descartar(Contexto.NULO);
+    }
+
+    /** Como {@link #descartar()}, avisando a habilidade em carga para desfazer o visual. */
+    public void descartar(Contexto contexto) {
+        Habilidade emCarga = execucao != null && execucao.fase() == Execucao.Fase.CARGA ? execucao.habilidade() : null;
         limpar();
         efeitos.clear();
+        if (emCarga != null) emCarga.aoInterromper(contexto);
     }
 
     public List<Execucao.Evento> tick(long agora, EstadoDoJogador estado, Contexto contexto) {
@@ -123,6 +130,7 @@ public final class KitDoJogador {
                 // Sem recurso na hora do disparo: conta como interrupção na carga.
                 recargas.iniciar(h.id(), agora, n.recarga() / 4);
                 limpar();
+                h.aoInterromper(contexto);
                 return eventos;
             }
             recurso.gastar(n.custo());

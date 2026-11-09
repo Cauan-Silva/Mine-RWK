@@ -38,14 +38,23 @@ public final class Pincel {
     }
 
     public static void registrarShaders(RegisterShadersEvent evento) {
+        // Os dois ou nenhum: sem um deles o desenho todo cai para cor simples.
+        base = null;
+        aditivo = null;
         try {
-            evento.registerShader(new ShaderInstance(evento.getResourceProvider(), MineRWK.id("gojo_energy"),
-                    DefaultVertexFormat.POSITION_TEX_COLOR), s -> base = s);
-            evento.registerShader(new ShaderInstance(evento.getResourceProvider(), MineRWK.id("gojo_energy_additive"),
-                    DefaultVertexFormat.POSITION_TEX_COLOR), s -> aditivo = s);
+            ShaderInstance b = new ShaderInstance(evento.getResourceProvider(), MineRWK.id("gojo_energy"),
+                    DefaultVertexFormat.POSITION_TEX_COLOR);
+            ShaderInstance a;
+            try {
+                a = new ShaderInstance(evento.getResourceProvider(), MineRWK.id("gojo_energy_additive"),
+                        DefaultVertexFormat.POSITION_TEX_COLOR);
+            } catch (IOException | RuntimeException e) {
+                b.close();
+                throw e;
+            }
+            evento.registerShader(b, s -> base = s);
+            evento.registerShader(a, s -> aditivo = s);
         } catch (IOException | RuntimeException e) {
-            base = null;
-            aditivo = null;
             MineRWK.LOGGER.warn("Shader gojo_energy não carregou; o visual do Gojo usa cor simples", e);
         }
     }
@@ -86,9 +95,17 @@ public final class Pincel {
     }
 
     public void terminar() {
-        MeshData malha = buffer.build();
-        if (malha != null) BufferUploader.drawWithShader(malha);
-        buffer = null;
+        try {
+            MeshData malha = buffer.build();
+            if (malha != null) BufferUploader.drawWithShader(malha);
+        } finally {
+            buffer = null;
+            restaurar();
+        }
+    }
+
+    /** Volta o estado de render ao padrão (também usado se um desenho falhar no meio). */
+    static void restaurar() {
         RenderSystem.depthMask(true);
         RenderSystem.enableCull();
         RenderSystem.defaultBlendFunc();

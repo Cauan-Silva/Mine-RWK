@@ -182,8 +182,8 @@ public final class Gojo {
         @Override
         public void tick(Contexto ctx, int t) {
             if (!ctx.gastarRecurso(DRENO)) {
+                if (!semEnergia) ctx.visualFim("gojo_infinito", ctx.olhos());
                 semEnergia = true;
-                ctx.visualFim("gojo_infinito", ctx.olhos());
                 return;
             }
             // Renova por 2 ticks: se o efeito acabar, o Infinito cai logo em seguida.

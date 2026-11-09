@@ -48,6 +48,19 @@ public final class RenderVisuaisGojo {
             float op = v.opacidade(agora, parcial);
             if (op <= .004f) continue;
             double t = v.idade(agora, parcial);
+            try {
+                desenhar(q, v, t, op);
+            } catch (RuntimeException erro) {
+                // Um visual quebrado não derruba o jogo: some, e o estado de render volta ao padrão.
+                Pincel.restaurar();
+                VisuaisAtivos.ativos().remove(v);
+                com.minerwk.MineRWK.LOGGER.warn("Visual {} falhou e foi removido", v.tipo, erro);
+            }
+        }
+    }
+
+    private static void desenhar(Quadro q, VisuaisAtivos.Visual v, double t, float op) {
+        {
             switch (v.tipo) {
                 case "gojo_azul" -> azul(q, v, t, op);
                 case "gojo_vermelho_carga" -> vermelhoCarga(q, v, t, op);
@@ -260,7 +273,8 @@ public final class RenderVisuaisGojo {
     }
 
     private static void roxo(Quadro q, VisuaisAtivos.Visual v, double t, float op, double passo, double raio) {
-        Vec3 c = q.rel(TrajetoriaGojo.roxo(v.origem, v.direcao, passo, t));
+        // O feixe do servidor começa a andar um tick depois do disparo.
+        Vec3 c = q.rel(TrajetoriaGojo.roxo(v.origem, v.direcao, passo, t - 1));
         if (q.longe(c)) return;
         esfera(q, Pincel.ROXO, false, c, raio, VIOLETA, op);
         esfera(q, Pincel.ROXO, true, c, raio * 1.35, VIOLETA, op * .3f);
