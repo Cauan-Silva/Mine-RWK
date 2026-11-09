@@ -67,10 +67,15 @@ public final class ServicoKits {
         Sincronizacao.enviar(jogador);
     }
 
+    /** Só jogador vivo e fora do modo espectador usa habilidades. */
+    static boolean podeAgir(ServerPlayer jogador) {
+        return !jogador.isDeadOrDying() && !jogador.isSpectator();
+    }
+
     /** Tecla apertada ou solta no cliente. Sem personagem, nada acontece. */
     public static void usarTecla(ServerPlayer jogador, Tecla tecla, boolean apertou) {
         kit(jogador).ifPresent(k -> {
-            if (apertou) k.apertar(tecla, jogador.level().getGameTime());
+            if (apertou && podeAgir(jogador)) k.apertar(tecla, jogador.level().getGameTime());
             else k.soltar(tecla);
         });
     }
@@ -99,12 +104,21 @@ public final class ServicoKits {
     }
 
     private static void aoTick(PlayerTickEvent.Post evento) {
-        if (!(evento.getEntity() instanceof ServerPlayer jogador)) return;
+        if (evento.getEntity() instanceof ServerPlayer jogador) tickJogador(jogador);
+    }
+
+    /** Um tick do kit do jogador (separado do evento para os GameTests chamarem direto). */
+    static void tickJogador(ServerPlayer jogador) {
         UUID id = jogador.getUUID();
         boolean apanhou = APANHOU.remove(id);
         boolean causou = CAUSOU_DANO.remove(id);
         Optional<KitDoJogador> kit = kit(jogador);
         if (kit.isEmpty()) return;
+        if (!podeAgir(jogador)) {
+            // Morto ou espectador: o golpe em andamento some sem cobrar nem punir, e nada mais roda.
+            kit.get().descartar();
+            return;
+        }
         long agora = jogador.level().getGameTime();
         boolean parado = jogador.getDeltaMovement().horizontalDistanceSqr() < LIMIAR_PARADO * LIMIAR_PARADO;
         kit.get().tick(agora, new EstadoDoJogador(parado, apanhou, causou), new ContextoServidor(jogador));

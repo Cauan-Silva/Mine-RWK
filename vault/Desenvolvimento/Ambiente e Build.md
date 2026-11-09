@@ -15,7 +15,7 @@ Voltar para [[00 Início]].
 | `./gradlew build` | Compila, roda os testes JUnit e gera `build/libs/minerwk-<versão>.jar` |
 | `./gradlew runClient` | Abre o Minecraft com o mod e as bibliotecas |
 | `./gradlew runServer` | Servidor dedicado |
-| `./gradlew runGameTestServer` | Servidor sem tela que roda os GameTests e fecha (falha com "No test functions" enquanto não houver testes) |
+| `./gradlew runGameTestServer` | Servidor sem tela que roda os GameTests (`kit/TestesKit`) e fecha |
 | `./gradlew runData` | Gera recursos em `src/generated/resources` |
 
 ## Estrutura

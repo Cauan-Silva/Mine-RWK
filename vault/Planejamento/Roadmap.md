@@ -6,7 +6,7 @@ atualizado: 2026-11-08
 
 Voltar para [[00 Início]]. Marque `[x]` ao concluir e registre no [[Diário]]. Decisões novas vão em [[Decisões]]; o que precisa de teste no jogo vai em [[Pendências]].
 
-**Onde estamos:** Fase 1, item 1.2 (prova de conceito).
+**Onde estamos:** Fase 1, item 1.4 (base visual e de som). O 1.2 ainda tem o `.fx` de teste e o Iris pendentes.
 
 ## Como trabalhar em outro PC
 1. `git clone https://github.com/Cauan-Silva/Mine-RWK.git` (ou `git pull` se já tiver).
@@ -36,14 +36,15 @@ Voltar para [[00 Início]]. Marque `[x]` ao concluir e registre no [[Diário]]. 
 - [ ] Criar um `.fx` de teste no editor do Photon2 em `assets/minerwk/fx/` e tocar com `/rwk fx`
 - [ ] Conferir com Iris + um shaderpack que o efeito continua visível
 
-### 1.3 Núcleo dos kits
-- [ ] Registro de personagem (`Personagem` com id, nome, obra, habilidades)
-- [ ] Habilidade com tempo em ticks (carga, disparo, fim), recarga (`core/kit/Recargas` já existe) e custo
-- [ ] Teclas Z, X, C, V, G (e R para ultimate) configuráveis
-- [ ] Rede: payloads (`CustomPacketPayload`) para usar habilidade, sincronizar recargas e mandar tocar VFX/animação/som nos outros jogadores
-- [ ] Dados do jogador com Data Attachments (personagem escolhido, recargas, recurso)
-- [ ] Interrupção e postura (atordoar cancela golpe em carga)
-- [ ] Testes JUnit da lógica de habilidade e um GameTest de uso de habilidade no servidor
+### 1.3 Núcleo dos kits ✅
+Spec e plano: [[2026-11-09 Núcleo dos kits]] (em `Desenvolvimento/Specs` e `Desenvolvimento/Planos`).
+- [x] Registro de personagem (`Personagem` com id, nome, obra, habilidades)
+- [x] Habilidade com tempo em ticks (carga, disparo, fim), recarga (`core/kit/Recargas` já existe) e custo
+- [x] Teclas Z, X, C, V, G (e R para ultimate) configuráveis
+- [x] Rede: payloads (`CustomPacketPayload`) para usar habilidade, sincronizar recargas e mandar tocar VFX/animação/som nos outros jogadores
+- [x] Dados do jogador com Data Attachments (personagem escolhido, recargas, recurso)
+- [x] Interrupção (atordoar cancela golpe em carga, recarga de 1/4). A postura em si fica para a Fase 4; ninguém chama `atordoar()` ainda
+- [x] Testes JUnit da lógica de habilidade e um GameTest de uso de habilidade no servidor
 
 ### 1.4 Base visual e de som
 - [ ] Pipeline de áudio: pasta `tools/` com o gerador em Python adaptado do Minezin e teste que confere ticks do som contra o Java
@@ -51,7 +52,7 @@ Voltar para [[00 Início]]. Marque `[x]` ao concluir e registre no [[Diário]]. 
 - [ ] Configuração do cliente (opção "SFX anime", intensidade de tremor de tela, VFX reduzido)
 - [ ] Tremor de tela próprio (sem Lodestone)
 - [ ] HUD de recargas e ícones das habilidades
-- [ ] Tela de seleção de personagem
+- [ ] Tela de seleção de personagem (a simples já existe no 1.3: `client/kit/TelaEscolha`; falta retratos, descrição e rolagem)
 
 ## Fase 2: Gojo completo (primeiro personagem, vira o modelo dos outros)
 - [ ] Pesquisa canônica na nota do Gojo seguindo [[Kits Canônicos]] e [[Modelo de Personagem]]

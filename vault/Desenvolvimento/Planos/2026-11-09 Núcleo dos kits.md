@@ -101,7 +101,7 @@ tags: [desenvolvimento, plano]
 **Produz:**
 - `DadosKit`: `String personagem` (`""` = nenhum), `double recurso`, `Map<String, Long> recargas`; `Codec<DadosKit> CODEC`.
 - `Anexos.DADOS_KIT`: `AttachmentType<DadosKit>` com `.serialize(CODEC).copyOnDeath()`, registrado por `DeferredRegister` de `NeoForgeRegistries.Keys.ATTACHMENT_TYPES`.
-- `ServicoKits`: `Optional<KitDoJogador> kit(ServerPlayer)` (cria do attachment na primeira chamada; cache por UUID); `void definirPersonagem(ServerPlayer, Personagem)` (zera recurso e recargas, salva, sincroniza); ouvintes de `PlayerTickEvent.Post` (só servidor; `parado` = velocidade horizontal < 0,01; `apanhou/causouDano` marcados em `LivingDamageEvent.Post`; chama `kit.tick`; salva no attachment a cada 20 ticks e ao sair), `PlayerLoggedOutEvent` e `PlayerEvent.Clone` (`descartar()` e limpa o cache).
+- `ServicoKits`: `Optional<KitDoJogador> kit(ServerPlayer)` (cria do attachment na primeira chamada; cache por UUID); `void definirPersonagem(ServerPlayer, Personagem)` (zera recurso e recargas, salva, sincroniza); ouvintes de `PlayerTickEvent.Post` (só servidor; `parado` = velocidade horizontal < 0,01; `apanhou/causouDano` marcados em `LivingDamageEvent.Post`; chama `kit.tick`; salva no attachment a cada 20 ticks e ao sair), `PlayerLoggedOutEvent` e `PlayerEvent.Clone` (`descartar()` e limpa o cache). **Correção da revisão:** morto ou espectador não usa habilidade e a execução é descartada no tick (`podeAgir`).
 - `/rwk trocar <jogador> <personagem>` (nível 2, sugere ids de `Personagens.todos()`), em `RegisterCommandsEvent`.
 - `MineRWK`: registra `Anexos.REGISTRO`, `Personagens.registrar(PersonagemTeste.criar())` e os ouvintes.
 
