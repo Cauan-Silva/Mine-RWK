@@ -10,3 +10,4 @@ Voltar para [[Diário]].
 - A lista de personagens agora vai pela rede com nome, obra e golpes (`PersonagemEscolha`), no lugar do texto "id|nome|obra". Nomes e descrições dos golpes ficam nas traduções (`habilidade.minerwk.<id>` e `.desc`).
 - Comando `/rwk tela <quantos>` abre a tela com personagens falsos, para ver a rolagem.
 - Esboço da tela feito direto na conversa. Revisão final com modelo mais barato.
+- Testado no jogo pelo autor: funcionando perfeitamente.
