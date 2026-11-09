@@ -1,0 +1,27 @@
+# Gradle / build
+.gradle/
+build/
+out/
+run/
+runs/
+logs/
+
+# IDEs
+.idea/
+*.iml
+*.ipr
+*.iws
+.vscode/
+.classpath
+.project
+.settings/
+bin/
+
+# Obsidian (configuração local do usuário; app.json fica versionado)
+vault/.obsidian/workspace*.json
+vault/.obsidian/cache
+vault/.trash/
+
+# Sistema
+.DS_Store
+Thumbs.db

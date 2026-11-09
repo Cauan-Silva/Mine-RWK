@@ -1,0 +1,27 @@
+package com.minerwk;
+
+import com.mojang.logging.LogUtils;
+import net.minecraft.resources.ResourceLocation;
+import net.neoforged.bus.api.IEventBus;
+import net.neoforged.fml.common.Mod;
+import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
+import org.slf4j.Logger;
+
+/** Ponto de entrada do Mine-RWK (lado comum: cliente e servidor). */
+@Mod(MineRWK.MOD_ID)
+public final class MineRWK {
+    public static final String MOD_ID = "minerwk";
+    public static final Logger LOGGER = LogUtils.getLogger();
+
+    public MineRWK(IEventBus modBus) {
+        modBus.addListener(this::commonSetup);
+    }
+
+    private void commonSetup(FMLCommonSetupEvent event) {
+        LOGGER.info("Mine-RWK carregado");
+    }
+
+    public static ResourceLocation id(String path) {
+        return ResourceLocation.fromNamespaceAndPath(MOD_ID, path);
+    }
+}
