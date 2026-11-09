@@ -2,6 +2,7 @@ package com.minerwk.client.vfx;
 
 import com.minerwk.core.kit.Vetor;
 import com.minerwk.core.vfx.PerfilVfxGojo;
+import com.minerwk.core.vfx.TrajetoriaGojo;
 import com.minerwk.rede.EncerrarVisual;
 import com.minerwk.rede.MostrarVisual;
 import java.util.ArrayList;
@@ -29,6 +30,8 @@ public final class VisuaisAtivos {
         final int duracao;
         final long inicio;
         long fimEm = -1;
+        /** Se já deixou o rastro (túnel do Roxo, marca do Azul). */
+        boolean deixouRastro;
 
         Visual(int dono, String tipo, Vetor origem, Vetor direcao, float forca, int duracao, long inicio) {
             this.dono = dono;
@@ -105,9 +108,58 @@ public final class VisuaisAtivos {
         }
         if (nivel == null) return;
         long agora = nivel.getGameTime();
+        deixarRastros(nivel, agora);
         ATIVOS.removeIf(v -> v.acabou(agora));
         ImpactoCamera.tick();
         DetritosGojo.tick();
+    }
+
+    /** Passo da massa do Roxo pelo tipo do visual (0 se não for Roxo). */
+    static double passoRoxo(String tipo) {
+        return switch (tipo) {
+            case "gojo_roxo", "gojo_roxo_rastro" -> TrajetoriaGojo.PASSO_ROXO;
+            case "gojo_roxo_200", "gojo_roxo_200_rastro" -> TrajetoriaGojo.PASSO_ROXO_200;
+            default -> 0;
+        };
+    }
+
+    /** O golpe chegou ao fim natural: o que ele deixa no mundo vira um visual novo. */
+    private static void deixarRastros(ClientLevel nivel, long agora) {
+        List<Visual> novos = new ArrayList<>(0);
+        for (Visual v : ATIVOS) {
+            if (v.deixouRastro || v.fimEm >= 0 || agora - v.inicio < v.duracao) continue;
+            switch (v.tipo) {
+                case "gojo_roxo", "gojo_roxo_200" -> {
+                    v.deixouRastro = true;
+                    // forca guarda o comprimento do túnel.
+                    float comprimento = (float) (passoRoxo(v.tipo) * v.duracao);
+                    novos.add(new Visual(v.dono, v.tipo + "_rastro", v.origem, v.direcao, comprimento,
+                            PerfilVfxGojo.RASTRO_ROXO, agora));
+                }
+                case "gojo_azul" -> {
+                    v.deixouRastro = true;
+                    Vetor chao = chao(nivel, v.origem);
+                    if (chao != null) {
+                        novos.add(new Visual(v.dono, "gojo_azul_marca", chao, v.direcao, 1, PerfilVfxGojo.MARCA_AZUL, agora));
+                    }
+                }
+                default -> {
+                }
+            }
+        }
+        for (Visual n : novos) {
+            if (ATIVOS.size() >= LIMITE) ATIVOS.remove(0);
+            ATIVOS.add(n);
+        }
+    }
+
+    /** Topo do primeiro bloco sólido até 8 abaixo do ponto. */
+    private static Vetor chao(ClientLevel nivel, Vetor p) {
+        net.minecraft.core.BlockPos.MutableBlockPos b = net.minecraft.core.BlockPos.containing(p.x(), p.y(), p.z()).mutable();
+        for (int i = 0; i < 9; i++, b.move(0, -1, 0)) {
+            if (!nivel.getBlockState(b).getCollisionShape(nivel, b).isEmpty()) return new Vetor(p.x(), b.getY() + 1.02, p.z());
+        }
+        return null;
     }
 
     public static void limpar() {

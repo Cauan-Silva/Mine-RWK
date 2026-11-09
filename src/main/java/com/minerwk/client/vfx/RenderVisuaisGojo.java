@@ -46,7 +46,9 @@ public final class RenderVisuaisGojo {
                 (float) ((agora % 24000) + parcial) / 20f, PerfilVfxGojo.detalhe(ConfigCliente.vfxReduzido()));
         for (VisuaisAtivos.Visual v : List.copyOf(VisuaisAtivos.ativos())) {
             float op = v.opacidade(agora, parcial);
-            if (op <= .004f) continue;
+            // Rastros calculam a própria transparência (começam cheios, sem a entrada suave).
+            boolean rastro = v.tipo.endsWith("_rastro") || v.tipo.equals("gojo_azul_marca");
+            if (op <= .004f && !rastro) continue;
             double t = v.idade(agora, parcial);
             try {
                 desenhar(q, v, t, op);
@@ -67,10 +69,15 @@ public final class RenderVisuaisGojo {
                 case "gojo_vermelho" -> vermelho(q, v, t, op);
                 case "gojo_vermelho_explosao" -> explosao(q, v, t);
                 case "gojo_infinito" -> infinito(q, v, op);
-                case "gojo_roxo_carga" -> roxoCarga(q, v, t, op, 2, 30, 1);
-                case "gojo_roxo_200_carga" -> roxoCarga(q, v, t, op, 4, 80, 1.7);
-                case "gojo_roxo" -> roxo(q, v, t, op, 2, 2.1);
-                case "gojo_roxo_200" -> roxo(q, v, t, op, 4, 3.5);
+                case "gojo_roxo_carga" -> roxoCarga(q, v, t, op, TrajetoriaGojo.PASSO_ROXO, 30, 1);
+                case "gojo_roxo_200_carga" -> roxoCarga(q, v, t, op, TrajetoriaGojo.PASSO_ROXO_200, 80, 1.7);
+                case "gojo_roxo" -> roxo(q, v, t, op, TrajetoriaGojo.PASSO_ROXO, 2.1);
+                case "gojo_roxo_200" -> roxo(q, v, t, op, TrajetoriaGojo.PASSO_ROXO_200, 3.5);
+                case "gojo_roxo_rastro" -> tunelRoxo(q, v.origem, v.direcao, v.forca, 1.5,
+                        .7f * (float) Math.pow(Math.max(0, 1 - t / v.duracao), 1.5));
+                case "gojo_roxo_200_rastro" -> tunelRoxo(q, v.origem, v.direcao, v.forca, 2.5,
+                        .7f * (float) Math.pow(Math.max(0, 1 - t / v.duracao), 1.5));
+                case "gojo_azul_marca" -> marcaAzul(q, v, (float) Math.max(0, 1 - t / v.duracao));
                 case "gojo_vazio_infinito" -> dominio(q, v, t, op);
                 default -> {
                 }
@@ -294,7 +301,11 @@ public final class RenderVisuaisGojo {
 
     private static void roxo(Quadro q, VisuaisAtivos.Visual v, double t, float op, double passo, double raio) {
         // O feixe do servidor começa a andar um tick depois do disparo.
-        Vec3 c = q.rel(TrajetoriaGojo.roxo(v.origem, v.direcao, passo, t - 1));
+        Vetor ponta = TrajetoriaGojo.roxo(v.origem, v.direcao, passo, t - 1);
+        // O túnel já aberto brilha atrás da massa (depois, o rastro continua sozinho).
+        tunelRoxo(q, v.origem, v.direcao, (float) Math.max(0, ponta.distancia(v.origem)), raio / 1.4,
+                .7f * (float) PerfilVfxGojo.suave(t / 4));
+        Vec3 c = q.rel(ponta);
         if (q.longe(c)) return;
         esfera(q, Pincel.ROXO, false, c, raio, VIOLETA, op);
         esfera(q, Pincel.ROXO, true, c, raio * 1.35, VIOLETA, op * .3f);
@@ -322,6 +333,49 @@ public final class RenderVisuaisGojo {
         p.terminar();
     }
 
+    /** Túnel do Roxo: faixa violeta ao longo do caminho, com brilhos espaçados. */
+    private static void tunelRoxo(Quadro q, Vetor origem, Vetor direcao, float comprimento, double raio, float alpha) {
+        if (alpha <= .004f || comprimento < 1) return;
+        Vec3 o = q.rel(origem);
+        Vec3 d = vec(direcao);
+        int n = Math.max(2, (int) (comprimento / 2));
+        List<Vec3> pts = new ArrayList<>(n + 1);
+        float[] a = new float[n + 1];
+        for (int k = 0; k <= n; k++) {
+            double s = (double) k / n;
+            pts.add(o.add(d.scale(s * comprimento)));
+            // Entra suave perto do Gojo, para não cobrir a tela de quem disparou.
+            a[k] = alpha * (float) PerfilVfxGojo.suave(s * comprimento / 3);
+        }
+        Pincel p = Pincel.novo().comecar(Pincel.FITA, true, q.tempo, new Vec3(0, 0, 1));
+        p.fita(pts, raio * .8, VIOLETA, a);
+        p.terminar();
+        int espaco = q.detalhe.faixas() < 64 ? 12 : 6;
+        for (double s = 4; s < comprimento; s += espaco) {
+            brilho(q, o.add(d.scale(s)), raio * 1.5, VIOLETA, alpha * .45f);
+        }
+    }
+
+    /** Marca escura com borda ciano que o Azul deixa no chão. */
+    private static void marcaAzul(Quadro q, VisuaisAtivos.Visual v, float a) {
+        if (a <= .004f) return;
+        Vec3 c = q.rel(v.origem);
+        if (q.longe(c)) return;
+        double raio = 2.5;
+        Pincel chao = Pincel.novo().comecar(Pincel.CHAO, false, q.tempo, new Vec3(0, 1, 0));
+        chao.disco(c, raio, 0xFFFFFF, a * .7f, q.segmentos(32));
+        chao.terminar();
+        int n = q.segmentos(32);
+        List<Vec3> anel = new ArrayList<>(n + 1);
+        for (int k = 0; k <= n; k++) {
+            double ang = k * Math.PI * 2 / n;
+            anel.add(c.add(Math.cos(ang) * raio, .03, Math.sin(ang) * raio));
+        }
+        Pincel p = Pincel.novo().comecar(Pincel.FITA, true, q.tempo, new Vec3(0, 0, 1));
+        p.fita(anel, .12, CIANO, alphas(anel.size(), a * .8f));
+        p.terminar();
+    }
+
     // ---------------------------------------------------------------- Vazio Infinito
 
     private static void dominio(Quadro q, VisuaisAtivos.Visual v, double t, float op) {
@@ -329,14 +383,18 @@ public final class RenderVisuaisGojo {
         if (q.longe(c)) return;
         double raio = PerfilVfxGojo.raioDominio(t);
         if (raio < .2) return;
+        // Nos últimos ticks o domo racha e se desfaz em vez de só sumir.
+        double racha = PerfilVfxGojo.suave((t - (v.duracao - PerfilVfxGojo.DOMINIO_RACHA)) / PerfilVfxGojo.DOMINIO_RACHA);
+        float opDomo = op * (float) (1 - racha);
+        if (racha > 0) rachaduras(q, c, raio, racha);
         // O domo escuro é desenhado depois do terreno: de dentro, esconde o mundo além do raio;
         // de fora, é uma bolha escura. O teste de profundidade mantém o que está mais perto.
         Pincel p = Pincel.novo().comecar(Pincel.CEU, false, q.tempo, new Vec3(0, 0, 1));
-        p.esfera(c, raio, 0xFFFFFF, op, q.segmentos(48));
+        p.esfera(c, raio, 0xFFFFFF, opDomo, q.segmentos(48));
         p.terminar();
         Vec3 pes = c.add(0, -1.62 + .02, 0);
         Pincel chao = Pincel.novo().comecar(Pincel.CHAO, false, q.tempo, new Vec3(0, 1, 0));
-        chao.disco(pes, raio, 0xFFFFFF, op * .85f, q.segmentos(48));
+        chao.disco(pes, raio, 0xFFFFFF, opDomo * .85f, q.segmentos(48));
         chao.terminar();
         int faixas = Math.max(8, q.detalhe.faixas() / 3);
         int passos = q.detalhe.passos();
@@ -352,6 +410,26 @@ public final class RenderVisuaisGojo {
             linhas.fita(pts, .05, VazioInfinitoGojo.cor(f, .5, t), a);
         }
         linhas.terminar();
+    }
+
+    /** Rachaduras de luz que correm pelo domo enquanto ele se desfaz ({@code racha} de 0 a 1). */
+    private static void rachaduras(Quadro q, Vec3 c, double raio, double racha) {
+        int n = q.detalhe.faixas() < 64 ? 6 : 12;
+        float alpha = (float) Math.sin(racha * Math.PI);
+        int passos = 10;
+        Pincel p = Pincel.novo().comecar(Pincel.FITA, true, q.tempo, new Vec3(0, 0, 1));
+        for (int f = 0; f < n; f++) {
+            double teta = f * 2.399963;
+            double fi = Math.acos(1 - 2 * (f + .5) / n);
+            List<Vec3> pts = new ArrayList<>(passos + 1);
+            for (int k = 0; k <= passos; k++) {
+                double a = teta + k * .09 * (.4 + racha * 2);
+                double b = fi + Math.sin(k * 1.7 + f) * .07;
+                pts.add(c.add(Math.sin(b) * Math.cos(a) * raio, Math.cos(b) * raio, Math.sin(b) * Math.sin(a) * raio));
+            }
+            p.fita(pts, .18, 0xCFF6FF, alphas(pts.size(), alpha));
+        }
+        p.terminar();
     }
 
     /** Neblina escura dentro do domínio (só a cor; água e lava ficam como estão). */

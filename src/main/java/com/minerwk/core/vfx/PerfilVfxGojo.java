@@ -10,7 +10,11 @@ public final class PerfilVfxGojo {
     /** Ticks até o domo atingir o raio cheio. */
     public static final int DOMINIO_ABERTURA = 20;
     /** Ticks que a explosão do Vermelho fica na tela depois do impacto (só cliente). */
-    public static final int EXPLOSAO_VERMELHO = 28;
+    public static final int EXPLOSAO_VERMELHO = 40;
+    /** Ticks que o túnel do Roxo e a marca do Azul ficam no mundo depois do golpe. */
+    public static final int RASTRO_ROXO = 60, MARCA_AZUL = 40;
+    /** Ticks finais em que o domo do domínio racha e se desfaz. */
+    public static final int DOMINIO_RACHA = 20;
 
     /** Quantos elementos desenhar: faixas e passos das curvas, detritos do Azul, estrelas do domínio. */
     public record Detalhe(int faixas, int passos, int detritos, int estrelas) {

@@ -121,9 +121,30 @@ public final class DetritosGojo {
                 }
                 case "gojo_roxo", "gojo_roxo_200" -> {
                     boolean maior = v.tipo.equals("gojo_roxo_200");
-                    Vetor c = TrajetoriaGojo.roxo(v.origem, v.direcao, maior ? 4 : 2, t - 1);
+                    Vetor c = TrajetoriaGojo.roxo(v.origem, v.direcao, VisuaisAtivos.passoRoxo(v.tipo), t - 1);
                     if (!perto(c)) break;
                     varias(l, FAISCA_VIOLETA, qtd(maior ? 8 : 4), new Vec3(c.x(), c.y(), c.z()), maior ? 5 : 3, .2);
+                }
+                case "gojo_roxo_rastro", "gojo_roxo_200_rastro" -> {
+                    // Fumaça grossa subindo do túnel enquanto ele esfria.
+                    double raio = v.tipo.startsWith("gojo_roxo_200") ? 2.5 : 1.5;
+                    for (int i = 0; i < qtd(3); i++) {
+                        Vetor p = v.origem.mais(v.direcao.vezes(rnd.nextDouble() * v.forca));
+                        if (!perto(p)) continue;
+                        l.addParticle(ParticleTypes.LARGE_SMOKE, p.x() + (rnd.nextDouble() - .5) * raio,
+                                p.y() + (rnd.nextDouble() - .5) * raio, p.z() + (rnd.nextDouble() - .5) * raio, 0, .04, 0);
+                    }
+                }
+                case "gojo_vermelho_explosao" -> {
+                    if (!perto(v.origem)) break;
+                    // Fumaça e brasas pairando e subindo devagar.
+                    Vec3 c = new Vec3(v.origem.x(), v.origem.y(), v.origem.z());
+                    for (int i = 0; i < qtd(2); i++) {
+                        l.addParticle(ParticleTypes.SMOKE, c.x + (rnd.nextDouble() - .5) * 2, c.y + (rnd.nextDouble() - .5),
+                                c.z + (rnd.nextDouble() - .5) * 2, 0, .03, 0);
+                    }
+                    l.addParticle(ParticleTypes.SMALL_FLAME, c.x + (rnd.nextDouble() - .5) * 1.5, c.y + (rnd.nextDouble() - .5),
+                            c.z + (rnd.nextDouble() - .5) * 1.5, 0, .02, 0);
                 }
                 default -> {
                 }
