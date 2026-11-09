@@ -43,6 +43,31 @@ class AnimacoesGojoTest {
         assertTrue(animacoes.getAsJsonObject(Gojo.ANIM_R_SEM_ALVO).get("animation_length").getAsDouble() * 20 >= semAlvo);
     }
 
+    @Test
+    void descidaDoREmLoopSemBody() throws IOException {
+        JsonObject descida = animacoes().getAsJsonObject(Gojo.ANIM_R_DESCIDA);
+        assertNotNull(descida, "falta a animação de descida");
+        assertTrue(descida.get("loop").getAsBoolean(), "a descida repete até ele pousar");
+    }
+
+    /** Quadros-chave de um osso entre {@code de} e {@code ate} segundos. */
+    private static long quadros(String anim, String osso, double de, double ate) throws IOException {
+        return animacoes().getAsJsonObject(anim).getAsJsonObject("bones").getAsJsonObject(osso)
+                .getAsJsonObject("rotation").keySet().stream()
+                .mapToDouble(Double::parseDouble).filter(t -> t >= de && t <= ate).count();
+    }
+
+    @Test
+    void encantamentoENoArSeMexemSemParar() throws IOException {
+        // Quatro gestos com transição e tremor: muitos quadros nos braços durante os 4 s.
+        assertTrue(quadros("gojo_roxo_200", "right_arm", 0, 4) >= 20, "encantamento com mais gestos no braço direito");
+        assertTrue(quadros("gojo_roxo_200", "left_arm", 0, 4) >= 20, "e no esquerdo");
+        assertTrue(quadros("gojo_roxo_200", "torso", 0, 4) >= 10, "o corpo respira e balança");
+        // No ar, do fim do uppercut até a explosão, as pernas e o tronco flutuam.
+        assertTrue(quadros(Gojo.ANIM_R_UPPERCUT, "right_leg", .6, 1.75) >= 4, "perna flutuando");
+        assertTrue(quadros(Gojo.ANIM_R_UPPERCUT, "torso", 1.75, 2.55) >= 3, "reação à explosão");
+    }
+
     private static JsonObject animacoes() throws IOException {
         try (Reader r = Files.newBufferedReader(ARQUIVO, StandardCharsets.UTF_8)) {
             return JsonParser.parseReader(r).getAsJsonObject().getAsJsonObject("animations");
