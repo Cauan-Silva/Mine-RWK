@@ -12,3 +12,4 @@ Voltar para [[Diário]].
 - Achado nos GameTests: o `ServerPlayer` recém-criado fica 60 ticks imune a dano, então testes de dano passavam sem testar nada; agora o contador é zerado no teste.
 - Revisão final (modelo barato) sem críticos; corrigidos 4 menores com GameTests (12 no total): dimensão, pets e montaria, Paralisia e ícone. O resto ficou em [[Pendências]].
 - O `teste` deixou de aparecer na tela de escolha (só aparece quando é o único personagem).
+- Testado no jogo pelo autor: todos os golpes funcionaram sem erro. Visual ainda provisório (partículas vanilla).
