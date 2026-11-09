@@ -78,6 +78,21 @@ public final class TestesKit {
     }
 
     @GameTest(template = "vazio")
+    public static void cargaComTremorNaoFalha(GameTestHelper helper) {
+        ServerPlayer jogador = helper.makeMockServerPlayerInLevel();
+        ServicoKits.definirPersonagem(jogador, Personagens.porId(Personagens.TESTE).orElseThrow());
+        KitDoJogador kit = ServicoKits.kit(jogador).orElseThrow();
+        ServicoKits.usarTecla(jogador, Tecla.X, true);
+        for (int i = 0; i < 20; i++) ServicoKits.tickJogador(jogador);
+        ServicoKits.usarTecla(jogador, Tecla.X, false);
+        ServicoKits.tickJogador(jogador);
+        helper.assertTrue(kit.recurso().atual() < 71 && kit.recurso().atual() >= 70,
+                "X deveria custar 30 (com o fôlego já cheio), recurso " + kit.recurso().atual());
+        helper.assertTrue(kit.recargas().duracao("teste_carga") == 100, "recarga de 100 ticks");
+        helper.succeed();
+    }
+
+    @GameTest(template = "vazio")
     public static void escolhaRecusadaQuandoJaTemPersonagem(GameTestHelper helper) {
         ServerPlayer jogador = helper.makeMockServerPlayerInLevel();
         helper.assertTrue(ServicoKits.escolher(jogador, Personagens.TESTE), "primeira escolha deveria valer");
