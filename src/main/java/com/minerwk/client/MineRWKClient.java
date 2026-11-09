@@ -3,11 +3,17 @@ package com.minerwk.client;
 import com.minerwk.MineRWK;
 import com.minerwk.client.animacao.AnimacoesJogador;
 import com.minerwk.client.comando.ComandosTeste;
+import com.minerwk.client.camera.TremorCamera;
+import com.minerwk.client.kit.HudKit;
 import com.minerwk.client.kit.RecepcaoKit;
 import com.minerwk.client.kit.TeclasKit;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
+import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.Mod;
+import net.neoforged.fml.config.ModConfig;
+import net.neoforged.neoforge.client.gui.ConfigurationScreen;
+import net.neoforged.neoforge.client.gui.IConfigScreenFactory;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.neoforge.client.event.ClientPlayerNetworkEvent;
 import net.neoforged.neoforge.client.event.RegisterClientCommandsEvent;
@@ -17,7 +23,13 @@ import net.neoforged.neoforge.common.NeoForge;
 @Mod(value = MineRWK.MOD_ID, dist = Dist.CLIENT)
 public final class MineRWKClient {
 
-    public MineRWKClient(IEventBus modBus) {
+    public MineRWKClient(IEventBus modBus, ModContainer container) {
+        container.registerConfig(ModConfig.Type.CLIENT, ConfigCliente.SPEC);
+        container.registerExtensionPoint(IConfigScreenFactory.class, ConfigurationScreen::new);
+        modBus.addListener(HudKit::registrar);
+        NeoForge.EVENT_BUS.addListener(HudKit::aoTick);
+        NeoForge.EVENT_BUS.addListener(TremorCamera::aoTick);
+        NeoForge.EVENT_BUS.addListener(TremorCamera::aoCalcularCamera);
         modBus.addListener(this::clientSetup);
         modBus.addListener(TeclasKit::registrar);
         RecepcaoKit.ligar();

@@ -12,5 +12,10 @@
   "tela.minerwk.escolha.confirmar": "Choose %s?",
   "tela.minerwk.escolha.definitiva": "This choice is permanent.",
   "tela.minerwk.escolha.sim": "Confirm",
-  "tela.minerwk.escolha.nao": "Back"
+  "tela.minerwk.escolha.nao": "Back",
+  "config.minerwk.intensidadeTremor": "Screen shake intensity",
+  "config.minerwk.vfxReduzido": "Reduced visual effects",
+  "config.minerwk.sfxAnime": "Ability sounds",
+  "config.minerwk.mostrarHud": "Show kit HUD",
+  "minerwk.configuration.title": "Mine-RWK"
 }

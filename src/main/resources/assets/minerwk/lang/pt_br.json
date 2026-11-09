@@ -12,5 +12,10 @@
   "tela.minerwk.escolha.confirmar": "Escolher %s?",
   "tela.minerwk.escolha.definitiva": "A escolha é definitiva.",
   "tela.minerwk.escolha.sim": "Confirmar",
-  "tela.minerwk.escolha.nao": "Voltar"
+  "tela.minerwk.escolha.nao": "Voltar",
+  "config.minerwk.intensidadeTremor": "Intensidade do tremor de tela",
+  "config.minerwk.vfxReduzido": "Efeitos visuais reduzidos",
+  "config.minerwk.sfxAnime": "Sons das habilidades",
+  "config.minerwk.mostrarHud": "Mostrar HUD do kit",
+  "minerwk.configuration.title": "Mine-RWK"
 }

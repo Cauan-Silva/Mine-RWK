@@ -1,13 +1,13 @@
 package com.minerwk.client.kit;
 
 import com.minerwk.MineRWK;
+import com.minerwk.client.ConfigCliente;
 import com.minerwk.client.animacao.AnimacoesJogador;
+import com.minerwk.client.camera.TremorCamera;
 import com.minerwk.client.vfx.EfeitosVisuais;
 import com.minerwk.rede.Pacotes;
 import com.minerwk.rede.SincronizarKit;
 import com.minerwk.rede.TocarApresentacao;
-import java.util.List;
-import java.util.Map;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -24,6 +24,7 @@ public final class RecepcaoKit {
     public static void ligar() {
         Pacotes.aoSincronizar = RecepcaoKit::aoSincronizar;
         Pacotes.aoTocar = RecepcaoKit::aoTocar;
+        Pacotes.aoTremer = TremorCamera::receber;
     }
 
     /** O último estado recebido (o HUD do 1.4 lê daqui). */
@@ -60,7 +61,7 @@ public final class RecepcaoKit {
         if (mc.level == null || !(mc.level.getEntity(p.entidade()) instanceof AbstractClientPlayer jogador)) return;
         if (!p.animacao().isEmpty()) AnimacoesJogador.tocar(jogador, MineRWK.id(p.animacao()));
         if (!p.efeito().isEmpty()) EfeitosVisuais.naEntidade(MineRWK.id(p.efeito()), mc.level, jogador);
-        if (!p.som().isEmpty()) {
+        if (!p.som().isEmpty() && ConfigCliente.sfxAnime()) {
             BuiltInRegistries.SOUND_EVENT.getOptional(MineRWK.id(p.som())).ifPresent(som ->
                     mc.level.playLocalSound(jogador.getX(), jogador.getY(), jogador.getZ(), som,
                             SoundSource.PLAYERS, 1f, 1f, false));
