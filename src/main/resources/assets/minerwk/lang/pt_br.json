@@ -22,5 +22,19 @@
   "habilidade.minerwk.teste_golpe": "Golpe de teste",
   "habilidade.minerwk.teste_golpe.desc": "Golpe instantâneo em área curta.",
   "habilidade.minerwk.teste_carga": "Carga de teste",
-  "habilidade.minerwk.teste_carga.desc": "Segure para carregar; mais força, mais dano e tremor."
+  "habilidade.minerwk.teste_carga.desc": "Segure para carregar; mais força, mais dano e tremor.",
+  "habilidade.minerwk.gojo_azul": "Azul",
+  "habilidade.minerwk.gojo_azul.desc": "Cria um ponto de atração que puxa e esmaga tudo em volta.",
+  "habilidade.minerwk.gojo_vermelho": "Vermelho",
+  "habilidade.minerwk.gojo_vermelho.desc": "Segure para carregar; a esfera explode e repele com força.",
+  "habilidade.minerwk.gojo_infinito": "Infinito",
+  "habilidade.minerwk.gojo_infinito.desc": "Por 6 s, golpes e projéteis não chegam até você. Gasta energia.",
+  "habilidade.minerwk.gojo_roxo": "Roxo",
+  "habilidade.minerwk.gojo_roxo.desc": "Junta Azul e Vermelho numa massa que apaga o caminho.",
+  "habilidade.minerwk.gojo_vazio_infinito": "Vazio Infinito",
+  "habilidade.minerwk.gojo_vazio_infinito.desc": "Expansão de domínio: quem está dentro fica paralisado.",
+  "habilidade.minerwk.gojo_roxo_200": "Roxo 200%",
+  "habilidade.minerwk.gojo_roxo_200.desc": "Encantamento completo: o Roxo com o dobro da força. Exige energia cheia.",
+  "effect.minerwk.paralisia": "Paralisia",
+  "gamerule.minerwkApagarBlocos": "Golpes do Mine-RWK apagam blocos"
 }

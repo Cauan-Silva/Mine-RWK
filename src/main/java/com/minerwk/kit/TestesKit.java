@@ -5,6 +5,7 @@ import com.minerwk.core.kit.EstadoDoJogador;
 import com.minerwk.core.kit.KitDoJogador;
 import com.minerwk.core.kit.Personagens;
 import com.minerwk.core.kit.Tecla;
+import com.minerwk.core.personagens.gojo.Gojo;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import com.mojang.authlib.GameProfile;
@@ -95,10 +96,12 @@ public final class TestesKit {
     @GameTest(template = "vazio")
     public static void escolhaRecusadaQuandoJaTemPersonagem(GameTestHelper helper) {
         ServerPlayer jogador = helper.makeMockServerPlayerInLevel();
-        helper.assertTrue(ServicoKits.escolher(jogador, Personagens.TESTE), "primeira escolha deveria valer");
-        helper.assertFalse(ServicoKits.escolher(jogador, Personagens.TESTE), "segunda escolha deveria ser recusada");
+        // O teste só é escolhível quando é o único personagem; com o Gojo registrado, escolhe-se o Gojo.
+        helper.assertFalse(ServicoKits.escolher(helper.makeMockServerPlayerInLevel(), Personagens.TESTE), "teste escondido");
+        helper.assertTrue(ServicoKits.escolher(jogador, Gojo.ID), "primeira escolha deveria valer");
+        helper.assertFalse(ServicoKits.escolher(jogador, Gojo.ID), "segunda escolha deveria ser recusada");
         helper.assertFalse(ServicoKits.escolher(helper.makeMockServerPlayerInLevel(), "nao_existe"), "id inválido deveria ser recusado");
-        helper.assertTrue(ServicoKits.dados(jogador).personagem.equals(Personagens.TESTE), "deveria continuar teste");
+        helper.assertTrue(ServicoKits.dados(jogador).personagem.equals(Gojo.ID), "deveria continuar Gojo");
         helper.succeed();
     }
 }

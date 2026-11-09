@@ -37,6 +37,7 @@ public final class ServicoKits {
         NeoForge.EVENT_BUS.addListener(ServicoKits::aoEntrar);
         NeoForge.EVENT_BUS.addListener(ServicoKits::aoSair);
         NeoForge.EVENT_BUS.addListener(ServicoKits::aoClonar);
+        NeoForge.EVENT_BUS.addListener(ServicoKits::aoMudarDeDimensao);
     }
 
     public static DadosKit dados(Player jogador) {
@@ -75,7 +76,7 @@ public final class ServicoKits {
     /** Tecla apertada ou solta no cliente. Sem personagem, nada acontece. */
     public static void usarTecla(ServerPlayer jogador, Tecla tecla, boolean apertou) {
         kit(jogador).ifPresent(k -> {
-            if (apertou && podeAgir(jogador)) k.apertar(tecla, jogador.level().getGameTime());
+            if (apertou && podeAgir(jogador) && !ProtecoesServidor.paralisado(jogador)) k.apertar(tecla, jogador.level().getGameTime());
             else k.soltar(tecla);
         });
     }
@@ -120,6 +121,8 @@ public final class ServicoKits {
             return;
         }
         long agora = jogador.level().getGameTime();
+        // Paralisado (Vazio Infinito): a carga em andamento cai, como num atordoamento.
+        if (ProtecoesServidor.paralisado(jogador)) kit.get().atordoar(agora);
         boolean parado = jogador.getDeltaMovement().horizontalDistanceSqr() < LIMIAR_PARADO * LIMIAR_PARADO;
         kit.get().tick(agora, new EstadoDoJogador(parado, apanhou, causou), new ContextoServidor(jogador));
         if (agora % SALVAR_A_CADA == 0) salvar(jogador, kit.get());
@@ -127,7 +130,10 @@ public final class ServicoKits {
     }
 
     private static void aoDano(LivingDamageEvent.Post evento) {
-        if (evento.getEntity() instanceof ServerPlayer vitima) APANHOU.add(vitima.getUUID());
+        if (evento.getEntity() instanceof ServerPlayer vitima) {
+            APANHOU.add(vitima.getUUID());
+            kit(vitima).ifPresent(k -> k.levouDano(evento.getNewDamage(), vitima.level().getGameTime()));
+        }
         if (evento.getSource().getEntity() instanceof ServerPlayer atacante) CAUSOU_DANO.add(atacante.getUUID());
     }
 
@@ -143,6 +149,14 @@ public final class ServicoKits {
             salvar(jogador, kit);
         }
         Sincronizacao.esquecer(jogador);
+    }
+
+    /** Os efeitos guardam coordenadas da dimensão antiga: acabam na troca (o domínio não segue para o Nether). */
+    private static void aoMudarDeDimensao(PlayerEvent.PlayerChangedDimensionEvent evento) {
+        if (evento.getEntity() instanceof ServerPlayer jogador) {
+            KitDoJogador kit = KITS.get(jogador.getUUID());
+            if (kit != null) kit.descartar();
+        }
     }
 
     /** Morte ou volta do End: o jogador vira outra entidade. Salva antes para o copyOnDeath levar os dados atuais. */

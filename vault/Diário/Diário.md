@@ -11,3 +11,4 @@ Voltar para [[00 Início]].
 - [[2026-11-09 Núcleo dos kits]]
 - [[2026-11-09 HUD e cliente]]
 - [[2026-11-09 Tela de escolha]]
+- [[2026-11-09 Gojo mecânica]]

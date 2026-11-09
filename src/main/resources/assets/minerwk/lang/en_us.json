@@ -22,5 +22,19 @@
   "habilidade.minerwk.teste_golpe": "Test strike",
   "habilidade.minerwk.teste_golpe.desc": "Instant strike in a short area.",
   "habilidade.minerwk.teste_carga": "Test charge",
-  "habilidade.minerwk.teste_carga.desc": "Hold to charge; more power, more damage and shake."
+  "habilidade.minerwk.teste_carga.desc": "Hold to charge; more power, more damage and shake.",
+  "habilidade.minerwk.gojo_azul": "Blue",
+  "habilidade.minerwk.gojo_azul.desc": "Creates a point of attraction that pulls in and crushes everything.",
+  "habilidade.minerwk.gojo_vermelho": "Red",
+  "habilidade.minerwk.gojo_vermelho.desc": "Hold to charge; the orb explodes with strong repulsion.",
+  "habilidade.minerwk.gojo_infinito": "Infinity",
+  "habilidade.minerwk.gojo_infinito.desc": "For 6 s, attacks and projectiles never reach you. Drains energy.",
+  "habilidade.minerwk.gojo_roxo": "Hollow Purple",
+  "habilidade.minerwk.gojo_roxo.desc": "Merges Blue and Red into a mass that erases its path.",
+  "habilidade.minerwk.gojo_vazio_infinito": "Unlimited Void",
+  "habilidade.minerwk.gojo_vazio_infinito.desc": "Domain expansion: everyone inside is paralyzed.",
+  "habilidade.minerwk.gojo_roxo_200": "200% Hollow Purple",
+  "habilidade.minerwk.gojo_roxo_200.desc": "Full incantation: Hollow Purple at double power. Needs full energy.",
+  "effect.minerwk.paralisia": "Paralysis",
+  "gamerule.minerwkApagarBlocos": "Mine-RWK abilities erase blocks"
 }
