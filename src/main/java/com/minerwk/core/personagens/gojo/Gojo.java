@@ -250,10 +250,8 @@ public final class Gojo {
 
     /** R: Roxo 200%, 4 s de encantamento; cai com golpe de 6 ou mais na carga. */
     public static final class Roxo200 extends Golpe {
-        /** Raio da massa colossal. */
-        static final double RAIO_MASSA = 7;
-        /** Ticks de voo depois da carga: o disparo (3 s) e a descida lenta (até 10 s). */
-        static final int VOO_DEPOIS = 60 + 200;
+        /** Ticks de voo depois da carga: a sequência mais longa e a descida lenta (até 10 s). */
+        static final int VOO_DEPOIS = RoxoMaximo.fim(RoxoMaximo.AVANCO_MAX) + 200;
 
         Roxo200() {
             super("gojo_roxo_200", Numeros.instantanea(80, 2, 10, 200, 6000));
@@ -267,7 +265,7 @@ public final class Gojo {
         @Override
         public void aoIniciarCarga(Contexto ctx) {
             super.aoIniciarCarga(ctx);
-            // Sobe durante o encantamento (o cliente move) e desce devagar depois do disparo.
+            // Fica no chão no encantamento; o voo cobre a sequência (o cliente move) e a descida lenta.
             ctx.voo(numeros().cargaMax() + VOO_DEPOIS);
             ctx.visual("gojo_roxo_200_carga", ctx.olhos(), ctx.olhar(), 0f, numeros().cargaMax());
             ctx.cutscene(CutsceneRoxo200.ID);
@@ -283,9 +281,87 @@ public final class Gojo {
         public void aoDisparar(Contexto ctx, float forca) {
             ctx.apresentacao("", "", SOM);
             ctx.tremor(1.2f, 30, 64);
-            ctx.visual("gojo_roxo_200", ctx.olhos(), ctx.olhar(), 2f, 60);
-            ctx.criarEfeito(new FeixeRoxo(ctx.olhos(), ctx.olhar(), TrajetoriaGojo.PASSO_ROXO_200, 60, RAIO_MASSA, 60f, 3, 6)
-                    .explodindo());
+            ctx.criarEfeito(new ComboRoxoMaximo(ctx));
+        }
+    }
+
+    /**
+     * O R depois do encantamento ({@link RoxoMaximo}): com alvo na mira, avança, dá o uppercut, os dois
+     * sobem, o Azul e o Vermelho se fundem atrás do Gojo e o Roxo explode engolindo os dois. Sem alvo,
+     * as esferas vão até a mira e explodem lá.
+     */
+    static final class ComboRoxoMaximo implements Efeito {
+        private final Object alvo;
+        private final Vetor olhos;
+        private final Vetor direcao;
+        private final double distancia;
+        private final int avanco;
+        private final java.util.Set<Object> atingidos = new HashSet<>();
+        private Vetor baseAlvo;
+        private Vetor centro;
+
+        ComboRoxoMaximo(Contexto ctx) {
+            olhos = ctx.olhos();
+            Object marcado = ctx.marcarAlvo(RoxoMaximo.ALCANCE, RoxoMaximo.LARGURA);
+            Vetor onde = marcado == null ? null : ctx.posicaoDe(marcado);
+            alvo = onde == null ? null : marcado;
+            if (alvo != null) {
+                Vetor ate = onde.menos(olhos);
+                distancia = ate.comprimento();
+                direcao = distancia > 1e-6 ? ate.vezes(1 / distancia) : ctx.olhar();
+                avanco = RoxoMaximo.avanco(distancia);
+                baseAlvo = onde;
+            } else {
+                direcao = ctx.olhar();
+                distancia = 0;
+                avanco = 0;
+                centro = ctx.alvoAte(RoxoMaximo.ALCANCE);
+            }
+        }
+
+        @Override
+        public int duracao() {
+            return alvo != null ? RoxoMaximo.fim(avanco)
+                    : RoxoMaximo.TICKS_ESFERAS_SEM_ALVO + RoxoMaximo.TICKS_FUSAO + RoxoMaximo.TICKS_EXPLOSAO;
+        }
+
+        @Override
+        public void tick(Contexto ctx, int t) {
+            if (alvo == null) {
+                if (t == 0) {
+                    ctx.visual("gojo_roxo_maximo_esferas", centro, direcao, RoxoMaximo.TICKS_ESFERAS_SEM_ALVO,
+                            RoxoMaximo.TICKS_ESFERAS_SEM_ALVO + RoxoMaximo.TICKS_FUSAO);
+                }
+                if (t == RoxoMaximo.TICKS_ESFERAS_SEM_ALVO + RoxoMaximo.TICKS_FUSAO) explodir(ctx);
+                return;
+            }
+            // O cliente move o Gojo pela mesma conta (avanço e subida) a partir deste visual.
+            if (t == 0) ctx.visual("gojo_roxo_maximo", olhos, direcao, (float) distancia, RoxoMaximo.fim(avanco));
+            if (t == avanco) {
+                Vetor agora = ctx.posicaoDe(alvo);
+                if (agora != null) baseAlvo = agora;
+                ctx.ferir(alvo, RoxoMaximo.DANO_UPPERCUT);
+                ctx.acertou(1.5f);
+                ctx.tremor(1f, 10, 32);
+            }
+            if (t >= avanco && t < RoxoMaximo.inicioExplosao(avanco)) {
+                ctx.suspender(alvo, baseAlvo.mais(new Vetor(0, RoxoMaximo.alturaAlvo(t - avanco + 1), 0)), 2);
+            }
+            if (t == RoxoMaximo.inicioEsferas(avanco)) {
+                centro = RoxoMaximo.centroFusao(ctx.olhos(), direcao);
+                ctx.visual("gojo_roxo_maximo_esferas", centro, direcao, RoxoMaximo.TICKS_ESFERAS,
+                        RoxoMaximo.TICKS_ESFERAS + RoxoMaximo.TICKS_FUSAO);
+            }
+            if (t == RoxoMaximo.inicioExplosao(avanco)) {
+                // O alvo marcado sempre leva o golpe, mesmo se tiver escapado do raio.
+                if (atingidos.add(alvo)) ctx.ferir(alvo, RoxoMaximo.DANO);
+                explodir(ctx);
+            }
+        }
+
+        private void explodir(Contexto ctx) {
+            ctx.criarEfeito(new ExplosaoRoxa(centro, direcao, RoxoMaximo.DANO, atingidos,
+                    RoxoMaximo.RAIO_EXPLOSAO, RoxoMaximo.TICKS_EXPLOSAO));
         }
     }
 
@@ -304,9 +380,6 @@ public final class Gojo {
         private final int congelar;
         private final java.util.Set<Object> atingidos = new HashSet<>();
         private boolean avisouAcerto;
-        /** Roxo 200%: ao bater (ou no fim do caminho), a massa para e vira a explosão. */
-        private boolean explode;
-        private boolean acabou;
 
         FeixeRoxo(Vetor origem, Vetor direcao, double passo, int passos, double raio, float dano,
                   double arremesso, int congelar) {
@@ -320,50 +393,36 @@ public final class Gojo {
             this.congelar = congelar;
         }
 
-        FeixeRoxo explodindo() {
-            explode = true;
-            return this;
-        }
-
         @Override
         public int duracao() {
             return passos;
         }
 
         @Override
-        public boolean encerrado() {
-            return acabou;
-        }
-
-        @Override
         public void tick(Contexto ctx, int t) {
             Vetor ponto = TrajetoriaGojo.roxo(origem, direcao, passo, t);
-            boolean bateu = explode && t > 0 && ctx.colide(TrajetoriaGojo.roxo(origem, direcao, passo, t - 1), ponto);
             ctx.apagarBlocos(ponto, raio);
             if (ctx.danoUmaVez(ponto, raio, dano, atingidos) > 0) {
                 ctx.arremessar(ponto, raio, arremesso, congelar, direcao);
                 if (!avisouAcerto) ctx.acertou(dano >= 60 ? 1.5f : 1f);
                 avisouAcerto = true;
             }
-            if (explode && (bateu || t == passos - 1)) {
-                acabou = true;
-                ctx.visualFim("gojo_roxo_200", ponto);
-                ctx.criarEfeito(new ExplosaoRoxa(ponto, direcao, dano, atingidos));
-            }
         }
     }
 
-    /** Fim do Roxo 200%: a explosão cresce de 2 em 2 blocos até o raio 24, ferindo cada alvo uma vez. */
+    /** Fim do R: a explosão cresce casca por casca até {@code raio} em {@code ticks}, ferindo cada alvo uma vez. */
     static final class ExplosaoRoxa implements Efeito {
-        static final double RAIO = 24;
-        static final int TICKS = 12;
+        private final double raio;
+        private final int ticks;
         private final Vetor centro;
         private final Vetor direcao;
         private final float dano;
         /** Os mesmos alvos da massa: quem já levou o golpe não leva de novo. */
         private final java.util.Set<Object> atingidos;
 
-        ExplosaoRoxa(Vetor centro, Vetor direcao, float dano, java.util.Set<Object> atingidos) {
+        ExplosaoRoxa(Vetor centro, Vetor direcao, float dano, java.util.Set<Object> atingidos, double raio, int ticks) {
+            this.raio = raio;
+            this.ticks = ticks;
             this.centro = centro;
             this.direcao = direcao;
             this.dano = dano;
@@ -372,17 +431,18 @@ public final class Gojo {
 
         @Override
         public int duracao() {
-            return TICKS;
+            return ticks;
         }
 
         @Override
         public void tick(Contexto ctx, int t) {
             if (t == 0) {
-                ctx.visual("gojo_roxo_explosao", centro, direcao, 1f, 40);
-                ctx.tremor(1.6f, 30, 64);
+                // A forca do visual leva o raio para o cliente.
+                ctx.visual("gojo_roxo_explosao", centro, direcao, (float) raio, ticks + 28);
+                ctx.tremor(1.8f, 40, 96);
             }
-            double de = RAIO * t / TICKS;
-            double ate = RAIO * (t + 1) / TICKS;
+            double de = raio * t / ticks;
+            double ate = raio * (t + 1) / ticks;
             ctx.apagarCasca(centro, de, ate);
             if (ctx.danoUmaVez(centro, ate, dano, atingidos) > 0) ctx.arremessar(centro, ate, 6, 4, null);
         }

@@ -56,6 +56,13 @@ class GojoTest {
         Vetor centroCasca;
         public void barreira(Vetor c, double r, double chao, int t) { chamadas.add("barreira"); barreiras.add(new double[] {r, chao, t}); }
         public void voo(int t) { chamadas.add("voo"); }
+        /** Alvo que o R marca (ou null) e onde ele está. */
+        Object alvoMarcado;
+        Vetor posAlvo;
+        public Object marcarAlvo(double alcance, double largura) { return alvoMarcado; }
+        public Vetor posicaoDe(Object alvo) { return posAlvo; }
+        public void suspender(Object alvo, Vetor ponto, int t) { chamadas.add("suspender"); }
+        public void ferir(Object alvo, float d) { chamadas.add("ferir"); danos.add(d); }
         public void apagarCasca(Vetor c, double de, double ate) { chamadas.add("casca"); cascas.add(new double[] {de, ate}); centroCasca = c; }
         public void cutscene(String id) { chamadas.add("cutscene:" + id); }
         public void apresentacao(String anim, String efeito, String som) { if (!anim.isEmpty()) chamadas.add("anim:" + anim); }
@@ -183,37 +190,43 @@ class GojoTest {
     }
 
     @Test
-    void roxo200ColossalAnda120BlocosComRaio7EExplodeNoFim() {
+    void roxo200SemAlvoExplodeOndeMiraSemFeixe() {
         usar(Tecla.R);
         ticks(300);
-        assertEquals(60, ctx.conta("apagar"));
-        assertTrue(ctx.raiosApagados.stream().allMatch(r -> r == 7.0));
-        assertTrue(ctx.danos.stream().allMatch(d -> d == 60f));
-        assertEquals(120, ctx.pontosDeDano.get(59).x(), 1e-6);
-        assertExplosaoInteira(120);
+        assertEquals(0, ctx.conta("apagar"), "o R não lança feixe");
+        assertEquals(0, ctx.conta("ferir"));
+        assertEquals(1, ctx.conta("visual:gojo_roxo_maximo_esferas"));
+        assertExplosaoInteira(new Vetor(RoxoMaximo.ALCANCE, 0, 0));
     }
 
     @Test
-    void roxo200ExplodeOndeBate() {
-        ctx.colideEm = v -> v.x() >= 31;
+    void roxo200ComAlvoAvancaDaUppercutSobeEExplodeAtrasDoGojo() {
+        ctx.alvoMarcado = "alvo";
+        ctx.posAlvo = new Vetor(31.5, 0, 0);
+        int a = RoxoMaximo.avanco(31.5);
         usar(Tecla.R);
         ticks(300);
-        assertEquals(1, ctx.conta("fim:gojo_roxo_200"), "a massa some onde bateu");
-        assertExplosaoInteira(32);
+        assertEquals(0, ctx.conta("apagar"));
+        assertEquals(1, ctx.conta("visual:gojo_roxo_maximo"));
+        assertEquals(List.of(RoxoMaximo.DANO_UPPERCUT, RoxoMaximo.DANO), ctx.danos,
+                "uppercut e depois a explosão, uma vez só (o alvo não leva de novo pela casca)");
+        assertEquals(RoxoMaximo.inicioExplosao(a) - a, ctx.conta("suspender"), "segurado no ar até explodir");
+        // Os olhos do falso ficam em 0 olhando para +x: a fusão fica 4 atrás.
+        assertExplosaoInteira(new Vetor(-RoxoMaximo.ATRAS, 0, 0));
     }
 
-    /** As cascas cobrem de 0 a 24 sem buraco nem repetição, e a explosão aparece uma vez. */
-    private void assertExplosaoInteira(double x) {
+    /** As cascas cobrem de 0 ao raio 40 sem buraco nem repetição, e a explosão aparece uma vez. */
+    private void assertExplosaoInteira(Vetor centro) {
         assertEquals(1, ctx.conta("visual:gojo_roxo_explosao"));
-        assertEquals(x, ctx.centroCasca.x(), 1e-6);
+        assertEquals(centro, ctx.centroCasca);
         double r = 0;
         for (double[] c : ctx.cascas) {
             assertEquals(r, c[0], 1e-9);
             assertTrue(c[1] > c[0]);
             r = c[1];
         }
-        assertEquals(24, r, 1e-9);
-        assertEquals(12, ctx.cascas.size(), "cresce em 12 ticks");
+        assertEquals(RoxoMaximo.RAIO_EXPLOSAO, r, 1e-9);
+        assertEquals(RoxoMaximo.TICKS_EXPLOSAO, ctx.cascas.size());
     }
 
     @Test
@@ -229,7 +242,7 @@ class GojoTest {
         ticks(10);
         kit.levouDano(6f, agora, ctx);
         ticks(100);
-        assertEquals(0, ctx.conta("apagar"));
+        assertEquals(0, ctx.conta("casca"));
     }
 
     @Test

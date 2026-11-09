@@ -84,6 +84,28 @@ public interface Contexto {
     default void barreira(Vetor centro, double raio, double chao, int ticks) {
     }
 
+    /**
+     * Marca o alvo de um golpe: a criatura mais perto da linha da mira, a até {@code alcance} blocos e a
+     * até {@code largura} da linha. Devolve uma chave opaca (a mesma que {@link #danoUmaVez} guarda em
+     * {@code atingidos}) ou null.
+     */
+    default Object marcarAlvo(double alcance, double largura) {
+        return null;
+    }
+
+    /** Centro do alvo marcado, ou null se ele não existe mais (morreu, saiu, mudou de dimensão). */
+    default Vetor posicaoDe(Object alvo) {
+        return null;
+    }
+
+    /** Segura o alvo marcado parado em {@code ponto} (centro) por {@code ticks}, sem gravidade nem IA. */
+    default void suspender(Object alvo, Vetor ponto, int ticks) {
+    }
+
+    /** Fere só o alvo marcado. */
+    default void ferir(Object alvo, float dano) {
+    }
+
     /** O jogador vai voar por {@code ticks} (o cliente o move): sem dano de queda e sem ser chutado por voo. */
     default void voo(int ticks) {
     }

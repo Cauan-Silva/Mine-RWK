@@ -33,6 +33,7 @@ import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.OwnableEntity;
+import net.minecraft.world.entity.decoration.ArmorStand;
 import net.minecraft.world.entity.item.FallingBlockEntity;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
@@ -242,6 +243,56 @@ public final class ContextoServidor implements Contexto {
     @Override
     public void barreira(Vetor centro, double raio, double chao, int ticks) {
         BarreirasServidor.criar(jogador, centro, raio, chao, ticks);
+    }
+
+    @Override
+    public Object marcarAlvo(double alcance, double largura) {
+        Vec3 olhos = jogador.getEyePosition();
+        Vec3 dir = jogador.getLookAngle();
+        AABB caixa = new AABB(olhos, olhos.add(dir.scale(alcance))).inflate(largura);
+        LivingEntity melhor = null;
+        double melhorFora = Double.MAX_VALUE;
+        double melhorLonge = Double.MAX_VALUE;
+        for (LivingEntity e : nivel().getEntitiesOfClass(LivingEntity.class, caixa,
+                e -> afetavel(e) && !(e instanceof ArmorStand))) {
+            Vec3 c = e.getBoundingBox().getCenter();
+            Vec3 ate = c.subtract(olhos);
+            double longe = ate.dot(dir);
+            if (longe < 0 || longe > alcance) continue;
+            double fora = ate.subtract(dir.scale(longe)).length();
+            if (fora > largura || !jogador.hasLineOfSight(e)) continue;
+            // O mais perto da linha; no empate, o mais perto do Gojo.
+            if (fora < melhorFora - 1e-6 || (Math.abs(fora - melhorFora) <= 1e-6 && longe < melhorLonge)) {
+                melhor = e;
+                melhorFora = fora;
+                melhorLonge = longe;
+            }
+        }
+        return melhor == null ? null : melhor.getUUID();
+    }
+
+    /** O alvo marcado, se ainda está vivo neste mundo. */
+    private LivingEntity marcado(Object alvo) {
+        if (!(alvo instanceof java.util.UUID id)) return null;
+        return nivel().getEntity(id) instanceof LivingEntity e && e.isAlive() ? e : null;
+    }
+
+    @Override
+    public Vetor posicaoDe(Object alvo) {
+        LivingEntity e = marcado(alvo);
+        return e == null ? null : vetor(e.getBoundingBox().getCenter());
+    }
+
+    @Override
+    public void suspender(Object alvo, Vetor ponto, int ticks) {
+        LivingEntity e = marcado(alvo);
+        if (e != null) SuspensosServidor.suspender(e, vec(ponto), ticks);
+    }
+
+    @Override
+    public void ferir(Object alvo, float dano) {
+        LivingEntity e = marcado(alvo);
+        if (e != null) e.hurt(jogador.damageSources().playerAttack(jogador), dano);
     }
 
     @Override

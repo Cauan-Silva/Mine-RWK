@@ -102,6 +102,28 @@ public final class TestesGojo {
     }
 
     @GameTest(template = "vazio")
+    public static void zumbiNaMiraDoRLevaUppercutESobe25(GameTestHelper helper) {
+        ServerPlayer jogador = gojo(helper);
+        jogador.setYRot(-90); // olhando para +x
+        jogador.setXRot(0);
+        Zombie zumbi = helper.spawn(EntityType.ZOMBIE, new BlockPos(6, 2, 1));
+        ContextoServidor ctx = new ContextoServidor(jogador);
+        Object alvo = ctx.marcarAlvo(60, 4);
+        helper.assertTrue(zumbi.getUUID().equals(alvo), "o zumbi na mira deveria ser o alvo, veio " + alvo);
+        float vida = zumbi.getHealth();
+        ctx.ferir(alvo, 10);
+        helper.assertTrue(zumbi.getHealth() < vida, "o uppercut deveria ferir");
+        Vetor base = ctx.posicaoDe(alvo);
+        Vetor topo = base.mais(new Vetor(0, 25, 0));
+        ctx.suspender(alvo, topo, 6);
+        helper.runAfterDelay(3, () -> {
+            Vetor agora = ctx.posicaoDe(alvo);
+            helper.assertTrue(agora.distancia(topo) < 0.5, "segurado 25 blocos acima: " + agora + " ≠ " + topo);
+            helper.succeed();
+        });
+    }
+
+    @GameTest(template = "vazio")
     public static void vermelhoCongelaEArremessaZumbi(GameTestHelper helper) {
         ServerPlayer jogador = gojo(helper);
         Zombie zumbi = helper.spawn(EntityType.ZOMBIE, new BlockPos(4, 2, 1));

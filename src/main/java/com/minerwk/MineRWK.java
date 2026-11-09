@@ -10,6 +10,7 @@ import com.minerwk.kit.ArremessosServidor;
 import com.minerwk.kit.BarreirasServidor;
 import com.minerwk.kit.ProtecoesServidor;
 import com.minerwk.kit.ServicoKits;
+import com.minerwk.kit.SuspensosServidor;
 import com.minerwk.registro.Blocos;
 import com.minerwk.registro.Efeitos;
 import com.minerwk.registro.Regras;
@@ -42,6 +43,7 @@ public final class MineRWK {
         ProtecoesServidor.registrarEventos();
         ArremessosServidor.registrarEventos();
         BarreirasServidor.registrarEventos();
+        SuspensosServidor.registrarEventos();
         ApagadorServidor.registrarEventos();
         NeoForge.EVENT_BUS.addListener((RegisterCommandsEvent e) -> ComandoTrocar.registrar(e.getDispatcher()));
         modBus.addListener(Pacotes::registrar);
