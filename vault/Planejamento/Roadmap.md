@@ -6,7 +6,7 @@ atualizado: 2026-11-08
 
 Voltar para [[00 Início]]. Marque `[x]` ao concluir e registre no [[Diário]]. Decisões novas vão em [[Decisões]]; o que precisa de teste no jogo vai em [[Pendências]].
 
-**Onde estamos:** Fase 1, item 1.4 (base visual e de som). O 1.2 ainda tem o `.fx` de teste e o Iris pendentes.
+**Onde estamos:** Fase 1, item 1.4, parte 2 (tela de escolha bonita). A parte 1 (HUD e cliente) está pronta; o áudio fica para o começo da Fase 2. O 1.2 ainda tem o `.fx` de teste e o Iris pendentes.
 
 ## Como trabalhar em outro PC
 1. `git clone https://github.com/Cauan-Silva/Mine-RWK.git` (ou `git pull` se já tiver).
@@ -49,9 +49,9 @@ Spec e plano: [[2026-11-09 Núcleo dos kits]] (em `Desenvolvimento/Specs` e `Des
 ### 1.4 Base visual e de som
 - [ ] Pipeline de áudio: pasta `tools/` com o gerador em Python adaptado do Minezin e teste que confere ticks do som contra o Java
 - [ ] `THIRD_PARTY_NOTICES.md` para gravações CC0 e Sonniss
-- [ ] Configuração do cliente (opção "SFX anime", intensidade de tremor de tela, VFX reduzido)
-- [ ] Tremor de tela próprio (sem Lodestone)
-- [ ] HUD de recargas e ícones das habilidades
+- [x] Configuração do cliente (`minerwk-client.toml`: tremor, VFX reduzido, sons, HUD)
+- [x] Tremor de tela próprio (`core/camera/Tremor`, pacote `Tremer`)
+- [x] HUD de recargas e recurso (os ícones vêm com o Gojo)
 - [ ] Tela de seleção de personagem (a simples já existe no 1.3: `client/kit/TelaEscolha`; falta retratos, descrição e rolagem)
 
 ## Fase 2: Gojo completo (primeiro personagem, vira o modelo dos outros)

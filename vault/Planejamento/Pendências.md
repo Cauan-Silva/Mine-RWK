@@ -6,6 +6,8 @@ tags: [planejamento]
 Voltar para [[00 Início]].
 
 ## Para conferir
+- `vfxReduzido` ainda não é lido: ligar ao Photon quando houver efeitos. `LogicaHud.teclasVisiveis` não é usada (a sincronização já manda só as teclas existentes).
+- O tremor continua decaindo com o jogo pausado (até 15 ticks): irrelevante por ora.
 - Animações do Minezin estão travadas na Player Animation Library: refazer/suavizar no Blockbench na Fase 2 (Gojo).
 - O som de teste (robô) e a falta de VFX nos golpes do `teste` são provisórios: somem com o Gojo.
 - Teclas X e C conflitam com salvar/carregar barra do criativo (configurável).
@@ -18,6 +20,7 @@ Voltar para [[00 Início]].
 - Texto da licença do Sonniss GDC Bundle no site oficial.
 
 ## Para testar no jogo
+- HUD (09/11): funcionou no jogo. Depois das correções da revisão, conferir: HUD acima da armadura e das bolhas de ar (mergulhar com armadura), texto "Fôlego" à esquerda da barra, barra sem subir de 0 ao entrar no mundo.
 - Núcleo dos kits (09/11): escolha pelo menu, Z, X segurando e recarga **funcionaram**. Falta: morrer segurando X (não pode disparar), usar como espectador (nada acontece), ver a animação em outro jogador (2 clientes), sair e entrar mantendo o personagem.
 - A tela de escolha pode abrir por cima da tela de carregamento do mundo: conferir.
 - `/rwk anim` com `gojo_vermelho`, `gojo_infinito`, `gojo_roxo`, `gojo_dominio` (o `gojo_azul` já foi confirmado em 09/11). `/rwk parar` interrompe.
