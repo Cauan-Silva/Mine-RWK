@@ -27,7 +27,7 @@ class KitDoJogadorTest {
     }
 
     /** Habilidade falsa que anota os ganchos chamados. */
-    static final class Falsa implements Habilidade {
+    static class Falsa implements Habilidade {
         final String id;
         final Numeros n;
         final List<String> chamadas = new ArrayList<>();

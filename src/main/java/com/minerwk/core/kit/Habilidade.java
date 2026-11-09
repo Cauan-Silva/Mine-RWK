@@ -15,4 +15,9 @@ public interface Habilidade {
 
     default void aoTerminar(Contexto contexto) {
     }
+
+    /** Dano mínimo de um golpe recebido que cancela a carga; infinito (padrão) = nada cancela. */
+    default float danoQueInterrompe() {
+        return Float.POSITIVE_INFINITY;
+    }
 }

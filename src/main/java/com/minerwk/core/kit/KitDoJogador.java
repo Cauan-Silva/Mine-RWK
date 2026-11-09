@@ -7,19 +7,32 @@ import java.util.Optional;
 /**
  * O kit de um jogador: personagem, recurso, recargas e a habilidade em uso.
  * Regras: uma habilidade por vez; custo cobrado no disparo; recarga começa no disparo;
- * interrupção durante a carga dá recarga de punição de 1/4.
+ * interrupção durante a carga dá recarga de punição de 1/4. Efeitos soltos e passivas rodam todo tick,
+ * independentes da habilidade em uso.
  */
 public final class KitDoJogador {
     private final Personagem personagem;
     private final Recurso recurso;
     private final Recargas recargas = new Recargas();
     private Execucao execucao;
+    private final List<Ativo> efeitos = new ArrayList<>();
+    private final List<Passiva> passivas;
+
+    private static final class Ativo {
+        final Efeito efeito;
+        int t;
+
+        Ativo(Efeito efeito) {
+            this.efeito = efeito;
+        }
+    }
     /** O gancho de início de carga roda no próximo tick, quando há um Contexto. */
     private boolean pendenteIniciar;
 
     public KitDoJogador(Personagem personagem) {
         this.personagem = personagem;
         this.recurso = personagem.recurso().get();
+        this.passivas = personagem.passivas().stream().map(java.util.function.Supplier::get).toList();
     }
 
     public Personagem personagem() {
@@ -62,13 +75,30 @@ public final class KitDoJogador {
         limpar();
     }
 
-    /** Cancela sem cobrar nem punir (jogador saiu ou morreu). */
+    /** Levou um golpe: se a habilidade em carga não aguenta esse dano, é interrompida como em {@link #atordoar}. */
+    public void levouDano(float dano, long agora) {
+        if (execucao != null && dano >= execucao.habilidade().danoQueInterrompe()) atordoar(agora);
+    }
+
+    /** Começa um efeito solto; ele roda a partir do próximo tick. */
+    public void adicionarEfeito(Efeito efeito) {
+        efeitos.add(new Ativo(efeito));
+    }
+
+    public List<Efeito> efeitos() {
+        return efeitos.stream().map(a -> a.efeito).toList();
+    }
+
+    /** Cancela sem cobrar nem punir e encerra os efeitos sem {@code aoAcabar} (jogador saiu ou morreu). */
     public void descartar() {
         limpar();
+        efeitos.clear();
     }
 
     public List<Execucao.Evento> tick(long agora, EstadoDoJogador estado, Contexto contexto) {
         recurso.tick(estado);
+        for (Passiva p : passivas) p.tick(contexto, estado);
+        tickEfeitos(contexto);
         List<Execucao.Evento> eventos = new ArrayList<>(1);
         if (execucao == null) return eventos;
         Habilidade h = execucao.habilidade();
@@ -95,6 +125,18 @@ public final class KitDoJogador {
             eventos.add(e);
         }
         return eventos;
+    }
+
+    private void tickEfeitos(Contexto contexto) {
+        // Cópia: um efeito pode criar outro durante o tick.
+        for (Ativo a : List.copyOf(efeitos)) {
+            if (!efeitos.contains(a)) continue;
+            a.efeito.tick(contexto, a.t++);
+            if (a.t >= a.efeito.duracao() || a.efeito.encerrado()) {
+                efeitos.remove(a);
+                a.efeito.aoAcabar(contexto);
+            }
+        }
     }
 
     private void limpar() {
