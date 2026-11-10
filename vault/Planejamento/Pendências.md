@@ -6,7 +6,7 @@ tags: [planejamento]
 Voltar para [[00 Início]].
 
 ## Para conferir
-- **Aguardando o autor (10/11):** aprovar ou mudar o spec [[2026-11-10 Som do Gojo]] (três perguntas no fim) e a proposta de kit do [[Toji]] (quatro pontos a decidir). No Toji, conferir na wiki da obra as linhas marcadas como "secundária".
+- **Aguardando o autor (10/11):** aprovar ou mudar a proposta de kit do [[Toji]] (quatro pontos a decidir). No Toji, conferir na wiki da obra as linhas marcadas como "secundária".
 - `vfxReduzido` já reduz faixas e segmentos do VFX do Gojo; os emissores de brilho do Photon (`GolpesGojoPhoton` do Minezin) ficaram de fora: a API do Photon2 mudou e o shader já carrega o visual. Retomar se faltar brilho. `LogicaHud.teclasVisiveis` não é usada (a sincronização já manda só as teclas existentes).
 - O tremor continua decaindo com o jogo pausado (até 15 ticks): irrelevante por ora.
 - Animações do Minezin estão travadas na Player Animation Library: refazer/suavizar no Blockbench na Fase 2 (Gojo).
@@ -68,6 +68,16 @@ Voltar para [[00 Início]].
   - **Céu e chão no encantamento (10/11):** conferir o céu escurecendo na carga e cheio na fusão e na explosão, voltando devagar depois; as rachaduras de luz saindo dos pés (em chão irregular elas ficam na altura dos pés, não acompanham o relevo); as pedras subindo devagar. Ver de noite, na chuva, debaixo d'água e com Iris (no Nether e no End o véu não é desenhado). O chão continua claro com o céu escuro: ver se incomoda.
   - **`/rwk recarregar`:** conferir que enche a energia, zera as recargas e o HUD acompanha.
   - Com teto baixo sobre o Gojo, a explosão sai um pouco acima dele (o centro vem da conta do movimento, não de onde ele parou).
+- Som do Gojo, parte 1 (10/11), conferir no jogo:
+  - **Z:** a sucção do Azul sai do ponto de atração e dura os 3 s do campo.
+  - **X:** estalo no disparo e o boom no ponto do impacto (de longe soa de longe). A carga ainda não tem som.
+  - **C:** toque de vidro ao ligar, outro ao desligar (pelo tempo ou por falta de energia) e o tic quando o Infinito para um golpe ou uma flecha; ver se muitos golpes seguidos não viram uma rajada de tics.
+  - **V:** os dois tons da carga batendo até o disparo, e a explosão abafada com cauda longa.
+  - **G:** o drone cresce na carga e o baque cai junto com a abertura do domínio.
+  - **R:** fica sem som até a parte 3.
+  - Volume de cada som em relação aos do jogo, legendas ligadas, outro jogador ouvindo, a opção `SFX de anime` desligada e o Sound Physics Remastered, se der.
+  - Carga interrompida ainda deixa o som tocar até o fim (parte 2).
+- Explosão do R depois do vídeo (10/11): a casca de distorção agora fica centrada e deixa o brilho de dentro aparecer; conferir que não sobrou esfera escura deslocada.
 - HUD (09/11): funcionou no jogo. Depois das correções da revisão, conferir: HUD acima da armadura e das bolhas de ar (mergulhar com armadura), texto "Fôlego" à esquerda da barra, barra sem subir de 0 ao entrar no mundo.
 - Núcleo dos kits (09/11): escolha pelo menu, Z, X segurando e recarga **funcionaram**. Falta: morrer segurando X (não pode disparar), usar como espectador (nada acontece), ver a animação em outro jogador (2 clientes), sair e entrar mantendo o personagem.
 - Tela de escolha (09/11): **funcionou no jogo** (autor). Conferido: mundo novo abre a tela com o `teste` (emblema genérico), golpes Z e X no painel, "Escolher" → confirmação. `/rwk tela 40` mostra a grade com rolagem pela roda do mouse e emblemas do Minezin; o 15º falso usa o genérico. Testar também com a janela estreita (painel embaixo) e com escala de interface grande.

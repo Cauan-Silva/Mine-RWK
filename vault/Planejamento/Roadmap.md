@@ -6,7 +6,7 @@ atualizado: 2026-11-08
 
 Voltar para [[00 Início]]. Marque `[x]` ao concluir e registre no [[Diário]]. Decisões novas vão em [[Decisões]]; o que precisa de teste no jogo vai em [[Pendências]].
 
-**Onde estamos:** Fase 2 (Gojo), mecânica das seis habilidades pronta (apresentação provisória); VFX dos seis golpes feito (shader portado do Minezin, falta o teste no jogo); impacto de câmera, detritos e brilho feito; o autor ainda acha os golpes simples. Reação do alvo, ritmo e a cutscene do Roxo 200% feitos (falta o teste no jogo). Animações, domínio fechado e R colossal feitos; o R virou o Vazio Roxo máximo com uppercut, e o Azul e o Infinito ganharam VFX mais rico (falta o teste no jogo). A cutscene completa do R e as animações novas estão feitas (falta o teste no jogo). VFX pesado e nova ordem do R feitos e testados pelo autor ("melhorou bastante"); céu e chão no encantamento feitos (falta o teste no jogo). Aguardando aprovação: spec do som do Gojo e kit do [[Toji]]. Próximo, na ordem aprovada em 09/11: som; depois e o pipeline de áudio (parte 3 do 1.4, adiada para cá). As partes 1 (HUD e cliente) e 2 (tela de escolha) do 1.4 estão prontas. O 1.2 ainda tem o `.fx` de teste e o Iris pendentes.
+**Onde estamos:** Fase 2 (Gojo), mecânica das seis habilidades pronta (apresentação provisória); VFX dos seis golpes feito (shader portado do Minezin, falta o teste no jogo); impacto de câmera, detritos e brilho feito; o autor ainda acha os golpes simples. Reação do alvo, ritmo e a cutscene do Roxo 200% feitos (falta o teste no jogo). Animações, domínio fechado e R colossal feitos; o R virou o Vazio Roxo máximo com uppercut, e o Azul e o Infinito ganharam VFX mais rico (falta o teste no jogo). A cutscene completa do R e as animações novas estão feitas (falta o teste no jogo). VFX pesado e nova ordem do R feitos e testados pelo autor ("melhorou bastante"); céu e chão no encantamento feitos (falta o teste no jogo). Som do Gojo: parte 1 de 3 feita (falta o teste no jogo). Aguardando aprovação: kit do [[Toji]]. Próximo, na ordem aprovada em 09/11: som; depois e o pipeline de áudio (parte 3 do 1.4, adiada para cá). As partes 1 (HUD e cliente) e 2 (tela de escolha) do 1.4 estão prontas. O 1.2 ainda tem o `.fx` de teste e o Iris pendentes.
 
 ## Como trabalhar em outro PC
 1. `git clone https://github.com/Cauan-Silva/Mine-RWK.git` (ou `git pull` se já tiver).
@@ -47,7 +47,7 @@ Spec e plano: [[2026-11-09 Núcleo dos kits]] (em `Desenvolvimento/Specs` e `Des
 - [x] Testes JUnit da lógica de habilidade e um GameTest de uso de habilidade no servidor
 
 ### 1.4 Base visual e de som
-- [ ] Pipeline de áudio: pasta `tools/` com o gerador em Python adaptado do Minezin e teste que confere ticks do som contra o Java
+- [x] Pipeline de áudio: `ferramentas/sfx_motor.py` e `gerar_sfx_gojo.py`, portados do Minezin, e o `SonsGojoTest`, que confere os ticks do som contra o Java; ver [[2026-11-10 Som do Gojo parte 1]]
 - [ ] `THIRD_PARTY_NOTICES.md` para gravações CC0 e Sonniss
 - [x] Configuração do cliente (`minerwk-client.toml`: tremor, VFX reduzido, sons, HUD)
 - [x] Tremor de tela próprio (`core/camera/Tremor`, pacote `Tremer`)
@@ -63,7 +63,7 @@ Spec e plano: [[2026-11-09 Núcleo dos kits]] (em `Desenvolvimento/Specs` e `Des
 - [x] Reação do alvo e ritmo: golpes mais longos, arremesso com congelamento, Azul arranca blocos, tela de quem acerta trava, rastros no mundo; ver [[2026-11-09 Gojo peso]]
 - [x] Roxo 200%: cutscene (sistema de câmera reutilizável) e encantamento visível; ver [[2026-11-09 Roxo 200 cutscene]]
 - [ ] VFX no Photon2 de cada habilidade; Veil só se o domínio precisar de pós-processamento
-- [ ] SFX de cada habilidade (spec em [[2026-11-10 Som do Gojo]], aguardando aprovação)
+- [ ] SFX de cada habilidade (spec [[2026-11-10 Som do Gojo]] aprovado; parte 1 feita: sons de Z, X, C, V e G; faltam a parte 2, som que para, e a parte 3, o R)
 - [x] Animações do jogador de cada golpe: corpo inteiro, primeira pessoa, começam na carga; ver [[2026-11-09 Gojo animações]]
 - [x] Domínio fechado (barreira e chão por regra de movimento), animações livres ao andar e Roxo 200% colossal (sobe 20 blocos, massa de raio 7, explosão de raio 24); ver [[2026-11-09 Gojo domínio, movimento e R colossal]]
 - [x] R vira o Vazio Roxo máximo (avanço, uppercut, fusão atrás do Gojo, explosão de raio 40) e VFX mais rico do Azul e do Infinito; ver [[2026-11-09 Vazio Roxo máximo e VFX do Azul e do Infinito]]
