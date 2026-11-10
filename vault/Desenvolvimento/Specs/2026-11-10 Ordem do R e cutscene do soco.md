@@ -52,3 +52,7 @@ O tempo das esferas continua 30: 8 para conjurar, 10 de viagem e 12 de dança. O
 
 ## Fora deste spec
 Céu escurecendo e chão rachando no encantamento (continuam do spec anterior); som.
+
+## Ajustes depois do segundo teste (10/11)
+- A explosão passou de 30 para 60 ticks crescendo, mais 50 de resto, a pedido do autor ("muito simples e rápida").
+- O centro da fusão sai da conta do movimento do Gojo, e o cliente o desenha atrás do Gojo de verdade.

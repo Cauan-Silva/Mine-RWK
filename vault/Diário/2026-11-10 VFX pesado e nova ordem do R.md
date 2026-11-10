@@ -24,3 +24,12 @@ Voltar para [[Diário]]. Specs: [[2026-11-10 Preparação e VFX pesado do Vazio 
   - **impact frame** de 3 ticks em preto e branco com toque de roxo, piscando invertido (pós-processamento `shaders/post/impacto`, decisão em `ImpactFrameGojo`).
 - O Azul e o Vermelho só aparecem no céu. O tempo das esferas continua 30 ticks: 8 nascendo nas mãos, 10 de viagem e 12 de dança.
 - O encantamento não tem mais esferas nas mãos. No lugar entraram uma aura de fitas azuis e vermelhas subindo em espiral e os olhos brilhando.
+
+## Segundo teste do autor (10/11)
+O autor viu o Azul e o Vermelho serem jogados para baixo, sem a fusão atrás do Gojo, e achou a explosão "muito simples e rápida".
+- **Esferas para baixo:** causa provável, não confirmada no jogo. O servidor calculava o centro da fusão com a posição que ele tinha do Gojo, mas quem move o Gojo na subida é o cliente.
+  - O servidor agora tira o centro da mesma conta do movimento (`deslocamentoGojo` no fim da subida).
+  - O cliente desenha a fusão sempre atrás do Gojo de verdade, na horizontal, e as esferas nascem nas mãos abertas para os lados, como na animação.
+- **Explosão:** cresce por 3 s em vez de 1,5 s, estourando rápido e depois devagar (`fracaoExplosao`), e o que sobra fica mais 2,5 s no ar (`TICKS_RESTO`).
+  - Camadas novas: miolo escuro, relâmpagos correndo na casca, levas de fitas a cada 12 ticks, coluna de luz, três ondas de choque em sequência e chuva de faíscas.
+  - O plano aberto da cutscene passou de 40 para 80 ticks, e as animações foram regeradas.
