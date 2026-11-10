@@ -24,12 +24,15 @@ public final class Pacotes {
     }
 
     public static void registrar(RegisterPayloadHandlersEvent evento) {
-        PayloadRegistrar r = evento.registrar("4");
+        PayloadRegistrar r = evento.registrar("5");
         r.playToServer(UsarTecla.TIPO, UsarTecla.CODEC, (p, ctx) -> {
             if (ctx.player() instanceof ServerPlayer jogador) ServicoKits.usarTecla(jogador, p.tecla(), p.apertou());
         });
         r.playToServer(EscolherPersonagem.TIPO, EscolherPersonagem.CODEC, (p, ctx) -> {
             if (ctx.player() instanceof ServerPlayer jogador) ServicoKits.escolher(jogador, p.id());
+        });
+        r.playToServer(ComprarNo.TIPO, ComprarNo.CODEC, (p, ctx) -> {
+            if (ctx.player() instanceof ServerPlayer jogador) ServicoKits.comprarNo(jogador, p.no());
         });
         r.playToClient(SincronizarKit.TIPO, SincronizarKit.CODEC, (p, ctx) -> aoSincronizar.accept(p));
         r.playToClient(TocarApresentacao.TIPO, TocarApresentacao.CODEC, (p, ctx) -> aoTocar.accept(p));

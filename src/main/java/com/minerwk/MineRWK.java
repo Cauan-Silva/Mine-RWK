@@ -49,6 +49,7 @@ public final class MineRWK {
         NeoForge.EVENT_BUS.addListener((RegisterCommandsEvent e) -> ComandoTrocar.registrar(e.getDispatcher()));
         NeoForge.EVENT_BUS.addListener((RegisterCommandsEvent e) -> ComandoTrocar.registrarRecarregar(e.getDispatcher()));
         NeoForge.EVENT_BUS.addListener((RegisterCommandsEvent e) -> ComandoTrocar.registrarMaestria(e.getDispatcher()));
+        NeoForge.EVENT_BUS.addListener((RegisterCommandsEvent e) -> ComandoTrocar.registrarDespertar(e.getDispatcher()));
         modBus.addListener(Pacotes::registrar);
         modBus.addListener(this::commonSetup);
     }

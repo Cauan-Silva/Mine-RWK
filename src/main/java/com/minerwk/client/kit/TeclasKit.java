@@ -19,6 +19,8 @@ public final class TeclasKit {
     private static final Map<Tecla, Boolean> APERTADA = new EnumMap<>(Tecla.class);
     private static final KeyMapping ESCOLHER = new KeyMapping("key.minerwk.escolher", KeyConflictContext.IN_GAME,
             InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_K, CATEGORIA);
+    private static final KeyMapping ARVORE = new KeyMapping("key.minerwk.arvore", KeyConflictContext.IN_GAME,
+            InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_H, CATEGORIA);
 
     static {
         int[] padrao = {GLFW.GLFW_KEY_Z, GLFW.GLFW_KEY_X, GLFW.GLFW_KEY_C, GLFW.GLFW_KEY_V, GLFW.GLFW_KEY_G, GLFW.GLFW_KEY_R};
@@ -35,11 +37,18 @@ public final class TeclasKit {
     public static void registrar(RegisterKeyMappingsEvent evento) {
         TECLAS.values().forEach(evento::register);
         evento.register(ESCOLHER);
+        evento.register(ARVORE);
+    }
+
+    /** Se a tecla apertada (dentro de uma tela) é a que abre a árvore. */
+    static boolean eDaArvore(int tecla, int scan) {
+        return ARVORE.matches(tecla, scan);
     }
 
     public static void aoTick(ClientTickEvent.Post evento) {
         while (ESCOLHER.consumeClick()) RecepcaoKit.abrirEscolha();
         if (RecepcaoKit.semPersonagem()) return;
+        while (ARVORE.consumeClick()) TelaArvore.abrir();
         for (Tecla t : Tecla.values()) {
             boolean agora = TECLAS.get(t).isDown();
             if (agora != APERTADA.get(t)) {

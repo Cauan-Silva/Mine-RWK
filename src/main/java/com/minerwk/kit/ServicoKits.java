@@ -178,6 +178,17 @@ public final class ServicoKits {
         return r;
     }
 
+    /**
+     * Marca (ou desmarca) o jogador como desperto no personagem atual: abre os nós de depois do despertar.
+     * Por enquanto só o comando de teste chama; a vitória sobre o Nêmesis vai chamar daqui.
+     */
+    public static void definirDespertou(ServerPlayer jogador, boolean despertou) {
+        DadosKit dados = dados(jogador);
+        if (!dados.temPersonagem()) return;
+        dados.maestriaAtual().despertou = despertou;
+        Sincronizacao.enviar(jogador);
+    }
+
     /** Define o XP total no personagem atual (também usado pelos comandos de teste). */
     public static void definirXp(ServerPlayer jogador, long xp) {
         DadosKit dados = dados(jogador);

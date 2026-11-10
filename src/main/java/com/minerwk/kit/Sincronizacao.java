@@ -43,15 +43,17 @@ final class Sincronizacao {
                         h.numeros().custo(), prontas.getOrDefault(h.id(), 0L), k.recargas().duracao(h.id()))));
             }
             String emUso = emUso(k);
-            long xp = ServicoKits.dados(jogador).maestriaAtual().xp;
+            DadosMaestria maestria = ServicoKits.dados(jogador).maestriaAtual();
+            long xp = maestria.xp;
             var progresso = com.minerwk.core.maestria.Maestria.progresso(xp);
             pacote = new SincronizarKit(k.personagem().id(), k.recurso().nome(), k.recurso().cor(),
                     k.recurso().atual(), k.recurso().maximo(), habilidades, emUso, List.of(),
-                    progresso.nivel(), progresso.xpNoNivel(), progresso.xpParaProximo());
+                    progresso.nivel(), progresso.xpNoNivel(), progresso.xpParaProximo(),
+                    Map.copyOf(maestria.nos), maestria.despertou);
             ULTIMO.put(jogador.getUUID(), new Enviado(k.recurso().atual(), prontas, emUso, xp));
         } else {
             List<PersonagemEscolha> lista = Personagens.escolhiveis().stream().map(PersonagemEscolha::de).toList();
-            pacote = new SincronizarKit("", "", 0, 0, 0, List.of(), "", lista, 0, 0, 0);
+            pacote = new SincronizarKit("", "", 0, 0, 0, List.of(), "", lista, 0, 0, 0, Map.of(), false);
             ULTIMO.remove(jogador.getUUID());
         }
         Envio.para(jogador, pacote);

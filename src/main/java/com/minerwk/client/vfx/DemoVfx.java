@@ -36,11 +36,13 @@ public final class DemoVfx {
     /** {@code traje}: o jogador como Gojo de frente, de costas, num golpe, com armadura vestida e em 1ª pessoa. */
     private static final boolean TRAJE = MODO.equals("traje");
     private static boolean vestiuPeitoral;
+    /** {@code arvore}: a tela da árvore do Gojo em três momentos (sem pontos, com compras e desperto). */
+    private static final boolean ARVORE = MODO.equals("arvore");
     private static final int CARGA = 100;
     private static final Path PASTA = Path.of("demo");
     private static final int ESFERAS = RoxoMaximo.TICKS_ESFERAS;
     private static final int ESTOURO = ESFERAS + RoxoMaximo.TICKS_FUSAO;
-    private static final int FIM_PREVIA = TRAJE ? 260 : R_COMPLETO ? 360
+    private static final int FIM_PREVIA = ARVORE ? 100 : TRAJE ? 260 : R_COMPLETO ? 360
             : ENCANTAMENTO ? CARGA + 90 : ESTOURO + RoxoMaximo.TICKS_EXPLOSAO + 110;
     private static int ticks;
     private static int quadro;
@@ -62,6 +64,7 @@ public final class DemoVfx {
         ticks++;
         if (DEMO && ticks == 40) {
             jogador.connection.sendCommand(ENCANTAMENTO || R_COMPLETO || TRAJE ? "time set noon" : "time set midnight");
+            if (ARVORE) jogador.connection.sendCommand("rwk trocar @s gojo");
             if (TRAJE) {
                 jogador.connection.sendCommand("rwk trocar @s gojo");
                 // Terreno limpo, longe dos blocos soltos do spawn; volta no fim.
@@ -96,6 +99,26 @@ public final class DemoVfx {
     }
 
     private static void tocarPrevia(Minecraft mc, LocalPlayer jogador, int t) {
+        if (ARVORE) {
+            mc.gui.getChat().clearMessages(false);
+            if (t == 0) jogador.connection.sendCommand("rwk maestria @s zerar");
+            if (t == 2) jogador.connection.sendCommand("rwk despertar @s nao");
+            if (t == 5) com.minerwk.client.kit.TelaArvore.abrir();
+            if (t == 30) jogador.connection.sendCommand("rwk maestria @s nivel 24");
+            if (t == 32) {
+                for (String no : new String[] {"gojo_azul_alcance", "gojo_azul_alcance", "gojo_infinito_duracao",
+                        "gojo_energia_reserva", "gojo_energia_reserva", "gojo_energia_reserva", "gojo_despertar"}) {
+                    jogador.connection.sendCommand("rwk maestria @s comprar " + no);
+                }
+            }
+            if (t == 60) jogador.connection.sendCommand("rwk despertar @s sim");
+            if (t == 62) jogador.connection.sendCommand("rwk maestria @s comprar gojo_vermelho_forca");
+            // Não deixa o mundo de testes com a maestria da demonstração.
+            if (t == FIM_PREVIA - 4) jogador.connection.sendCommand("rwk maestria @s zerar");
+            if (t == FIM_PREVIA - 3) jogador.connection.sendCommand("rwk despertar @s nao");
+            if (t >= FIM_PREVIA) previa = -1;
+            return;
+        }
         if (TRAJE) {
             mc.gui.getChat().clearMessages(false);
             var tipo = net.minecraft.client.CameraType.THIRD_PERSON_FRONT;

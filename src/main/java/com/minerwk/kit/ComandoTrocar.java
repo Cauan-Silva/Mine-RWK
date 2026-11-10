@@ -59,6 +59,27 @@ public final class ComandoTrocar {
                                 .executes(ComandoTrocar::comprar))))));
     }
 
+    /** {@code /rwk despertar <jogador> <sim|nao>}: liga ou desliga o despertar no personagem atual (teste). */
+    public static void registrarDespertar(CommandDispatcher<CommandSourceStack> d) {
+        d.register(Commands.literal("rwk").then(Commands.literal("despertar")
+                .requires(s -> s.hasPermission(2))
+                .then(Commands.argument("jogador", EntityArgument.player())
+                        .then(Commands.literal("sim").executes(c -> despertar(c, true)))
+                        .then(Commands.literal("nao").executes(c -> despertar(c, false))))));
+    }
+
+    private static int despertar(CommandContext<CommandSourceStack> c, boolean sim) throws CommandSyntaxException {
+        ServerPlayer jogador = EntityArgument.getPlayer(c, "jogador");
+        if (!ServicoKits.dados(jogador).temPersonagem()) {
+            c.getSource().sendFailure(Component.literal(jogador.getName().getString() + " ainda não escolheu um personagem"));
+            return 0;
+        }
+        ServicoKits.definirDespertou(jogador, sim);
+        String texto = jogador.getName().getString() + (sim ? ": desperto" : ": não desperto");
+        c.getSource().sendSuccess(() -> Component.literal(texto), true);
+        return 1;
+    }
+
     private static java.util.stream.Stream<String> nosDe(CommandContext<CommandSourceStack> c) {
         try {
             String id = ServicoKits.dados(EntityArgument.getPlayer(c, "jogador")).personagem;
