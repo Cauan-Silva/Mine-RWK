@@ -41,6 +41,38 @@ class SonsGojoTest {
         assertTrue(SonsGojo.doVisual("gojo_roxo_rastro").isEmpty(), "visual sem som próprio");
     }
 
+    @Test
+    void somDaCargaSaiDoVisualDaCargaEParaComEle() {
+        assertEquals(SonsGojo.VERMELHO_CARGA, SonsGojo.doVisual("gojo_vermelho_carga").orElseThrow());
+        assertEquals(SonsGojo.ROXO_CARGA, SonsGojo.doVisual("gojo_roxo_carga").orElseThrow());
+        assertTrue(SonsGojo.cortaComOVisual("gojo_vermelho_carga"), "soltou cedo ou foi interrompido: o som para");
+        assertTrue(SonsGojo.cortaComOVisual("gojo_roxo_carga"));
+        assertFalse(SonsGojo.cortaComOVisual("gojo_vermelho_explosao"), "a explosão soa até o fim");
+        assertFalse(SonsGojo.cortaComOVisual("gojo_azul"));
+    }
+
+    @Test
+    void dominioRachaComOEstilhacoCaindoQuandoEleSome() throws IOException {
+        SonsGojo.NoFim fim = SonsGojo.antesDoFim("gojo_vazio_infinito").orElseThrow();
+        assertEquals(SonsGojo.DOMINIO_FIM, fim.som());
+        assertEquals(marco(ler(MANIFESTO), "gojo_dominio_fim", "estilhaco"), fim.antes(),
+                "o som começa antes do fim, para o estilhaço cair no tick em que o domínio some");
+        assertTrue(SonsGojo.antesDoFim("gojo_azul").isEmpty());
+    }
+
+    @Test
+    void cargaDoRoxoNaoTocaDuasVezes() {
+        java.util.List<String> sons = new java.util.ArrayList<>();
+        com.minerwk.core.kit.Contexto ctx = new com.minerwk.core.kit.Contexto() {
+            @Override
+            public void apresentacao(String animacao, String efeito, String som) {
+                sons.add(som);
+            }
+        };
+        Gojo.criar().naTecla(Tecla.V).orElseThrow().aoIniciarCarga(ctx);
+        assertFalse(sons.contains(SonsGojo.ROXO_CARGA), "o som da carga vem do visual, não da apresentação");
+    }
+
     private static JsonObject ler(Path arquivo) throws IOException {
         try (Reader r = Files.newBufferedReader(arquivo, StandardCharsets.UTF_8)) {
             return JsonParser.parseReader(r).getAsJsonObject();

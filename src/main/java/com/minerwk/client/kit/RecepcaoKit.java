@@ -54,6 +54,7 @@ public final class RecepcaoKit {
     public static void esquecer() {
         ultimo = SincronizarKit.VAZIO;
         telaJaAberta = false;
+        SONS_DE_CARGA.clear();
     }
 
     private static void aoSincronizar(SincronizarKit pacote) {
@@ -64,16 +65,24 @@ public final class RecepcaoKit {
         }
     }
 
+    /** O som da carga em andamento de cada jogador (id da entidade), para cortar se for interrompida. */
+    private static final java.util.Map<Integer, net.minecraft.client.resources.sounds.SoundInstance> SONS_DE_CARGA =
+            new java.util.HashMap<>();
+
     private static void aoTocar(TocarApresentacao p) {
         Minecraft mc = Minecraft.getInstance();
         if (mc.level == null || !(mc.level.getEntity(p.entidade()) instanceof AbstractClientPlayer jogador)) return;
-        if (TocarApresentacao.PARAR.equals(p.animacao())) AnimacoesJogador.parar(jogador);
-        else if (!p.animacao().isEmpty()) AnimacoesJogador.tocar(jogador, MineRWK.id(p.animacao()));
+        if (TocarApresentacao.PARAR.equals(p.animacao())) {
+            AnimacoesJogador.parar(jogador);
+            // Golpe interrompido: o som que veio com a carga dele para junto.
+            com.minerwk.client.vfx.SonsVisuais.parar(SONS_DE_CARGA.remove(p.entidade()));
+        } else if (!p.animacao().isEmpty()) AnimacoesJogador.tocar(jogador, MineRWK.id(p.animacao()));
         if (!p.efeito().isEmpty()) EfeitosVisuais.naEntidade(MineRWK.id(p.efeito()), mc.level, jogador);
-        if (!p.som().isEmpty() && ConfigCliente.sfxAnime()) {
-            BuiltInRegistries.SOUND_EVENT.getOptional(MineRWK.id(p.som())).ifPresent(som ->
-                    mc.level.playLocalSound(jogador.getX(), jogador.getY(), jogador.getZ(), som,
-                            SoundSource.PLAYERS, 1f, 1f, false));
+        if (!p.som().isEmpty()) {
+            var som = com.minerwk.client.vfx.SonsVisuais.tocar(p.som(),
+                    new com.minerwk.core.kit.Vetor(jogador.getX(), jogador.getY(), jogador.getZ()));
+            // Som que veio junto com uma animação é o da carga: fica guardado para poder ser cortado.
+            if (som != null && !p.animacao().isEmpty()) SONS_DE_CARGA.put(p.entidade(), som);
         }
     }
 }

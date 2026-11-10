@@ -5,7 +5,7 @@
     "channels": 1,
     "peak": 0.61808,
     "rms": 0.1679,
-    "sha256": "e1036fcdec542d4692c103fbabddf816e88ea697106baac37f8acafa77ea4b2d",
+    "sha256": "0cab7d25221c6e625032718f60e7971b5a2c92398ffb2f2148023de82fed8388",
     "ticks": 68,
     "marcos": {
       "fim": 60
@@ -17,7 +17,7 @@
     "channels": 1,
     "peak": 0.6174,
     "rms": 0.18028,
-    "sha256": "64d9175bd79b51f8e65f1e170cd91769dcffd82a91d924638e1793e3433d7f39"
+    "sha256": "8a022dd8534fafa6f3892a3330d92b6138102a37230515c3f4a76e42ebbb24ba"
   },
   "gojo_azul_3": {
     "duration": 3.5416,
@@ -25,7 +25,7 @@
     "channels": 1,
     "peak": 0.58263,
     "rms": 0.17376,
-    "sha256": "1c8004ec8c4073a3258be3deedd09f30b9048c4ca0b862a77c5f6548f051a22e"
+    "sha256": "f8fec8a76c2b94083bb6316b53f6ac0867b1b50391f32cee25b34abcc1130a60"
   },
   "gojo_vermelho_carga": {
     "duration": 1.55,
@@ -33,7 +33,7 @@
     "channels": 1,
     "peak": 0.65506,
     "rms": 0.12363,
-    "sha256": "fc2646fc4acd1e333449b7e3b2f1947257c286c15fd1cb35d6673f840a05ae77",
+    "sha256": "85463f1de8ef6780c03b52d1a811f6abb99d1ffd3f4a67fc2f91fe152dee4556",
     "ticks": 31,
     "marcos": {
       "cheia": 30
@@ -45,7 +45,7 @@
     "channels": 1,
     "peak": 0.647,
     "rms": 0.13426,
-    "sha256": "49a4f1f4cee0844609290a2e8b47de4a3b0e96802eb0a06c567462e658583839"
+    "sha256": "3d5d62ba411b828816242c1476e16fc3167ac423f99db997ad6e2f7335f3432d"
   },
   "gojo_vermelho_carga_3": {
     "duration": 1.6146,
@@ -53,7 +53,7 @@
     "channels": 1,
     "peak": 0.6962,
     "rms": 0.13244,
-    "sha256": "f75101b11d9c6a4f4b9415d602a45fcf1297f59e61cbe4d5c4468050c1e335ed"
+    "sha256": "29aeaff528905f071262290902aff6f7b74fcdab6f1cc36bd146eaa3581fc58a"
   },
   "gojo_vermelho_disparo": {
     "duration": 0.6,
@@ -61,7 +61,7 @@
     "channels": 1,
     "peak": 0.59413,
     "rms": 0.10948,
-    "sha256": "45ee23f095ed95b8c42c13f7f7ef49d9e171947372c815e5be7b472d4554baed",
+    "sha256": "1a234e847e6384bb0cbe7c8bea15621a25935026d0938467f39b2d5fe8fb0b03",
     "ticks": 12,
     "marcos": {}
   },
@@ -71,7 +71,7 @@
     "channels": 1,
     "peak": 0.56108,
     "rms": 0.10636,
-    "sha256": "86c7bb71505f1269939b6be71dbf07cc1f2e477aee1e4e273c9d4677ad9d9214"
+    "sha256": "ecad16fc3dd10550241037b8348e18953404af2c561e96fc9fe49944da1a75e7"
   },
   "gojo_vermelho_disparo_3": {
     "duration": 0.625,
@@ -79,7 +79,7 @@
     "channels": 1,
     "peak": 0.66944,
     "rms": 0.09707,
-    "sha256": "d06c8aad0da0dcece2df36991dacd54950b658420b7b4fd0fe2c1fb16b889125"
+    "sha256": "db7194b18979b1521948120ffe70477cb65c63cc21616df24d943d1266f9f166"
   },
   "gojo_vermelho_explosao": {
     "duration": 2.5,
@@ -87,7 +87,7 @@
     "channels": 1,
     "peak": 0.58766,
     "rms": 0.12719,
-    "sha256": "be6582ebc71fd6a74a8fa93938521dd855ba1e8553f850a989d5d033d4b98b7f",
+    "sha256": "2db4802d7e1abc1fb8b1272a2e8b8fd208e996fc0bb4c766743a8dbb03a7344e",
     "ticks": 50,
     "marcos": {}
   },
@@ -97,7 +97,7 @@
     "channels": 1,
     "peak": 0.63776,
     "rms": 0.13437,
-    "sha256": "0f6dedb24d135c948aeb700709bd29c6ca07fbcce7d130749d56ee6b699f99e2"
+    "sha256": "2ab3545b500e1c25de28302d62961f0e33444026aad7207f3d35f7964023b701"
   },
   "gojo_vermelho_explosao_3": {
     "duration": 2.6041,
@@ -105,7 +105,7 @@
     "channels": 1,
     "peak": 0.61819,
     "rms": 0.14258,
-    "sha256": "3da9b2eed075aa30e05aa5d48c52a2eb0551e615feeee4818d6e5fa9ab2bd2f4"
+    "sha256": "00c34993a1ccb8ddc248478e09b97e6b3c87388d361dfb1c2f448bf609b2f728"
   },
   "gojo_infinito_ativa": {
     "duration": 1.0,
@@ -113,7 +113,7 @@
     "channels": 1,
     "peak": 0.66827,
     "rms": 0.09312,
-    "sha256": "1a99af4fcca5bef83d56d047f760f263a868b81f62ef9029625e93def5b0040b",
+    "sha256": "dd8fe9c17782063f3f9f02644c4887df43f5c31856f64e394380c6eb641ee599",
     "ticks": 20,
     "marcos": {}
   },
@@ -123,7 +123,7 @@
     "channels": 1,
     "peak": 0.59944,
     "rms": 0.08304,
-    "sha256": "012ca279d62b24c2d1da3c37f7570625dade8f12dc45687224f4e7471cd350eb"
+    "sha256": "b6dddeec842fb4f3b9581281024fd56cef0b5018186ca959f3c262d05bf78adb"
   },
   "gojo_infinito_ativa_3": {
     "duration": 1.0416,
@@ -131,7 +131,7 @@
     "channels": 1,
     "peak": 0.61337,
     "rms": 0.07994,
-    "sha256": "eb0d5a9ade88b8f33cb170d5729bf4d71c0729aa176c9709ac7a30fcc8bb15c5"
+    "sha256": "7594012735ed8dd20155f0f76a97df54c534a61d39b1c70edcf98f54302c24f6"
   },
   "gojo_infinito_desativa": {
     "duration": 0.7,
@@ -139,7 +139,7 @@
     "channels": 1,
     "peak": 0.63832,
     "rms": 0.09436,
-    "sha256": "3e6f6ed9ecc0c2e7db5ccc17cd334ae5a915e444eed72238170f18e51e28e47d",
+    "sha256": "96710b1f3f2ef2fcb1817e462b0b8dcf631399c20e465c613e8d722a49aab533",
     "ticks": 14,
     "marcos": {}
   },
@@ -149,7 +149,7 @@
     "channels": 1,
     "peak": 0.68836,
     "rms": 0.10316,
-    "sha256": "f495bef887ae868203fe8043d313e03bf67e5e1845e181a5ae008f4f8491a868"
+    "sha256": "8eb251ed9ad2baaabc710a0b0b1ff53c31b28d252801c9cf4b58c41c4bd08571"
   },
   "gojo_infinito_desativa_3": {
     "duration": 0.7291,
@@ -157,7 +157,7 @@
     "channels": 1,
     "peak": 0.66052,
     "rms": 0.09195,
-    "sha256": "c4454540aa654f073c5d9b21db0959643c989bedd0c47f598f2fa56e1ae18eb6"
+    "sha256": "84ccf0a58170b448c9330e163c289f6ee783421d549da5bb339784ab7c4a8f1f"
   },
   "gojo_infinito_tic": {
     "duration": 0.45,
@@ -165,7 +165,7 @@
     "channels": 1,
     "peak": 0.64141,
     "rms": 0.05951,
-    "sha256": "519a03bb4bcaedf603dc10d03e98233b5ac3e25bc304f6b43a4afc56f200c09c",
+    "sha256": "16171b75b619e4aae237d5bb4321054ed8c9c9e7cca306bd67944cfcf9e6668b",
     "ticks": 9,
     "marcos": {}
   },
@@ -175,7 +175,7 @@
     "channels": 1,
     "peak": 0.62204,
     "rms": 0.07797,
-    "sha256": "d0acf0be30a8e821c68ac40142241efdc30340d41103a3d6dba4b0de62ea5f5c"
+    "sha256": "b16759522e59e1fb212eafcbc8d545b839f88f2591de3b9c40c52f97728cb09d"
   },
   "gojo_infinito_tic_3": {
     "duration": 0.4687,
@@ -183,7 +183,7 @@
     "channels": 1,
     "peak": 0.58937,
     "rms": 0.06832,
-    "sha256": "26592282610f8cb78a30f279d1612db5f60cdaff94af2b299714732e389f7f56"
+    "sha256": "1cb2e78cbebcacbc14423b0192dd0df036cedf3bd856e4336d8bd178ae1f0dc6"
   },
   "gojo_roxo_carga": {
     "duration": 1.55,
@@ -191,7 +191,7 @@
     "channels": 1,
     "peak": 0.60926,
     "rms": 0.16401,
-    "sha256": "7a9931c8f5f63d1bf8899e57e0d63f7dac76ea185d215db791334f5773ac3063",
+    "sha256": "79093ffeba3cbb7aa5c64e812cdbcc0fa7171bbd5ab0b06f707bfada46abff48",
     "ticks": 31,
     "marcos": {
       "dispara": 30
@@ -203,7 +203,7 @@
     "channels": 1,
     "peak": 0.59429,
     "rms": 0.18723,
-    "sha256": "154136c230a8c23c2556fdf2552b9f324837f5636d7c2dd86741d09ab4488702"
+    "sha256": "97e1f449c5bab229c0b28f88b077684f589693802e0497c9948cf4ab512abec5"
   },
   "gojo_roxo_carga_3": {
     "duration": 1.6146,
@@ -211,7 +211,7 @@
     "channels": 1,
     "peak": 0.61133,
     "rms": 0.17427,
-    "sha256": "6d85370091165a77d962cbea4ac5e50f801389bc4e5ed32b823c15c8275306e5"
+    "sha256": "3ffb9056c4abd608482ce8b0af0accd7892aac5ea0b659db918052cd739e4f89"
   },
   "gojo_roxo_disparo": {
     "duration": 5.0,
@@ -219,7 +219,7 @@
     "channels": 1,
     "peak": 0.63963,
     "rms": 0.13,
-    "sha256": "7624a6e2f42e1910e8ead5a7b5ca4563a79a4f7509d16486522f5d54e1c5b987",
+    "sha256": "7c87f437eb928e3ec698055ca1822d8a0656ffb9dad543c9bb9ed5d06bc54ab8",
     "ticks": 100,
     "marcos": {}
   },
@@ -229,7 +229,7 @@
     "channels": 1,
     "peak": 0.59817,
     "rms": 0.15954,
-    "sha256": "1c2edb4605fe0f6d62d2323d088838f10db0eff8f7d806a5f18b0081f1895297"
+    "sha256": "6a4caaf57715b82d4d2260e0ba1b6c1a19df3ec1039a5170108d2892e54e3740"
   },
   "gojo_roxo_disparo_3": {
     "duration": 5.2083,
@@ -237,7 +237,7 @@
     "channels": 1,
     "peak": 0.59853,
     "rms": 0.16496,
-    "sha256": "b162c4cd70ca20c299cbd2223246d584462c78c16c3ced2cff6e30c4e19ee4db"
+    "sha256": "7564d2414ed66fc451d2ab90363a953f46ec8575fce921fb00cef2a82181b07f"
   },
   "gojo_dominio": {
     "duration": 6.0,
@@ -245,7 +245,7 @@
     "channels": 1,
     "peak": 0.59075,
     "rms": 0.17904,
-    "sha256": "3573f1bd3fb124df5b47b754f0117b8e1b7b351c7060317de456569a97c98f0d",
+    "sha256": "27839ec151cef4c3fd50088c587d0e86897fc643013473531292efe0c5dba259",
     "ticks": 120,
     "marcos": {
       "abertura": 10
@@ -257,7 +257,7 @@
     "channels": 1,
     "peak": 0.60827,
     "rms": 0.19066,
-    "sha256": "69d7d3c7aaef2b927691b0291d03e51029c01f9a0df159cb41c99091039fa2a4"
+    "sha256": "3a8f76828565f209fcfd2dcc59f4a65ed40be40c708f7e8dbca5553dc0e24f8e"
   },
   "gojo_dominio_3": {
     "duration": 6.25,
@@ -265,32 +265,34 @@
     "channels": 1,
     "peak": 0.61085,
     "rms": 0.19574,
-    "sha256": "478e3a47c300aaa89922aae68a49826cdd971cea5439d88222b36b2be3e7d4bd"
+    "sha256": "fca7e2c23fb830dcd1d7bb4bdef431f502fd45e90aa0d6278326b8f054d0d551"
   },
   "gojo_dominio_fim": {
     "duration": 1.6,
     "sample_rate": 48000,
     "channels": 1,
-    "peak": 0.55029,
-    "rms": 0.125,
-    "sha256": "0c2cb85ae12cef196eeb362fe542d46db211de102684e2900a2dd0aca792fbaf",
+    "peak": 0.6009,
+    "rms": 0.16117,
+    "sha256": "16f5a2ffb2652dbf98d9ab6abf7c65b638777a77b4ec7a10c35c78041b9bb1c8",
     "ticks": 32,
-    "marcos": {}
+    "marcos": {
+      "estilhaco": 8
+    }
   },
   "gojo_dominio_fim_2": {
     "duration": 1.5385,
     "sample_rate": 48000,
     "channels": 1,
-    "peak": 0.55659,
-    "rms": 0.16165,
-    "sha256": "f1457a8196b3c32a3bde67e315f37594a5ab270061dbd774873f207431e5a78a"
+    "peak": 0.61881,
+    "rms": 0.16859,
+    "sha256": "95868907427763d6f3eb61fde3d9a6f361940ece2a604ef0e53eff31c77ae67a"
   },
   "gojo_dominio_fim_3": {
     "duration": 1.6666,
     "sample_rate": 48000,
     "channels": 1,
-    "peak": 0.63044,
-    "rms": 0.1612,
-    "sha256": "28419cb7731051d558c1a048f37afe5c8c164c9990979fc3ed9f8c5008684e37"
+    "peak": 0.64076,
+    "rms": 0.17249,
+    "sha256": "0f8ce51d8502b7669e8f3d76cfb49c7d842b3777a879bafe3d2afe6516433129"
   }
 }

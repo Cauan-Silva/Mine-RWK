@@ -62,7 +62,7 @@ public final class Gojo {
             ctx.apresentacao(id, "", somDaCarga());
         }
 
-        /** Som que começa junto com a carga (vazio = nenhum). Só para cargas de duração fixa. */
+        /** Som que começa junto com a carga (vazio = nenhum); para se a carga for interrompida. */
         protected String somDaCarga() {
             return "";
         }
@@ -244,11 +244,6 @@ public final class Gojo {
         public void aoIniciarCarga(Contexto ctx) {
             super.aoIniciarCarga(ctx);
             ctx.visual("gojo_roxo_carga", ctx.olhos(), ctx.olhar(), 0f, numeros().cargaMax());
-        }
-
-        @Override
-        protected String somDaCarga() {
-            return SonsGojo.ROXO_CARGA;
         }
 
         @Override

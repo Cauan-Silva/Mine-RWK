@@ -64,13 +64,6 @@ public final class DetritosGojo {
     /** Um visual começou: o que acontece uma vez só. */
     public static void aoComecar(String tipo, Vetor origem, float forca) {
         ClientLevel l = Minecraft.getInstance().level;
-        if (l != null && com.minerwk.client.ConfigCliente.sfxAnime()) {
-            // O som da fase sai do ponto do visual, no mesmo tick em que ele aparece.
-            com.minerwk.core.personagens.gojo.SonsGojo.doVisual(tipo).flatMap(id ->
-                    net.minecraft.core.registries.BuiltInRegistries.SOUND_EVENT.getOptional(com.minerwk.MineRWK.id(id)))
-                    .ifPresent(som -> l.playLocalSound(origem.x(), origem.y(), origem.z(), som,
-                            net.minecraft.sounds.SoundSource.PLAYERS, 1f, 1f, false));
-        }
         if (l != null && tipo.equals("gojo_roxo_explosao")) {
             explosaoRoxa(l, origem);
             PhotonRoxoMaximo.explosao(l, origem, forca > 1 ? forca : 24);

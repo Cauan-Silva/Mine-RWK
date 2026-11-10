@@ -117,7 +117,9 @@ public final class VisuaisAtivos {
 
     public static void receber(MostrarVisual p) {
         if (ATIVOS.size() >= LIMITE) despejar();
-        ATIVOS.add(new Visual(p.dono(), p.tipo(), p.origem(), p.direcao(), p.forca(), p.duracao(), p.inicio()));
+        Visual novo = new Visual(p.dono(), p.tipo(), p.origem(), p.direcao(), p.forca(), p.duracao(), p.inicio());
+        ATIVOS.add(novo);
+        SonsVisuais.aoComecar(novo);
         ClientLevel nivel = Minecraft.getInstance().level;
         if (p.tipo().equals("gojo_azul") && nivel != null) {
             // A marca no chão nasce junto com o campo e some devagar depois que ele acaba.
@@ -142,8 +144,10 @@ public final class VisuaisAtivos {
             if (p.tipo().equals("gojo_vermelho")) {
                 // A esfera bateu (ou chegou ao fim): some e nasce a explosão no ponto exato.
                 ATIVOS.remove(i);
-                ATIVOS.add(new Visual(v.dono, "gojo_vermelho_explosao", p.ponto(), v.direcao, v.forca,
-                        PerfilVfxGojo.EXPLOSAO_VERMELHO, agora));
+                Visual explosao = new Visual(v.dono, "gojo_vermelho_explosao", p.ponto(), v.direcao, v.forca,
+                        PerfilVfxGojo.EXPLOSAO_VERMELHO, agora);
+                ATIVOS.add(explosao);
+                SonsVisuais.aoComecar(explosao);
                 ImpactoCamera.momento("gojo_vermelho_explosao", p.ponto());
                 DetritosGojo.explosao(p.ponto());
             } else if (p.tipo().equals("gojo_roxo_200")) {
@@ -173,6 +177,7 @@ public final class VisuaisAtivos {
         ImpactoCamera.tick();
         ImpactFrame.tick();
         CeuRoxo.tick();
+        SonsVisuais.tick();
         DetritosGojo.tick();
     }
 
@@ -222,6 +227,7 @@ public final class VisuaisAtivos {
         ImpactoCamera.limpar();
         ImpactFrame.limpar();
         CeuRoxo.limpar();
+        SonsVisuais.limpar();
         mundo = null;
     }
 }

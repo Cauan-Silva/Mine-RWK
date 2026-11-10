@@ -39,6 +39,7 @@ MARCOS = {
     'gojo_vermelho_carga': {'cheia': 30},
     'gojo_roxo_carga': {'dispara': 30},
     'gojo_dominio': {'abertura': 10},
+    'gojo_dominio_fim': {'estilhaco': 8},
 }
 
 
@@ -103,11 +104,12 @@ def sintese(nome, s):
         return s.reverb(x, 6.0, .6, 4000)
     if nome == 'gojo_dominio_fim':
         # Vidro grande trincando: trincas curtas se espalhando, depois o estilhaço e um sub de ar voltando.
-        trincas = sum(.5 * s.transiente(d, 8000, .004) for d in (0, .09, .16, .27, .33, .41))
+        E = 8 * T  # o estilhaço cai no tick em que o domínio some (SonsGojo.antesDoFim)
+        trincas = sum(.5 * s.transiente(d, 8000, .004) for d in (0, .09, .16, .27, .33, .39))
         vidro = sum(.16 * s.tom(f, harmonicos=(1, 2.76, 5.4), pesos=(1, .5, .25)) * s.env(d, .001, 14)
-                    for d, f in ((.02, 2900), (.17, 3700), (.34, 4600), (.45, 2300), (.5, 5200)))
-        estilhaco = .45 * s.estalos(.42, 1.2, 140, 9000) * s.env(.42, .01, 3.5) + .5 * s.transiente(.42, 5000, .02)
-        return trincas + s.reverb(vidro + estilhaco + .6 * s.sub(.42, 80, 30, 3, 2), 1.8, .35, 9000)
+                    for d, f in ((.02, 2900), (.17, 3700), (.34, 4600), (E + .03, 2300), (E + .08, 5200)))
+        estilhaco = .45 * s.estalos(E, 1.2, 140, 9000) * s.env(E, .01, 3.5) + .5 * s.transiente(E, 5000, .02)
+        return trincas + s.reverb(vidro + estilhaco + .6 * s.sub(E, 80, 30, 3, 2), 1.8, .35, 9000)
     raise ValueError(nome)
 
 

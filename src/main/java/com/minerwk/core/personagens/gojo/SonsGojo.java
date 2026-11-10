@@ -33,9 +33,25 @@ public final class SonsGojo {
     public static Optional<String> doVisual(String tipo) {
         return Optional.ofNullable(switch (tipo) {
             case "gojo_azul" -> AZUL;
+            case "gojo_vermelho_carga" -> VERMELHO_CARGA;
+            case "gojo_roxo_carga" -> ROXO_CARGA;
             case "gojo_vermelho_explosao" -> VERMELHO_EXPLOSAO;
             case "gojo_infinito_toque" -> INFINITO_TIC;
             default -> null;
         });
+    }
+
+    /** Se o som do visual {@code tipo} para quando o visual é encerrado antes da hora (as cargas). */
+    public static boolean cortaComOVisual(String tipo) {
+        return tipo.equals("gojo_vermelho_carga") || tipo.equals("gojo_roxo_carga");
+    }
+
+    /** Um som que começa {@code antes} ticks antes de o visual acabar. */
+    public record NoFim(String som, int antes) {
+    }
+
+    /** O som de fim do visual {@code tipo}: o domínio racha e o estilhaço cai no tick em que ele some. */
+    public static Optional<NoFim> antesDoFim(String tipo) {
+        return tipo.equals("gojo_vazio_infinito") ? Optional.of(new NoFim(DOMINIO_FIM, 8)) : Optional.empty();
     }
 }
