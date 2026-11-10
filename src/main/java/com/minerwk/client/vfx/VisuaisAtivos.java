@@ -32,6 +32,8 @@ public final class VisuaisAtivos {
         long fimEm = -1;
         /** Se já deixou o rastro (túnel do Roxo, marca do Azul). */
         boolean deixouRastro;
+        /** Se o som de fim (o domínio rachando) já tocou. */
+        boolean somDeFimTocado;
 
         Visual(int dono, String tipo, Vetor origem, Vetor direcao, float forca, int duracao, long inicio) {
             this.dono = dono;
@@ -167,6 +169,7 @@ public final class VisuaisAtivos {
     public static void tick() {
         ClientLevel nivel = Minecraft.getInstance().level;
         if (nivel != mundo) {
+            SonsVisuais.limpar(); // outro mundo ou dimensão: o som das cargas não segue junto
             ATIVOS.clear();
             mundo = nivel;
         }

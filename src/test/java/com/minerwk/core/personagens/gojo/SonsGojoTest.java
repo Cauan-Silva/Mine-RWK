@@ -61,6 +61,23 @@ class SonsGojoTest {
     }
 
     @Test
+    void soOSomDeCargaPodeSerCortadoEMesmoAssimSoDuranteACarga() {
+        assertEquals(cargaMax(Tecla.G), SonsGojo.cargaInterrompivel(SonsGojo.DOMINIO).orElseThrow(),
+                "o som do domínio só é cortado se a carga for interrompida; depois da abertura ele soa até o fim");
+        assertTrue(SonsGojo.cargaInterrompivel(SonsGojo.VERMELHO_DISPARO).isEmpty(), "som de disparo nunca é cortado");
+        assertTrue(SonsGojo.cargaInterrompivel(SonsGojo.INFINITO_ATIVA).isEmpty());
+    }
+
+    @Test
+    void somDeFimTocaUmaVezNaJanelaFinalMesmoSeOTickPular() {
+        SonsGojo.NoFim fim = SonsGojo.antesDoFim("gojo_vazio_infinito").orElseThrow();
+        assertFalse(fim.naJanela(151, 160), "ainda cedo");
+        assertTrue(fim.naJanela(152, 160), "no tick certo");
+        assertTrue(fim.naJanela(155, 160), "o tick do cliente pulou: ainda toca, atrasado");
+        assertFalse(fim.naJanela(160, 160), "depois que o visual acabou não toca mais");
+    }
+
+    @Test
     void cargaDoRoxoNaoTocaDuasVezes() {
         java.util.List<String> sons = new java.util.ArrayList<>();
         com.minerwk.core.kit.Contexto ctx = new com.minerwk.core.kit.Contexto() {

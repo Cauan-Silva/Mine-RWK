@@ -48,6 +48,21 @@ public final class SonsGojo {
 
     /** Um som que começa {@code antes} ticks antes de o visual acabar. */
     public record NoFim(String som, int antes) {
+        /**
+         * Se já é hora de tocar, com o visual na {@code idade} de {@code duracao} ticks. É uma janela, não um
+         * tick exato: o relógio do cliente pode pular. Quem chama garante que toca uma vez só.
+         */
+        public boolean naJanela(long idade, int duracao) {
+            return idade >= duracao - antes && idade < duracao;
+        }
+    }
+
+    /**
+     * Por quantos ticks o som {@code som}, que começa junto com a carga, ainda pode ser cortado por uma
+     * interrupção. Vazio para os sons que nunca são cortados (disparos e gestos).
+     */
+    public static Optional<Integer> cargaInterrompivel(String som) {
+        return som.equals(DOMINIO) ? Optional.of(10) : Optional.empty();
     }
 
     /** O som de fim do visual {@code tipo}: o domínio racha e o estilhaço cai no tick em que ele some. */

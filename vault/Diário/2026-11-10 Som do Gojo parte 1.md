@@ -13,9 +13,17 @@ Voltar para [[Diário]]. Spec: [[2026-11-10 Som do Gojo]] (aprovado em 10/11, co
 - **Ligação nos golpes:** os ids ficam em `SonsGojo` (núcleo). Os sons de fase (Azul, explosão do Vermelho, tic do Infinito) tocam no cliente quando o visual chega, no ponto do visual. Os de gesto saem pelo `ctx.apresentacao`.
 - A prévia em áudio foi para o autor ouvir.
 
-## O que ficou para as próximas partes
-- **Parte 2:** cortar o som quando a carga é interrompida. Por isso a carga do Vermelho (que o jogador solta quando quer) e o domínio rachando ainda não tocam no jogo, embora os arquivos existam.
-- **Parte 3:** os sete sons do R. Até lá o R fica sem som (antes tocava o som de teste).
+## Parte 2, no mesmo dia: som preso ao visual e som que para
+- **`SonsVisuais`** (cliente) toca o som no ponto do visual, corta o som da carga quando o visual é encerrado antes da hora e toca o som de fim perto do término. Qual som vai com qual visual fica no núcleo (`SonsGojo`), com JUnit.
+- **Carga do Vermelho:** agora tem som, e ele para quando a tecla é solta ou a carga é interrompida.
+- **Carga do Roxo:** o som passou a sair do visual da carga, então para junto se o golpe for interrompido.
+- **Domínio rachando:** começa 8 ticks antes de o domínio sumir, com o estilhaço caindo no tick em que ele some. É uma janela, não um tick exato, e toca uma vez só.
+- **Domínio na carga:** se a carga de 10 ticks for interrompida, o som para. Depois da abertura ele soa até o fim.
+- **Correção da parte 1:** a explosão do Vermelho nascia no cliente por outro caminho e ficava muda.
+- A revisão apontou o tick exato do som de fim, um som guardado que podia ser cortado por uma parada que não era dele e o som que continuava ao trocar de dimensão. Os três foram corrigidos.
+
+## O que ficou para a parte 3
+Os sete sons do R. Até lá o R fica sem som (antes tocava o som de teste).
 
 ## Do mesmo dia: vídeo do R completo
 A demo gravável ganhou o modo `-Pdemo=r`, que invoca um alvo longe do spawn, usa o R de verdade e grava a cutscene inteira. Ao gravar apareceram dois defeitos da explosão, já corrigidos:

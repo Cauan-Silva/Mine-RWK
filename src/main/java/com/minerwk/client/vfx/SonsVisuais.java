@@ -21,7 +21,6 @@ import net.minecraft.sounds.SoundSource;
 public final class SonsVisuais {
     /** Sons que param junto com o visual, enquanto ele existe. */
     private static final Map<VisuaisAtivos.Visual, SoundInstance> TOCANDO = new IdentityHashMap<>();
-    private static long ultimo = Long.MIN_VALUE;
 
     private SonsVisuais() {
     }
@@ -65,12 +64,12 @@ public final class SonsVisuais {
                 it.remove(); // chegou ao fim natural: o som acaba sozinho
             }
         }
-        if (agora == ultimo) return; // jogo pausado: o tick do mundo não andou
-        ultimo = agora;
         for (VisuaisAtivos.Visual v : VisuaisAtivos.ativos()) {
-            if (v.fimEm >= 0) continue;
+            if (v.fimEm >= 0 || v.somDeFimTocado) continue;
             SonsGojo.antesDoFim(v.tipo).ifPresent(fim -> {
-                if (agora - v.inicio == v.duracao - fim.antes()) tocar(fim.som(), v.origem);
+                if (!fim.naJanela(agora - v.inicio, v.duracao)) return;
+                v.somDeFimTocado = true;
+                tocar(fim.som(), v.origem);
             });
         }
     }
@@ -78,6 +77,5 @@ public final class SonsVisuais {
     static void limpar() {
         TOCANDO.values().forEach(SonsVisuais::parar);
         TOCANDO.clear();
-        ultimo = Long.MIN_VALUE;
     }
 }
