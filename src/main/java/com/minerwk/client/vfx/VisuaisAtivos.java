@@ -129,7 +129,7 @@ public final class VisuaisAtivos {
             }
         }
         ImpactoCamera.momento(p.tipo(), p.origem());
-        DetritosGojo.aoComecar(p.tipo(), p.origem());
+        DetritosGojo.aoComecar(p.tipo(), p.origem(), p.forca());
     }
 
     public static void encerrar(EncerrarVisual p) {

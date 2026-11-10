@@ -9,7 +9,7 @@ out vec3 posVista;
 out vec3 normalVista;
 out vec4 corVertice;
 
-// Protótipo da Parte 0: casca da explosão com fresnel, interseção e distorção.
+// Casca da explosão do R: fresnel, linha onde corta o terreno e o ar ondulando atrás.
 void main() {
     ParticleData data = getParticleData();
     vec4 vista = ModelViewMat * vec4(data.Position, 1.0);

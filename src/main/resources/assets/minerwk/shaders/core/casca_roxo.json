@@ -1,6 +1,6 @@
 {
-    "vertex": "minerwk:casca_teste",
-    "fragment": "minerwk:casca_teste",
+    "vertex": "minerwk:casca_roxo",
+    "fragment": "minerwk:casca_roxo",
     "samplers": [
         { "name": "SamplerSceneDepth" },
         { "name": "SamplerSceneColor" }

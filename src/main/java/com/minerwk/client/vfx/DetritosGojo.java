@@ -62,10 +62,11 @@ public final class DetritosGojo {
     }
 
     /** Um visual começou: o que acontece uma vez só. */
-    public static void aoComecar(String tipo, Vetor origem) {
+    public static void aoComecar(String tipo, Vetor origem, float forca) {
         ClientLevel l = Minecraft.getInstance().level;
         if (l != null && tipo.equals("gojo_roxo_explosao")) {
             explosaoRoxa(l, origem);
+            PhotonRoxoMaximo.explosao(l, origem, forca > 1 ? forca : 24);
             return;
         }
         if (l == null || !tipo.equals("gojo_vazio_infinito") || !perto(origem)) return;
@@ -127,6 +128,23 @@ public final class DetritosGojo {
             if (v.fimEm >= 0 || v.opacidade(agora, 0) <= .05f) continue;
             double t = v.idade(agora, 0);
             switch (v.tipo) {
+                case "gojo_roxo_maximo_esferas" -> {
+                    // A fusão nasce depois das esferas; o silêncio vem nos últimos ticks antes do estouro.
+                    int nasce = Math.round(v.forca);
+                    if ((int) t == nasce) PhotonRoxoMaximo.carga(l, v.origem);
+                    if ((int) t == nasce + com.minerwk.core.personagens.gojo.RoxoMaximo.TICKS_FUSAO
+                            - com.minerwk.core.personagens.gojo.RoxoMaximo.TICKS_SILENCIO) {
+                        PhotonRoxoMaximo.silencio(l, v.origem);
+                    }
+                }
+                case "gojo_roxo_explosao" -> {
+                    // A casca de distorção acompanha o raio que cresce, uma camada a cada 3 ticks.
+                    double cresceEm = Math.max(1, v.duracao - 28);
+                    if (t < cresceEm && ((int) t) % 3 == 0) {
+                        double raio = v.forca > 1 ? v.forca : 24;
+                        PhotonRoxoMaximo.casca(l, v.origem, 2 + (raio - 2) * PerfilVfxGojo.suave(t / cresceEm));
+                    }
+                }
                 case "gojo_azul" -> {
                     if (!perto(v.origem)) break;
                     for (int i = 0; i < qtd(3); i++) {
