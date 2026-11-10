@@ -47,6 +47,7 @@ public final class MineRWKClient {
         NeoForge.EVENT_BUS.addListener(ImpactoCamera::aoCalcularFov);
         NeoForge.EVENT_BUS.addListener(ImpactoCamera::aoCalcularAngulos);
         NeoForge.EVENT_BUS.addListener(CutsceneCliente::aoTick);
+        NeoForge.EVENT_BUS.addListener(com.minerwk.client.vfx.DemoVfx::aoTick);
         NeoForge.EVENT_BUS.addListener(com.minerwk.client.kit.MovimentoCliente::aoTickJogador);
         NeoForge.EVENT_BUS.addListener(CutsceneCliente::aoTickAntes);
         NeoForge.EVENT_BUS.addListener(CutsceneCliente::aoInteragir);

@@ -36,6 +36,10 @@ public final class ComandosTeste {
                 .then(Commands.literal("fx").then(Commands.argument("efeito", ResourceLocationArgument.id()).executes(ComandosTeste::fx)))
                 .then(Commands.literal("anim").then(Commands.argument("animacao", ResourceLocationArgument.id()).executes(ComandosTeste::anim)))
                 .then(Commands.literal("parar").executes(ComandosTeste::parar))
+                .then(Commands.literal("prototipo")
+                        .then(Commands.literal("fogos").executes(c -> prototipo(c, com.minerwk.client.vfx.PrototipoPhoton::fogos)))
+                        .then(Commands.literal("halo").executes(c -> prototipo(c, com.minerwk.client.vfx.PrototipoPhoton::halo)))
+                        .then(Commands.literal("casca").executes(c -> prototipo(c, com.minerwk.client.vfx.PrototipoPhoton::casca))))
                 .then(Commands.literal("som").executes(ComandosTeste::som))
                 .then(Commands.literal("tela").then(Commands.argument("quantos", IntegerArgumentType.integer(1, 200))
                         .executes(ComandosTeste::tela))));
@@ -53,6 +57,16 @@ public final class ComandosTeste {
         ResourceLocation efeito = idDoMod(ctx, "efeito");
         boolean ok = EfeitosVisuais.noBloco(efeito, jogador.level(), jogador.blockPosition());
         return responder(ctx, ok, "Efeito " + efeito);
+    }
+
+    /** Parte 0 do VFX pesado (descartável): toca um protótipo do Photon na frente do jogador. */
+    private static int prototipo(CommandContext<CommandSourceStack> ctx,
+                                 java.util.function.BiConsumer<net.minecraft.world.level.Level, net.minecraft.core.BlockPos> efeito) {
+        LocalPlayer jogador = Minecraft.getInstance().player;
+        if (jogador == null) return 0;
+        net.minecraft.world.phys.Vec3 frente = jogador.position().add(jogador.getLookAngle().multiply(6, 0, 6));
+        efeito.accept(jogador.level(), net.minecraft.core.BlockPos.containing(frente));
+        return responder(ctx, true, "Protótipo");
     }
 
     private static int anim(CommandContext<CommandSourceStack> ctx) {

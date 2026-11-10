@@ -1,0 +1,18 @@
+{
+    "vertex": "minerwk:casca_teste",
+    "fragment": "minerwk:casca_teste",
+    "samplers": [
+        { "name": "SamplerSceneDepth" },
+        { "name": "SamplerSceneColor" }
+    ],
+    "uniforms": [
+        { "name": "ModelViewMat", "type": "matrix4x4", "count": 16, "values": [ 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0 ] },
+        { "name": "ProjMat", "type": "matrix4x4", "count": 16, "values": [ 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0 ] },
+        { "name": "ColorModulator", "type": "float", "count": 4, "values": [ 1.0, 1.0, 1.0, 1.0 ] },
+        { "name": "GameTime", "type": "float", "count": 1, "values": [ 0.0 ] },
+        { "name": "U_InverseProjectionMatrix", "type": "matrix4x4", "count": 16, "values": [ 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0 ] },
+        { "name": "Potencia", "type": "float", "count": 1, "values": [ 2.2 ] },
+        { "name": "Distorcao", "type": "float", "count": 1, "values": [ 0.06 ] },
+        { "name": "HDRCor", "type": "float", "count": 4, "values": [ 1.6, 0.5, 3.0, 1.0 ] }
+    ]
+}
