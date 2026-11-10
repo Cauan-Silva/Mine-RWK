@@ -1,6 +1,6 @@
 ---
 tags: [desenvolvimento, spec]
-estado: aguardando revisão
+estado: aprovado
 ---
 # Spec e plano: preparação, ritmo e VFX pesado do Vazio Roxo máximo (Fase 2, parte 8)
 
