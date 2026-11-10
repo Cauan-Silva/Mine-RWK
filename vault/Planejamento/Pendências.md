@@ -68,6 +68,11 @@ Voltar para [[00 Início]].
   - **Céu e chão no encantamento (10/11):** conferir o céu escurecendo na carga e cheio na fusão e na explosão, voltando devagar depois; as rachaduras de luz saindo dos pés (em chão irregular elas ficam na altura dos pés, não acompanham o relevo); as pedras subindo devagar. Ver de noite, na chuva, debaixo d'água e com Iris (no Nether e no End o véu não é desenhado). O chão continua claro com o céu escuro: ver se incomoda.
   - **`/rwk recarregar`:** conferir que enche a energia, zera as recargas e o HUD acompanha.
   - Com teto baixo sobre o Gojo, a explosão sai um pouco acima dele (o centro vem da conta do movimento, não de onde ele parou).
+- Maestria, parte 2 (10/11), conferir no jogo (por comando, enquanto a tela não existe):
+  - **Compra:** `/rwk maestria <jogador> nivel 20` e depois `comprar gojo_azul_alcance`; sem pontos ou sem nível a compra é recusada com o motivo.
+  - **Efeito:** o Azul puxa de mais longe, o Infinito dura mais, as recargas no HUD ficam menores, a energia máxima sobe (o HUD mostra 220, 240, 260).
+  - **Depois do despertar:** os nós do Vermelho, do Roxo, da Técnica Reversa, do G e do R são recusados com `NAO_DESPERTOU`.
+  - **Visual:** o efeito do Azul continua do tamanho original mesmo com o alcance maior; ver se incomoda.
 - Maestria, parte 1 (10/11), conferir no jogo:
   - **XP:** golpes do Gojo em mobs hostis enchem a linha de XP; soco, espada, animais e golpe no ar não.
   - **Subir de nível:** mensagem, som e partículas; `/rwk maestria <jogador> nivel 20` e `zerar`.

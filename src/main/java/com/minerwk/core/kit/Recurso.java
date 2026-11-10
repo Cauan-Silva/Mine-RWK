@@ -23,6 +23,10 @@ public interface Recurso {
     /** Um tick de jogo: aqui o recurso enche, esvazia ou reage ao que o jogador fez. */
     void tick(EstadoDoJogador estado);
 
+    /** As melhorias da árvore mudaram (ou acabaram de ser carregadas); o recurso guarda o que usa delas. */
+    default void melhorias(com.minerwk.core.maestria.Melhorias melhorias) {
+    }
+
     /** Valor para salvar nos dados do jogador. */
     double salvar();
 

@@ -6,6 +6,11 @@ public interface Contexto {
     Contexto NULO = new Contexto() {
     };
 
+    /** As melhorias da árvore que o jogador comprou; os golpes leem daqui o nível de cada nó. */
+    default com.minerwk.core.maestria.Melhorias melhorias() {
+        return com.minerwk.core.maestria.Melhorias.NENHUMA;
+    }
+
     /** Causa {@code dano} a todas as criaturas num raio em volta do jogador, menos ele. */
     default void danoEmArea(double raio, float dano) {
     }

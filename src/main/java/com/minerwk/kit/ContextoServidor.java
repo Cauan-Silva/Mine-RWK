@@ -411,6 +411,11 @@ public final class ContextoServidor implements Contexto {
     }
 
     @Override
+    public com.minerwk.core.maestria.Melhorias melhorias() {
+        return kit().map(KitDoJogador::melhorias).orElse(com.minerwk.core.maestria.Melhorias.NENHUMA);
+    }
+
+    @Override
     public void criarEfeito(Efeito efeito) {
         kit().ifPresent(k -> k.adicionarEfeito(efeito));
     }

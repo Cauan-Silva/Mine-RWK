@@ -53,7 +53,34 @@ public final class ComandoTrocar {
                                 .executes(c -> maestria(c, Maestria.xpAte(IntegerArgumentType.getInteger(c, "n")), false))))
                         .then(Commands.literal("xp").then(Commands.argument("quantia", IntegerArgumentType.integer(1))
                                 .executes(c -> maestria(c, IntegerArgumentType.getInteger(c, "quantia"), true))))
-                        .then(Commands.literal("zerar").executes(c -> maestria(c, 0, false))))));
+                        .then(Commands.literal("zerar").executes(c -> maestria(c, 0, false)))
+                        .then(Commands.literal("comprar").then(Commands.argument("no", StringArgumentType.word())
+                                .suggests((c, b) -> SharedSuggestionProvider.suggest(nosDe(c), b))
+                                .executes(ComandoTrocar::comprar))))));
+    }
+
+    private static java.util.stream.Stream<String> nosDe(CommandContext<CommandSourceStack> c) {
+        try {
+            String id = ServicoKits.dados(EntityArgument.getPlayer(c, "jogador")).personagem;
+            return Personagens.porId(id).stream().flatMap(p -> p.arvore().nos().stream()).map(n -> n.id());
+        } catch (CommandSyntaxException e) {
+            return java.util.stream.Stream.empty();
+        }
+    }
+
+    /** {@code /rwk maestria <jogador> comprar <no>}: a mesma compra que a tela da árvore faz, com as mesmas regras. */
+    private static int comprar(CommandContext<CommandSourceStack> c) throws CommandSyntaxException {
+        ServerPlayer jogador = EntityArgument.getPlayer(c, "jogador");
+        String no = StringArgumentType.getString(c, "no");
+        var r = ServicoKits.comprarNo(jogador, no);
+        if (r != com.minerwk.core.maestria.Arvore.Resultado.OK) {
+            c.getSource().sendFailure(Component.literal("Não comprou " + no + ": " + r));
+            return 0;
+        }
+        DadosMaestria m = ServicoKits.dados(jogador).maestriaAtual();
+        String texto = jogador.getName().getString() + ": " + no + " no nível " + m.nos.get(no);
+        c.getSource().sendSuccess(() -> Component.literal(texto), true);
+        return 1;
     }
 
     private static int maestria(CommandContext<CommandSourceStack> c, long xp, boolean somar) throws CommandSyntaxException {
@@ -66,7 +93,10 @@ public final class ComandoTrocar {
         if (somar) ServicoKits.ganharXp(jogador, xp);
         else {
             // Zerar também devolve os pontos: os nós comprados somem.
-            if (xp == 0) dados.maestriaAtual().nos.clear();
+            if (xp == 0) {
+                dados.maestriaAtual().nos.clear();
+                ServicoKits.atualizarMelhorias(jogador);
+            }
             ServicoKits.definirXp(jogador, xp);
         }
         var p = Maestria.progresso(dados.maestriaAtual().xp);

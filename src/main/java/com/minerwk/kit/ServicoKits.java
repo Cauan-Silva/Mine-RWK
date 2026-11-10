@@ -3,7 +3,9 @@ package com.minerwk.kit;
 import com.minerwk.MineRWK;
 import com.minerwk.core.kit.EstadoDoJogador;
 import com.minerwk.core.kit.Tecla;
+import com.minerwk.core.maestria.Arvore;
 import com.minerwk.core.maestria.Maestria;
+import com.minerwk.core.maestria.Melhorias;
 import com.minerwk.core.kit.KitDoJogador;
 import com.minerwk.core.kit.Personagem;
 import com.minerwk.core.kit.Personagens;
@@ -57,6 +59,8 @@ public final class ServicoKits {
         Optional<Personagem> personagem = Personagens.porId(dados.personagem);
         if (personagem.isEmpty()) return Optional.empty();
         kit = new KitDoJogador(personagem.get());
+        // Antes de carregar o recurso: a reserva comprada na árvore muda o máximo.
+        kit.definirMelhorias(new Melhorias(personagem.get().arvore(), dados.maestriaAtual().nos));
         kit.recurso().carregar(dados.recurso);
         kit.recargas().carregar(dados.recargas, jogador.level().getGameTime());
         KITS.put(jogador.getUUID(), kit);
@@ -71,6 +75,8 @@ public final class ServicoKits {
         KitDoJogador novo = new KitDoJogador(personagem);
         KITS.put(jogador.getUUID(), novo);
         salvar(jogador, novo);
+        atualizarMelhorias(jogador);
+        novo.recarregar();
         Sincronizacao.enviar(jogador);
         // Quem já está vendo o jogador passa a vê-lo com o traje do personagem novo.
         com.minerwk.rede.Envio.paraQuemVe(jogador, new com.minerwk.rede.PersonagemDe(jogador.getId(), personagem.id()));
@@ -150,6 +156,26 @@ public final class ServicoKits {
         if (ganho <= 0 || !dados.temPersonagem()) return;
         DadosMaestria m = dados.maestriaAtual();
         definirXp(jogador, Maestria.somar(m.xp, ganho));
+    }
+
+    /** Os nós comprados mudaram (compra, zerar ou troca de personagem): o kit passa a usar os novos. */
+    public static void atualizarMelhorias(ServerPlayer jogador) {
+        DadosKit dados = dados(jogador);
+        kit(jogador).ifPresent(k -> k.definirMelhorias(new Melhorias(k.personagem().arvore(), dados.maestriaAtual().nos)));
+    }
+
+    /** Sobe um nível de um nó da árvore do personagem atual, se as regras deixarem. O servidor é quem decide. */
+    public static Arvore.Resultado comprarNo(ServerPlayer jogador, String no) {
+        DadosKit dados = dados(jogador);
+        Optional<Personagem> personagem = Personagens.porId(dados.personagem);
+        if (personagem.isEmpty()) return Arvore.Resultado.NO_DESCONHECIDO;
+        DadosMaestria m = dados.maestriaAtual();
+        Arvore.Resultado r = personagem.get().arvore().comprar(m.nos, no, Maestria.nivel(m.xp), m.despertou);
+        if (r == Arvore.Resultado.OK) {
+            atualizarMelhorias(jogador);
+            Sincronizacao.enviar(jogador);
+        }
+        return r;
     }
 
     /** Define o XP total no personagem atual (também usado pelos comandos de teste). */

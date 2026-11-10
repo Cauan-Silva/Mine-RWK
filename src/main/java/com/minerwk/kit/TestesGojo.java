@@ -350,4 +350,31 @@ public final class TestesGojo {
         helper.assertTrue(ServicoKits.dados(jogador).maestriaAtual().xp == 149, "a maestria do Gojo volta");
         helper.succeed();
     }
+
+    @GameTest(template = "vazio")
+    public static void compraDeNoValeNoServidorEChegaNoKit(GameTestHelper helper) {
+        ServerPlayer jogador = gojo(helper);
+        var ok = com.minerwk.core.maestria.Arvore.Resultado.OK;
+        String reserva = com.minerwk.core.personagens.gojo.ArvoreGojo.ENERGIA_RESERVA;
+        String despertar = com.minerwk.core.personagens.gojo.ArvoreGojo.DESPERTAR;
+        String vermelho = com.minerwk.core.personagens.gojo.ArvoreGojo.VERMELHO_FORCA;
+        helper.assertTrue(ServicoKits.comprarNo(jogador, reserva) == com.minerwk.core.maestria.Arvore.Resultado.SEM_PONTOS,
+                "no nível 1 não há pontos");
+        ServicoKits.definirXp(jogador, com.minerwk.core.maestria.Maestria.xpAte(20));
+        helper.assertTrue(ServicoKits.comprarNo(jogador, reserva) == ok, "com 19 pontos compra a reserva");
+        KitDoJogador kit = ServicoKits.kit(jogador).orElseThrow();
+        helper.assertTrue(kit.recurso().maximo() == 220, "a reserva deveria subir o máximo para 220, está " + kit.recurso().maximo());
+        helper.assertTrue(new ContextoServidor(jogador).melhorias().nivel(reserva) == 1, "o contexto enxerga o nó");
+        helper.assertTrue(ServicoKits.comprarNo(jogador, despertar) == ok, "no nível 20 compra o Despertar");
+        helper.assertTrue(ServicoKits.comprarNo(jogador, vermelho) == com.minerwk.core.maestria.Arvore.Resultado.NAO_DESPERTOU,
+                "nó de depois do despertar fica trancado");
+        helper.assertTrue(ServicoKits.comprarNo(jogador, "nao_existe") == com.minerwk.core.maestria.Arvore.Resultado.NO_DESCONHECIDO,
+                "id inventado é recusado");
+        // Trocar de personagem e voltar: os nós continuam valendo.
+        ServicoKits.definirPersonagem(jogador, Personagens.porId(Personagens.TESTE).orElseThrow());
+        ServicoKits.definirPersonagem(jogador, Personagens.porId(Gojo.ID).orElseThrow());
+        kit = ServicoKits.kit(jogador).orElseThrow();
+        helper.assertTrue(kit.recurso().maximo() == 220 && kit.recurso().atual() == 220, "o kit novo nasce com a reserva cheia");
+        helper.succeed();
+    }
 }

@@ -1,5 +1,6 @@
 package com.minerwk.core.kit;
 
+import com.minerwk.core.maestria.Melhorias;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -17,6 +18,7 @@ public final class KitDoJogador {
     private Execucao execucao;
     private final List<Ativo> efeitos = new ArrayList<>();
     private final List<Passiva> passivas;
+    private Melhorias melhorias = Melhorias.NENHUMA;
 
     private static final class Ativo {
         final Efeito efeito;
@@ -47,6 +49,21 @@ public final class KitDoJogador {
         return recargas;
     }
 
+    public Melhorias melhorias() {
+        return melhorias;
+    }
+
+    /** As melhorias da árvore do jogador: valem para o próximo golpe e, no recurso, na hora. */
+    public void definirMelhorias(Melhorias melhorias) {
+        this.melhorias = melhorias;
+        recurso.melhorias(melhorias);
+    }
+
+    /** Os números da habilidade já com as melhorias de carga e de recarga. */
+    public Numeros numeros(Habilidade h) {
+        return melhorias.ajustar(h.id(), h.numeros());
+    }
+
     /** Ferramenta de teste: enche o recurso e zera todas as recargas, sem trocar de kit. */
     public void recarregar() {
         recargas.limpar();
@@ -62,7 +79,7 @@ public final class KitDoJogador {
         if (execucao != null) return false;
         Habilidade h = personagem.naTecla(tecla).orElse(null);
         if (h == null || !recargas.pronta(h.id(), agora) || !recurso.pode(h.numeros().custo())) return false;
-        execucao = new Execucao(h);
+        execucao = new Execucao(h, numeros(h));
         pendenteIniciar = true;
         return true;
     }
@@ -82,7 +99,7 @@ public final class KitDoJogador {
     public void atordoar(long agora, Contexto contexto) {
         if (execucao == null || execucao.fase() != Execucao.Fase.CARGA) return;
         Habilidade h = execucao.habilidade();
-        recargas.iniciar(h.id(), agora, h.numeros().recarga() / 4);
+        recargas.iniciar(h.id(), agora, numeros(h).recarga() / 4);
         limpar();
         h.aoInterromper(contexto);
     }
@@ -136,7 +153,7 @@ public final class KitDoJogador {
         }
         Execucao.Evento e = execucao.tick();
         if (e instanceof Execucao.Disparou d) {
-            Numeros n = h.numeros();
+            Numeros n = numeros(h);
             if (!recurso.pode(n.custo())) {
                 // Sem recurso na hora do disparo: conta como interrupção na carga.
                 recargas.iniciar(h.id(), agora, n.recarga() / 4);

@@ -30,6 +30,8 @@ class GojoTest {
         Vetor alvoEm;
         int arrancados;
         boolean temRecurso = true;
+        com.minerwk.core.maestria.Melhorias melhorias = com.minerwk.core.maestria.Melhorias.NENHUMA;
+        public com.minerwk.core.maestria.Melhorias melhorias() { return melhorias; }
 
         int conta(String nome) {
             return (int) chamadas.stream().filter(nome::equals).count();
@@ -421,5 +423,57 @@ class GojoTest {
         ctx.temRecurso = false;
         ticks(5);
         assertEquals(1, ctx.conta("fim:gojo_infinito"));
+    }
+
+    private static com.minerwk.core.maestria.Melhorias comprou(String no, int nivel) {
+        return new com.minerwk.core.maestria.Melhorias(ArvoreGojo.ARVORE, java.util.Map.of(no, nivel));
+    }
+
+    @Test
+    void reservaEFluxoDaArvoreMudamAEnergia() {
+        var e = new EnergiaAmaldicoada();
+        e.melhorias(comprou(ArvoreGojo.ENERGIA_RESERVA, 3));
+        assertEquals(260, e.maximo(), 1e-9);
+        assertEquals(200, e.atual(), 1e-9, "comprar a reserva não enche a barra");
+        e.carregar(999);
+        assertEquals(260, e.atual(), 1e-9);
+        e.melhorias(comprou(ArvoreGojo.ENERGIA_FLUXO, 2));
+        assertEquals(200, e.maximo(), 1e-9);
+        assertEquals(200, e.atual(), 1e-9, "sem a reserva, o que passava do máximo some");
+        e.gastar(100);
+        e.tick(PARADO);
+        assertEquals(101.2, e.atual(), 1e-9);
+    }
+
+    @Test
+    void tecnicaReversaDaArvoreCuraMaisVezes() {
+        var comArvore = new Falso();
+        comArvore.melhorias = comprou(ArvoreGojo.TECNICA_REVERSA, 3);
+        var p = new TecnicaReversa();
+        // Intervalo de 80 com -30%: 56 ticks.
+        for (int i = 0; i < 100 + 56; i++) p.tick(comArvore, PARADO);
+        assertEquals(2, comArvore.conta("curar"));
+    }
+
+    @Test
+    void arvoreDoGojoVemComOPersonagem() {
+        assertSame(ArvoreGojo.ARVORE, Gojo.criar().arvore());
+    }
+
+    @Test
+    void melhoriasDaArvoreChegamNosGolpes() {
+        var falso = new Falso();
+        falso.melhorias = new com.minerwk.core.maestria.Melhorias(ArvoreGojo.ARVORE, java.util.Map.of(
+                ArvoreGojo.INFINITO_DURACAO, 2, ArvoreGojo.DOMINIO_DURACAO, 3, ArvoreGojo.VERMELHO_FORCA, 3));
+        KitDoJogador k = new KitDoJogador(Gojo.criar());
+        falso.kit = k;
+        new Gojo.Infinito().aoDisparar(falso, 1f);
+        assertEquals(156, k.efeitos().get(0).duracao(), "120 ticks com +30%");
+        new Gojo.VazioInfinito().aoDisparar(falso, 1f);
+        assertEquals(208, k.efeitos().get(1).duracao(), "160 ticks com +30%");
+        assertEquals(208, falso.barreiras.get(0)[2], 1e-9, "a barreira dura o mesmo que o domínio");
+        var esfera = new Gojo.EsferaVermelha(Vetor.ZERO, new Vetor(1, 0, 0), 1f, 1.24f);
+        esfera.aoAcabar(falso);
+        assertEquals(14 * 1.24f, falso.danos.get(0), 1e-4);
     }
 }
