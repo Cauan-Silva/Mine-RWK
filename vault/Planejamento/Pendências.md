@@ -63,6 +63,7 @@ Voltar para [[00 Início]].
   - **Rosto do alvo:** a câmera nunca entra nele.
   - Ver o FPS na explosão (Photon e casca) e o `VFX reduzido`.
   - **Depois do segundo teste (10/11):** conferir se o Azul e o Vermelho vão para trás do Gojo lá no alto (antes desciam) e se a explosão agora tem peso: 3 s crescendo, miolo escuro, relâmpagos na casca, coluna de luz, três ondas de choque e o resto sumindo por 2,5 s. Se as esferas ainda descerem, a causa é outra e precisa de log no jogo.
+  - **Depois do terceiro teste (10/11, "quase perfeito"):** a fumaça da cratera agora só sai quando a explosão termina de crescer; conferir que ela não cobre mais a casca.
   - Com teto baixo sobre o Gojo, a explosão sai um pouco acima dele (o centro vem da conta do movimento, não de onde ele parou).
 - HUD (09/11): funcionou no jogo. Depois das correções da revisão, conferir: HUD acima da armadura e das bolhas de ar (mergulhar com armadura), texto "Fôlego" à esquerda da barra, barra sem subir de 0 ao entrar no mundo.
 - Núcleo dos kits (09/11): escolha pelo menu, Z, X segurando e recarga **funcionaram**. Falta: morrer segurando X (não pode disparar), usar como espectador (nada acontece), ver a animação em outro jogador (2 clientes), sair e entrar mantendo o personagem.

@@ -69,12 +69,17 @@ public final class PhotonRoxoMaximo {
         float vel = (float) (FusaoRoxoGojo.RAIO_CHOQUE / (RoxoMaximo.TICKS_EXPLOSAO / 20.0));
         FxCodigo.emissor(40).rajada(0, 160).circulo(2, 0).velocidade(vel * .8f, vel).vida(30, 40).tamanho(2.5f)
                 .cor(0xC0B0A0B0).textura(FxCodigo.FUMACA, 0, 0, 0, FxCodigo.TRANSLUCIDO).tocar(nivel, chao);
-        // Fumaça da cratera por 5 s.
-        FxCodigo.emissor(100).taxa(20).esfera(r * .6f, 1).velocidade(.5f, 1.5f).vida(60, 90).tamanho(4)
-                .cor(0xB0A898A8).textura(FxCodigo.FUMACA, 0, 0, 0, FxCodigo.TRANSLUCIDO).tocar(nivel, chao.add(0, 2, 0));
         // Partículas roxas pairando no ar.
         FxCodigo.emissor(20).rajada(0, 120).esfera(r, 1).velocidade(.1f, .5f).vida(80, 120).tamanho(.18f)
                 .cor(0xFFB070FF).textura(FxCodigo.CIRCULO, .8f, .3f, 1.6f, FxCodigo.ADITIVO).tocar(nivel, c);
+    }
+
+    /** A fumaça da cratera, por 5 s. Só sai depois de a explosão crescer, para não cobrir a casca. */
+    public static void fumaca(Level nivel, Vetor centro, double raio) {
+        float r = (float) raio;
+        Vec3 chao = vec(centro).add(0, -Math.min(raio * .5, 20) + 2, 0);
+        FxCodigo.emissor(100).taxa(20).esfera(r * .6f, 1).velocidade(.5f, 1.5f).vida(60, 90).tamanho(4)
+                .cor(0xB0A898A8).textura(FxCodigo.FUMACA, 0, 0, 0, FxCodigo.TRANSLUCIDO).tocar(nivel, chao);
     }
 
     /** Uma camada da casca de distorção (fresnel, linha no terreno e o ar ondulando atrás), com o raio do tick. */

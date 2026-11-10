@@ -33,3 +33,5 @@ O autor viu o Azul e o Vermelho serem jogados para baixo, sem a fusão atrás do
 - **Explosão:** cresce por 3 s em vez de 1,5 s, estourando rápido e depois devagar (`fracaoExplosao`), e o que sobra fica mais 2,5 s no ar (`TICKS_RESTO`).
   - Camadas novas: miolo escuro, relâmpagos correndo na casca, levas de fitas a cada 12 ticks, coluna de luz, três ondas de choque em sequência e chuva de faíscas.
   - O plano aberto da cutscene passou de 40 para 80 ticks, e as animações foram regeradas.
+## Terceiro teste do autor (10/11)
+"Quase perfeito": a fumaça saía junto com o estouro e cobria a explosão. Agora a fumaça da cratera só sai quando a casca termina de crescer (3 s depois do estouro).

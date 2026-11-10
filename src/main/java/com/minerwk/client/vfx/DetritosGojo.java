@@ -140,11 +140,13 @@ public final class DetritosGojo {
                 case "gojo_roxo_explosao" -> {
                     // A casca de distorção acompanha o raio que cresce, uma camada a cada 3 ticks.
                     double cresceEm = Math.max(1, v.duracao - com.minerwk.core.personagens.gojo.RoxoMaximo.TICKS_RESTO);
+                    double raio = v.forca > 1 ? v.forca : 24;
                     if (t < cresceEm && ((int) t) % 3 == 0) {
-                        double raio = v.forca > 1 ? v.forca : 24;
                         PhotonRoxoMaximo.casca(l, v.origem, 2 + (raio - 2)
                                 * com.minerwk.core.personagens.gojo.RoxoMaximo.fracaoExplosao(t / cresceEm));
                     }
+                    // A fumaça só sobe quando a explosão termina de crescer.
+                    if ((int) t == (int) cresceEm) PhotonRoxoMaximo.fumaca(l, v.origem, raio);
                 }
                 case "gojo_azul" -> {
                     if (!perto(v.origem)) break;
