@@ -181,9 +181,9 @@ A["gojo_roxo_200"] = anim(5.0, {
 # silêncio antes do estouro, explosão (5 s) e fim (6,5 s). No ar, uma perna dobrada
 # para a frente e a outra solta, balançando. Na explosão a esfera passa por ele: tronco para a frente,
 # cabeça baixa e braços abertos segurando o vento; depois o punho estendido até o fim.
-ABRE, FUSAO, EXPLODE, FIM = 1.5, 3.0, 5.0, 6.5
+ABRE, FUSAO, EXPLODE, FIM = 1.5, 3.0, 5.0, 8.0
 SILENCIO = EXPLODE - 0.2
-FIM_ANIM = 7.0
+FIM_ANIM = 8.5
 REACAO = EXPLODE + 0.35
 A["gojo_roxo_maximo"] = anim(FIM_ANIM, {
     "right_arm": {"rotation": [(0, [45, 0, 12]), (0.12, [-170, 0, 8], EXPO), (0.6, [-165, 0, 10]),

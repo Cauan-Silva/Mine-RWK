@@ -52,6 +52,15 @@ public final class PhotonRoxoMaximo {
         // Fitas de energia saindo em raios.
         FxCodigo.emissor(20).rajada(0, 70).esfera(1, 1).velocidade(45, 70).vida(14, 20).tamanho(.25f)
                 .cor(0xFFC890FF).rastro(.5f).textura(FxCodigo.CIRCULO, 1.4f, .5f, 2.6f, FxCodigo.ADITIVO).tocar(nivel, c);
+        // Mais duas levas de fitas enquanto a casca cresce.
+        FxCodigo.emissor(40).rajada(12, 50).esfera(r * .3f, 1).velocidade(30, 50).vida(16, 24).tamanho(.22f)
+                .cor(0xFFE0C8FF).rastro(.5f).textura(FxCodigo.CIRCULO, 1.6f, .8f, 2.6f, FxCodigo.ADITIVO).tocar(nivel, c);
+        FxCodigo.emissor(40).rajada(28, 40).esfera(r * .5f, 1).velocidade(20, 35).vida(18, 26).tamanho(.2f)
+                .cor(0xFFC890FF).rastro(.5f).textura(FxCodigo.CIRCULO, 1.4f, .5f, 2.6f, FxCodigo.ADITIVO).tocar(nivel, c);
+        // Faíscas roxas caindo em chuva depois do estouro.
+        FxCodigo.emissor(90).taxa(30).esfera(r * .8f, 1).velocidade(1, 4).vida(40, 70).tamanho(.14f)
+                .cor(0xFFD0A0FF).gravidade(.35f, true).rastro(.3f)
+                .textura(FxCodigo.CIRCULO, 1.2f, .5f, 2.2f, FxCodigo.ADITIVO).tocar(nivel, c);
         // Detritos: pedaços escuros voando para fora e caindo.
         FxCodigo.emissor(80).rajada(0, 90).esfera(r * .3f, 1).velocidade(12, 28).vida(50, 80).tamanho(.35f)
                 .cor(0xFF3A302C).gravidade(1.2f, true).textura(FxCodigo.CIRCULO, 0, 0, 0, FxCodigo.TRANSLUCIDO).tocar(nivel, c);

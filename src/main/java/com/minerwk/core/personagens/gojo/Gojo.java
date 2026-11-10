@@ -376,7 +376,10 @@ public final class Gojo {
                 ctx.suspender(alvo, baseAlvo.mais(new Vetor(0, RoxoMaximo.alturaAlvo(t - avanco + 1), 0)), 2);
             }
             if (t == RoxoMaximo.inicioEsferas(avanco)) {
-                centro = RoxoMaximo.centroFusao(ctx.olhos(), direcao);
+                // Quem move o Gojo é o cliente, e o servidor pode estar atrasado: o centro sai da mesma conta
+                // do movimento (onde ele está no fim da subida), não da posição que o servidor tem agora.
+                Vetor noAlto = olhos.mais(RoxoMaximo.deslocamentoGojo(RoxoMaximo.inicioEsferas(avanco), direcao, distancia));
+                centro = RoxoMaximo.centroFusao(noAlto, direcao);
                 ctx.visual("gojo_roxo_maximo_esferas", centro, direcao, RoxoMaximo.TICKS_ESFERAS,
                         RoxoMaximo.TICKS_ESFERAS + RoxoMaximo.TICKS_FUSAO);
             }
@@ -466,11 +469,11 @@ public final class Gojo {
         public void tick(Contexto ctx, int t) {
             if (t == 0) {
                 // A forca do visual leva o raio para o cliente.
-                ctx.visual("gojo_roxo_explosao", centro, direcao, (float) raio, ticks + 28);
-                ctx.tremor(1.8f, 40, 96);
+                ctx.visual("gojo_roxo_explosao", centro, direcao, (float) raio, ticks + RoxoMaximo.TICKS_RESTO);
+                ctx.tremor(1.8f, ticks + 10, 96);
             }
-            double de = raio * t / ticks;
-            double ate = raio * (t + 1) / ticks;
+            double de = raio * RoxoMaximo.fracaoExplosao((double) t / ticks);
+            double ate = raio * RoxoMaximo.fracaoExplosao((double) (t + 1) / ticks);
             ctx.apagarCasca(centro, de, ate);
             if (ctx.danoUmaVez(centro, ate, dano, atingidos) > 0) ctx.arremessar(centro, ate, 6, 4, null);
         }

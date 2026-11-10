@@ -17,7 +17,7 @@ public final class CutsceneRoxoMaximo {
     public static final String PREFIXO = "gojo_roxo_maximo:";
     private static final String SEM_ALVO = "sem_alvo:";
     /** Ticks do plano aberto, do começo da explosão até a volta. */
-    public static final int PLANO_ABERTO = 40;
+    public static final int PLANO_ABERTO = 90;
     public static final int VOLTA = 15;
     /** Centro da explosão na base, com alvo: atrás do Gojo ({@link RoxoMaximo#centroFusao}). */
     public static final Vetor CENTRO_COM_ALVO = new Vetor(0, 0, -RoxoMaximo.ATRAS);

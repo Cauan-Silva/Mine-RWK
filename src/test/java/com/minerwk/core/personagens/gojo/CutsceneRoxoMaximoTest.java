@@ -48,6 +48,11 @@ class CutsceneRoxoMaximoTest {
     }
 
     @Test
+    void planoAbertoMostraAExplosaoInteiraEUmPoucoDoQueSobra() {
+        assertTrue(CutsceneRoxoMaximo.PLANO_ABERTO >= RoxoMaximo.TICKS_EXPLOSAO + 20);
+    }
+
+    @Test
     void corridaBaixaAtrasECorteSecoDeLadoNoUppercut() {
         for (int a : new int[] {0, 10, 20}) {
             Coreografia c = CutsceneRoxoMaximo.coreografia(a);

@@ -82,7 +82,7 @@ public final class DemoVfx {
         }
         if (t == ESTOURO + 10) {
             VisuaisAtivos.receber(new MostrarVisual(jogador.getId(), "gojo_roxo_explosao", vetor(longe), dir,
-                    (float) RoxoMaximo.RAIO_EXPLOSAO, RoxoMaximo.TICKS_EXPLOSAO + 28, agora));
+                    (float) RoxoMaximo.RAIO_EXPLOSAO, RoxoMaximo.TICKS_EXPLOSAO + RoxoMaximo.TICKS_RESTO, agora));
         }
         if (t >= FIM_PREVIA) previa = -1;
     }

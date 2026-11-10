@@ -30,7 +30,9 @@ public final class RoxoMaximo {
     public static final int TICKS_SILENCIO = 4;
     public static final double ATRAS = 4;
     public static final double RAIO_EXPLOSAO = 40;
-    public static final int TICKS_EXPLOSAO = 30;
+    public static final int TICKS_EXPLOSAO = 60;
+    /** Depois de crescer, o que sobra da explosão ainda fica esse tempo no ar, sumindo. */
+    public static final int TICKS_RESTO = 50;
     public static final float DANO_UPPERCUT = 10;
     public static final float DANO = 60;
     /** Sem alvo: as esferas vão até a mira nesse tempo. */
@@ -76,6 +78,12 @@ public final class RoxoMaximo {
         double fracao = a == 0 ? 1 : Math.min(1, Math.max(0, t / a));
         Vetor frente = dir.normalizado().vezes(fracao * Math.max(0, distancia - PARADA));
         return frente.mais(new Vetor(0, alturaAlvo(t - a), 0));
+    }
+
+    /** Quanto do raio a explosão já tomou na fração {@code s} do tempo: estoura rápido e depois cresce devagar. */
+    public static double fracaoExplosao(double s) {
+        s = Math.max(0, Math.min(1, s));
+        return 1 - (1 - s) * (1 - s);
     }
 
     /** Centro da fusão: {@link #ATRAS} blocos atrás dos olhos, na horizontal (ou acima, se ele olha reto para baixo). */

@@ -318,41 +318,83 @@ public final class RenderVisuaisGojo {
      * tempo do servidor (a duração menos os 28 ticks de sumir), fitas de energia em raios e duas ondas de
      * choque (uma correndo pelo chão até 60 blocos, outra no ar). A distorção e as partículas vêm do Photon.
      */
+    /**
+     * A explosão do Roxo em camadas: estoura rápido e cresce devagar até o raio, com o vazio escuro no
+     * miolo, a casca violeta com relâmpagos correndo nela, levas de fitas em raios, uma coluna de luz,
+     * ondas de choque em sequência e, no fim, o que sobra encolhendo e sumindo.
+     */
     private static void explosaoRoxa(Quadro q, VisuaisAtivos.Visual v, double i) {
         Vec3 c = q.rel(v.origem);
         if (c.lengthSqr() > 400 * 400) return;
         double raio = v.forca > 1 ? v.forca : 24;
-        double cresceEm = Math.max(1, v.duracao - 28);
-        double cresce = PerfilVfxGojo.suave(i / cresceEm);
-        float some = (float) Math.max(0, 1 - Math.max(0, i - cresceEm) / (v.duracao - cresceEm));
-        double r = 2 + (raio - 2) * cresce;
+        double resto = Math.min(com.minerwk.core.personagens.gojo.RoxoMaximo.TICKS_RESTO, Math.max(1, v.duracao - 1));
+        double cresceEm = Math.max(1, v.duracao - resto);
+        double cresce = com.minerwk.core.personagens.gojo.RoxoMaximo.fracaoExplosao(i / cresceEm);
+        float some = (float) Math.max(0, 1 - Math.max(0, i - cresceEm) / resto);
+        some *= some;
+        // No resto, a casca encolhe um pouco enquanto some.
+        double r = (2 + (raio - 2) * cresce) * (1 - .2 * (1 - Math.sqrt(some)));
+        float tremula = (float) (.85 + .15 * Math.sin(i * 1.7));
+        boolean reduzido = q.detalhe.faixas() < 64;
+        // O vazio no miolo, a camada violeta forte e a casca clara por fora.
+        esfera(q, Pincel.ROXO, false, c, r * .5, 0x14041F, .75f * some);
+        esfera(q, Pincel.ROXO, true, c, r * .78, 0x7A2CFF, .55f * some * tremula);
         esfera(q, Pincel.ROXO, true, c, r, 0xC890FF, .75f * some);
-        esfera(q, Pincel.ROXO, true, c, 1 + raio * .45 * cresce, 0xFFFFFF, (float) Math.exp(-i / 6));
+        esfera(q, Pincel.ROXO, true, c, 1 + raio * .45 * cresce, 0xFFFFFF, (float) Math.exp(-i / 8));
         brilho(q, c, raio * 1.25 + raio * .8 * cresce, 0x9A4DFF, .8f * some);
         Pincel p = Pincel.novo().comecar(Pincel.FITA, true, q.tempo, new Vec3(0, 0, 1));
-        // Fitas em raios: saem do núcleo e passam da casca enquanto ela cresce.
-        java.util.Random rnd = new java.util.Random(v.inicio);
-        float fitas = (float) Math.max(0, 1 - i / (cresceEm * .8)) ;
-        for (int k = 0; k < 14 && fitas > .01f; k++) {
-            Vec3 dir = new Vec3(rnd.nextGaussian(), rnd.nextGaussian() * .6, rnd.nextGaussian()).normalize();
-            double ate = r * (1.1 + rnd.nextDouble() * .5);
-            List<Vec3> pts = List.of(c.add(dir.scale(r * .2)), c.add(dir.scale(ate * .6)), c.add(dir.scale(ate)));
-            p.fita(pts, .6 + raio * .02, k % 3 == 0 ? 0xFFFFFF : 0xC890FF, new float[] {fitas, fitas * .7f, 0});
+        // Coluna de luz atravessando o centro no estouro.
+        float coluna = (float) Math.exp(-i / 14);
+        if (coluna > .02f) {
+            List<Vec3> pts = List.of(c.add(0, -raio, 0), c, c.add(0, raio * 1.8, 0));
+            p.fita(pts, 2 + raio * .12 * coluna, 0xE0C8FF, new float[] {0, coluna, 0});
+            p.fita(pts, .8 + raio * .04 * coluna, 0xFFFFFF, new float[] {0, coluna, 0});
         }
-        // Onda de choque no chão (a metade do raio abaixo do centro) e outra no ar, inclinada.
-        double rc = com.minerwk.core.vfx.FusaoRoxoGojo.raioChoque(i);
-        float onda = (float) Math.max(0, 1 - i / (cresceEm + 10));
+        // Levas de fitas em raios: uma nova a cada 12 ticks enquanto cresce.
+        if (i < cresceEm) {
+            int leva = (int) (i / 12);
+            float fitas = (float) (1 - (i - leva * 12) / 12);
+            java.util.Random rnd = new java.util.Random(v.inicio * 31 + leva);
+            for (int k = 0; k < (reduzido ? 8 : 16); k++) {
+                Vec3 dir = new Vec3(rnd.nextGaussian(), rnd.nextGaussian() * .6, rnd.nextGaussian()).normalize();
+                double ate = r * (1.1 + rnd.nextDouble() * .5);
+                List<Vec3> pts = List.of(c.add(dir.scale(r * .2)), c.add(dir.scale(ate * .6)), c.add(dir.scale(ate)));
+                p.fita(pts, .6 + raio * .02, k % 3 == 0 ? 0xFFFFFF : 0xC890FF, new float[] {fitas, fitas * .7f, 0});
+            }
+        }
+        // Relâmpagos correndo na casca: mudam de lugar a cada 2 ticks.
+        if (some > .05f) {
+            java.util.Random rnd = new java.util.Random(v.inicio * 17 + (long) (i / 2));
+            for (int k = 0; k < (reduzido ? 5 : 12); k++) {
+                Vec3 a = new Vec3(rnd.nextGaussian(), rnd.nextGaussian(), rnd.nextGaussian()).normalize();
+                Vec3 passo = new Vec3(rnd.nextGaussian(), rnd.nextGaussian(), rnd.nextGaussian()).scale(.22);
+                List<Vec3> pts = new ArrayList<>(6);
+                for (int j = 0; j < 6; j++) {
+                    pts.add(c.add(a.scale(r * 1.01)));
+                    a = a.add(passo).add(rnd.nextGaussian() * .08, rnd.nextGaussian() * .08, rnd.nextGaussian() * .08).normalize();
+                }
+                float al = .9f * some;
+                p.fita(pts, .25 + raio * .012, k % 2 == 0 ? 0xFFFFFF : 0xE0C8FF, new float[] {0, al, al, al, al, 0});
+            }
+        }
+        // Ondas de choque no chão, três em sequência, e uma no ar, inclinada.
         int n = q.segmentos(64);
-        for (int anel = 0; anel < 2 && onda > .01f && rc > .5; anel++) {
-            double ra = anel == 0 ? rc : rc * .8;
-            double y = anel == 0 ? -Math.min(raio * .5, 20) : 0;
-            double incl = anel == 0 ? 0 : .35;
+        for (int anel = 0; anel < 4; anel++) {
+            double atraso = anel == 3 ? 0 : anel * 10;
+            double rc = com.minerwk.core.vfx.FusaoRoxoGojo.raioChoque(i - atraso);
+            float onda = (float) Math.max(0, 1 - (i - atraso) / (cresceEm + 10));
+            if (i < atraso || onda <= .01f || rc <= .5) continue;
+            boolean noAr = anel == 3;
+            double ra = noAr ? rc * .8 : rc;
+            double y = noAr ? 0 : -Math.min(raio * .5, 20);
+            double incl = noAr ? .35 : 0;
             List<Vec3> pts = new ArrayList<>(n + 1);
             for (int k = 0; k <= n; k++) {
                 double ang = k * Math.PI * 2 / n;
                 pts.add(c.add(Math.cos(ang) * ra, y + Math.sin(ang) * ra * incl, Math.sin(ang) * ra));
             }
-            p.fita(pts, anel == 0 ? 2.5 : 1.2, anel == 0 ? 0xE0C8FF : 0xFFFFFF, alphas(pts.size(), onda * (anel == 0 ? .7f : .5f)));
+            float forca = noAr ? .5f : .7f / (1 + anel * .6f);
+            p.fita(pts, noAr ? 1.2 : 2.5, noAr ? 0xFFFFFF : 0xE0C8FF, alphas(pts.size(), onda * forca));
         }
         p.terminar();
     }
@@ -450,24 +492,40 @@ public final class RenderVisuaisGojo {
      */
     private static void esferasRoxoMaximo(Quadro q, VisuaisAtivos.Visual v, double t, float op) {
         Vec3 centro = q.rel(v.origem);
+        Vetor frente = v.direcao;
+        Entity e = dono(v);
+        // Com alvo (o Gojo no ar, no meio do combo): a fusão fica sempre atrás dele de verdade, na
+        // horizontal, e as esferas nascem nas mãos abertas para os lados, como na animação.
+        boolean atras = e != null && noCombo(v);
+        Vec3[] maos = null;
+        if (atras) {
+            Vec3 olho = e.getEyePosition(q.parcial);
+            frente = new Vetor(v.direcao.x(), 0, v.direcao.z());
+            centro = q.rel(com.minerwk.core.personagens.gojo.RoxoMaximo.centroFusao(
+                    new Vetor(olho.x, olho.y, olho.z), v.direcao));
+            Base aberta = Base.de(frente);
+            maos = new Vec3[] {q.rel(olho.add(aberta.lado.scale(-.9)).add(0, -.35, 0)),
+                    q.rel(olho.add(aberta.lado.scale(.9)).add(0, -.35, 0))};
+        } else if (e != null) {
+            maos = new Vec3[] {q.rel(mao(e, q.parcial, -1)), q.rel(mao(e, q.parcial, 1))};
+        }
         if (q.longe(centro)) return;
         int danca = com.minerwk.core.personagens.gojo.RoxoMaximo.TICKS_DANCA;
         int conjurar = com.minerwk.core.personagens.gojo.RoxoMaximo.TICKS_CONJURAR;
         double esferas = Math.max(danca + conjurar + 1, v.forca);
         double viagem = esferas - danca - conjurar;
-        Base b = Base.de(v.direcao);
-        Entity e = dono(v);
+        Base b = Base.de(frente);
         if (t < conjurar) {
             // Lá no céu: o Azul nasce na mão esquerda e o Vermelho na direita, crescendo.
-            if (e != null) {
+            if (maos != null) {
                 double r = FusaoRoxoGojo.raioConjurando(t);
-                bolaDaFusao(q, -1, q.rel(mao(e, q.parcial, -1)), null, 1, op, r);
-                bolaDaFusao(q, 1, q.rel(mao(e, q.parcial, 1)), null, 1, op, r);
+                bolaDaFusao(q, -1, maos[0], null, 1, op, r);
+                bolaDaFusao(q, 1, maos[1], null, 1, op, r);
             }
             return;
         }
         if (t < conjurar + viagem) {
-            if (e != null) viagemEsferas(q, centro, b, e, (t - conjurar) / viagem, op);
+            if (maos != null) viagemEsferas(q, centro, b, maos, (t - conjurar) / viagem, op);
             return;
         }
         if (t < esferas) {
@@ -477,12 +535,20 @@ public final class RenderVisuaisGojo {
         nucleoRoxoMaximo(q, centro, t - esferas, op);
     }
 
-    private static void viagemEsferas(Quadro q, Vec3 centro, Base b, Entity e, double fracao, float op) {
+    /** Se o dono deste visual está no meio do combo do R com alvo (avanço, uppercut e subida). */
+    private static boolean noCombo(VisuaisAtivos.Visual v) {
+        for (VisuaisAtivos.Visual o : VisuaisAtivos.ativos()) {
+            if (o.dono == v.dono && o.tipo.equals("gojo_roxo_maximo")) return true;
+        }
+        return false;
+    }
+
+    private static void viagemEsferas(Quadro q, Vec3 centro, Base b, Vec3[] maos, double fracao, float op) {
         double s = PerfilVfxGojo.suave(fracao);
         Pincel p = Pincel.novo().comecar(Pincel.FITA, true, q.tempo, new Vec3(0, 0, 1));
         Vec3[] bolas = new Vec3[2];
         for (int lado = -1; lado <= 1; lado += 2) {
-            Vec3 de = q.rel(mao(e, q.parcial, lado));
+            Vec3 de = maos[(lado + 1) / 2];
             Vec3 ate = centro.add(b.aplicar(FusaoRoxoGojo.posicao(lado, 0)));
             double curva = 1 + .35 * de.distanceTo(ate);
             int cor = lado < 0 ? CIANO : CARMESIM;

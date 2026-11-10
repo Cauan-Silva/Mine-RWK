@@ -22,12 +22,25 @@ class RoxoMaximoTest {
         assertEquals(70, RoxoMaximo.inicioFusao(a), "esferas em 30 (8 conjurando, 10 de viagem e 12 de dança)");
         assertEquals(106, RoxoMaximo.inicioSilencio(a), "4 ticks de silêncio antes do estouro");
         assertEquals(110, RoxoMaximo.inicioExplosao(a), "fusão carregando 40");
-        assertEquals(140, RoxoMaximo.fim(a), "explosão em 30");
+        assertEquals(170, RoxoMaximo.fim(a), "explosão em 60");
+        assertEquals(60, RoxoMaximo.TICKS_EXPLOSAO, "a explosão cresce por 3 s");
+        assertEquals(50, RoxoMaximo.TICKS_RESTO, "e o que sobra dela fica mais 2,5 s no ar");
     }
 
     @Test
     void ritmoCercaDoDobroDoAntigo() {
-        assertEquals(130, RoxoMaximo.fim(0) - 0, "do uppercut ao fim da explosão: ~6,5 s");
+        assertEquals(160, RoxoMaximo.fim(0) - 0, "do uppercut ao fim da explosão: 8 s");
+    }
+
+    @Test
+    void explosaoEstouraRapidoEDepoisCresceDevagar() {
+        assertEquals(0, RoxoMaximo.fracaoExplosao(0), 1e-9);
+        assertEquals(1, RoxoMaximo.fracaoExplosao(1), 1e-9);
+        assertEquals(1, RoxoMaximo.fracaoExplosao(2), 1e-9);
+        assertTrue(RoxoMaximo.fracaoExplosao(.25) > .4, "em um quarto do tempo já passou de 40% do raio");
+        for (double s = .05; s <= 1; s += .05) {
+            assertTrue(RoxoMaximo.fracaoExplosao(s) > RoxoMaximo.fracaoExplosao(s - .05));
+        }
         assertEquals(RoxoMaximo.TICKS_ESFERAS, RoxoMaximo.TICKS_CONJURAR + RoxoMaximo.TICKS_VIAGEM + RoxoMaximo.TICKS_DANCA);
         assertEquals(8, RoxoMaximo.TICKS_CONJURAR, "lá no céu ele conjura os dois nas mãos");
         assertEquals(10, RoxoMaximo.TICKS_VIAGEM);

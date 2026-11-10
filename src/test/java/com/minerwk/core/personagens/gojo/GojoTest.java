@@ -225,8 +225,9 @@ class GojoTest {
         assertEquals(List.of(RoxoMaximo.DANO_UPPERCUT, RoxoMaximo.DANO), ctx.danos,
                 "uppercut e depois a explosão, uma vez só (o alvo não leva de novo pela casca)");
         assertEquals(RoxoMaximo.inicioExplosao(a) - a, ctx.conta("suspender"), "segurado no ar até explodir");
-        // Os olhos do falso ficam em 0 olhando para +x: a fusão fica 4 atrás.
-        assertExplosaoInteira(new Vetor(-RoxoMaximo.ATRAS, 0, 0));
+        // O falso não anda (como um servidor atrasado em relação ao cliente, que é quem move o Gojo): a
+        // fusão fica 4 atrás de onde o Gojo está pela conta do movimento, 30 à frente e 25 acima.
+        assertExplosaoInteira(new Vetor(31.5 - RoxoMaximo.PARADA - RoxoMaximo.ATRAS, RoxoMaximo.SUBIDA, 0));
     }
 
     @Test
