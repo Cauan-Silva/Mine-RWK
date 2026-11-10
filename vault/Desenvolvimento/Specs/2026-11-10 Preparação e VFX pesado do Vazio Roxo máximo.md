@@ -36,6 +36,15 @@ Os tempos ficam em `RoxoMaximo`. A cutscene e as animações se ajustam sozinhas
 - **Chão:** rachaduras que crescem a partir dos pés. Pedras e terra flutuam e giram devagar (só visual, sem tirar blocos).
 - **Céu:** escurece aos poucos para todos perto, até o roxo ser a luz principal na explosão. Volta ao normal devagar depois.
 
+**A fusão das esferas (pedido do autor, 10/11: "devem se fundir de uma forma mais bonita"):**
+Hoje as duas esferas chegam em arco e trocam de repente pelo núcleo roxo. A proposta é um encontro em quatro tempos:
+1. **Dança:** ao chegar atrás do Gojo, o Azul e o Vermelho não se batem. Eles giram um em volta do outro numa espiral que vai fechando (duas voltas e meia), cada um deixando o seu rastro. Os rastros se trançam como uma hélice dupla.
+2. **Atração:** quanto mais perto, mais as esferas se deformam uma na direção da outra, esticando como gotas. Um filete de energia liga as duas, e a cor dele vai do ciano ao carmesim passando pelo violeta. O espaço entre elas ondula.
+3. **Toque:** quando se encostam, as duas param por 2 ticks, giram coladas e as bordas misturam as cores. Sai um anel fino de luz branca no plano da órbita.
+4. **Nascimento do roxo:** as duas afundam uma na outra e somem num ponto. Depois de um clarão curto, o núcleo roxo nasce pequeno e escuro, com borda violeta, e começa a carregar (o resto da fusão).
+
+O tempo das esferas (30 ticks) se divide assim: 18 de viagem em arco e 12 de dança e toque. A forma da espiral e da deformação fica no `core/vfx`, com testes.
+
 **Fusão carregando (40 ticks):**
 - o núcleo suga ar, poeira e detritos de volta para ele;
 - pulsa cada vez mais rápido;
