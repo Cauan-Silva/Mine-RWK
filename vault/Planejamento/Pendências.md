@@ -68,7 +68,7 @@ Voltar para [[00 Início]].
   - **Céu e chão no encantamento (10/11):** conferir o céu escurecendo na carga e cheio na fusão e na explosão, voltando devagar depois; as rachaduras de luz saindo dos pés (em chão irregular elas ficam na altura dos pés, não acompanham o relevo); as pedras subindo devagar. Ver de noite, na chuva, debaixo d'água e com Iris (no Nether e no End o véu não é desenhado). O chão continua claro com o céu escuro: ver se incomoda.
   - **`/rwk recarregar`:** conferir que enche a energia, zera as recargas e o HUD acompanha.
   - Com teto baixo sobre o Gojo, a explosão sai um pouco acima dele (o centro vem da conta do movimento, não de onde ele parou).
-- Som do Gojo, parte 1 (10/11), conferir no jogo:
+- Som do Gojo (10/11): **aprovado pelo autor pela prévia** (áudio em fila e o vídeo do R com som). Ainda vale conferir no jogo o que a prévia não mostra, que é o volume com a distância, o corte na interrupção e outro jogador ouvindo:
   - **Z:** a sucção do Azul sai do ponto de atração e dura os 3 s do campo.
   - **X:** o agudo da carga subindo enquanto segura, cortado ao soltar; estalo no disparo e o boom no ponto do impacto (de longe soa de longe).
   - **C:** toque de vidro ao ligar, outro ao desligar (pelo tempo ou por falta de energia) e o tic quando o Infinito para um golpe ou uma flecha; ver se muitos golpes seguidos não viram uma rajada de tics.

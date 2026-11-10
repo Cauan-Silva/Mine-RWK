@@ -39,6 +39,8 @@ Voltar para [[Diário]]. Spec: [[2026-11-10 Som do Gojo]] (aprovado em 10/11, co
 
 Com isso o Gojo tem 18 sons, três variações de cada, 1,2 MB no total.
 
+O autor aprovou os sons pela prévia (10/11).
+
 ## Do mesmo dia: vídeo do R completo
 A demo gravável ganhou o modo `-Pdemo=r`, que invoca um alvo longe do spawn, usa o R de verdade e grava a cutscene inteira. Ao gravar apareceram dois defeitos da explosão, já corrigidos:
 - a casca de distorção do Photon saía meia esfera para o lado, por causa do pivô do modelo;
