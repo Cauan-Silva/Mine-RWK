@@ -62,10 +62,10 @@ São 17 sons. A base dos de Z, X, C, V e G é a síntese que já existe no Minez
 2. "Som preso ao visual" e "som que para".
 3. Os sete sons do R.
 
-## Perguntas para o autor
-1. **Fonte:** síntese própria, como no Minezin (recomendado), bancos prontos, ou mistura?
-2. **Voz no encantamento:** sem voz, só as batidas nas palavras (recomendado, porque voz exige dublagem ou áudio da obra, que não podemos usar), ou você quer gravar a voz?
-3. **Impact frame:** o som quase mudo nos 3 ticks do soco te agrada, ou prefere o impacto cheio desde o primeiro tick?
+## Escolhas do autor (10/11)
+1. **Fonte:** síntese própria, com o motor portado do Minezin.
+2. **Voz no encantamento:** sem voz; só o hum crescendo e uma batida em cada palavra.
+3. **Impact frame:** os 3 ticks do soco ficam quase mudos e o impacto entra logo depois.
 
 ## Fora deste spec
 Música, sons de passo ou de ambiente, e os sons dos outros personagens.
