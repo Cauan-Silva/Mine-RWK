@@ -64,8 +64,13 @@ class AnimacoesGojoTest {
         assertTrue(quadros("gojo_roxo_200", "left_arm", 0, 4) >= 20, "e no esquerdo");
         assertTrue(quadros("gojo_roxo_200", "torso", 0, 4) >= 10, "o corpo respira e balança");
         // No ar, do fim do uppercut até a explosão, as pernas e o tronco flutuam.
-        assertTrue(quadros(Gojo.ANIM_R_UPPERCUT, "right_leg", .6, 1.75) >= 4, "perna flutuando");
-        assertTrue(quadros(Gojo.ANIM_R_UPPERCUT, "torso", 1.75, 2.55) >= 3, "reação à explosão");
+        double explode = RoxoMaximo.inicioExplosao(0) / 20.0, fim = RoxoMaximo.fim(0) / 20.0;
+        assertTrue(quadros(Gojo.ANIM_R_UPPERCUT, "right_leg", .6, explode) >= 4, "perna flutuando");
+        assertTrue(quadros(Gojo.ANIM_R_UPPERCUT, "torso", explode, fim) >= 3, "reação à explosão");
+        // A carga treme até o silêncio e as mãos param nos últimos ticks antes do estouro.
+        double silencio = RoxoMaximo.inicioSilencio(0) / 20.0;
+        assertTrue(quadros(Gojo.ANIM_R_UPPERCUT, "right_arm", RoxoMaximo.inicioFusao(0) / 20.0, silencio) >= 6, "mãos tremendo na carga");
+        assertEquals(0, quadros(Gojo.ANIM_R_UPPERCUT, "right_arm", silencio + .01, explode - .01), "silêncio: nada mexe");
     }
 
     private static JsonObject animacoes() throws IOException {

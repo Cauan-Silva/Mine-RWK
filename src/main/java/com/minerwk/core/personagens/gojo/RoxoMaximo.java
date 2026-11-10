@@ -16,16 +16,21 @@ public final class RoxoMaximo {
     public static final double PARADA = 1.5;
     public static final int AVANCO_MAX = 20;
     public static final double SUBIDA = 25;
-    public static final int TICKS_SUBIDA = 15;
-    public static final int TICKS_ESFERAS = 10;
-    public static final int TICKS_FUSAO = 10;
+    public static final int TICKS_SUBIDA = 30;
+    /** As esferas: {@link #TICKS_VIAGEM} em arco das mãos até atrás do Gojo e {@link #TICKS_DANCA} de dança e toque. */
+    public static final int TICKS_VIAGEM = 18;
+    public static final int TICKS_DANCA = 12;
+    public static final int TICKS_ESFERAS = TICKS_VIAGEM + TICKS_DANCA;
+    /** O núcleo roxo carregando; os últimos {@link #TICKS_SILENCIO} são o silêncio antes do estouro. */
+    public static final int TICKS_FUSAO = 40;
+    public static final int TICKS_SILENCIO = 4;
     public static final double ATRAS = 4;
     public static final double RAIO_EXPLOSAO = 40;
-    public static final int TICKS_EXPLOSAO = 16;
+    public static final int TICKS_EXPLOSAO = 30;
     public static final float DANO_UPPERCUT = 10;
     public static final float DANO = 60;
     /** Sem alvo: as esferas vão até a mira nesse tempo. */
-    public static final int TICKS_ESFERAS_SEM_ALVO = 20;
+    public static final int TICKS_ESFERAS_SEM_ALVO = TICKS_ESFERAS;
 
     private RoxoMaximo() {
     }
@@ -41,6 +46,10 @@ public final class RoxoMaximo {
 
     public static int inicioFusao(int avanco) {
         return inicioEsferas(avanco) + TICKS_ESFERAS;
+    }
+
+    public static int inicioSilencio(int avanco) {
+        return inicioExplosao(avanco) - TICKS_SILENCIO;
     }
 
     public static int inicioExplosao(int avanco) {

@@ -18,10 +18,18 @@ class RoxoMaximoTest {
     @Test
     void fasesEmSequencia() {
         int a = 10;
-        assertEquals(25, RoxoMaximo.inicioEsferas(a));
-        assertEquals(35, RoxoMaximo.inicioFusao(a));
-        assertEquals(45, RoxoMaximo.inicioExplosao(a));
-        assertEquals(61, RoxoMaximo.fim(a));
+        assertEquals(40, RoxoMaximo.inicioEsferas(a), "subida de 30");
+        assertEquals(70, RoxoMaximo.inicioFusao(a), "esferas em 30 (18 de viagem e 12 de dança)");
+        assertEquals(106, RoxoMaximo.inicioSilencio(a), "4 ticks de silêncio antes do estouro");
+        assertEquals(110, RoxoMaximo.inicioExplosao(a), "fusão carregando 40");
+        assertEquals(140, RoxoMaximo.fim(a), "explosão em 30");
+    }
+
+    @Test
+    void ritmoCercaDoDobroDoAntigo() {
+        assertEquals(130, RoxoMaximo.fim(0) - 0, "do uppercut ao fim da explosão: ~6,5 s");
+        assertEquals(RoxoMaximo.TICKS_ESFERAS, RoxoMaximo.TICKS_VIAGEM + RoxoMaximo.TICKS_DANCA);
+        assertEquals(30, RoxoMaximo.TICKS_ESFERAS_SEM_ALVO);
     }
 
     @Test
@@ -37,10 +45,10 @@ class RoxoMaximoTest {
     }
 
     @Test
-    void alvoSobe25Em15TicksSuave() {
+    void alvoSobe25Em30TicksSuave() {
         assertEquals(0, RoxoMaximo.alturaAlvo(0), 1e-9);
-        assertEquals(RoxoMaximo.SUBIDA, RoxoMaximo.alturaAlvo(15), 1e-9);
-        for (int t = 1; t <= 15; t++) assertTrue(RoxoMaximo.alturaAlvo(t) > RoxoMaximo.alturaAlvo(t - 1));
+        assertEquals(RoxoMaximo.SUBIDA, RoxoMaximo.alturaAlvo(30), 1e-9);
+        for (int t = 1; t <= 30; t++) assertTrue(RoxoMaximo.alturaAlvo(t) > RoxoMaximo.alturaAlvo(t - 1));
     }
 
     @Test

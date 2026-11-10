@@ -177,37 +177,40 @@ A["gojo_roxo_200"] = anim(5.0, {
 
 # Depois do soco (tempos em segundos a partir do uppercut; ticks do RoxoMaximo): uppercut com o braço
 # direito subindo (0), lá no alto as mãos se abrem para os lados e para trás, esquerda e depois direita
-# (0,75 s = esferas), fusão às costas (1,25 s), explosão (1,75 s) e fim (2,55 s). No ar, uma perna dobrada
+# (1,5 s = esferas), fusão às costas carregando (3 s) com as mãos tremendo cada vez mais, parado no
+# silêncio antes do estouro, explosão (5 s) e fim (6,5 s). No ar, uma perna dobrada
 # para a frente e a outra solta, balançando. Na explosão a esfera passa por ele: tronco para a frente,
 # cabeça baixa e braços abertos segurando o vento; depois o punho estendido até o fim.
-ABRE, FUSAO, EXPLODE, FIM = 0.75, 1.25, 1.75, 2.55
+ABRE, FUSAO, EXPLODE, FIM = 1.5, 3.0, 5.0, 6.5
+SILENCIO = EXPLODE - 0.2
+FIM_ANIM = 7.0
 REACAO = EXPLODE + 0.35
-A["gojo_roxo_maximo"] = anim(3.1, {
+A["gojo_roxo_maximo"] = anim(FIM_ANIM, {
     "right_arm": {"rotation": [(0, [45, 0, 12]), (0.12, [-170, 0, 8], EXPO), (0.6, [-165, 0, 10]),
                                (ABRE + 0.2, [20, 0, 80], BACK)]
-                  + tremer([20, 0, 80], ABRE + 0.2, FUSAO + 0.4, 0.15, 3)
+                  + tremer([20, 0, 80], ABRE + 0.2, SILENCIO, 0.15, 3)
                   + [(EXPLODE, [-40, 0, 70], EXPO), (REACAO, [-45, 0, 72]), (REACAO + 0.15, [-90, 0, 0], BACK)]
-                  + tremer([-90, 0, 0], REACAO + 0.15, FIM, 0.1, 2) + [(FIM, [-90, 0, 0]), (3.1, N, C)]},
+                  + tremer([-90, 0, 0], REACAO + 0.15, FIM, 0.1, 2) + [(FIM, [-90, 0, 0]), (FIM_ANIM, N, C)]},
     "left_arm": {"rotation": [(0, [-62, 0, -10]), (0.12, [10, 0, -20], EXPO), (0.6, [12, 0, -22]),
-                              (ABRE, [20, 0, -80], BACK)] + balancar([20, 0, -80], ABRE, FUSAO + 0.4, 3, 0.25)
+                              (ABRE, [20, 0, -80], BACK)] + balancar([20, 0, -80], ABRE, SILENCIO, 3, 0.25)
                  + [(EXPLODE, [-40, 0, -70], EXPO), (REACAO, [-45, 0, -72]), (REACAO + 0.2, [10, 0, -30], C),
-                    (FIM, [10, 0, -28]), (3.1, N, C)]},
+                    (FIM, [10, 0, -28]), (FIM_ANIM, N, C)]},
     "torso": {"rotation": [(0, [20, 22, 0]), (0.12, [-12, -20, 0], EXPO), (0.6, [-10, -18, 0]),
-                           (ABRE + 0.2, [-6, 0, 0], C), (1.1, [-4, 3, 0]), (FUSAO + 0.4, [-8, -2, 0]),
+                           (ABRE + 0.2, [-6, 0, 0], C), ((ABRE + FUSAO) / 2, [-4, 3, 0]), (SILENCIO, [-8, -2, 0]),
                            (EXPLODE, [16, 0, 0], EXPO), (EXPLODE + 0.15, [19, 2, 0]), (REACAO, [17, -2, 0]),
-                           (REACAO + 0.15, [4, -12, 0], C), (FIM, [4, -10, 0]), (3.1, N, C)]},
+                           (REACAO + 0.15, [4, -12, 0], C), (FIM, [4, -10, 0]), (FIM_ANIM, N, C)]},
     "head": {"rotation": [(0, [-14, -10, 0]), (0.12, [-25, 0, 0], EXPO), (0.6, [-20, 0, 0]),
-                          (ABRE + 0.2, [0, 0, 0], C), (FUSAO + 0.4, [2, 0, 0]),
+                          (ABRE + 0.2, [0, 0, 0], C), (SILENCIO, [2, 0, 0]),
                           (EXPLODE, [28, 0, 0], EXPO), (REACAO, [26, 0, 0]),
-                          (REACAO + 0.15, [-4, 8, 0], C), (FIM, [-4, 8, 0]), (3.1, N, C)]},
+                          (REACAO + 0.15, [-4, 8, 0], C), (FIM, [-4, 8, 0]), (FIM_ANIM, N, C)]},
     "right_leg": {"rotation": [(0, [42, 0, 4]), (0.12, [-35, 0, 6], EXPO), (0.6, [-40, 0, 6], C)]
                   + balancar([-42, 0, 6], 0.6, EXPLODE, 4, 0.2)
-                  + [(EXPLODE, [-20, 0, 8], EXPO), (FIM, [-25, 0, 6]), (3.1, N, C)]},
+                  + [(EXPLODE, [-20, 0, 8], EXPO), (FIM, [-25, 0, 6]), (FIM_ANIM, N, C)]},
     "left_leg": {"rotation": [(0, [-32, 0, -4]), (0.12, [25, 0, -6], EXPO), (0.6, [10, 0, -4], C)]
                  + balancar([10, 0, -4], 0.6, EXPLODE, 3, 0.25)
-                 + [(EXPLODE, [18, 0, -8], EXPO), (FIM, [12, 0, -6]), (3.1, N, C)]},
+                 + [(EXPLODE, [18, 0, -8], EXPO), (FIM, [12, 0, -6]), (FIM_ANIM, N, C)]},
 })
-# Sem alvo: as mãos abrem na hora; os tempos se ajustam (esferas 1 s, fusão 0,5 s, explosão 0,8 s).
+# Sem alvo: as mãos abrem na hora; os tempos se ajustam (esferas 1,5 s, fusão 2 s, explosão 1,5 s).
 A["gojo_roxo_maximo_sem_alvo"] = fatia(A["gojo_roxo_maximo"], ABRE - 0.2)
 
 # Descida lenta depois do R, em loop até pousar: braços meio abertos, pernas soltas, olhando para baixo.
