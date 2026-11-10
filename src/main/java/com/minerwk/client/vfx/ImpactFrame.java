@@ -18,6 +18,8 @@ public final class ImpactFrame {
     private static boolean falhou;
     private static int largura, altura;
     private static long inicio = Long.MIN_VALUE;
+    /** Último tick do mundo já olhado (com o jogo pausado o tick do cliente roda e o do mundo não). */
+    private static long ultimo = Long.MIN_VALUE;
 
     private ImpactFrame() {
     }
@@ -27,6 +29,8 @@ public final class ImpactFrame {
         Minecraft mc = Minecraft.getInstance();
         if (mc.level == null) return;
         long agora = mc.level.getGameTime();
+        if (agora == ultimo) return;
+        ultimo = agora;
         Vec3 cam = mc.gameRenderer.getMainCamera().getPosition();
         for (VisuaisAtivos.Visual v : VisuaisAtivos.ativos()) {
             if (!v.tipo.equals("gojo_roxo_maximo")) continue;
@@ -39,6 +43,12 @@ public final class ImpactFrame {
 
     public static void limpar() {
         inicio = Long.MIN_VALUE;
+        ultimo = Long.MIN_VALUE;
+        if (cadeia != null) {
+            cadeia.close();
+            cadeia = null;
+        }
+        falhou = false;
     }
 
     /** Depois do mundo desenhado, antes da GUI: aplica o preto e branco por cima da tela. */

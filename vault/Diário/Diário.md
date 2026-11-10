@@ -20,3 +20,4 @@ Voltar para [[00 Início]].
 - [[2026-11-09 Gojo domínio, movimento e R colossal]]
 - [[2026-11-09 Vazio Roxo máximo e VFX do Azul e do Infinito]]
 - [[2026-11-09 Cutscene do Vazio Roxo máximo]]
+- [[2026-11-10 VFX pesado e nova ordem do R]]

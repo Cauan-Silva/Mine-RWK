@@ -55,6 +55,13 @@ Voltar para [[00 Início]].
     - se a parte 2 chegar com mais de 1 s de atraso, a câmera volta ao jogador e a cutscene recomeça;
     - um Gojo atingido pelo R de outro Gojo perde a própria cutscene;
     - com o dono fora do alcance de rastreamento, o alvo vê a câmera a partir dos olhos do início.
+- VFX pesado e nova ordem do R (10/11), conferir no jogo:
+  - **Encantamento:** sem esferas nas mãos; aura de fitas azuis e vermelhas subindo em espiral, cada vez mais forte, e os olhos brilhando.
+  - **Corrida:** câmera baixa atrás do Gojo, perto do chão, com o FOV abrindo.
+  - **Uppercut:** corte seco para o plano de lado e de baixo, e o **impact frame** (3 ticks em preto e branco com toque de roxo, piscando invertido) junto com o hit-stop. Se o shader não carregar, o log avisa "Impact frame desligado" e o golpe segue sem ele.
+  - **No céu:** o Azul nasce na mão esquerda e o Vermelho na direita, voam para trás dele, dançam, encostam e fundem; silêncio, estouro e a explosão em camadas com bloom.
+  - **Rosto do alvo:** a câmera nunca entra nele.
+  - Ver o FPS na explosão (Photon e casca) e o `VFX reduzido`.
 - HUD (09/11): funcionou no jogo. Depois das correções da revisão, conferir: HUD acima da armadura e das bolhas de ar (mergulhar com armadura), texto "Fôlego" à esquerda da barra, barra sem subir de 0 ao entrar no mundo.
 - Núcleo dos kits (09/11): escolha pelo menu, Z, X segurando e recarga **funcionaram**. Falta: morrer segurando X (não pode disparar), usar como espectador (nada acontece), ver a animação em outro jogador (2 clientes), sair e entrar mantendo o personagem.
 - Tela de escolha (09/11): **funcionou no jogo** (autor). Conferido: mundo novo abre a tela com o `teste` (emblema genérico), golpes Z e X no painel, "Escolher" → confirmação. `/rwk tela 40` mostra a grade com rolagem pela roda do mouse e emblemas do Minezin; o 15º falso usa o genérico. Testar também com a janela estreita (painel embaixo) e com escala de interface grande.
