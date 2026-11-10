@@ -6,6 +6,7 @@ tags: [planejamento]
 Voltar para [[00 Início]].
 
 ## Para conferir
+- **Aguardando o autor (10/11):** aprovar ou mudar o spec [[2026-11-10 Som do Gojo]] (três perguntas no fim) e a proposta de kit do [[Toji]] (quatro pontos a decidir). No Toji, conferir na wiki da obra as linhas marcadas como "secundária".
 - `vfxReduzido` já reduz faixas e segmentos do VFX do Gojo; os emissores de brilho do Photon (`GolpesGojoPhoton` do Minezin) ficaram de fora: a API do Photon2 mudou e o shader já carrega o visual. Retomar se faltar brilho. `LogicaHud.teclasVisiveis` não é usada (a sincronização já manda só as teclas existentes).
 - O tremor continua decaindo com o jogo pausado (até 15 ticks): irrelevante por ora.
 - Animações do Minezin estão travadas na Player Animation Library: refazer/suavizar no Blockbench na Fase 2 (Gojo).
@@ -64,6 +65,8 @@ Voltar para [[00 Início]].
   - Ver o FPS na explosão (Photon e casca) e o `VFX reduzido`.
   - **Depois do segundo teste (10/11):** conferir se o Azul e o Vermelho vão para trás do Gojo lá no alto (antes desciam) e se a explosão agora tem peso: 3 s crescendo, miolo escuro, relâmpagos na casca, coluna de luz, três ondas de choque e o resto sumindo por 2,5 s. Se as esferas ainda descerem, a causa é outra e precisa de log no jogo.
   - **Depois do terceiro teste (10/11, "quase perfeito"):** a fumaça da cratera agora só sai quando a explosão termina de crescer; conferir que ela não cobre mais a casca.
+  - **Céu e chão no encantamento (10/11):** conferir o céu escurecendo na carga e cheio na fusão e na explosão, voltando devagar depois; as rachaduras de luz saindo dos pés (em chão irregular elas ficam na altura dos pés, não acompanham o relevo); as pedras subindo devagar. Ver de noite, na chuva, debaixo d'água e com Iris (no Nether e no End o véu não é desenhado). O chão continua claro com o céu escuro: ver se incomoda.
+  - **`/rwk recarregar`:** conferir que enche a energia, zera as recargas e o HUD acompanha.
   - Com teto baixo sobre o Gojo, a explosão sai um pouco acima dele (o centro vem da conta do movimento, não de onde ele parou).
 - HUD (09/11): funcionou no jogo. Depois das correções da revisão, conferir: HUD acima da armadura e das bolhas de ar (mergulhar com armadura), texto "Fôlego" à esquerda da barra, barra sem subir de 0 ao entrar no mundo.
 - Núcleo dos kits (09/11): escolha pelo menu, Z, X segurando e recarga **funcionaram**. Falta: morrer segurando X (não pode disparar), usar como espectador (nada acontece), ver a animação em outro jogador (2 clientes), sair e entrar mantendo o personagem.

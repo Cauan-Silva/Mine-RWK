@@ -67,6 +67,9 @@ public final class CeuRoxo {
 
     public static void aoRenderizar(RenderLevelStageEvent evento) {
         if (evento.getStage() != RenderLevelStageEvent.Stage.AFTER_SKY || escuro <= 0) return;
+        // Só onde há céu: no Nether e no End o véu pintaria o fundo.
+        Minecraft mc = Minecraft.getInstance();
+        if (mc.level == null || !mc.level.dimensionType().hasSkyLight()) return;
         // Um cubo de cor única em volta da câmera cobre o céu inteiro, qualquer que seja a rotação.
         float l = 60;
         int a = (int) (Math.min(1, escuro) * .88 * 255);

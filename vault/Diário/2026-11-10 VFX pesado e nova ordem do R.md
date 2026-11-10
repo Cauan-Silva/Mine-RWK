@@ -35,3 +35,15 @@ O autor viu o Azul e o Vermelho serem jogados para baixo, sem a fusão atrás do
   - O plano aberto da cutscene passou de 40 para 80 ticks, e as animações foram regeradas.
 ## Terceiro teste do autor (10/11)
 "Quase perfeito": a fumaça saía junto com o estouro e cobria a explosão. Agora a fumaça da cratera só sai quando a casca termina de crescer (3 s depois do estouro).
+
+## Enquanto o autor almoçava (10/11)
+O autor achou que "melhorou bastante" e deixou quatro tópicos rodando.
+- **Céu e chão no encantamento** (do spec do VFX pesado):
+  - o céu escurece aos poucos na carga, fica cheio na fusão e na explosão e volta devagar (`CeuRoxo`, um véu desenhado depois do céu e antes do terreno);
+  - rachaduras de luz crescem no chão a partir dos pés (`EncantamentoGojo`, com JUnit);
+  - pedras e faíscas sobem devagar em volta do Gojo (Photon);
+  - a prévia gravável ganhou o modo `-Pdemo=encantamento`, e o vídeo foi para o autor.
+- **`/rwk recarregar [jogador]`:** enche a energia e zera as recargas, para testar sem trocar de kit.
+- **Guia:** primeira versão de [[Como portar um personagem]].
+- **Som:** [[2026-11-10 Som do Gojo]], aguardando aprovação. O Minezin já tem um motor de síntese do próprio autor, então a proposta é portá-lo, sem áudio de terceiros.
+- **Próximo personagem:** pesquisa e proposta de kit do [[Toji]], aguardando aprovação. A wiki da obra recusou a leitura automática; parte das armas veio só de fontes secundárias e está marcada na nota.

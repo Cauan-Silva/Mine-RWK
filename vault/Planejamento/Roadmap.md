@@ -6,7 +6,7 @@ atualizado: 2026-11-08
 
 Voltar para [[00 Início]]. Marque `[x]` ao concluir e registre no [[Diário]]. Decisões novas vão em [[Decisões]]; o que precisa de teste no jogo vai em [[Pendências]].
 
-**Onde estamos:** Fase 2 (Gojo), mecânica das seis habilidades pronta (apresentação provisória); VFX dos seis golpes feito (shader portado do Minezin, falta o teste no jogo); impacto de câmera, detritos e brilho feito; o autor ainda acha os golpes simples. Reação do alvo, ritmo e a cutscene do Roxo 200% feitos (falta o teste no jogo). Animações, domínio fechado e R colossal feitos; o R virou o Vazio Roxo máximo com uppercut, e o Azul e o Infinito ganharam VFX mais rico (falta o teste no jogo). A cutscene completa do R e as animações novas estão feitas (falta o teste no jogo). VFX pesado e nova ordem do R feitos (falta o teste no jogo). Próximo, na ordem aprovada em 09/11: som; depois e o pipeline de áudio (parte 3 do 1.4, adiada para cá). As partes 1 (HUD e cliente) e 2 (tela de escolha) do 1.4 estão prontas. O 1.2 ainda tem o `.fx` de teste e o Iris pendentes.
+**Onde estamos:** Fase 2 (Gojo), mecânica das seis habilidades pronta (apresentação provisória); VFX dos seis golpes feito (shader portado do Minezin, falta o teste no jogo); impacto de câmera, detritos e brilho feito; o autor ainda acha os golpes simples. Reação do alvo, ritmo e a cutscene do Roxo 200% feitos (falta o teste no jogo). Animações, domínio fechado e R colossal feitos; o R virou o Vazio Roxo máximo com uppercut, e o Azul e o Infinito ganharam VFX mais rico (falta o teste no jogo). A cutscene completa do R e as animações novas estão feitas (falta o teste no jogo). VFX pesado e nova ordem do R feitos e testados pelo autor ("melhorou bastante"); céu e chão no encantamento feitos (falta o teste no jogo). Aguardando aprovação: spec do som do Gojo e kit do [[Toji]]. Próximo, na ordem aprovada em 09/11: som; depois e o pipeline de áudio (parte 3 do 1.4, adiada para cá). As partes 1 (HUD e cliente) e 2 (tela de escolha) do 1.4 estão prontas. O 1.2 ainda tem o `.fx` de teste e o Iris pendentes.
 
 ## Como trabalhar em outro PC
 1. `git clone https://github.com/Cauan-Silva/Mine-RWK.git` (ou `git pull` se já tiver).
@@ -63,7 +63,7 @@ Spec e plano: [[2026-11-09 Núcleo dos kits]] (em `Desenvolvimento/Specs` e `Des
 - [x] Reação do alvo e ritmo: golpes mais longos, arremesso com congelamento, Azul arranca blocos, tela de quem acerta trava, rastros no mundo; ver [[2026-11-09 Gojo peso]]
 - [x] Roxo 200%: cutscene (sistema de câmera reutilizável) e encantamento visível; ver [[2026-11-09 Roxo 200 cutscene]]
 - [ ] VFX no Photon2 de cada habilidade; Veil só se o domínio precisar de pós-processamento
-- [ ] SFX de cada habilidade
+- [ ] SFX de cada habilidade (spec em [[2026-11-10 Som do Gojo]], aguardando aprovação)
 - [x] Animações do jogador de cada golpe: corpo inteiro, primeira pessoa, começam na carga; ver [[2026-11-09 Gojo animações]]
 - [x] Domínio fechado (barreira e chão por regra de movimento), animações livres ao andar e Roxo 200% colossal (sobe 20 blocos, massa de raio 7, explosão de raio 24); ver [[2026-11-09 Gojo domínio, movimento e R colossal]]
 - [x] R vira o Vazio Roxo máximo (avanço, uppercut, fusão atrás do Gojo, explosão de raio 40) e VFX mais rico do Azul e do Infinito; ver [[2026-11-09 Vazio Roxo máximo e VFX do Azul e do Infinito]]
@@ -71,7 +71,7 @@ Spec e plano: [[2026-11-09 Núcleo dos kits]] (em `Desenvolvimento/Specs` e `Des
 - [x] VFX pesado do R (Photon em código, bloom, casca com shader, fusão em quatro tempos, explosão em camadas) e nova ordem do R (conjurar no céu, cutscene da corrida e do uppercut com impact frame, câmera longe do alvo); ver [[2026-11-10 VFX pesado e nova ordem do R]]
 - [ ] Traje (GeckoLib) com óculos, e passivas (Seis Olhos, Técnica Reversa)
 - [ ] Teste no jogo de ponta a ponta, anotado em [[Pendências]]
-- [ ] Escrever em `vault/Desenvolvimento/` o passo a passo de "como portar um personagem", com base no que o Gojo ensinou
+- [ ] Escrever em `vault/Desenvolvimento/` o passo a passo de "como portar um personagem", com base no que o Gojo ensinou (primeira versão em [[Como portar um personagem]]; falta completar som e traje)
 
 ## Fase 3: demais personagens
 Um por vez, sempre: pesquisa canônica → kit aprovado → código → VFX → SFX → animações → traje → teste no jogo. Ordem sugerida (começa pelos que reaproveitam mais coisa do Gojo e do núcleo, deixa invocações e formas para depois):
