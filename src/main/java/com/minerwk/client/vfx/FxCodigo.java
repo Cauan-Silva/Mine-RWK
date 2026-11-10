@@ -153,7 +153,8 @@ public final class FxCodigo {
         c.renderer.setRenderMode(ParticleRendererSetting.Mode.Model);
         c.renderer.setUseBlockUV(false);
         c.renderer.setModel(new MeshData(new ObjModelSource(ESFERA)));
-        c.renderer.setModelPivot(new Vector3f(.5f, .5f, .5f));
+        // O sphere.obj do Photon já é centrado na origem: com pivô a casca saía meia esfera para o lado.
+        c.renderer.setModelPivot(new Vector3f(0, 0, 0));
         return material(new CustomShaderMaterial(MineRWK.id(shader)), TRANSLUCIDO);
     }
 

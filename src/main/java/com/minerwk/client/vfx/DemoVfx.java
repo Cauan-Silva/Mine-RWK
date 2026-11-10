@@ -30,11 +30,15 @@ public final class DemoVfx {
     private static final String MODO = System.getProperty("minerwk.demo", "");
     private static final boolean DEMO = !MODO.isEmpty();
     private static final boolean ENCANTAMENTO = MODO.equals("encantamento");
+    /** {@code r}: o R de verdade num alvo invocado, com a cutscene inteira, longe do spawn. */
+    private static final boolean R_COMPLETO = MODO.equals("r");
+    private static final int LONGE_DO_SPAWN = 300;
     private static final int CARGA = 100;
     private static final Path PASTA = Path.of("demo");
     private static final int ESFERAS = RoxoMaximo.TICKS_ESFERAS;
     private static final int ESTOURO = ESFERAS + RoxoMaximo.TICKS_FUSAO;
-    private static final int FIM_PREVIA = ENCANTAMENTO ? CARGA + 90 : ESTOURO + RoxoMaximo.TICKS_EXPLOSAO + 110;
+    private static final int FIM_PREVIA = R_COMPLETO ? 360
+            : ENCANTAMENTO ? CARGA + 90 : ESTOURO + RoxoMaximo.TICKS_EXPLOSAO + 110;
     private static int ticks;
     private static int quadro;
     /** Tick (do contador da demo) em que a prévia começou; -1 parada. */
@@ -54,13 +58,23 @@ public final class DemoVfx {
         if (jogador == null || mc.isPaused()) return;
         ticks++;
         if (DEMO && ticks == 40) {
-            jogador.connection.sendCommand(ENCANTAMENTO ? "time set noon" : "time set midnight");
+            jogador.connection.sendCommand(ENCANTAMENTO || R_COMPLETO ? "time set noon" : "time set midnight");
+            // A explosão apaga blocos: a demo do R acontece longe do spawn e o jogador volta no fim.
+            if (R_COMPLETO) jogador.connection.sendCommand("tp @s ~" + LONGE_DO_SPAWN + " ~12 ~"); // do alto: o chão de lá pode ser mais alto
             jogador.connection.sendCommand("weather clear");
             jogador.connection.sendCommand("gamemode creative");
             jogador.setYRot(0);
-            jogador.setXRot(ENCANTAMENTO ? 6 : -8);
+            jogador.setXRot(ENCANTAMENTO ? 6 : R_COMPLETO ? 4 : -8);
             if (ENCANTAMENTO) mc.options.setCameraType(net.minecraft.client.CameraType.THIRD_PERSON_BACK);
         }
+        if (R_COMPLETO && ticks == 120) {
+            jogador.setYRot(0);
+            jogador.setXRot(4);
+            jogador.connection.sendCommand("rwk trocar @s gojo");
+            jogador.connection.sendCommand("kill @e[type=minecraft:husk,distance=..60]");
+            jogador.connection.sendCommand("execute at @s run summon minecraft:husk ~ ~ ~14 {NoAI:1b}");
+        }
+        if (R_COMPLETO && ticks == 190) jogador.connection.sendCommand("rwk recarregar");
         // Espera o servidor integrado assentar depois de carregar o mundo (senão o tempo do visual trava e pula).
         if (DEMO && ticks == 200) previa();
         if (previa < 0) return;
@@ -74,6 +88,17 @@ public final class DemoVfx {
     }
 
     private static void tocarPrevia(Minecraft mc, LocalPlayer jogador, int t) {
+        if (R_COMPLETO) {
+            mc.gui.getChat().clearMessages(false); // sem as respostas dos comandos na gravação
+            // O R de verdade: aperta e solta a tecla; o servidor faz o resto (cutscene, alvo, explosão).
+            if (t == 0) net.neoforged.neoforge.network.PacketDistributor.sendToServer(
+                    new com.minerwk.rede.UsarTecla(com.minerwk.core.kit.Tecla.R, true));
+            if (t == 3) net.neoforged.neoforge.network.PacketDistributor.sendToServer(
+                    new com.minerwk.rede.UsarTecla(com.minerwk.core.kit.Tecla.R, false));
+            if (t == FIM_PREVIA - 3) jogador.connection.sendCommand("tp @s ~-" + LONGE_DO_SPAWN + " ~ ~");
+            if (t >= FIM_PREVIA) previa = -1;
+            return;
+        }
         if (ENCANTAMENTO) {
             // Só a carga: aura, olhos, rachaduras, pedras e o céu escurecendo, e depois o céu voltando.
             if (t == 0) {

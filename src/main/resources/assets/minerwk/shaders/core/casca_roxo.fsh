@@ -33,5 +33,7 @@ void main() {
     vec2 desvio = normalize(normalVista).xy * Distorcao * (0.6 + 0.4 * sin(posVista.y * 6.0 + t * 4.0));
     vec3 atras = texture(SamplerSceneColor, tela + desvio).rgb;
     vec3 cor = atras + HDRCor.rgb * (fresnel * 0.8 + corte * 1.5) * corVertice.rgb * ColorModulator.rgb;
-    fragColor = vec4(cor, 1.0);
+    // Só a borda e a linha de interseção cobrem a cena: o miolo fica transparente, para o brilho da
+    // explosão que está dentro da casca (desenhado depois da captura da cena) continuar aparecendo.
+    fragColor = vec4(cor, clamp(fresnel * 1.3 + corte, 0.0, 1.0));
 }
