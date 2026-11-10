@@ -74,7 +74,7 @@ Voltar para [[00 Início]].
   - **C:** toque de vidro ao ligar, outro ao desligar (pelo tempo ou por falta de energia) e o tic quando o Infinito para um golpe ou uma flecha; ver se muitos golpes seguidos não viram uma rajada de tics.
   - **V:** os dois tons da carga batendo até o disparo, e a explosão abafada com cauda longa.
   - **G:** o drone cresce na carga e o baque cai junto com a abertura do domínio. No fim, o vidro trinca e o estilhaço cai quando o domínio some.
-  - **R:** fica sem som até a parte 3.
+  - **R (parte 3):** o hum do encantamento com uma batida em cada palavra (e cortado por um golpe forte na carga); o baque da arrancada; o uppercut quase mudo no impact frame e o impacto logo depois; o vento da subida; as esferas com o tic do toque; a fusão com o silêncio antes do estouro; a explosão com a cauda. Ver o volume da explosão de perto e de longe, o R sem alvo e outro jogador ouvindo.
   - Volume de cada som em relação aos do jogo, legendas ligadas, outro jogador ouvindo, a opção `SFX de anime` desligada e o Sound Physics Remastered, se der.
   - **Som que para (parte 2):** levar um golpe forte na carga do Roxo ou do domínio e soltar o X cedo: o som da carga para na hora. Trocar de dimensão no meio de uma carga não leva o som junto.
 - Explosão do R depois do vídeo (10/11): a casca de distorção agora fica centrada e deixa o brilho de dentro aparecer; conferir que não sobrou esfera escura deslocada.

@@ -1,7 +1,7 @@
 ---
 tags: [diario]
 ---
-# 10/11/2026: som do Gojo, parte 1
+# 10/11/2026: som do Gojo (partes 1, 2 e 3)
 
 Voltar para [[Diário]]. Spec: [[2026-11-10 Som do Gojo]] (aprovado em 10/11, com síntese própria, sem voz e uppercut quase mudo no impact frame). Branch `gojo-som`.
 
@@ -22,8 +22,22 @@ Voltar para [[Diário]]. Spec: [[2026-11-10 Som do Gojo]] (aprovado em 10/11, co
 - **Correção da parte 1:** a explosão do Vermelho nascia no cliente por outro caminho e ficava muda.
 - A revisão apontou o tick exato do som de fim, um som guardado que podia ser cortado por uma parada que não era dele e o som que continuava ao trocar de dimensão. Os três foram corrigidos.
 
-## O que ficou para a parte 3
-Os sete sons do R. Até lá o R fica sem som (antes tocava o som de teste).
+## Parte 3, no mesmo dia: os sete sons do R
+| Som | Quando toca | Ideia |
+| --- | --- | --- |
+| `gojo_r_encantamento` | com a carga (80 ticks); cortado se a carga for interrompida | hum grave crescendo, com uma batida e um toque vítreo em cada palavra |
+| `gojo_r_avanco` | no disparo | baque nos pés e o ar rasgando |
+| `gojo_r_uppercut` | no tick do soco, no ponto do soco | quase mudo nos 3 ticks do impact frame; depois o impacto seco e a cauda |
+| `gojo_r_subida` | 3 ticks depois do soco | vento subindo de tom |
+| `gojo_r_esferas` | quando as esferas nascem (30 ticks) | dois tics nas mãos, Azul grave e Vermelho agudo se aproximando, tic do toque e o afundar |
+| `gojo_r_fusao` | quando o núcleo nasce (40 ticks) | zumbido batendo cada vez mais rápido, com 4 ticks de silêncio no fim |
+| `gojo_r_explosao` | no estouro (60 + 50 ticks) | estalo enorme, sub distorcido, corpo rasgando por 3 s e cauda |
+
+- Uppercut, subida e fusão tocam no meio de um visual, numa janela de ticks e uma vez só (`SonsGojo.noMeio`, com JUnit).
+- O `SonsGojoTest` confere os marcos contra o Java: as quatro palavras, o impact frame, o toque das esferas, o silêncio antes do estouro e a duração da explosão.
+- Prévia: `previas/r-completo-com-som.mp4`, o vídeo da demo com a trilha montada por fora, cada som no tick da sua fase.
+
+Com isso o Gojo tem 18 sons, três variações de cada, 1,2 MB no total.
 
 ## Do mesmo dia: vídeo do R completo
 A demo gravável ganhou o modo `-Pdemo=r`, que invoca um alvo longe do spawn, usa o R de verdade e grava a cutscene inteira. Ao gravar apareceram dois defeitos da explosão, já corrigidos:
