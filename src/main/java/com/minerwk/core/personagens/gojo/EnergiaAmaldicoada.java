@@ -10,6 +10,15 @@ public final class EnergiaAmaldicoada implements Recurso {
     static final double ANDANDO = 0.4;
 
     private double atual = MAXIMO;
+    private double fatorMaximo = 1;
+    private double fatorFluxo = 1;
+
+    @Override
+    public void melhorias(com.minerwk.core.maestria.Melhorias melhorias) {
+        fatorMaximo = melhorias.mais(ArvoreGojo.ENERGIA_RESERVA);
+        fatorFluxo = melhorias.mais(ArvoreGojo.ENERGIA_FLUXO);
+        atual = Math.min(atual, maximo());
+    }
 
     @Override
     public String nome() {
@@ -28,7 +37,7 @@ public final class EnergiaAmaldicoada implements Recurso {
 
     @Override
     public double maximo() {
-        return MAXIMO;
+        return Math.round(MAXIMO * fatorMaximo);
     }
 
     @Override
@@ -44,7 +53,7 @@ public final class EnergiaAmaldicoada implements Recurso {
 
     @Override
     public void tick(EstadoDoJogador estado) {
-        atual = Math.min(MAXIMO, atual + (estado.parado() ? PARADO : ANDANDO));
+        atual = Math.min(maximo(), atual + (estado.parado() ? PARADO : ANDANDO) * fatorFluxo);
     }
 
     @Override
@@ -54,6 +63,6 @@ public final class EnergiaAmaldicoada implements Recurso {
 
     @Override
     public void carregar(double valor) {
-        atual = Double.isFinite(valor) ? Math.max(0, Math.min(MAXIMO, valor)) : 0;
+        atual = Double.isFinite(valor) ? Math.max(0, Math.min(maximo(), valor)) : 0;
     }
 }

@@ -36,6 +36,7 @@ public final class ComandosTeste {
                 .then(Commands.literal("fx").then(Commands.argument("efeito", ResourceLocationArgument.id()).executes(ComandosTeste::fx)))
                 .then(Commands.literal("anim").then(Commands.argument("animacao", ResourceLocationArgument.id()).executes(ComandosTeste::anim)))
                 .then(Commands.literal("parar").executes(ComandosTeste::parar))
+                .then(Commands.literal("previa").executes(ComandosTeste::previa))
                 .then(Commands.literal("som").executes(ComandosTeste::som))
                 .then(Commands.literal("tela").then(Commands.argument("quantos", IntegerArgumentType.integer(1, 200))
                         .executes(ComandosTeste::tela))));
@@ -53,6 +54,12 @@ public final class ComandosTeste {
         ResourceLocation efeito = idDoMod(ctx, "efeito");
         boolean ok = EfeitosVisuais.noBloco(efeito, jogador.level(), jogador.blockPosition());
         return responder(ctx, ok, "Efeito " + efeito);
+    }
+
+    /** Prévia do VFX do R só no cliente (fusão perto e explosão longe), sem alvo nem servidor. */
+    private static int previa(CommandContext<CommandSourceStack> ctx) {
+        com.minerwk.client.vfx.DemoVfx.previa();
+        return responder(ctx, true, "Prévia do R");
     }
 
     private static int anim(CommandContext<CommandSourceStack> ctx) {

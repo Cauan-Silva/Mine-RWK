@@ -1,6 +1,572 @@
 {
   "teste": {
     "subtitle": "subtitles.minerwk.teste",
-    "sounds": [{ "name": "minerwk:teste/teste", "attenuation_distance": 32 }]
+    "sounds": [
+      {
+        "name": "minerwk:teste/teste",
+        "attenuation_distance": 32
+      }
+    ]
+  },
+  "gojo_azul": {
+    "subtitle": "subtitles.minerwk.gojo_azul",
+    "sounds": [
+      {
+        "name": "minerwk:gojo/gojo_azul",
+        "attenuation_distance": 48
+      },
+      {
+        "name": "minerwk:gojo/gojo_azul_2",
+        "attenuation_distance": 48
+      },
+      {
+        "name": "minerwk:gojo/gojo_azul_3",
+        "attenuation_distance": 48
+      }
+    ]
+  },
+  "gojo_vermelho_carga": {
+    "subtitle": "subtitles.minerwk.gojo_vermelho_carga",
+    "sounds": [
+      {
+        "name": "minerwk:gojo/gojo_vermelho_carga",
+        "attenuation_distance": 32
+      },
+      {
+        "name": "minerwk:gojo/gojo_vermelho_carga_2",
+        "attenuation_distance": 32
+      },
+      {
+        "name": "minerwk:gojo/gojo_vermelho_carga_3",
+        "attenuation_distance": 32
+      }
+    ]
+  },
+  "gojo_vermelho_disparo": {
+    "subtitle": "subtitles.minerwk.gojo_vermelho_disparo",
+    "sounds": [
+      {
+        "name": "minerwk:gojo/gojo_vermelho_disparo",
+        "attenuation_distance": 48
+      },
+      {
+        "name": "minerwk:gojo/gojo_vermelho_disparo_2",
+        "attenuation_distance": 48
+      },
+      {
+        "name": "minerwk:gojo/gojo_vermelho_disparo_3",
+        "attenuation_distance": 48
+      }
+    ]
+  },
+  "gojo_vermelho_explosao": {
+    "subtitle": "subtitles.minerwk.gojo_vermelho_explosao",
+    "sounds": [
+      {
+        "name": "minerwk:gojo/gojo_vermelho_explosao",
+        "attenuation_distance": 64
+      },
+      {
+        "name": "minerwk:gojo/gojo_vermelho_explosao_2",
+        "attenuation_distance": 64
+      },
+      {
+        "name": "minerwk:gojo/gojo_vermelho_explosao_3",
+        "attenuation_distance": 64
+      }
+    ]
+  },
+  "gojo_infinito_ativa": {
+    "subtitle": "subtitles.minerwk.gojo_infinito_ativa",
+    "sounds": [
+      {
+        "name": "minerwk:gojo/gojo_infinito_ativa",
+        "attenuation_distance": 24
+      },
+      {
+        "name": "minerwk:gojo/gojo_infinito_ativa_2",
+        "attenuation_distance": 24
+      },
+      {
+        "name": "minerwk:gojo/gojo_infinito_ativa_3",
+        "attenuation_distance": 24
+      }
+    ]
+  },
+  "gojo_infinito_desativa": {
+    "subtitle": "subtitles.minerwk.gojo_infinito_desativa",
+    "sounds": [
+      {
+        "name": "minerwk:gojo/gojo_infinito_desativa",
+        "attenuation_distance": 24
+      },
+      {
+        "name": "minerwk:gojo/gojo_infinito_desativa_2",
+        "attenuation_distance": 24
+      },
+      {
+        "name": "minerwk:gojo/gojo_infinito_desativa_3",
+        "attenuation_distance": 24
+      }
+    ]
+  },
+  "gojo_infinito_tic": {
+    "subtitle": "subtitles.minerwk.gojo_infinito_tic",
+    "sounds": [
+      {
+        "name": "minerwk:gojo/gojo_infinito_tic",
+        "attenuation_distance": 16
+      },
+      {
+        "name": "minerwk:gojo/gojo_infinito_tic_2",
+        "attenuation_distance": 16
+      },
+      {
+        "name": "minerwk:gojo/gojo_infinito_tic_3",
+        "attenuation_distance": 16
+      }
+    ]
+  },
+  "gojo_roxo_carga": {
+    "subtitle": "subtitles.minerwk.gojo_roxo_carga",
+    "sounds": [
+      {
+        "name": "minerwk:gojo/gojo_roxo_carga",
+        "attenuation_distance": 48
+      },
+      {
+        "name": "minerwk:gojo/gojo_roxo_carga_2",
+        "attenuation_distance": 48
+      },
+      {
+        "name": "minerwk:gojo/gojo_roxo_carga_3",
+        "attenuation_distance": 48
+      }
+    ]
+  },
+  "gojo_roxo_disparo": {
+    "subtitle": "subtitles.minerwk.gojo_roxo_disparo",
+    "sounds": [
+      {
+        "name": "minerwk:gojo/gojo_roxo_disparo",
+        "attenuation_distance": 64
+      },
+      {
+        "name": "minerwk:gojo/gojo_roxo_disparo_2",
+        "attenuation_distance": 64
+      },
+      {
+        "name": "minerwk:gojo/gojo_roxo_disparo_3",
+        "attenuation_distance": 64
+      }
+    ]
+  },
+  "gojo_dominio": {
+    "subtitle": "subtitles.minerwk.gojo_dominio",
+    "sounds": [
+      {
+        "name": "minerwk:gojo/gojo_dominio",
+        "attenuation_distance": 64
+      },
+      {
+        "name": "minerwk:gojo/gojo_dominio_2",
+        "attenuation_distance": 64
+      },
+      {
+        "name": "minerwk:gojo/gojo_dominio_3",
+        "attenuation_distance": 64
+      }
+    ]
+  },
+  "gojo_dominio_fim": {
+    "subtitle": "subtitles.minerwk.gojo_dominio_fim",
+    "sounds": [
+      {
+        "name": "minerwk:gojo/gojo_dominio_fim",
+        "attenuation_distance": 48
+      },
+      {
+        "name": "minerwk:gojo/gojo_dominio_fim_2",
+        "attenuation_distance": 48
+      },
+      {
+        "name": "minerwk:gojo/gojo_dominio_fim_3",
+        "attenuation_distance": 48
+      }
+    ]
+  },
+  "gojo_r_encantamento": {
+    "subtitle": "subtitles.minerwk.gojo_r_encantamento",
+    "sounds": [
+      {
+        "name": "minerwk:gojo/gojo_r_encantamento",
+        "attenuation_distance": 48
+      },
+      {
+        "name": "minerwk:gojo/gojo_r_encantamento_2",
+        "attenuation_distance": 48
+      },
+      {
+        "name": "minerwk:gojo/gojo_r_encantamento_3",
+        "attenuation_distance": 48
+      }
+    ]
+  },
+  "gojo_r_avanco": {
+    "subtitle": "subtitles.minerwk.gojo_r_avanco",
+    "sounds": [
+      {
+        "name": "minerwk:gojo/gojo_r_avanco",
+        "attenuation_distance": 48
+      },
+      {
+        "name": "minerwk:gojo/gojo_r_avanco_2",
+        "attenuation_distance": 48
+      },
+      {
+        "name": "minerwk:gojo/gojo_r_avanco_3",
+        "attenuation_distance": 48
+      }
+    ]
+  },
+  "gojo_r_uppercut": {
+    "subtitle": "subtitles.minerwk.gojo_r_uppercut",
+    "sounds": [
+      {
+        "name": "minerwk:gojo/gojo_r_uppercut",
+        "attenuation_distance": 64
+      },
+      {
+        "name": "minerwk:gojo/gojo_r_uppercut_2",
+        "attenuation_distance": 64
+      },
+      {
+        "name": "minerwk:gojo/gojo_r_uppercut_3",
+        "attenuation_distance": 64
+      }
+    ]
+  },
+  "gojo_r_subida": {
+    "subtitle": "subtitles.minerwk.gojo_r_subida",
+    "sounds": [
+      {
+        "name": "minerwk:gojo/gojo_r_subida",
+        "attenuation_distance": 64
+      },
+      {
+        "name": "minerwk:gojo/gojo_r_subida_2",
+        "attenuation_distance": 64
+      },
+      {
+        "name": "minerwk:gojo/gojo_r_subida_3",
+        "attenuation_distance": 64
+      }
+    ]
+  },
+  "gojo_r_esferas": {
+    "subtitle": "subtitles.minerwk.gojo_r_esferas",
+    "sounds": [
+      {
+        "name": "minerwk:gojo/gojo_r_esferas",
+        "attenuation_distance": 64
+      },
+      {
+        "name": "minerwk:gojo/gojo_r_esferas_2",
+        "attenuation_distance": 64
+      },
+      {
+        "name": "minerwk:gojo/gojo_r_esferas_3",
+        "attenuation_distance": 64
+      }
+    ]
+  },
+  "gojo_r_fusao": {
+    "subtitle": "subtitles.minerwk.gojo_r_fusao",
+    "sounds": [
+      {
+        "name": "minerwk:gojo/gojo_r_fusao",
+        "attenuation_distance": 96
+      },
+      {
+        "name": "minerwk:gojo/gojo_r_fusao_2",
+        "attenuation_distance": 96
+      },
+      {
+        "name": "minerwk:gojo/gojo_r_fusao_3",
+        "attenuation_distance": 96
+      }
+    ]
+  },
+  "gojo_r_explosao": {
+    "subtitle": "subtitles.minerwk.gojo_r_explosao",
+    "sounds": [
+      {
+        "name": "minerwk:gojo/gojo_r_explosao",
+        "attenuation_distance": 128
+      },
+      {
+        "name": "minerwk:gojo/gojo_r_explosao_2",
+        "attenuation_distance": 128
+      },
+      {
+        "name": "minerwk:gojo/gojo_r_explosao_3",
+        "attenuation_distance": 128
+      }
+    ]
+  },
+  "toji_entrada": {
+    "subtitle": "subtitles.minerwk.toji_entrada",
+    "sounds": [
+      {
+        "name": "minerwk:toji/toji_entrada",
+        "attenuation_distance": 48
+      },
+      {
+        "name": "minerwk:toji/toji_entrada_2",
+        "attenuation_distance": 48
+      },
+      {
+        "name": "minerwk:toji/toji_entrada_3",
+        "attenuation_distance": 48
+      }
+    ]
+  },
+  "toji_aviso": {
+    "subtitle": "subtitles.minerwk.toji_aviso",
+    "sounds": [
+      {
+        "name": "minerwk:toji/toji_aviso",
+        "attenuation_distance": 32
+      },
+      {
+        "name": "minerwk:toji/toji_aviso_2",
+        "attenuation_distance": 32
+      },
+      {
+        "name": "minerwk:toji/toji_aviso_3",
+        "attenuation_distance": 32
+      }
+    ]
+  },
+  "toji_investida": {
+    "subtitle": "subtitles.minerwk.toji_investida",
+    "sounds": [
+      {
+        "name": "minerwk:toji/toji_investida",
+        "attenuation_distance": 48
+      },
+      {
+        "name": "minerwk:toji/toji_investida_2",
+        "attenuation_distance": 48
+      },
+      {
+        "name": "minerwk:toji/toji_investida_3",
+        "attenuation_distance": 48
+      }
+    ]
+  },
+  "toji_lanca": {
+    "subtitle": "subtitles.minerwk.toji_lanca",
+    "sounds": [
+      {
+        "name": "minerwk:toji/toji_lanca",
+        "attenuation_distance": 48
+      },
+      {
+        "name": "minerwk:toji/toji_lanca_2",
+        "attenuation_distance": 48
+      },
+      {
+        "name": "minerwk:toji/toji_lanca_3",
+        "attenuation_distance": 48
+      }
+    ]
+  },
+  "toji_anula": {
+    "subtitle": "subtitles.minerwk.toji_anula",
+    "sounds": [
+      {
+        "name": "minerwk:toji/toji_anula",
+        "attenuation_distance": 48
+      },
+      {
+        "name": "minerwk:toji/toji_anula_2",
+        "attenuation_distance": 48
+      },
+      {
+        "name": "minerwk:toji/toji_anula_3",
+        "attenuation_distance": 48
+      }
+    ]
+  },
+  "toji_corrente": {
+    "subtitle": "subtitles.minerwk.toji_corrente",
+    "sounds": [
+      {
+        "name": "minerwk:toji/toji_corrente",
+        "attenuation_distance": 48
+      },
+      {
+        "name": "minerwk:toji/toji_corrente_2",
+        "attenuation_distance": 48
+      },
+      {
+        "name": "minerwk:toji/toji_corrente_3",
+        "attenuation_distance": 48
+      }
+    ]
+  },
+  "toji_soco": {
+    "subtitle": "subtitles.minerwk.toji_soco",
+    "sounds": [
+      {
+        "name": "minerwk:toji/toji_soco",
+        "attenuation_distance": 32
+      },
+      {
+        "name": "minerwk:toji/toji_soco_2",
+        "attenuation_distance": 32
+      },
+      {
+        "name": "minerwk:toji/toji_soco_3",
+        "attenuation_distance": 32
+      }
+    ]
+  },
+  "toji_nuvem": {
+    "subtitle": "subtitles.minerwk.toji_nuvem",
+    "sounds": [
+      {
+        "name": "minerwk:toji/toji_nuvem",
+        "attenuation_distance": 32
+      },
+      {
+        "name": "minerwk:toji/toji_nuvem_2",
+        "attenuation_distance": 32
+      },
+      {
+        "name": "minerwk:toji/toji_nuvem_3",
+        "attenuation_distance": 32
+      }
+    ]
+  },
+  "toji_sumir": {
+    "subtitle": "subtitles.minerwk.toji_sumir",
+    "sounds": [
+      {
+        "name": "minerwk:toji/toji_sumir",
+        "attenuation_distance": 32
+      },
+      {
+        "name": "minerwk:toji/toji_sumir_2",
+        "attenuation_distance": 32
+      },
+      {
+        "name": "minerwk:toji/toji_sumir_3",
+        "attenuation_distance": 32
+      }
+    ]
+  },
+  "toji_surgir": {
+    "subtitle": "subtitles.minerwk.toji_surgir",
+    "sounds": [
+      {
+        "name": "minerwk:toji/toji_surgir",
+        "attenuation_distance": 32
+      },
+      {
+        "name": "minerwk:toji/toji_surgir_2",
+        "attenuation_distance": 32
+      },
+      {
+        "name": "minerwk:toji/toji_surgir_3",
+        "attenuation_distance": 32
+      }
+    ]
+  },
+  "toji_marca": {
+    "subtitle": "subtitles.minerwk.toji_marca",
+    "sounds": [
+      {
+        "name": "minerwk:toji/toji_marca",
+        "attenuation_distance": 48
+      },
+      {
+        "name": "minerwk:toji/toji_marca_2",
+        "attenuation_distance": 48
+      },
+      {
+        "name": "minerwk:toji/toji_marca_3",
+        "attenuation_distance": 48
+      }
+    ]
+  },
+  "toji_fase": {
+    "subtitle": "subtitles.minerwk.toji_fase",
+    "sounds": [
+      {
+        "name": "minerwk:toji/toji_fase",
+        "attenuation_distance": 64
+      },
+      {
+        "name": "minerwk:toji/toji_fase_2",
+        "attenuation_distance": 64
+      },
+      {
+        "name": "minerwk:toji/toji_fase_3",
+        "attenuation_distance": 64
+      }
+    ]
+  },
+  "toji_queda": {
+    "subtitle": "subtitles.minerwk.toji_queda",
+    "sounds": [
+      {
+        "name": "minerwk:toji/toji_queda",
+        "attenuation_distance": 48
+      },
+      {
+        "name": "minerwk:toji/toji_queda_2",
+        "attenuation_distance": 48
+      },
+      {
+        "name": "minerwk:toji/toji_queda_3",
+        "attenuation_distance": 48
+      }
+    ]
+  },
+  "toji_despertar": {
+    "subtitle": "subtitles.minerwk.toji_despertar",
+    "sounds": [
+      {
+        "name": "minerwk:toji/toji_despertar",
+        "attenuation_distance": 64
+      },
+      {
+        "name": "minerwk:toji/toji_despertar_2",
+        "attenuation_distance": 64
+      },
+      {
+        "name": "minerwk:toji/toji_despertar_3",
+        "attenuation_distance": 64
+      }
+    ]
+  },
+  "toji_morte": {
+    "subtitle": "subtitles.minerwk.toji_morte",
+    "sounds": [
+      {
+        "name": "minerwk:toji/toji_morte",
+        "attenuation_distance": 64
+      },
+      {
+        "name": "minerwk:toji/toji_morte_2",
+        "attenuation_distance": 64
+      },
+      {
+        "name": "minerwk:toji/toji_morte_3",
+        "attenuation_distance": 64
+      }
+    ]
   }
 }

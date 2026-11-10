@@ -1,5 +1,6 @@
 package com.minerwk.core.kit;
 
+import com.minerwk.core.maestria.Melhorias;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -17,6 +18,9 @@ public final class KitDoJogador {
     private Execucao execucao;
     private final List<Ativo> efeitos = new ArrayList<>();
     private final List<Passiva> passivas;
+    private Melhorias melhorias = Melhorias.NENHUMA;
+    /** Se o jogador já despertou (de vez ou só nesta luta): libera o que o personagem tranca. */
+    private boolean desperto;
 
     private static final class Ativo {
         final Efeito efeito;
@@ -47,16 +51,51 @@ public final class KitDoJogador {
         return recargas;
     }
 
+    public Melhorias melhorias() {
+        return melhorias;
+    }
+
+    public boolean desperto() {
+        return desperto;
+    }
+
+    /** Liga ou desliga o despertar. Voltar a trancar não interrompe o golpe em andamento. */
+    public void definirDesperto(boolean desperto) {
+        this.desperto = desperto;
+    }
+
+    /** Se a habilidade da tecla ainda exige o despertar. */
+    public boolean trancada(Tecla tecla) {
+        return !desperto && personagem.trancas().teclas().contains(tecla);
+    }
+
+    /** As melhorias da árvore do jogador: valem para o próximo golpe e, no recurso, na hora. */
+    public void definirMelhorias(Melhorias melhorias) {
+        this.melhorias = melhorias;
+        recurso.melhorias(melhorias);
+    }
+
+    /** Os números da habilidade já com as melhorias de carga e de recarga. */
+    public Numeros numeros(Habilidade h) {
+        return melhorias.ajustar(h.id(), h.numeros());
+    }
+
+    /** Ferramenta de teste: enche o recurso e zera todas as recargas, sem trocar de kit. */
+    public void recarregar() {
+        recargas.limpar();
+        recurso.carregar(recurso.maximo());
+    }
+
     public Optional<Execucao> execucao() {
         return Optional.ofNullable(execucao);
     }
 
     /** Tenta começar a habilidade da tecla. Devolve se começou. */
     public boolean apertar(Tecla tecla, long agora) {
-        if (execucao != null) return false;
+        if (execucao != null || trancada(tecla)) return false;
         Habilidade h = personagem.naTecla(tecla).orElse(null);
         if (h == null || !recargas.pronta(h.id(), agora) || !recurso.pode(h.numeros().custo())) return false;
-        execucao = new Execucao(h);
+        execucao = new Execucao(h, numeros(h));
         pendenteIniciar = true;
         return true;
     }
@@ -76,7 +115,7 @@ public final class KitDoJogador {
     public void atordoar(long agora, Contexto contexto) {
         if (execucao == null || execucao.fase() != Execucao.Fase.CARGA) return;
         Habilidade h = execucao.habilidade();
-        recargas.iniciar(h.id(), agora, h.numeros().recarga() / 4);
+        recargas.iniciar(h.id(), agora, numeros(h).recarga() / 4);
         limpar();
         h.aoInterromper(contexto);
     }
@@ -99,6 +138,21 @@ public final class KitDoJogador {
         return efeitos.stream().map(a -> a.efeito).toList();
     }
 
+    /**
+     * Um golpe que anula técnicas acertou o jogador: os efeitos anuláveis acabam na hora, com o
+     * {@code aoAcabar} deles. A recarga da habilidade já corre desde o disparo. Devolve se anulou algum.
+     */
+    public boolean anularTecnicas(Contexto contexto) {
+        boolean anulou = false;
+        for (Ativo a : List.copyOf(efeitos)) {
+            if (a.efeito.anulavel() && efeitos.remove(a)) {
+                a.efeito.aoAcabar(contexto);
+                anulou = true;
+            }
+        }
+        return anulou;
+    }
+
     /** Cancela sem cobrar nem punir e encerra os efeitos sem {@code aoAcabar} (jogador saiu ou morreu). */
     public void descartar() {
         descartar(Contexto.NULO);
@@ -107,14 +161,21 @@ public final class KitDoJogador {
     /** Como {@link #descartar()}, avisando a habilidade em carga para desfazer o visual. */
     public void descartar(Contexto contexto) {
         Habilidade emCarga = execucao != null && execucao.fase() == Execucao.Fase.CARGA ? execucao.habilidade() : null;
+        // A animação cobre o golpe inteiro, não só a carga: havendo golpe ou efeito no ar, ela para.
+        boolean emAndamento = execucao != null || !efeitos.isEmpty();
         limpar();
         efeitos.clear();
         if (emCarga != null) emCarga.aoInterromper(contexto);
+        else if (emAndamento) contexto.pararAnimacao();
+        // Uma cutscene no meio do golpe (a parte 2 do R) acaba junto.
+        if (emAndamento) contexto.encerrarCutscene();
     }
 
     public List<Execucao.Evento> tick(long agora, EstadoDoJogador estado, Contexto contexto) {
         recurso.tick(estado);
-        for (Passiva p : passivas) p.tick(contexto, estado);
+        if (desperto || !personagem.trancas().passivas()) {
+            for (Passiva p : passivas) p.tick(contexto, estado);
+        }
         tickEfeitos(contexto);
         List<Execucao.Evento> eventos = new ArrayList<>(1);
         if (execucao == null) return eventos;
@@ -125,7 +186,7 @@ public final class KitDoJogador {
         }
         Execucao.Evento e = execucao.tick();
         if (e instanceof Execucao.Disparou d) {
-            Numeros n = h.numeros();
+            Numeros n = numeros(h);
             if (!recurso.pode(n.custo())) {
                 // Sem recurso na hora do disparo: conta como interrupção na carga.
                 recargas.iniciar(h.id(), agora, n.recarga() / 4);

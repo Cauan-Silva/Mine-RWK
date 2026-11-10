@@ -1,0 +1,79 @@
+package com.minerwk.core.personagens.gojo;
+
+import static org.junit.jupiter.api.Assertions.*;
+
+import com.minerwk.core.kit.Vetor;
+import org.junit.jupiter.api.Test;
+
+class RoxoMaximoTest {
+    private static final Vetor FRENTE = new Vetor(1, 0, 0);
+
+    @Test
+    void avancoA3BlocosPorTickParandoA1E5DoAlvo() {
+        assertEquals(10, RoxoMaximo.avanco(31.5));
+        assertEquals(RoxoMaximo.AVANCO_MAX, RoxoMaximo.avanco(60));
+        assertEquals(0, RoxoMaximo.avanco(1), "colado no alvo: uppercut na hora");
+    }
+
+    @Test
+    void fasesEmSequencia() {
+        int a = 10;
+        assertEquals(40, RoxoMaximo.inicioEsferas(a), "subida de 30");
+        assertEquals(70, RoxoMaximo.inicioFusao(a), "esferas em 30 (8 conjurando, 10 de viagem e 12 de dança)");
+        assertEquals(106, RoxoMaximo.inicioSilencio(a), "4 ticks de silêncio antes do estouro");
+        assertEquals(110, RoxoMaximo.inicioExplosao(a), "fusão carregando 40");
+        assertEquals(170, RoxoMaximo.fim(a), "explosão em 60");
+        assertEquals(60, RoxoMaximo.TICKS_EXPLOSAO, "a explosão cresce por 3 s");
+        assertEquals(50, RoxoMaximo.TICKS_RESTO, "e o que sobra dela fica mais 2,5 s no ar");
+    }
+
+    @Test
+    void ritmoCercaDoDobroDoAntigo() {
+        assertEquals(160, RoxoMaximo.fim(0) - 0, "do uppercut ao fim da explosão: 8 s");
+    }
+
+    @Test
+    void explosaoEstouraRapidoEDepoisCresceDevagar() {
+        assertEquals(0, RoxoMaximo.fracaoExplosao(0), 1e-9);
+        assertEquals(1, RoxoMaximo.fracaoExplosao(1), 1e-9);
+        assertEquals(1, RoxoMaximo.fracaoExplosao(2), 1e-9);
+        assertTrue(RoxoMaximo.fracaoExplosao(.25) > .4, "em um quarto do tempo já passou de 40% do raio");
+        for (double s = .05; s <= 1; s += .05) {
+            assertTrue(RoxoMaximo.fracaoExplosao(s) > RoxoMaximo.fracaoExplosao(s - .05));
+        }
+        assertEquals(RoxoMaximo.TICKS_ESFERAS, RoxoMaximo.TICKS_CONJURAR + RoxoMaximo.TICKS_VIAGEM + RoxoMaximo.TICKS_DANCA);
+        assertEquals(8, RoxoMaximo.TICKS_CONJURAR, "lá no céu ele conjura os dois nas mãos");
+        assertEquals(10, RoxoMaximo.TICKS_VIAGEM);
+        assertEquals(12, RoxoMaximo.TICKS_DANCA);
+        assertEquals(30, RoxoMaximo.TICKS_ESFERAS_SEM_ALVO);
+    }
+
+    @Test
+    void gojoAvancaAteOAlvoESobeJunto() {
+        double dist = 31.5;
+        int a = RoxoMaximo.avanco(dist);
+        assertEquals(Vetor.ZERO, RoxoMaximo.deslocamentoGojo(0, FRENTE, dist));
+        assertEquals(30, RoxoMaximo.deslocamentoGojo(a, FRENTE, dist).x(), 1e-9, "para a 1,5 do alvo");
+        Vetor topo = RoxoMaximo.deslocamentoGojo(a + RoxoMaximo.TICKS_SUBIDA, FRENTE, dist);
+        assertEquals(30, topo.x(), 1e-9);
+        assertEquals(RoxoMaximo.SUBIDA, topo.y(), 1e-9);
+        assertEquals(RoxoMaximo.SUBIDA, RoxoMaximo.deslocamentoGojo(a + 40, FRENTE, dist).y(), 1e-9, "fica lá em cima");
+    }
+
+    @Test
+    void alvoSobe25Em30TicksSuave() {
+        assertEquals(0, RoxoMaximo.alturaAlvo(0), 1e-9);
+        assertEquals(RoxoMaximo.SUBIDA, RoxoMaximo.alturaAlvo(30), 1e-9);
+        for (int t = 1; t <= 30; t++) assertTrue(RoxoMaximo.alturaAlvo(t) > RoxoMaximo.alturaAlvo(t - 1));
+    }
+
+    @Test
+    void fusaoQuatroBlocosAtrasDoGojoNaHorizontal() {
+        Vetor olhos = new Vetor(10, 90, 5);
+        Vetor c = RoxoMaximo.centroFusao(olhos, new Vetor(.6, -.8, 0));
+        assertEquals(new Vetor(6, 90, 5), c);
+        Vetor reto = RoxoMaximo.centroFusao(olhos, new Vetor(0, -1, 0));
+        assertEquals(4, reto.distancia(olhos), 1e-9, "olhando reto para baixo: fica 4 acima");
+        assertEquals(94, reto.y(), 1e-9);
+    }
+}

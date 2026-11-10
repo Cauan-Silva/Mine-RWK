@@ -3,6 +3,9 @@ package com.minerwk.kit;
 import com.minerwk.MineRWK;
 import com.minerwk.core.kit.EstadoDoJogador;
 import com.minerwk.core.kit.Tecla;
+import com.minerwk.core.maestria.Arvore;
+import com.minerwk.core.maestria.Maestria;
+import com.minerwk.core.maestria.Melhorias;
 import com.minerwk.core.kit.KitDoJogador;
 import com.minerwk.core.kit.Personagem;
 import com.minerwk.core.kit.Personagens;
@@ -27,13 +30,19 @@ public final class ServicoKits {
     private static final Map<UUID, KitDoJogador> KITS = new HashMap<>();
     private static final Set<UUID> APANHOU = new HashSet<>();
     private static final Set<UUID> CAUSOU_DANO = new HashSet<>();
+    /** O jogador cujo golpe do kit está causando dano agora (o servidor roda numa thread só). */
+    private static ServerPlayer golpeDoKit;
+    /** Quem despertou só para a luta em andamento contra o Nêmesis. Não é salvo: acaba com a luta. */
+    private static final Set<UUID> DESPERTOS_NA_LUTA = new HashSet<>();
 
     private ServicoKits() {
     }
 
     public static void registrarEventos() {
+        NeoForge.EVENT_BUS.addListener(ServicoKits::aoComecarAVer);
         NeoForge.EVENT_BUS.addListener(ServicoKits::aoTick);
         NeoForge.EVENT_BUS.addListener(ServicoKits::aoDano);
+        NeoForge.EVENT_BUS.addListener(ServicoKits::aoMorrer);
         NeoForge.EVENT_BUS.addListener(ServicoKits::aoEntrar);
         NeoForge.EVENT_BUS.addListener(ServicoKits::aoSair);
         NeoForge.EVENT_BUS.addListener(ServicoKits::aoClonar);
@@ -52,6 +61,9 @@ public final class ServicoKits {
         Optional<Personagem> personagem = Personagens.porId(dados.personagem);
         if (personagem.isEmpty()) return Optional.empty();
         kit = new KitDoJogador(personagem.get());
+        // Antes de carregar o recurso: a reserva comprada na árvore muda o máximo.
+        kit.definirMelhorias(new Melhorias(personagem.get().arvore(), dados.maestriaAtual().nos));
+        kit.definirDesperto(desperto(jogador));
         kit.recurso().carregar(dados.recurso);
         kit.recargas().carregar(dados.recargas, jogador.level().getGameTime());
         KITS.put(jogador.getUUID(), kit);
@@ -61,11 +73,26 @@ public final class ServicoKits {
     /** Define (ou troca) o personagem: recurso novo (cheio) e recargas zeradas. */
     public static void definirPersonagem(ServerPlayer jogador, Personagem personagem) {
         KitDoJogador antigo = KITS.remove(jogador.getUUID());
-        if (antigo != null) antigo.descartar();
+        DESPERTOS_NA_LUTA.remove(jogador.getUUID());
+        // Com o contexto do jogador: a carga em andamento desfaz o visual e para a animação.
+        if (antigo != null) antigo.descartar(new ContextoServidor(jogador));
         KitDoJogador novo = new KitDoJogador(personagem);
         KITS.put(jogador.getUUID(), novo);
         salvar(jogador, novo);
+        atualizarMelhorias(jogador);
+        novo.definirDesperto(desperto(jogador));
+        novo.recarregar();
         Sincronizacao.enviar(jogador);
+        // Quem já está vendo o jogador passa a vê-lo com o traje do personagem novo.
+        com.minerwk.rede.Envio.paraQuemVe(jogador, new com.minerwk.rede.PersonagemDe(jogador.getId(), personagem.id()));
+    }
+
+    /** Um jogador passou a ver outro: recebe o personagem dele, para desenhar o traje. */
+    private static void aoComecarAVer(PlayerEvent.StartTracking evento) {
+        if (evento.getTarget() instanceof ServerPlayer visto && evento.getEntity() instanceof ServerPlayer quemVe) {
+            String personagem = kit(visto).map(k -> k.personagem().id()).orElse("");
+            com.minerwk.rede.Envio.para(quemVe, new com.minerwk.rede.PersonagemDe(visto.getId(), personagem));
+        }
     }
 
     /** Só jogador vivo e fora do modo espectador usa habilidades. */
@@ -100,8 +127,120 @@ public final class ServicoKits {
     }
 
     private static void salvar(ServerPlayer jogador, KitDoJogador kit) {
-        jogador.setData(Anexos.DADOS_KIT,
-                new DadosKit(kit.personagem().id(), kit.recurso().salvar(), kit.recargas().salvar()));
+        jogador.setData(Anexos.DADOS_KIT, new DadosKit(kit.personagem().id(), kit.recurso().salvar(),
+                kit.recargas().salvar(), dados(jogador).maestria));
+    }
+
+    /**
+     * Roda {@code golpe} marcando o dano como vindo do kit do {@code jogador}: só esse dano (e o abate que
+     * ele causar) dá XP de maestria. Um soco ou uma espada não contam.
+     */
+    static void comoGolpeDoKit(ServerPlayer jogador, Runnable golpe) {
+        ServerPlayer antes = golpeDoKit;
+        golpeDoKit = jogador;
+        try {
+            golpe.run();
+        } finally {
+            golpeDoKit = antes;
+        }
+    }
+
+    private static boolean inimigo(net.minecraft.world.entity.Entity alvo) {
+        return alvo instanceof net.minecraft.world.entity.monster.Enemy;
+    }
+
+    private static void aoMorrer(net.neoforged.neoforge.event.entity.living.LivingDeathEvent evento) {
+        if (golpeDoKit != null && evento.getSource().getEntity() == golpeDoKit) {
+            ganharXp(golpeDoKit, Maestria.xpPorAbate(inimigo(evento.getEntity())));
+        }
+    }
+
+    /** Dá XP de maestria ao jogador no personagem atual; avisa e festeja se subiu de nível. */
+    public static void ganharXp(ServerPlayer jogador, long ganho) {
+        DadosKit dados = dados(jogador);
+        if (ganho <= 0 || !dados.temPersonagem()) return;
+        DadosMaestria m = dados.maestriaAtual();
+        definirXp(jogador, Maestria.somar(m.xp, ganho));
+    }
+
+    /** Os nós comprados mudaram (compra, zerar ou troca de personagem): o kit passa a usar os novos. */
+    public static void atualizarMelhorias(ServerPlayer jogador) {
+        DadosKit dados = dados(jogador);
+        kit(jogador).ifPresent(k -> k.definirMelhorias(new Melhorias(k.personagem().arvore(), dados.maestriaAtual().nos)));
+    }
+
+    /** Sobe um nível de um nó da árvore do personagem atual, se as regras deixarem. O servidor é quem decide. */
+    public static Arvore.Resultado comprarNo(ServerPlayer jogador, String no) {
+        DadosKit dados = dados(jogador);
+        Optional<Personagem> personagem = Personagens.porId(dados.personagem);
+        if (personagem.isEmpty()) return Arvore.Resultado.NO_DESCONHECIDO;
+        DadosMaestria m = dados.maestriaAtual();
+        Arvore.Resultado r = personagem.get().arvore().comprar(m.nos, no, Maestria.nivel(m.xp), m.despertou);
+        if (r == Arvore.Resultado.OK) {
+            atualizarMelhorias(jogador);
+            Sincronizacao.enviar(jogador);
+        }
+        return r;
+    }
+
+    /**
+     * Marca (ou desmarca) o jogador como desperto no personagem atual: abre os nós de depois do despertar.
+     * Por enquanto só o comando de teste chama; a vitória sobre o Nêmesis vai chamar daqui.
+     */
+    public static void definirDespertou(ServerPlayer jogador, boolean despertou) {
+        DadosKit dados = dados(jogador);
+        if (!dados.temPersonagem()) return;
+        dados.maestriaAtual().despertou = despertou;
+        atualizarDespertar(jogador);
+    }
+
+    /** Se o jogador pode usar o que o personagem tranca: despertou de vez ou está desperto nesta luta. */
+    public static boolean desperto(ServerPlayer jogador) {
+        DadosKit dados = dados(jogador);
+        return dados.temPersonagem() && (dados.maestriaAtual().despertou || DESPERTOS_NA_LUTA.contains(jogador.getUUID()));
+    }
+
+    /** O despertar no meio da luta contra o Nêmesis: vale enquanto a luta durar e some com ela. */
+    public static void definirDespertoNaLuta(ServerPlayer jogador, boolean desperto) {
+        if (desperto) DESPERTOS_NA_LUTA.add(jogador.getUUID());
+        else DESPERTOS_NA_LUTA.remove(jogador.getUUID());
+        atualizarDespertar(jogador);
+    }
+
+    /** O servidor fechou: nenhuma luta sobrevive a ele. */
+    public static void esquecerDespertosNaLuta() {
+        DESPERTOS_NA_LUTA.clear();
+    }
+
+    private static void atualizarDespertar(ServerPlayer jogador) {
+        boolean desperto = desperto(jogador);
+        kit(jogador).ifPresent(k -> k.definirDesperto(desperto));
+        Sincronizacao.enviar(jogador);
+    }
+
+    /** Define o XP total no personagem atual (também usado pelos comandos de teste). */
+    public static void definirXp(ServerPlayer jogador, long xp) {
+        DadosKit dados = dados(jogador);
+        if (!dados.temPersonagem()) return;
+        DadosMaestria m = dados.maestriaAtual();
+        int antes = Maestria.nivel(m.xp);
+        m.xp = Math.max(0, Math.min(Maestria.XP_MAX, xp));
+        int depois = Maestria.nivel(m.xp);
+        if (depois > antes) aoSubirDeNivel(jogador, depois, depois - antes);
+    }
+
+    private static void aoSubirDeNivel(ServerPlayer jogador, int nivel, int pontos) {
+        // Jogador sem conexão (GameTest) não recebe mensagem.
+        if (jogador.connection != null) {
+            jogador.displayClientMessage(net.minecraft.network.chat.Component.translatable(
+                    "mensagem.minerwk.maestria", nivel, pontos), true);
+        }
+        if (jogador.level() instanceof net.minecraft.server.level.ServerLevel mundo) {
+            mundo.playSound(null, jogador.getX(), jogador.getY(), jogador.getZ(),
+                    net.minecraft.sounds.SoundEvents.PLAYER_LEVELUP, net.minecraft.sounds.SoundSource.PLAYERS, .8f, 1f);
+            mundo.sendParticles(net.minecraft.core.particles.ParticleTypes.TOTEM_OF_UNDYING, jogador.getX(),
+                    jogador.getY() + 1, jogador.getZ(), 30, .4, .6, .4, .25);
+        }
     }
 
     private static void aoTick(PlayerTickEvent.Post evento) {
@@ -136,7 +275,12 @@ public final class ServicoKits {
             kit(vitima).ifPresent(k -> k.levouDano(evento.getNewDamage(), vitima.level().getGameTime(),
                     new ContextoServidor(vitima)));
         }
-        if (evento.getSource().getEntity() instanceof ServerPlayer atacante) CAUSOU_DANO.add(atacante.getUUID());
+        if (evento.getSource().getEntity() instanceof ServerPlayer atacante) {
+            CAUSOU_DANO.add(atacante.getUUID());
+            if (atacante == golpeDoKit) {
+                ganharXp(atacante, Maestria.xpPorDano(evento.getNewDamage(), inimigo(evento.getEntity())));
+            }
+        }
     }
 
     private static void aoEntrar(PlayerEvent.PlayerLoggedInEvent evento) {
@@ -151,6 +295,7 @@ public final class ServicoKits {
             salvar(jogador, kit);
         }
         Sincronizacao.esquecer(jogador);
+        DESPERTOS_NA_LUTA.remove(jogador.getUUID());
     }
 
     /** Os efeitos guardam coordenadas da dimensão antiga: acabam na troca (o domínio não segue para o Nether). */

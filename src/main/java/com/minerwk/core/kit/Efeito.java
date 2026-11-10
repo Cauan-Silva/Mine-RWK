@@ -16,6 +16,11 @@ public interface Efeito {
         return false;
     }
 
+    /** Se um golpe que anula técnicas (a Lança Invertida do Céu) derruba este efeito. */
+    default boolean anulavel() {
+        return false;
+    }
+
     /** Roda uma vez quando acaba (pela duração ou por {@link #encerrado()}); não roda se o jogador morreu ou saiu. */
     default void aoAcabar(Contexto contexto) {
     }

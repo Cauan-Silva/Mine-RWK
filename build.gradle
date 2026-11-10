@@ -36,6 +36,13 @@ neoForge {
             client()
             systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
         }
+        clientDemo {
+            // Prévia gravável: entra direto no mundo e toca a demonstração de VFX (client/vfx/DemoVfx).
+            client()
+            programArguments.addAll('--quickPlaySingleplayer', 'New World')
+            // -Pdemo=encantamento grava a carga do R em vez da fusão e da explosão.
+            systemProperty 'minerwk.demo', (project.findProperty('demo') ?: 'true').toString()
+        }
         server {
             server()
             programArgument '--nogui'
@@ -88,6 +95,8 @@ dependencies {
 
     testImplementation platform('org.junit:junit-bom:5.11.4')
     testImplementation 'org.junit.jupiter:junit-jupiter'
+    // Ler os JSON de animação nos testes do núcleo (a mesma versão do Minecraft 1.21.1)
+    testImplementation 'com.google.code.gson:gson:2.11.0'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 

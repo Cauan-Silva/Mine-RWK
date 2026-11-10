@@ -39,6 +39,7 @@ Coordenadas Maven: ver `build.gradle` e [[Ambiente e Build]].
 - Requer LDLib2 (o POM da 2.2.11 aponta 2.2.45); o KilaGraph vem embutido no jar `:all`.
 - API: `FXHelper.getFX(id)` + `BlockEffectExecutor` / `EntityEffectExecutor` (só no cliente). Atalhos em `client/vfx/EfeitosVisuais`.
 - Documentação: https://low-drag-mc.github.io/LowDragMC-Doc/en/photon2/java-api/
+- Estudo do tutorial oficial (bloom por HDR, módulos, shaders próprios): [[Tutoriais de VFX e animação]].
 - **Risco:** é uma versão maior. Os efeitos do Minezin (Photon 1) provavelmente precisam ser reexportados ou refeitos. Testar com um efeito antes de portar o resto.
 
 ### Veil (complemento, opcional)

@@ -8,7 +8,9 @@ import com.minerwk.core.kit.Vetor;
  */
 public final class TrajetoriaGojo {
     /** Blocos por tick da esfera do Vermelho. */
-    public static final double VELOCIDADE_VERMELHO = 1.5;
+    public static final double VELOCIDADE_VERMELHO = 1.0;
+    /** Blocos por tick da massa do Roxo e do Roxo 200%. */
+    public static final double PASSO_ROXO = 1, PASSO_ROXO_200 = 2;
 
     private TrajetoriaGojo() {
     }

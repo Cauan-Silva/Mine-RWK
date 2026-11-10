@@ -3,6 +3,7 @@ package com.minerwk.client.vfx;
 import com.minerwk.client.camera.TremorCamera;
 import com.minerwk.core.kit.Vetor;
 import com.minerwk.core.vfx.ImpactoGojo;
+import com.minerwk.rede.Acertou;
 import com.minerwk.rede.Tremer;
 import java.util.ArrayList;
 import java.util.List;
@@ -26,6 +27,10 @@ public final class ImpactoCamera {
     }
 
     private static final List<Ativo> ATIVOS = new ArrayList<>();
+    /** Ticks que a câmera de quem acertou fica parada (hit-stop). */
+    private static final int TRAVA = 2;
+    private static long travaAte = Long.MIN_VALUE;
+    private static float[] angulosTravados;
     private static final int CARGA_200 = 80;
 
     private ImpactoCamera() {
@@ -69,6 +74,36 @@ public final class ImpactoCamera {
 
     public static void limpar() {
         ATIVOS.clear();
+        travaAte = Long.MIN_VALUE;
+        angulosTravados = null;
+    }
+
+    /** O golpe deste jogador acertou: a câmera para um instante, fecha um pouco o FOV e treme de leve. */
+    public static void acertou(Acertou pacote) {
+        Minecraft mc = Minecraft.getInstance();
+        if (mc.level == null) return;
+        float f = Math.max(0, Math.min(2, pacote.forca()));
+        long agora = mc.level.getGameTime();
+        if (agora < travaAte) return; // já travada por outro acerto
+        travaAte = agora + TRAVA;
+        angulosTravados = null;
+        TremorCamera.receber(new Tremer(.25f * f, 4));
+        ATIVOS.add(new Ativo(new ImpactoGojo.Reacao(0, 0, 0xFFFFFF, .1f * f, 2, -.03 * f, 5, 1), 1, agora));
+    }
+
+    public static void aoCalcularAngulos(ViewportEvent.ComputeCameraAngles evento) {
+        Minecraft mc = Minecraft.getInstance();
+        if (mc.level == null || mc.level.getGameTime() >= travaAte) {
+            angulosTravados = null;
+            return;
+        }
+        if (angulosTravados == null) {
+            angulosTravados = new float[]{evento.getYaw(), evento.getPitch(), evento.getRoll()};
+        } else {
+            evento.setYaw(angulosTravados[0]);
+            evento.setPitch(angulosTravados[1]);
+            evento.setRoll(angulosTravados[2]);
+        }
     }
 
     public static void aoCalcularFov(ViewportEvent.ComputeFov evento) {

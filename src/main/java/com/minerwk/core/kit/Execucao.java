@@ -25,8 +25,13 @@ public final class Execucao {
     private boolean solta;
 
     public Execucao(Habilidade habilidade) {
+        this(habilidade, habilidade.numeros());
+    }
+
+    /** Com os números já ajustados pelas melhorias do jogador. */
+    public Execucao(Habilidade habilidade, Numeros numeros) {
         this.habilidade = habilidade;
-        this.n = habilidade.numeros();
+        this.n = numeros;
     }
 
     public Habilidade habilidade() {

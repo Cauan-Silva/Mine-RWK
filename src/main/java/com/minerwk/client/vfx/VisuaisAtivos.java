@@ -2,6 +2,7 @@ package com.minerwk.client.vfx;
 
 import com.minerwk.core.kit.Vetor;
 import com.minerwk.core.vfx.PerfilVfxGojo;
+import com.minerwk.core.vfx.TrajetoriaGojo;
 import com.minerwk.rede.EncerrarVisual;
 import com.minerwk.rede.MostrarVisual;
 import java.util.ArrayList;
@@ -29,6 +30,12 @@ public final class VisuaisAtivos {
         final int duracao;
         final long inicio;
         long fimEm = -1;
+        /** Se já deixou o rastro (túnel do Roxo, marca do Azul). */
+        boolean deixouRastro;
+        /** Se o som de fim (o domínio rachando) já tocou. */
+        boolean somDeFimTocado;
+        /** Quais sons do meio do visual já tocaram (um bit por som, na ordem de SonsGojo.noMeio). */
+        int sonsDoMeioTocados;
 
         Visual(int dono, String tipo, Vetor origem, Vetor direcao, float forca, int duracao, long inicio) {
             this.dono = dono;
@@ -38,6 +45,39 @@ public final class VisuaisAtivos {
             this.forca = forca;
             this.duracao = duracao;
             this.inicio = inicio;
+        }
+
+        public int dono() {
+            return dono;
+        }
+
+        public String tipo() {
+            return tipo;
+        }
+
+        public Vetor origem() {
+            return origem;
+        }
+
+        public int duracao() {
+            return duracao;
+        }
+
+        public Vetor direcao() {
+            return direcao;
+        }
+
+        public float forca() {
+            return forca;
+        }
+
+        public long inicio() {
+            return inicio;
+        }
+
+        /** Encerrado antes da hora (golpe cortado, Roxo que bateu). */
+        public boolean encerrado() {
+            return fimEm >= 0;
         }
 
         /** Ticks desde o começo, com a fração do quadro. */
@@ -68,11 +108,34 @@ public final class VisuaisAtivos {
         return ATIVOS;
     }
 
+    /** Abre espaço tirando o mais antigo, menos os que movem o jogador (domínio e sequência do R). */
+    private static void despejar() {
+        for (int i = 0; i < ATIVOS.size(); i++) {
+            String tipo = ATIVOS.get(i).tipo;
+            if (!tipo.equals("gojo_vazio_infinito") && !tipo.equals("gojo_roxo_maximo")) {
+                ATIVOS.remove(i);
+                return;
+            }
+        }
+    }
+
     public static void receber(MostrarVisual p) {
-        if (ATIVOS.size() >= LIMITE) ATIVOS.remove(0);
-        ATIVOS.add(new Visual(p.dono(), p.tipo(), p.origem(), p.direcao(), p.forca(), p.duracao(), p.inicio()));
+        if (ATIVOS.size() >= LIMITE) despejar();
+        Visual novo = new Visual(p.dono(), p.tipo(), p.origem(), p.direcao(), p.forca(), p.duracao(), p.inicio());
+        ATIVOS.add(novo);
+        SonsVisuais.aoComecar(novo);
+        ClientLevel nivel = Minecraft.getInstance().level;
+        if (p.tipo().equals("gojo_azul") && nivel != null) {
+            // A marca no chão nasce junto com o campo e some devagar depois que ele acaba.
+            Vetor chao = chao(nivel, p.origem());
+            if (chao != null) {
+                if (ATIVOS.size() >= LIMITE) despejar();
+                ATIVOS.add(new Visual(p.dono(), "gojo_azul_marca", chao, p.direcao(), 1,
+                        p.duracao() + PerfilVfxGojo.MARCA_AZUL, p.inicio()));
+            }
+        }
         ImpactoCamera.momento(p.tipo(), p.origem());
-        DetritosGojo.aoComecar(p.tipo(), p.origem());
+        DetritosGojo.aoComecar(p.tipo(), p.origem(), p.forca());
     }
 
     public static void encerrar(EncerrarVisual p) {
@@ -85,10 +148,18 @@ public final class VisuaisAtivos {
             if (p.tipo().equals("gojo_vermelho")) {
                 // A esfera bateu (ou chegou ao fim): some e nasce a explosão no ponto exato.
                 ATIVOS.remove(i);
-                ATIVOS.add(new Visual(v.dono, "gojo_vermelho_explosao", p.ponto(), v.direcao, v.forca,
-                        PerfilVfxGojo.EXPLOSAO_VERMELHO, agora));
+                Visual explosao = new Visual(v.dono, "gojo_vermelho_explosao", p.ponto(), v.direcao, v.forca,
+                        PerfilVfxGojo.EXPLOSAO_VERMELHO, agora);
+                ATIVOS.add(explosao);
+                SonsVisuais.aoComecar(explosao);
                 ImpactoCamera.momento("gojo_vermelho_explosao", p.ponto());
                 DetritosGojo.explosao(p.ponto());
+            } else if (p.tipo().equals("gojo_roxo_200")) {
+                // A massa bateu e virou a explosão (que chega como visual próprio): o túnel fica até ali.
+                ATIVOS.remove(i);
+                float comprimento = (float) v.origem.distancia(p.ponto());
+                ATIVOS.add(new Visual(v.dono, "gojo_roxo_200_rastro", v.origem, v.direcao, comprimento,
+                        PerfilVfxGojo.RASTRO_ROXO, agora));
             } else {
                 v.fimEm = agora;
             }
@@ -100,19 +171,68 @@ public final class VisuaisAtivos {
     public static void tick() {
         ClientLevel nivel = Minecraft.getInstance().level;
         if (nivel != mundo) {
+            SonsVisuais.limpar(); // outro mundo ou dimensão: o som das cargas não segue junto
             ATIVOS.clear();
             mundo = nivel;
         }
         if (nivel == null) return;
         long agora = nivel.getGameTime();
+        deixarRastros(nivel, agora);
         ATIVOS.removeIf(v -> v.acabou(agora));
         ImpactoCamera.tick();
+        ImpactFrame.tick();
+        CeuRoxo.tick();
+        SonsVisuais.tick();
         DetritosGojo.tick();
+    }
+
+    /** Passo da massa do Roxo pelo tipo do visual (0 se não for Roxo). */
+    static double passoRoxo(String tipo) {
+        return switch (tipo) {
+            case "gojo_roxo", "gojo_roxo_rastro" -> TrajetoriaGojo.PASSO_ROXO;
+            case "gojo_roxo_200", "gojo_roxo_200_rastro" -> TrajetoriaGojo.PASSO_ROXO_200;
+            default -> 0;
+        };
+    }
+
+    /** O golpe chegou ao fim natural: o que ele deixa no mundo vira um visual novo. */
+    private static void deixarRastros(ClientLevel nivel, long agora) {
+        List<Visual> novos = new ArrayList<>(0);
+        for (Visual v : ATIVOS) {
+            if (v.deixouRastro || v.fimEm >= 0 || agora - v.inicio < v.duracao) continue;
+            switch (v.tipo) {
+                case "gojo_roxo", "gojo_roxo_200" -> {
+                    v.deixouRastro = true;
+                    // forca guarda o comprimento do túnel.
+                    float comprimento = (float) (passoRoxo(v.tipo) * v.duracao);
+                    novos.add(new Visual(v.dono, v.tipo + "_rastro", v.origem, v.direcao, comprimento,
+                            PerfilVfxGojo.RASTRO_ROXO, agora));
+                }
+                default -> {
+                }
+            }
+        }
+        for (Visual n : novos) {
+            if (ATIVOS.size() >= LIMITE) despejar();
+            ATIVOS.add(n);
+        }
+    }
+
+    /** Topo do primeiro bloco sólido até 8 abaixo do ponto. */
+    private static Vetor chao(ClientLevel nivel, Vetor p) {
+        net.minecraft.core.BlockPos.MutableBlockPos b = net.minecraft.core.BlockPos.containing(p.x(), p.y(), p.z()).mutable();
+        for (int i = 0; i < 9; i++, b.move(0, -1, 0)) {
+            if (!nivel.getBlockState(b).getCollisionShape(nivel, b).isEmpty()) return new Vetor(p.x(), b.getY() + 1.02, p.z());
+        }
+        return null;
     }
 
     public static void limpar() {
         ATIVOS.clear();
         ImpactoCamera.limpar();
+        ImpactFrame.limpar();
+        CeuRoxo.limpar();
+        SonsVisuais.limpar();
         mundo = null;
     }
 }

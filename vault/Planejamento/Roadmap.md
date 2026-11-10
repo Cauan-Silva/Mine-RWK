@@ -6,7 +6,7 @@ atualizado: 2026-11-08
 
 Voltar para [[00 Início]]. Marque `[x]` ao concluir e registre no [[Diário]]. Decisões novas vão em [[Decisões]]; o que precisa de teste no jogo vai em [[Pendências]].
 
-**Onde estamos:** Fase 2 (Gojo), mecânica das seis habilidades pronta (apresentação provisória); VFX dos seis golpes feito (shader portado do Minezin, falta o teste no jogo); impacto de câmera, detritos e brilho feito; o autor ainda acha os golpes simples. Próximo, nessa ordem: reação do alvo e ritmo (congelar no acerto, mobs voando; golpes durando mais e rastro que fica no mundo, pois o autor acha que acabam rápido demais), animações, som, efeitos desenhados no Photon (referência: Gojo x Sukuna no mangá), depois a cutscene da ultimate e o pipeline de áudio (parte 3 do 1.4, adiada para cá). As partes 1 (HUD e cliente) e 2 (tela de escolha) do 1.4 estão prontas. O 1.2 ainda tem o `.fx` de teste e o Iris pendentes.
+**Onde estamos:** Fase 2 (Gojo), mecânica das seis habilidades pronta (apresentação provisória); VFX dos seis golpes feito (shader portado do Minezin, falta o teste no jogo); impacto de câmera, detritos e brilho feito; o autor ainda acha os golpes simples. Reação do alvo, ritmo e a cutscene do Roxo 200% feitos (falta o teste no jogo). Animações, domínio fechado e R colossal feitos; o R virou o Vazio Roxo máximo com uppercut, e o Azul e o Infinito ganharam VFX mais rico (falta o teste no jogo). A cutscene completa do R e as animações novas estão feitas (falta o teste no jogo). VFX pesado e nova ordem do R feitos e testados pelo autor ("melhorou bastante"); céu e chão no encantamento feitos (falta o teste no jogo). Som do Gojo feito, as três partes (falta o teste no jogo). Traje do Gojo feito (falta o teste no jogo). O boss [[Toji]] está feito, as três partes (falta o teste no jogo; a maestria e a árvore de habilidades também). Próximo no Gojo: o teste do autor no jogo e os ajustes que saírem dele. O [[Toji]] não é jogável: é o boss do despertar do Gojo, a fazer depois do traje. Próximo, na ordem aprovada em 09/11: som; depois e o pipeline de áudio (parte 3 do 1.4, adiada para cá). As partes 1 (HUD e cliente) e 2 (tela de escolha) do 1.4 estão prontas. O 1.2 ainda tem o `.fx` de teste e o Iris pendentes.
 
 ## Como trabalhar em outro PC
 1. `git clone https://github.com/Cauan-Silva/Mine-RWK.git` (ou `git pull` se já tiver).
@@ -47,7 +47,7 @@ Spec e plano: [[2026-11-09 Núcleo dos kits]] (em `Desenvolvimento/Specs` e `Des
 - [x] Testes JUnit da lógica de habilidade e um GameTest de uso de habilidade no servidor
 
 ### 1.4 Base visual e de som
-- [ ] Pipeline de áudio: pasta `tools/` com o gerador em Python adaptado do Minezin e teste que confere ticks do som contra o Java
+- [x] Pipeline de áudio: `ferramentas/sfx_motor.py` e `gerar_sfx_gojo.py`, portados do Minezin, e o `SonsGojoTest`, que confere os ticks do som contra o Java; ver [[2026-11-10 Som do Gojo parte 1]]
 - [ ] `THIRD_PARTY_NOTICES.md` para gravações CC0 e Sonniss
 - [x] Configuração do cliente (`minerwk-client.toml`: tremor, VFX reduzido, sons, HUD)
 - [x] Tremor de tela próprio (`core/camera/Tremor`, pacote `Tremer`)
@@ -60,33 +60,40 @@ Spec e plano: [[2026-11-09 Núcleo dos kits]] (em `Desenvolvimento/Specs` e `Des
 - [x] Habilidades: Azul, Vermelho, Infinito, Roxo, Vazio Infinito (domínio), Roxo 200% (o teleporte ficou de fora do kit). Mecânica no servidor com apresentação provisória; ver [[2026-11-09 Gojo mecânica]]
 - [x] VFX dos seis golpes (shader `gojo_energy` + geometria, sem Photon por enquanto); ver [[2026-11-09 Gojo VFX]]
 - [x] Impacto dos golpes: câmera reage (tremor, clarão, FOV), detritos e brilho; ver [[2026-11-09 Gojo impacto]]
+- [x] Reação do alvo e ritmo: golpes mais longos, arremesso com congelamento, Azul arranca blocos, tela de quem acerta trava, rastros no mundo; ver [[2026-11-09 Gojo peso]]
+- [x] Roxo 200%: cutscene (sistema de câmera reutilizável) e encantamento visível; ver [[2026-11-09 Roxo 200 cutscene]]
 - [ ] VFX no Photon2 de cada habilidade; Veil só se o domínio precisar de pós-processamento
-- [ ] SFX de cada habilidade
-- [ ] Animações do jogador de cada golpe
-- [ ] Cutscene cinemática da ultimate (Roxo 200%), com sistema de câmera reutilizável pelas outras ultimates
-- [ ] Traje (GeckoLib) com óculos, e passivas (Seis Olhos, Técnica Reversa)
+- [x] SFX de cada habilidade: 18 sons sintetizados, presos ao visual e cortados na interrupção, incluindo os sete do R; ver [[2026-11-10 Som do Gojo parte 1]] (falta o teste no jogo)
+- [x] Animações do jogador de cada golpe: corpo inteiro, primeira pessoa, começam na carga; ver [[2026-11-09 Gojo animações]]
+- [x] Domínio fechado (barreira e chão por regra de movimento), animações livres ao andar e Roxo 200% colossal (sobe 20 blocos, massa de raio 7, explosão de raio 24); ver [[2026-11-09 Gojo domínio, movimento e R colossal]]
+- [x] Domínio fechado (barreira e chão por regra de movimento), animações livres ao andar e Roxo 200% colossal (sobe 20 blocos, massa de raio 7, explosão de raio 24); ver [[2026-11-09 Gojo domínio, movimento e R colossal]]
+- [x] R vira o Vazio Roxo máximo (avanço, uppercut, fusão atrás do Gojo, explosão de raio 40) e VFX mais rico do Azul e do Infinito; ver [[2026-11-09 Vazio Roxo máximo e VFX do Azul e do Infinito]]
+- [x] Cutscene cinemática da ultimate (Vazio Roxo máximo): encantamento, avanço, uppercut, esferas, fusão e a explosão em plano aberto, vista pelo Gojo e pelo alvo; mais animações do R; ver [[2026-11-09 Cutscene do Vazio Roxo máximo]]
+- [x] VFX pesado do R (Photon em código, bloom, casca com shader, fusão em quatro tempos, explosão em camadas) e nova ordem do R (conjurar no céu, cutscene da corrida e do uppercut com impact frame, câmera longe do alvo); ver [[2026-11-10 VFX pesado e nova ordem do R]]
+- [x] Traje (GeckoLib) com a venda que sai no domínio e no R, automático ao escolher o Gojo, e passivas (Seis Olhos e Técnica Reversa, que já existiam); ver [[2026-11-10 Traje do Gojo]] (falta o teste no jogo)
+- [x] Maestria e árvore de habilidades, adiantadas da Fase 4 porque o Toji depende delas; spec [[2026-11-10 Maestria e árvore de habilidades]] (aprovado). As três partes feitas, ver [[2026-11-10 Maestria parte 1]], [[2026-11-10 Maestria parte 2]] e [[2026-11-10 Maestria parte 3]] (falta o teste no jogo)
+- [x] [[Toji]] como boss (Nêmesis do Gojo) e o despertar: o Gojo começa com Azul e Infinito; vencer o Toji, invocado com um item, libera a Técnica Reversa, o Vermelho e o Roxo. Vem depois do traje (decisão de 10/11). Spec [[2026-11-10 Toji e o despertar do Gojo]] (aprovado). Parte 1 (golpes trancados) feita, ver [[2026-11-10 Toji parte 1]]; parte 2 (o boss essencial, o Contrato e o despertar no meio da luta) feita, ver [[2026-11-10 Toji parte 2]]; parte 3 (Nuvem Brincalhona, Desaparecer, Execução do Assassino, três fases, marcas no chão, som, entrada e cutscene) feita, ver [[2026-11-10 Toji parte 3]] (falta o teste no jogo)
 - [ ] Teste no jogo de ponta a ponta, anotado em [[Pendências]]
-- [ ] Escrever em `vault/Desenvolvimento/` o passo a passo de "como portar um personagem", com base no que o Gojo ensinou
+- [ ] Escrever em `vault/Desenvolvimento/` o passo a passo de "como portar um personagem", com base no que o Gojo ensinou (primeira versão em [[Como portar um personagem]]; falta completar som e traje)
 
 ## Fase 3: demais personagens
 Um por vez, sempre: pesquisa canônica → kit aprovado → código → VFX → SFX → animações → traje → teste no jogo. Ordem sugerida (começa pelos que reaproveitam mais coisa do Gojo e do núcleo, deixa invocações e formas para depois):
 
 | # | Personagem | Por que nessa posição |
 | --- | --- | --- |
-| 1 | Toji | Mesma obra do Gojo; corpo a corpo e armas |
-| 2 | Ichigo | Espada + forma (Bankai/Mugetsu) |
-| 3 | Tanjiro | Espada + respirações, efeitos de água/fogo |
-| 4 | Asta | Espadas + forma demônio |
-| 5 | Killua | Rápido, elétrico, sem invocações |
-| 6 | Douma | Gelo, área |
-| 7 | Frieren | Magias de projétil e área |
-| 8 | Rudeus | Magias elementais |
-| 9 | Homura | Tempo parado (sistema de tempo) |
-| 10 | Dio | Stand + tempo parado (reaproveita a Homura) |
-| 11 | Cid | Espada + ultimate de área |
-| 12 | Guts | Arma enorme + armadura berserker (forma) |
-| 13 | Jin-Woo | Invocações (Igris, Beru) com GeckoLib |
-| 14 | Subaru e Beatrice | Contrato, forma e magias da Beatrice |
+| 1 | Ichigo | Espada + forma (Bankai/Mugetsu) |
+| 2 | Tanjiro | Espada + respirações, efeitos de água/fogo |
+| 3 | Asta | Espadas + forma demônio |
+| 4 | Killua | Rápido, elétrico, sem invocações |
+| 5 | Douma | Gelo, área |
+| 6 | Frieren | Magias de projétil e área |
+| 7 | Rudeus | Magias elementais |
+| 8 | Homura | Tempo parado (sistema de tempo) |
+| 9 | Dio | Stand + tempo parado (reaproveita a Homura) |
+| 10 | Cid | Espada + ultimate de área |
+| 11 | Guts | Arma enorme + armadura berserker (forma) |
+| 12 | Jin-Woo | Invocações (Igris, Beru) com GeckoLib |
+| 13 | Subaru e Beatrice | Contrato, forma e magias da Beatrice |
 
 Atualizar a coluna "Portado" em [[Personagens]] a cada um.
 

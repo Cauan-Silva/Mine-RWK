@@ -3,6 +3,7 @@ package com.minerwk.core.personagens.gojo;
 import com.minerwk.core.kit.Contexto;
 import com.minerwk.core.kit.EstadoDoJogador;
 import com.minerwk.core.kit.Passiva;
+import com.minerwk.core.maestria.Melhorias;
 
 /** Passiva: depois de 100 ticks sem levar dano, cura 2 de vida (1 coração) a cada 80 ticks. */
 public final class TecnicaReversa implements Passiva {
@@ -19,6 +20,7 @@ public final class TecnicaReversa implements Passiva {
             return;
         }
         semDano++;
-        if (semDano >= ESPERA && (semDano - ESPERA) % INTERVALO == 0) contexto.curar(CURA);
+        int intervalo = Melhorias.escala(INTERVALO, contexto.melhorias().menos(ArvoreGojo.TECNICA_REVERSA));
+        if (semDano >= ESPERA && (semDano - ESPERA) % intervalo == 0) contexto.curar(CURA);
     }
 }

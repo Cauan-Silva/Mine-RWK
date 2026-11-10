@@ -20,7 +20,8 @@ public final class ImpactoGojo {
             "gojo_vermelho_explosao", new Reacao(.8f, 8, 0xFFB0A0, .35f, 4, .06, 6, 24),
             "gojo_roxo", new Reacao(1f, 12, 0xB060FF, .45f, 5, .08, 8, 30),
             "gojo_roxo_200", new Reacao(1.6f, 20, 0xFFFFFF, .7f, 6, .12, 12, 48),
-            "gojo_vazio_infinito", new Reacao(.5f, 10, 0xDDEEFF, .8f, 3, -.08, 20, 16));
+            "gojo_vazio_infinito", new Reacao(.5f, 10, 0xDDEEFF, .8f, 3, -.08, 20, 16),
+            "gojo_roxo_explosao", new Reacao(2f, 30, 0xC890FF, .85f, 8, .15, 16, 64));
 
     /** Raio em que o tremor da carga do Roxo 200% ainda chega. */
     public static final double RAIO_CARGA_200 = 16;

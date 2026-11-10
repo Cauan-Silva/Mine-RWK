@@ -9,10 +9,10 @@ class TrajetoriaGojoTest {
     private static final Vetor DIR = new Vetor(1, 0, 0);
 
     @Test
-    void esferaVermelhaAnda15PorTick() {
+    void esferaVermelhaAnda1PorTick() {
         Vetor inicio = new Vetor(1, 0, 0);
         assertEquals(inicio, TrajetoriaGojo.vermelho(inicio, DIR, 0));
-        assertEquals(new Vetor(31, 0, 0), TrajetoriaGojo.vermelho(inicio, DIR, 20));
+        assertEquals(new Vetor(31, 0, 0), TrajetoriaGojo.vermelho(inicio, DIR, 30));
     }
 
     @Test

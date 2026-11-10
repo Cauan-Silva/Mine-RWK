@@ -55,6 +55,23 @@ class KitDoJogadorTest {
     }
 
     @Test
+    void anularTecnicasDerrubaSoOsEfeitosAnulaveis() {
+        KitDoJogador k = kit(100);
+        List<String> acabou = new ArrayList<>();
+        record Solto(String nome, boolean anulavel, List<String> acabou) implements Efeito {
+            public int duracao() { return 100; }
+            public void tick(Contexto c, int t) { }
+            public void aoAcabar(Contexto c) { acabou.add(nome); }
+        }
+        k.adicionarEfeito(new Solto("infinito", true, acabou));
+        k.adicionarEfeito(new Solto("campo", false, acabou));
+        assertTrue(k.anularTecnicas(CTX));
+        assertEquals(List.of("infinito"), acabou);
+        assertEquals(1, k.efeitos().size());
+        assertFalse(k.anularTecnicas(CTX), "nada mais para anular");
+    }
+
+    @Test
     void custoCobradoSoNoDisparo() {
         KitDoJogador k = kit(100);
         assertTrue(k.apertar(Tecla.Z, 0));
@@ -168,5 +185,36 @@ class KitDoJogadorTest {
         rodar(k, 0, 9);
         assertEquals(List.of("carga", "disparo", "fim"), z.chamadas);
         assertTrue(k.execucao().isEmpty());
+    }
+
+    @Test
+    void recarregarEncheORecursoEZeraAsRecargasSemTrocarDeKit() {
+        KitDoJogador k = kit(100);
+        k.apertar(Tecla.Z, 0);
+        long t = rodar(k, 0, 9); // disparou: gastou 20 e entrou em recarga
+        assertFalse(k.recargas().pronta("z", t));
+        k.recarregar();
+        assertEquals(100, k.recurso().atual());
+        assertTrue(k.recargas().pronta("z", t));
+        assertTrue(k.apertar(Tecla.Z, t), "pronto para usar de novo na hora");
+    }
+
+    @Test
+    void melhoriasEncurtamACargaEARecarga() {
+        var arvore = new com.minerwk.core.maestria.Arvore(List.of(
+                com.minerwk.core.maestria.No.recarga("z_recarga", false, "z", .25),
+                com.minerwk.core.maestria.No.carga("x_carga", false, "x", .10)));
+        KitDoJogador k = kit(100);
+        k.definirMelhorias(new com.minerwk.core.maestria.Melhorias(arvore, Map.of("z_recarga", 2, "x_carga", 3)));
+        k.apertar(Tecla.Z, 0);
+        rodar(k, 0, 5); // dispara no tick 4
+        assertEquals(20, k.recargas().restante("z", 4), "40 de recarga com -50%");
+        rodar(k, 5, 10);
+        // X: segurar 10..30 vira 7..21 com -30% de carga.
+        assertTrue(k.apertar(Tecla.X, 100));
+        rodar(k, 100, 20);
+        assertEquals(100, k.recurso().atual() + 20, "ainda carregando no 20º tick");
+        k.tick(120, ESTADO, CTX);
+        assertEquals(50, k.recurso().atual(), "dispara sozinho no 21º tick");
     }
 }

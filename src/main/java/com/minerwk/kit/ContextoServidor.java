@@ -1,9 +1,12 @@
 package com.minerwk.kit;
 
+import com.minerwk.core.kit.Arremessos;
 import com.minerwk.core.kit.Contexto;
 import com.minerwk.core.kit.Efeito;
 import com.minerwk.core.kit.KitDoJogador;
 import com.minerwk.core.kit.Vetor;
+import com.minerwk.rede.Acertou;
+import com.minerwk.rede.Cutscene;
 import com.minerwk.rede.EncerrarVisual;
 import com.minerwk.rede.Envio;
 import com.minerwk.rede.MostrarVisual;
@@ -13,8 +16,12 @@ import com.minerwk.registro.Efeitos;
 import com.minerwk.registro.Regras;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Predicate;
 import net.minecraft.core.BlockPos;
+import net.minecraft.tags.BlockTags;
+import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.event.level.BlockEvent;
 import net.minecraft.core.particles.BlockParticleOption;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.core.particles.SimpleParticleType;
@@ -26,6 +33,10 @@ import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.OwnableEntity;
+import net.minecraft.world.entity.boss.enderdragon.EnderDragon;
+import net.minecraft.world.entity.boss.wither.WitherBoss;
+import net.minecraft.world.entity.decoration.ArmorStand;
+import net.minecraft.world.entity.item.FallingBlockEntity;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.Projectile;
@@ -40,6 +51,8 @@ import net.minecraft.world.phys.Vec3;
 
 /** O {@link Contexto} do núcleo, executado no servidor em nome de um jogador. Nada aqui afeta o próprio jogador. */
 public final class ContextoServidor implements Contexto {
+    /** Marca do projétil que o Infinito já parou (o toque aparece uma vez só). */
+    private static final String PARADO_PELO_INFINITO = "minerwk_parado_infinito";
     private final ServerPlayer jogador;
 
     public ContextoServidor(ServerPlayer jogador) {
@@ -87,7 +100,14 @@ public final class ContextoServidor implements Contexto {
 
     @Override
     public void apresentacao(String animacao, String efeito, String som) {
+        // Outra animação por cima da pose de descida: ao pousar, ela não é cortada.
+        if (!animacao.isEmpty()) BarreirasServidor.animacaoTrocada(jogador);
         Envio.paraQuemVe(jogador, new TocarApresentacao(jogador.getId(), animacao, efeito, som));
+    }
+
+    @Override
+    public void pararAnimacao() {
+        Envio.paraQuemVe(jogador, new TocarApresentacao(jogador.getId(), TocarApresentacao.PARAR, "", ""));
     }
 
     @Override
@@ -122,15 +142,40 @@ public final class ContextoServidor implements Contexto {
 
     private void mover(Vec3 centro, double raio, double forca, boolean puxar) {
         List<Entity> alvos = naEsfera(Entity.class, centro, raio,
-                e -> e instanceof LivingEntity || e instanceof ItemEntity || e instanceof Projectile);
+                e -> e instanceof LivingEntity || e instanceof ItemEntity || e instanceof Projectile
+                        || e instanceof FallingBlockEntity && e.getTags().contains(ARRANCADO));
         for (Entity e : alvos) {
+            if (puxar && e instanceof FallingBlockEntity) {
+                orbitar(e, centro);
+                continue;
+            }
             Vec3 dir = centro.subtract(e.getBoundingBox().getCenter());
             if (dir.lengthSqr() < 0.25 && puxar) continue; // já está no centro
-            Vec3 passo = dir.normalize().scale(puxar ? forca : -forca);
+            // O Toji não tem energia amaldiçoada para o Azul agarrar: é puxado com metade da força.
+            double f = puxar && e instanceof com.minerwk.boss.TojiEntity ? forca * .5 : forca;
+            Vec3 passo = dir.normalize().scale(puxar ? f : -f);
             if (!puxar) passo = passo.add(0, 0.1 * forca, 0);
             e.setDeltaMovement(e.getDeltaMovement().add(passo));
             e.hurtMarked = true; // manda a velocidade para o cliente (jogadores)
+            e.hasImpulse = true; // e para as outras entidades
         }
+    }
+
+    /**
+     * Bloco arrancado pelo Azul: flutua e gira em volta de um ponto um pouco acima do centro (senão pousa
+     * logo e vira bloco de novo). Quando o campo acaba, a gravidade volta e ele cai.
+     */
+    private static void orbitar(Entity e, Vec3 centro) {
+        Vec3 alvo = centro.add(0, 1.5, 0);
+        Vec3 d = alvo.subtract(e.position());
+        double dist = d.length();
+        Vec3 ida = dist < 1e-3 ? Vec3.ZERO : d.scale(Math.min(.45, dist * .2) / dist);
+        Vec3 giro = d.cross(new Vec3(0, 1, 0));
+        giro = giro.lengthSqr() < 1e-6 ? Vec3.ZERO : giro.normalize().scale(.22);
+        // +0,04 desfaz a gravidade do bloco caindo neste tick.
+        e.setDeltaMovement(ida.add(giro).add(0, .04, 0));
+        e.hurtMarked = true;
+        e.hasImpulse = true;
     }
 
     @Override
@@ -146,7 +191,138 @@ public final class ContextoServidor implements Contexto {
     @Override
     public void danoEm(Vetor centro, double raio, float dano) {
         var fonte = jogador.damageSources().playerAttack(jogador);
-        for (LivingEntity alvo : naEsfera(LivingEntity.class, vec(centro), raio, e -> true)) alvo.hurt(fonte, dano);
+        ServicoKits.comoGolpeDoKit(jogador, () -> {
+            for (LivingEntity alvo : naEsfera(LivingEntity.class, vec(centro), raio, e -> true)) alvo.hurt(fonte, dano);
+        });
+    }
+
+    @Override
+    public int danoUmaVez(Vetor centro, double raio, float dano, Set<Object> atingidos) {
+        var fonte = jogador.damageSources().playerAttack(jogador);
+        int[] feridos = {0};
+        ServicoKits.comoGolpeDoKit(jogador, () -> {
+            for (LivingEntity alvo : naEsfera(LivingEntity.class, vec(centro), raio, e -> true)) {
+                if (atingidos.add(alvo.getUUID()) && alvo.hurt(fonte, dano)) feridos[0]++;
+            }
+        });
+        return feridos[0];
+    }
+
+    @Override
+    public void arremessar(Vetor centro, double raio, double forca, int congelar, Vetor eixo) {
+        for (LivingEntity alvo : naEsfera(LivingEntity.class, vec(centro), raio, e -> true)) {
+            Vetor v = Arremessos.velocidade(centro, vetor(alvo.getBoundingBox().getCenter()), forca, eixo);
+            ArremessosServidor.iniciar(alvo, v, congelar);
+        }
+    }
+
+    @Override
+    public int arrancarBlocos(Vetor centro, double raio, int maximo, float durezaMax) {
+        ServerLevel nivel = nivel();
+        if (maximo <= 0 || !nivel.getGameRules().getBoolean(Regras.APAGAR_BLOCOS)) return 0;
+        Vec3 c = vec(centro);
+        int feitos = 0;
+        // Sorteia pontos na esfera; só sai o que está exposto por cima (o chão, não o que está enterrado).
+        for (int tentativa = 0; tentativa < maximo * 8 && feitos < maximo; tentativa++) {
+            double dx = (nivel.random.nextDouble() * 2 - 1) * raio;
+            double dy = (nivel.random.nextDouble() * 2 - 1) * raio;
+            double dz = (nivel.random.nextDouble() * 2 - 1) * raio;
+            if (dx * dx + dy * dy + dz * dz > raio * raio) continue;
+            BlockPos p = BlockPos.containing(c.x + dx, c.y + dy, c.z + dz);
+            if (!nivel.isLoaded(p) || nivel.isOutsideBuildHeight(p) || !nivel.mayInteract(jogador, p)) continue;
+            BlockState estado = nivel.getBlockState(p);
+            float dureza = estado.getDestroySpeed(nivel, p);
+            if (estado.isAir() || dureza < 0 || dureza > durezaMax || estado.hasBlockEntity()
+                    || !estado.getFluidState().isEmpty() || !nivel.getBlockState(p.above()).isAir()
+                    || estado.is(BlockTags.CROPS) || !podeQuebrar(nivel, p, estado)) continue;
+            FallingBlockEntity bloco = FallingBlockEntity.fall(nivel, p, estado);
+            bloco.addTag(ARRANCADO);
+            bloco.setDeltaMovement(0, .35, 0); // sai do chão antes de começar a girar
+            bloco.hurtMarked = true;
+            feitos++;
+        }
+        return feitos;
+    }
+
+    /** Etiqueta dos blocos que o Azul arrancou: só esses são puxados (não a areia caindo dos outros). */
+    static final String ARRANCADO = "minerwk_arrancado";
+
+    /** Pergunta aos mods de proteção de terreno (claims) se o jogador pode quebrar aqui. */
+    private boolean podeQuebrar(ServerLevel nivel, BlockPos p, BlockState estado) {
+        return !NeoForge.EVENT_BUS.post(new BlockEvent.BreakEvent(nivel, p, estado, jogador)).isCanceled();
+    }
+
+    @Override
+    public void barreira(Vetor centro, double raio, double chao, int ticks) {
+        BarreirasServidor.criar(jogador, centro, raio, chao, ticks);
+    }
+
+    @Override
+    public Object marcarAlvo(double alcance, double largura) {
+        Vec3 olhos = jogador.getEyePosition();
+        Vec3 dir = jogador.getLookAngle();
+        AABB caixa = new AABB(olhos, olhos.add(dir.scale(alcance))).inflate(largura);
+        LivingEntity melhor = null;
+        double melhorFora = Double.MAX_VALUE;
+        double melhorLonge = Double.MAX_VALUE;
+        for (LivingEntity e : nivel().getEntitiesOfClass(LivingEntity.class, caixa,
+                e -> afetavel(e) && !(e instanceof ArmorStand) && !(e instanceof EnderDragon) && !(e instanceof WitherBoss))) {
+            Vec3 c = e.getBoundingBox().getCenter();
+            Vec3 ate = c.subtract(olhos);
+            double longe = ate.dot(dir);
+            if (longe < 0 || longe > alcance) continue;
+            double fora = ate.subtract(dir.scale(longe)).length();
+            if (fora > largura || !jogador.hasLineOfSight(e)) continue;
+            // O mais perto da linha; no empate, o mais perto do Gojo.
+            if (fora < melhorFora - 1e-6 || (Math.abs(fora - melhorFora) <= 1e-6 && longe < melhorLonge)) {
+                melhor = e;
+                melhorFora = fora;
+                melhorLonge = longe;
+            }
+        }
+        return melhor == null ? null : melhor.getUUID();
+    }
+
+    /** O alvo marcado, se ainda está vivo neste mundo. */
+    private LivingEntity marcado(Object alvo) {
+        if (!(alvo instanceof java.util.UUID id)) return null;
+        return nivel().getEntity(id) instanceof LivingEntity e && e.isAlive() ? e : null;
+    }
+
+    @Override
+    public Vetor posicaoDe(Object alvo) {
+        LivingEntity e = marcado(alvo);
+        return e == null ? null : vetor(e.getBoundingBox().getCenter());
+    }
+
+    @Override
+    public void suspender(Object alvo, Vetor ponto, int ticks) {
+        LivingEntity e = marcado(alvo);
+        if (e != null) SuspensosServidor.suspender(e, vec(ponto), ticks);
+    }
+
+    @Override
+    public void ferir(Object alvo, float dano) {
+        LivingEntity e = marcado(alvo);
+        if (e != null) ServicoKits.comoGolpeDoKit(jogador, () -> e.hurt(jogador.damageSources().playerAttack(jogador), dano));
+    }
+
+    @Override
+    public void voo(int ticks) {
+        BarreirasServidor.voar(jogador, ticks);
+    }
+
+    @Override
+    public void apagarCasca(Vetor centro, double de, double ate) {
+        ServerLevel nivel = nivel();
+        if (!nivel.getGameRules().getBoolean(Regras.APAGAR_BLOCOS)) return;
+        ApagadorServidor.apagarCasca(nivel, vec(centro), de, ate,
+                (p, estado) -> nivel.mayInteract(jogador, p) && podeQuebrar(nivel, p.immutable(), estado));
+    }
+
+    @Override
+    public void acertou(float forca) {
+        Envio.para(jogador, new Acertou(forca));
     }
 
     @Override
@@ -170,6 +346,8 @@ public final class ContextoServidor implements Contexto {
         int r = (int) Math.ceil(raio);
         BlockPos base = BlockPos.containing(c);
         int apagados = 0;
+        // Massa grande (Roxo 200%): avisa só os clientes, sem atualizar vizinhos, que pesa bem menos.
+        int flags = raio > 4 ? Block.UPDATE_CLIENTS : Block.UPDATE_ALL;
         BlockPos[] sorteados = new BlockPos[DETRITOS];
         BlockState[] estados = new BlockState[DETRITOS];
         for (BlockPos p : BlockPos.betweenClosed(base.offset(-r, -r, -r), base.offset(r, r, r))) {
@@ -177,8 +355,8 @@ public final class ContextoServidor implements Contexto {
             if (!nivel.isLoaded(p) || nivel.isOutsideBuildHeight(p) || !nivel.mayInteract(jogador, p)) continue;
             BlockState estado = nivel.getBlockState(p);
             if (estado.isAir() || estado.getDestroySpeed(nivel, p) < 0 || estado.hasBlockEntity()
-                    || !estado.getFluidState().isEmpty()) continue;
-            nivel.setBlock(p, Blocks.AIR.defaultBlockState(), Block.UPDATE_ALL);
+                    || !estado.getFluidState().isEmpty() || !podeQuebrar(nivel, p, estado)) continue;
+            nivel.setBlock(p, Blocks.AIR.defaultBlockState(), flags);
             // Sorteio de reservatório: guarda DETRITOS blocos ao acaso entre os apagados.
             int vaga = apagados < DETRITOS ? apagados : nivel.random.nextInt(apagados + 1);
             if (vaga < DETRITOS) {
@@ -210,6 +388,8 @@ public final class ContextoServidor implements Contexto {
         // Projéteis que chegam perto param no ar e caem.
         for (Projectile p : nivel().getEntitiesOfClass(Projectile.class, jogador.getBoundingBox().inflate(1.5),
                 p -> p.getOwner() != jogador)) {
+            // Só a primeira parada é um toque (o que já parou volta a ganhar um pouco de queda a cada tick).
+            if (p.addTag(PARADO_PELO_INFINITO)) ProtecoesServidor.toque(jogador, p.position(), true);
             p.setDeltaMovement(Vec3.ZERO);
             p.hurtMarked = true;
         }
@@ -233,6 +413,11 @@ public final class ContextoServidor implements Contexto {
     }
 
     @Override
+    public com.minerwk.core.maestria.Melhorias melhorias() {
+        return kit().map(KitDoJogador::melhorias).orElse(com.minerwk.core.maestria.Melhorias.NENHUMA);
+    }
+
+    @Override
     public void criarEfeito(Efeito efeito) {
         kit().ifPresent(k -> k.adicionarEfeito(efeito));
     }
@@ -241,6 +426,38 @@ public final class ContextoServidor implements Contexto {
     public void visual(String tipo, Vetor origem, Vetor direcao, float forca, int duracao) {
         Envio.paraQuemVe(jogador, new MostrarVisual(jogador.getId(), tipo, origem, direcao, forca, duracao,
                 nivel().getGameTime()));
+    }
+
+    @Override
+    public void cutscene(String id) {
+        Envio.para(jogador, new Cutscene(id, jogador.getId(), olhos(), olhar(), nivel().getGameTime()));
+    }
+
+    @Override
+    public void cutscene(String id, Vetor origem, Vetor direcao) {
+        Envio.para(jogador, new Cutscene(id, jogador.getId(), origem, direcao, nivel().getGameTime()));
+    }
+
+    @Override
+    public void cutsceneParaAlvo(Object alvo, String id, Vetor origem, Vetor direcao, int passados) {
+        if (marcado(alvo) instanceof ServerPlayer outro) {
+            Envio.para(outro, new Cutscene(id, jogador.getId(), origem, direcao, nivel().getGameTime() - passados));
+        }
+    }
+
+    @Override
+    public void encerrarCutscene() {
+        Envio.paraQuemVe(jogador, new Cutscene(Cutscene.FIM, jogador.getId(), olhos(), olhar(), nivel().getGameTime()));
+    }
+
+    @Override
+    public void descida(String animacao, int ticksMax) {
+        if (BarreirasServidor.pousado(jogador)) {
+            BarreirasServidor.pousar(jogador);
+            return;
+        }
+        apresentacao(animacao, "", "");
+        BarreirasServidor.descer(jogador, ticksMax);
     }
 
     @Override
