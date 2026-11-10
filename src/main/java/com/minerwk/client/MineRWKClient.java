@@ -44,6 +44,7 @@ public final class MineRWKClient {
         NeoForge.EVENT_BUS.addListener(RenderVisuaisGojo::aoTick);
         NeoForge.EVENT_BUS.addListener(RenderVisuaisGojo::aoRenderizar);
         NeoForge.EVENT_BUS.addListener(RenderVisuaisGojo::aoCorDaNeblina);
+        NeoForge.EVENT_BUS.addListener(com.minerwk.client.vfx.ImpactFrame::aoRenderizar);
         NeoForge.EVENT_BUS.addListener(ImpactoCamera::aoCalcularFov);
         NeoForge.EVENT_BUS.addListener(ImpactoCamera::aoCalcularAngulos);
         NeoForge.EVENT_BUS.addListener(CutsceneCliente::aoTick);

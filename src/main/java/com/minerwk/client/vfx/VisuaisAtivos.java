@@ -171,6 +171,7 @@ public final class VisuaisAtivos {
         deixarRastros(nivel, agora);
         ATIVOS.removeIf(v -> v.acabou(agora));
         ImpactoCamera.tick();
+        ImpactFrame.tick();
         DetritosGojo.tick();
     }
 
@@ -218,6 +219,7 @@ public final class VisuaisAtivos {
     public static void limpar() {
         ATIVOS.clear();
         ImpactoCamera.limpar();
+        ImpactFrame.limpar();
         mundo = null;
     }
 }
