@@ -67,6 +67,7 @@ public final class DemoVfx {
             if (ARVORE) jogador.connection.sendCommand("rwk trocar @s gojo");
             if (TRAJE) {
                 jogador.connection.sendCommand("rwk trocar @s gojo");
+                jogador.connection.sendCommand("rwk despertar @s sim");
                 // Terreno limpo, longe dos blocos soltos do spawn; volta no fim.
                 jogador.connection.sendCommand("tp @s ~150 ~12 ~");
             }
@@ -82,6 +83,7 @@ public final class DemoVfx {
             jogador.setYRot(0);
             jogador.setXRot(4);
             jogador.connection.sendCommand("rwk trocar @s gojo");
+            jogador.connection.sendCommand("rwk despertar @s sim");
             jogador.connection.sendCommand("kill @e[type=minecraft:husk,distance=..60]");
             jogador.connection.sendCommand("execute at @s run summon minecraft:husk ~ ~ ~14 {NoAI:1b}");
         }

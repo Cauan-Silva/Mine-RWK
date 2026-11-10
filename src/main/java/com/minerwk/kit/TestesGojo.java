@@ -46,6 +46,8 @@ public final class TestesGojo {
         ObfuscationReflectionHelper.setPrivateValue(ServerPlayer.class, jogador, 0, "spawnInvulnerableTime");
         jogador.setPos(helper.absoluteVec(new Vec3(1.5, 2, 1.5)));
         ServicoKits.definirPersonagem(jogador, Personagens.porId(Gojo.ID).orElseThrow());
+        // Os testes dos golpes não são sobre o trancamento: o Gojo deles já despertou.
+        ServicoKits.definirDespertou(jogador, true);
         return jogador;
     }
 
@@ -354,6 +356,7 @@ public final class TestesGojo {
     @GameTest(template = "vazio")
     public static void compraDeNoValeNoServidorEChegaNoKit(GameTestHelper helper) {
         ServerPlayer jogador = gojo(helper);
+        ServicoKits.definirDespertou(jogador, false);
         var ok = com.minerwk.core.maestria.Arvore.Resultado.OK;
         String reserva = com.minerwk.core.personagens.gojo.ArvoreGojo.ENERGIA_RESERVA;
         String despertar = com.minerwk.core.personagens.gojo.ArvoreGojo.DESPERTAR;
@@ -375,6 +378,31 @@ public final class TestesGojo {
         ServicoKits.definirPersonagem(jogador, Personagens.porId(Gojo.ID).orElseThrow());
         kit = ServicoKits.kit(jogador).orElseThrow();
         helper.assertTrue(kit.recurso().maximo() == 220 && kit.recurso().atual() == 220, "o kit novo nasce com a reserva cheia");
+        helper.succeed();
+    }
+
+    @GameTest(template = "vazio")
+    public static void golpesTrancadosAteDespertar(GameTestHelper helper) {
+        ServerPlayer jogador = gojo(helper);
+        ServicoKits.definirDespertou(jogador, false);
+        KitDoJogador kit = ServicoKits.kit(jogador).orElseThrow();
+        long agora = helper.getLevel().getGameTime();
+        helper.assertFalse(kit.apertar(com.minerwk.core.kit.Tecla.X, agora), "sem despertar o Vermelho não começa");
+        helper.assertFalse(kit.apertar(com.minerwk.core.kit.Tecla.R, agora), "nem o R");
+        // Desperto só na luta: vale agora e some quando a luta acaba.
+        ServicoKits.definirDespertoNaLuta(jogador, true);
+        helper.assertTrue(ServicoKits.desperto(jogador), "desperto na luta");
+        helper.assertFalse(ServicoKits.dados(jogador).maestriaAtual().despertou, "mas não de vez");
+        helper.assertTrue(kit.apertar(com.minerwk.core.kit.Tecla.X, agora), "na luta o Vermelho funciona");
+        kit.descartar();
+        ServicoKits.definirDespertoNaLuta(jogador, false);
+        helper.assertFalse(kit.apertar(com.minerwk.core.kit.Tecla.X, agora), "acabou a luta, tranca de novo");
+        helper.assertTrue(kit.apertar(com.minerwk.core.kit.Tecla.Z, agora), "o Azul nunca tranca");
+        kit.descartar();
+        // Trocar de personagem durante a luta não carrega o despertar junto.
+        ServicoKits.definirDespertoNaLuta(jogador, true);
+        ServicoKits.definirPersonagem(jogador, Personagens.porId(Gojo.ID).orElseThrow());
+        helper.assertFalse(ServicoKits.desperto(jogador), "kit novo começa trancado");
         helper.succeed();
     }
 }

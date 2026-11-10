@@ -32,6 +32,8 @@ public final class ServicoKits {
     private static final Set<UUID> CAUSOU_DANO = new HashSet<>();
     /** O jogador cujo golpe do kit está causando dano agora (o servidor roda numa thread só). */
     private static ServerPlayer golpeDoKit;
+    /** Quem despertou só para a luta em andamento contra o Nêmesis. Não é salvo: acaba com a luta. */
+    private static final Set<UUID> DESPERTOS_NA_LUTA = new HashSet<>();
 
     private ServicoKits() {
     }
@@ -61,6 +63,7 @@ public final class ServicoKits {
         kit = new KitDoJogador(personagem.get());
         // Antes de carregar o recurso: a reserva comprada na árvore muda o máximo.
         kit.definirMelhorias(new Melhorias(personagem.get().arvore(), dados.maestriaAtual().nos));
+        kit.definirDesperto(desperto(jogador));
         kit.recurso().carregar(dados.recurso);
         kit.recargas().carregar(dados.recargas, jogador.level().getGameTime());
         KITS.put(jogador.getUUID(), kit);
@@ -70,12 +73,14 @@ public final class ServicoKits {
     /** Define (ou troca) o personagem: recurso novo (cheio) e recargas zeradas. */
     public static void definirPersonagem(ServerPlayer jogador, Personagem personagem) {
         KitDoJogador antigo = KITS.remove(jogador.getUUID());
+        DESPERTOS_NA_LUTA.remove(jogador.getUUID());
         // Com o contexto do jogador: a carga em andamento desfaz o visual e para a animação.
         if (antigo != null) antigo.descartar(new ContextoServidor(jogador));
         KitDoJogador novo = new KitDoJogador(personagem);
         KITS.put(jogador.getUUID(), novo);
         salvar(jogador, novo);
         atualizarMelhorias(jogador);
+        novo.definirDesperto(desperto(jogador));
         novo.recarregar();
         Sincronizacao.enviar(jogador);
         // Quem já está vendo o jogador passa a vê-lo com o traje do personagem novo.
@@ -186,6 +191,25 @@ public final class ServicoKits {
         DadosKit dados = dados(jogador);
         if (!dados.temPersonagem()) return;
         dados.maestriaAtual().despertou = despertou;
+        atualizarDespertar(jogador);
+    }
+
+    /** Se o jogador pode usar o que o personagem tranca: despertou de vez ou está desperto nesta luta. */
+    public static boolean desperto(ServerPlayer jogador) {
+        DadosKit dados = dados(jogador);
+        return dados.temPersonagem() && (dados.maestriaAtual().despertou || DESPERTOS_NA_LUTA.contains(jogador.getUUID()));
+    }
+
+    /** O despertar no meio da luta contra o Nêmesis: vale enquanto a luta durar e some com ela. */
+    public static void definirDespertoNaLuta(ServerPlayer jogador, boolean desperto) {
+        if (desperto) DESPERTOS_NA_LUTA.add(jogador.getUUID());
+        else DESPERTOS_NA_LUTA.remove(jogador.getUUID());
+        atualizarDespertar(jogador);
+    }
+
+    private static void atualizarDespertar(ServerPlayer jogador) {
+        boolean desperto = desperto(jogador);
+        kit(jogador).ifPresent(k -> k.definirDesperto(desperto));
         Sincronizacao.enviar(jogador);
     }
 
@@ -266,6 +290,7 @@ public final class ServicoKits {
             salvar(jogador, kit);
         }
         Sincronizacao.esquecer(jogador);
+        DESPERTOS_NA_LUTA.remove(jogador.getUUID());
     }
 
     /** Os efeitos guardam coordenadas da dimensão antiga: acabam na troca (o domínio não segue para o Nether). */

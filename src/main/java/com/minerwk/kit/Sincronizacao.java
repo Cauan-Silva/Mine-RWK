@@ -40,7 +40,7 @@ final class Sincronizacao {
             Map<String, Long> prontas = k.recargas().salvar();
             for (Tecla t : Tecla.values()) {
                 k.personagem().naTecla(t).ifPresent(h -> habilidades.add(new HabilidadeHud(t, h.id(),
-                        h.numeros().custo(), prontas.getOrDefault(h.id(), 0L), k.recargas().duracao(h.id()))));
+                        h.numeros().custo(), prontas.getOrDefault(h.id(), 0L), k.recargas().duracao(h.id()), k.trancada(t))));
             }
             String emUso = emUso(k);
             DadosMaestria maestria = ServicoKits.dados(jogador).maestriaAtual();

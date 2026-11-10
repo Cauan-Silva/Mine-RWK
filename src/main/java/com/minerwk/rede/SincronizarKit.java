@@ -30,14 +30,19 @@ public record SincronizarKit(String personagem, String nomeRecurso, int corRecur
 
     public static final SincronizarKit VAZIO = new SincronizarKit("", "", 0, 0, 0, List.of(), "", List.of(), 0, 0, 0, Map.of(), false);
 
-    /** @param prontaNoTick tick do jogo em que a recarga acaba @param duracao duração total dessa recarga */
-    public record HabilidadeHud(Tecla tecla, String id, double custo, long prontaNoTick, int duracao) {
+    /**
+     * @param prontaNoTick tick do jogo em que a recarga acaba
+     * @param duracao      duração total dessa recarga
+     * @param trancada     ainda exige o despertar
+     */
+    public record HabilidadeHud(Tecla tecla, String id, double custo, long prontaNoTick, int duracao, boolean trancada) {
         static final StreamCodec<ByteBuf, HabilidadeHud> CODEC = StreamCodec.composite(
                 UsarTecla.TECLA, HabilidadeHud::tecla,
                 ByteBufCodecs.STRING_UTF8, HabilidadeHud::id,
                 ByteBufCodecs.DOUBLE, HabilidadeHud::custo,
                 ByteBufCodecs.VAR_LONG, HabilidadeHud::prontaNoTick,
                 ByteBufCodecs.VAR_INT, HabilidadeHud::duracao,
+                ByteBufCodecs.BOOL, HabilidadeHud::trancada,
                 HabilidadeHud::new);
     }
 

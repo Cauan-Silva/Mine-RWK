@@ -24,7 +24,7 @@ public final class Pacotes {
     }
 
     public static void registrar(RegisterPayloadHandlersEvent evento) {
-        PayloadRegistrar r = evento.registrar("5");
+        PayloadRegistrar r = evento.registrar("6");
         r.playToServer(UsarTecla.TIPO, UsarTecla.CODEC, (p, ctx) -> {
             if (ctx.player() instanceof ServerPlayer jogador) ServicoKits.usarTecla(jogador, p.tecla(), p.apertou());
         });

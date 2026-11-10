@@ -1,10 +1,10 @@
 ---
 tags: [desenvolvimento, spec]
-estado: aguardando revisão
+estado: aprovado
 ---
 # Spec: o boss Toji e o despertar do Gojo
 
-Voltar para [[Roadmap]]. Fecha o item "[[Toji]] como boss (Nêmesis do Gojo) e o despertar". Depende da maestria e da árvore, já feitas ([[2026-11-10 Maestria e árvore de habilidades]]). Nada foi programado: é para o autor aprovar ou mudar.
+Voltar para [[Roadmap]]. Fecha o item "[[Toji]] como boss (Nêmesis do Gojo) e o despertar". Depende da maestria e da árvore, já feitas ([[2026-11-10 Maestria e árvore de habilidades]]). Aprovado pelo autor em 10/11; parte 1 feita.
 
 ## Escolhas do autor (10/11)
 1. **O que desperta:** como na obra. O Gojo começa com Azul e Infinito; o despertar libera a Técnica Reversa, o Vermelho, o Roxo, o Vazio Infinito (G) e o Vazio Roxo máximo (R).

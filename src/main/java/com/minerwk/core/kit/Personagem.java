@@ -10,9 +10,10 @@ import java.util.function.Supplier;
  * Um personagem jogável: quem é, de que obra, o recurso dele, as habilidades por tecla e as passivas.
  * Recurso e passivas vêm de fábricas porque guardam estado de cada jogador; habilidades não guardam estado.
  * A árvore de habilidades é a das melhorias que a maestria compra (vazia se o personagem não tem).
+ * As trancas dizem o que só vale depois do despertar.
  */
 public record Personagem(String id, String nome, String obra, Supplier<Recurso> recurso, Map<Tecla, Habilidade> habilidades,
-                         List<Supplier<Passiva>> passivas, Arvore arvore) {
+                         List<Supplier<Passiva>> passivas, Arvore arvore, Trancas trancas) {
     public Personagem {
         habilidades = Map.copyOf(habilidades);
         passivas = List.copyOf(passivas);
@@ -25,6 +26,11 @@ public record Personagem(String id, String nome, String obra, Supplier<Recurso> 
     public Personagem(String id, String nome, String obra, Supplier<Recurso> recurso, Map<Tecla, Habilidade> habilidades,
                       List<Supplier<Passiva>> passivas) {
         this(id, nome, obra, recurso, habilidades, passivas, Arvore.VAZIA);
+    }
+
+    public Personagem(String id, String nome, String obra, Supplier<Recurso> recurso, Map<Tecla, Habilidade> habilidades,
+                      List<Supplier<Passiva>> passivas, Arvore arvore) {
+        this(id, nome, obra, recurso, habilidades, passivas, arvore, Trancas.NENHUMA);
     }
 
     public Optional<Habilidade> naTecla(Tecla tecla) {

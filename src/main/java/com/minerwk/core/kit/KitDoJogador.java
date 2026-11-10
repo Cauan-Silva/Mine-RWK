@@ -19,6 +19,8 @@ public final class KitDoJogador {
     private final List<Ativo> efeitos = new ArrayList<>();
     private final List<Passiva> passivas;
     private Melhorias melhorias = Melhorias.NENHUMA;
+    /** Se o jogador já despertou (de vez ou só nesta luta): libera o que o personagem tranca. */
+    private boolean desperto;
 
     private static final class Ativo {
         final Efeito efeito;
@@ -53,6 +55,20 @@ public final class KitDoJogador {
         return melhorias;
     }
 
+    public boolean desperto() {
+        return desperto;
+    }
+
+    /** Liga ou desliga o despertar. Voltar a trancar não interrompe o golpe em andamento. */
+    public void definirDesperto(boolean desperto) {
+        this.desperto = desperto;
+    }
+
+    /** Se a habilidade da tecla ainda exige o despertar. */
+    public boolean trancada(Tecla tecla) {
+        return !desperto && personagem.trancas().teclas().contains(tecla);
+    }
+
     /** As melhorias da árvore do jogador: valem para o próximo golpe e, no recurso, na hora. */
     public void definirMelhorias(Melhorias melhorias) {
         this.melhorias = melhorias;
@@ -76,7 +92,7 @@ public final class KitDoJogador {
 
     /** Tenta começar a habilidade da tecla. Devolve se começou. */
     public boolean apertar(Tecla tecla, long agora) {
-        if (execucao != null) return false;
+        if (execucao != null || trancada(tecla)) return false;
         Habilidade h = personagem.naTecla(tecla).orElse(null);
         if (h == null || !recargas.pronta(h.id(), agora) || !recurso.pode(h.numeros().custo())) return false;
         execucao = new Execucao(h, numeros(h));
@@ -142,7 +158,9 @@ public final class KitDoJogador {
 
     public List<Execucao.Evento> tick(long agora, EstadoDoJogador estado, Contexto contexto) {
         recurso.tick(estado);
-        for (Passiva p : passivas) p.tick(contexto, estado);
+        if (desperto || !personagem.trancas().passivas()) {
+            for (Passiva p : passivas) p.tick(contexto, estado);
+        }
         tickEfeitos(contexto);
         List<Execucao.Evento> eventos = new ArrayList<>(1);
         if (execucao == null) return eventos;

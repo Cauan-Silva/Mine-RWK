@@ -158,4 +158,42 @@ class EfeitosEPassivasTest {
         assertEquals(3, a.distancia(Vetor.ZERO), 1e-9);
         assertEquals(Vetor.ZERO, Vetor.ZERO.normalizado());
     }
+
+    @Test
+    void golpeEPassivaTrancadosSoValemParaQuemDespertou() {
+        List<String> curas = new ArrayList<>();
+        var r = new KitDoJogadorTest.RecursoFixo(100);
+        var z = new KitDoJogadorTest.Falsa("z", Numeros.instantanea(5, 2, 2, 20, 40));
+        var x = new KitDoJogadorTest.Falsa("x", Numeros.instantanea(5, 2, 2, 20, 40));
+        Passiva passiva = (c, e) -> curas.add("tick");
+        List<java.util.function.Supplier<Passiva>> passivas = List.of(() -> passiva);
+        KitDoJogador k = new KitDoJogador(new Personagem("p", "P", "Obra", () -> r, Map.of(Tecla.Z, z, Tecla.X, x),
+                passivas, com.minerwk.core.maestria.Arvore.VAZIA, new Trancas(java.util.Set.of(Tecla.X), true)));
+        assertFalse(k.desperto());
+        assertTrue(k.trancada(Tecla.X));
+        assertFalse(k.trancada(Tecla.Z));
+        assertFalse(k.apertar(Tecla.X, 0), "golpe trancado não começa");
+        assertTrue(k.execucao().isEmpty());
+        k.tick(0, ESTADO, CTX);
+        assertTrue(curas.isEmpty(), "passiva trancada não roda");
+        assertTrue(k.apertar(Tecla.Z, 1), "o golpe livre continua valendo");
+        k.descartar();
+
+        k.definirDesperto(true);
+        assertFalse(k.trancada(Tecla.X));
+        k.tick(2, ESTADO, CTX);
+        assertEquals(1, curas.size());
+        assertTrue(k.apertar(Tecla.X, 3));
+        // Voltar a trancar no meio do golpe não o interrompe.
+        k.definirDesperto(false);
+        assertTrue(k.execucao().isPresent());
+    }
+
+    @Test
+    void personagemSemTrancasNaoTrancaNada() {
+        var golpe = new KitDoJogadorTest.Falsa("z", Numeros.instantanea(1, 0, 0, 0, 0));
+        KitDoJogador k = kit(golpe, golpe, List.of());
+        assertFalse(k.trancada(Tecla.X));
+        assertTrue(k.apertar(Tecla.X, 0));
+    }
 }

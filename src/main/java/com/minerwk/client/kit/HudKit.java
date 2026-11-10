@@ -25,6 +25,7 @@ public final class HudKit {
     /** Folga acima da pilha vanilla (vida, armadura, fome, montaria, ar). */
     private static final int FOLGA = 5;
     private static final int COR_XP = 0xFFE8B84A;
+    private static final int COR_CADEADO = 0xFF8A8A95;
 
     private static final int FUNDO = 0xAA000000;
     private static final int SOMBRA_RECARGA = 0xB0000000;
@@ -57,6 +58,18 @@ public final class HudKit {
         else recursoMostrado += (alvo - recursoMostrado) * 0.35;
     }
 
+    /** Golpe que ainda exige o despertar: o quadro fica escuro, com um cadeado no lugar da letra. */
+    private static void desenharCadeado(GuiGraphics g, int x, int y) {
+        g.fill(x, y, x + LADO, y + LADO, SOMBRA_RECARGA);
+        int cx = x + LADO / 2;
+        // Argola (contorno de 6 x 4) e corpo (8 x 6).
+        g.fill(cx - 3, y + 3, cx + 3, y + 4, COR_CADEADO);
+        g.fill(cx - 3, y + 4, cx - 2, y + 7, COR_CADEADO);
+        g.fill(cx + 2, y + 4, cx + 3, y + 7, COR_CADEADO);
+        g.fill(cx - 4, y + 7, cx + 4, y + 13, COR_CADEADO);
+        g.fill(cx - 1, y + 9, cx + 1, y + 11, SOMBRA_RECARGA);
+    }
+
     private static void desenhar(GuiGraphics g, DeltaTracker delta) {
         Minecraft mc = Minecraft.getInstance();
         SincronizarKit s = RecepcaoKit.estado();
@@ -83,6 +96,10 @@ public final class HudKit {
             g.fill(x - 1, yQuadros - 1, x + LADO + 1, yQuadros + LADO + 1, emUso ? BORDA_EM_USO : BORDA);
             g.fill(x, yQuadros, x + LADO, yQuadros + LADO, FUNDO);
 
+            if (h.trancada()) {
+                desenharCadeado(g, x, yQuadros);
+                continue;
+            }
             long restante = h.prontaNoTick() - agora;
             // Relógio do cliente atrasado não mostra mais tempo que a recarga tem.
             if (h.duracao() > 0) restante = Math.min(restante, h.duracao());

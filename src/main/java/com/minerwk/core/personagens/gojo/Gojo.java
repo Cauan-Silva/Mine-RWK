@@ -7,6 +7,7 @@ import com.minerwk.core.kit.Numeros;
 import com.minerwk.core.maestria.Melhorias;
 import com.minerwk.core.kit.Personagem;
 import com.minerwk.core.kit.Tecla;
+import com.minerwk.core.kit.Trancas;
 import com.minerwk.core.kit.Vetor;
 import com.minerwk.core.vfx.TrajetoriaGojo;
 import java.util.HashSet;
@@ -34,7 +35,9 @@ public final class Gojo {
         return new Personagem(ID, "Satoru Gojo", "Jujutsu Kaisen", EnergiaAmaldicoada::new,
                 Map.of(Tecla.Z, new Azul(), Tecla.X, new Vermelho(), Tecla.C, new Infinito(),
                         Tecla.V, new Roxo(), Tecla.G, new VazioInfinito(), Tecla.R, new Roxo200()),
-                List.of(TecnicaReversa::new), ArvoreGojo.ARVORE);
+                List.of(TecnicaReversa::new), ArvoreGojo.ARVORE,
+                // Como na obra: antes do Toji ele só tem o Azul e o Infinito.
+                new Trancas(java.util.Set.of(Tecla.X, Tecla.V, Tecla.G, Tecla.R), true));
     }
 
     /** Base das habilidades do Gojo: id e números fixos. */

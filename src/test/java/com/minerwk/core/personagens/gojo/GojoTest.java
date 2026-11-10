@@ -87,7 +87,7 @@ class GojoTest {
     }
 
     private final Falso ctx = new Falso();
-    private final KitDoJogador kit = new KitDoJogador(Gojo.criar());
+    private final KitDoJogador kit = desperto();
     private long agora;
 
     GojoTest() {
@@ -166,7 +166,7 @@ class GojoTest {
         assertEquals(120, ctx.conta("infinito"));
 
         var ctx2 = new Falso();
-        var kit2 = new KitDoJogador(Gojo.criar());
+        var kit2 = desperto();
         ctx2.kit = kit2;
         assertTrue(kit2.apertar(Tecla.C, 0));
         for (int i = 0; i < 10; i++) kit2.tick(i, PARADO, ctx2);
@@ -335,7 +335,7 @@ class GojoTest {
         java.util.Map<Tecla, String> ids = java.util.Map.of(Tecla.Z, "gojo_azul", Tecla.X, "gojo_vermelho",
                 Tecla.C, "gojo_infinito", Tecla.V, "gojo_roxo", Tecla.G, "gojo_vazio_infinito", Tecla.R, "gojo_roxo_200");
         for (var e : ids.entrySet()) {
-            KitDoJogador k = new KitDoJogador(Gojo.criar());
+            KitDoJogador k = desperto();
             ctx.kit = k;
             k.recurso().carregar(10000);
             ctx.chamadas.clear();
@@ -398,7 +398,7 @@ class GojoTest {
         assertEquals(1, ctx.conta("visual:gojo_roxo_carga"));
         assertEquals(1, ctx.conta("visual:gojo_roxo"));
         var ctx2 = new Falso();
-        var kit2 = new KitDoJogador(Gojo.criar());
+        var kit2 = desperto();
         ctx2.kit = kit2;
         kit2.apertar(Tecla.G, 0);
         for (int i = 0; i < 30; i++) kit2.tick(i, PARADO, ctx2);
@@ -465,7 +465,7 @@ class GojoTest {
         var falso = new Falso();
         falso.melhorias = new com.minerwk.core.maestria.Melhorias(ArvoreGojo.ARVORE, java.util.Map.of(
                 ArvoreGojo.INFINITO_DURACAO, 2, ArvoreGojo.DOMINIO_DURACAO, 3, ArvoreGojo.VERMELHO_FORCA, 3));
-        KitDoJogador k = new KitDoJogador(Gojo.criar());
+        KitDoJogador k = desperto();
         falso.kit = k;
         new Gojo.Infinito().aoDisparar(falso, 1f);
         assertEquals(156, k.efeitos().get(0).duracao(), "120 ticks com +30%");
@@ -475,5 +475,21 @@ class GojoTest {
         var esfera = new Gojo.EsferaVermelha(Vetor.ZERO, new Vetor(1, 0, 0), 1f, 1.24f);
         esfera.aoAcabar(falso);
         assertEquals(14 * 1.24f, falso.danos.get(0), 1e-4);
+    }
+
+    /** Um kit do Gojo já desperto: os testes dos golpes não são sobre o trancamento. */
+    private static KitDoJogador desperto() {
+        KitDoJogador k = new KitDoJogador(Gojo.criar());
+        k.definirDesperto(true);
+        return k;
+    }
+
+    @Test
+    void gojoComecaSoComAzulEInfinito() {
+        KitDoJogador k = new KitDoJogador(Gojo.criar());
+        assertFalse(k.trancada(Tecla.Z));
+        assertFalse(k.trancada(Tecla.C));
+        for (Tecla t : new Tecla[] {Tecla.X, Tecla.V, Tecla.G, Tecla.R}) assertTrue(k.trancada(t), t + " deveria exigir o despertar");
+        assertTrue(Gojo.criar().trancas().passivas(), "a Técnica Reversa exige o despertar");
     }
 }

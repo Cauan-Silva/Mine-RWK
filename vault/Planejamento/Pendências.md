@@ -68,6 +68,11 @@ Voltar para [[00 Início]].
   - **Céu e chão no encantamento (10/11):** conferir o céu escurecendo na carga e cheio na fusão e na explosão, voltando devagar depois; as rachaduras de luz saindo dos pés (em chão irregular elas ficam na altura dos pés, não acompanham o relevo); as pedras subindo devagar. Ver de noite, na chuva, debaixo d'água e com Iris (no Nether e no End o véu não é desenhado). O chão continua claro com o céu escuro: ver se incomoda.
   - **`/rwk recarregar`:** conferir que enche a energia, zera as recargas e o HUD acompanha.
   - Com teto baixo sobre o Gojo, a explosão sai um pouco acima dele (o centro vem da conta do movimento, não de onde ele parou).
+- Toji, parte 1 (10/11), conferir no jogo:
+  - **Trancado:** um Gojo sem despertar só usa o Z e o C; X, V, G e R mostram o cadeado e não fazem nada; a Técnica Reversa não cura.
+  - **Liberar:** `/rwk despertar <jogador> sim` tira os cadeados na hora, e `nao` os põe de volta.
+  - **Persistência:** sair e entrar e morrer mantêm o despertou.
+  - **Atenção:** até o Toji existir, o seu Gojo do mundo de testes precisa do comando para usar os golpes.
 - Maestria, parte 3 (10/11), conferir no jogo:
   - **Tela:** H abre e fecha a árvore; os textos em português; o mouse sobre cada nó mostra "Agora" e "Próximo nível".
   - **Comprar:** clicar num nó dourado gasta os pontos e o número sobe; nó sem pontos só faz o clique surdo.
