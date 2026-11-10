@@ -323,4 +323,31 @@ public final class TestesGojo {
         helper.assertTrue(zumbi.getHealth() < vida, "dano causado em si mesmo não deveria ser cancelado");
         helper.succeed();
     }
+
+    @GameTest(template = "vazio")
+    public static void soGolpeDoKitEmInimigoDaXpDeMaestria(GameTestHelper helper) {
+        ServerPlayer jogador = gojo(helper);
+        Zombie zumbi = helper.spawn(EntityType.ZOMBIE, new BlockPos(3, 2, 1));
+        Wolf lobo = helper.spawn(EntityType.WOLF, new BlockPos(1, 2, 3));
+        DadosMaestria m = ServicoKits.dados(jogador).maestriaAtual();
+        zumbi.hurt(helper.getLevel().damageSources().playerAttack(jogador), 3);
+        helper.assertTrue(m.xp == 0, "soco não é golpe do kit: sem XP");
+        ContextoServidor ctx = new ContextoServidor(jogador);
+        ctx.ferir(lobo.getUUID(), 3);
+        helper.assertTrue(m.xp == 0, "lobo não é inimigo: sem XP");
+        zumbi.invulnerableTime = 0;
+        ctx.ferir(zumbi.getUUID(), 4);
+        helper.assertTrue(m.xp == 4, "4 de dano num zumbi deveria dar 4 de XP, deu " + m.xp);
+        zumbi.invulnerableTime = 0;
+        ctx.ferir(zumbi.getUUID(), 1000);
+        helper.assertTrue(m.xp == 4 + 20 + 25, "o golpe que mata dá o teto do dano e o abate, deu " + m.xp);
+        ServicoKits.ganharXp(jogador, 100);
+        helper.assertTrue(com.minerwk.core.maestria.Maestria.nivel(m.xp) == 2, "149 de XP é nível 2");
+        // Trocar de personagem e voltar não apaga a maestria.
+        ServicoKits.definirPersonagem(jogador, Personagens.porId(Personagens.TESTE).orElseThrow());
+        helper.assertTrue(ServicoKits.dados(jogador).maestriaAtual().xp == 0, "o outro personagem começa do zero");
+        ServicoKits.definirPersonagem(jogador, Personagens.porId(Gojo.ID).orElseThrow());
+        helper.assertTrue(ServicoKits.dados(jogador).maestriaAtual().xp == 149, "a maestria do Gojo volta");
+        helper.succeed();
+    }
 }

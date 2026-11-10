@@ -3,6 +3,8 @@ package com.minerwk.kit;
 import com.minerwk.core.kit.Personagem;
 import com.minerwk.core.kit.Personagens;
 import com.mojang.brigadier.CommandDispatcher;
+import com.minerwk.core.maestria.Maestria;
+import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
@@ -36,6 +38,41 @@ public final class ComandoTrocar {
                 .executes(c -> recarregar(c, c.getSource().getPlayerOrException()))
                 .then(Commands.argument("jogador", EntityArgument.player())
                         .executes(c -> recarregar(c, EntityArgument.getPlayer(c, "jogador"))))));
+    }
+
+    /**
+     * {@code /rwk maestria <jogador> nivel <n>}, {@code ... xp <quantia>} e {@code ... zerar}: mexe na maestria
+     * do personagem atual (teste), só para operadores.
+     */
+    public static void registrarMaestria(CommandDispatcher<CommandSourceStack> d) {
+        d.register(Commands.literal("rwk").then(Commands.literal("maestria")
+                .requires(s -> s.hasPermission(2))
+                .then(Commands.argument("jogador", EntityArgument.player())
+                        .then(Commands.literal("nivel").then(Commands.argument("n",
+                                        IntegerArgumentType.integer(1, Maestria.NIVEL_MAX))
+                                .executes(c -> maestria(c, Maestria.xpAte(IntegerArgumentType.getInteger(c, "n")), false))))
+                        .then(Commands.literal("xp").then(Commands.argument("quantia", IntegerArgumentType.integer(1))
+                                .executes(c -> maestria(c, IntegerArgumentType.getInteger(c, "quantia"), true))))
+                        .then(Commands.literal("zerar").executes(c -> maestria(c, 0, false))))));
+    }
+
+    private static int maestria(CommandContext<CommandSourceStack> c, long xp, boolean somar) throws CommandSyntaxException {
+        ServerPlayer jogador = EntityArgument.getPlayer(c, "jogador");
+        DadosKit dados = ServicoKits.dados(jogador);
+        if (!dados.temPersonagem()) {
+            c.getSource().sendFailure(Component.literal(jogador.getName().getString() + " ainda não escolheu um personagem"));
+            return 0;
+        }
+        if (somar) ServicoKits.ganharXp(jogador, xp);
+        else {
+            // Zerar também devolve os pontos: os nós comprados somem.
+            if (xp == 0) dados.maestriaAtual().nos.clear();
+            ServicoKits.definirXp(jogador, xp);
+        }
+        var p = Maestria.progresso(dados.maestriaAtual().xp);
+        String texto = jogador.getName().getString() + ": maestria " + p.nivel() + " (" + p.xpNoNivel() + "/" + p.xpParaProximo() + " XP)";
+        c.getSource().sendSuccess(() -> Component.literal(texto), true);
+        return 1;
     }
 
     private static int recarregar(CommandContext<CommandSourceStack> c, ServerPlayer jogador) {

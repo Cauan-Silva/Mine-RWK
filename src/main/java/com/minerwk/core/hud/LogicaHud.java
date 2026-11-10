@@ -28,6 +28,12 @@ public final class LogicaHud {
         return "0." + decimos;
     }
 
+    /** Quanto da barra de XP está cheia, em [0, 1]; cheia no nível máximo (que não pede mais XP). */
+    public static double fracaoXp(int xpNoNivel, int xpProximo) {
+        if (xpProximo <= 0) return 1;
+        return Math.max(0, Math.min(1, xpNoNivel / (double) xpProximo));
+    }
+
     public static boolean semRecurso(double atual, double custo) {
         return atual + 1e-9 < custo;
     }

@@ -68,5 +68,7 @@
   "subtitles.minerwk.gojo_r_fusao": "Hollow Purple gathers",
   "subtitles.minerwk.gojo_r_explosao": "Maximum Hollow Purple detonates",
   "config.minerwk.armaduraSobreTraje": "Armor over the outfit",
-  "config.minerwk.olhosBrilhando": "Glowing eyes without the blindfold"
+  "config.minerwk.olhosBrilhando": "Glowing eyes without the blindfold",
+  "mensagem.minerwk.maestria": "Mastery %s: +%s point(s)",
+  "hud.minerwk.nivel": "Lv %s"
 }

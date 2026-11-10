@@ -68,6 +68,12 @@ Voltar para [[00 Início]].
   - **Céu e chão no encantamento (10/11):** conferir o céu escurecendo na carga e cheio na fusão e na explosão, voltando devagar depois; as rachaduras de luz saindo dos pés (em chão irregular elas ficam na altura dos pés, não acompanham o relevo); as pedras subindo devagar. Ver de noite, na chuva, debaixo d'água e com Iris (no Nether e no End o véu não é desenhado). O chão continua claro com o céu escuro: ver se incomoda.
   - **`/rwk recarregar`:** conferir que enche a energia, zera as recargas e o HUD acompanha.
   - Com teto baixo sobre o Gojo, a explosão sai um pouco acima dele (o centro vem da conta do movimento, não de onde ele parou).
+- Maestria, parte 1 (10/11), conferir no jogo:
+  - **XP:** golpes do Gojo em mobs hostis enchem a linha de XP; soco, espada, animais e golpe no ar não.
+  - **Subir de nível:** mensagem, som e partículas; `/rwk maestria <jogador> nivel 20` e `zerar`.
+  - **HUD:** o "Nv" à direita da barra e a linha de XP embaixo, sem encostar nos corações nem na armadura.
+  - **Persistência:** sair e entrar, morrer, e trocar de personagem e voltar mantêm a maestria.
+  - **Ritmo:** se o nível 20 chega em cerca de 2 horas, como o spec estima.
 - Traje do Gojo (10/11), conferir no jogo:
   - **Vestir:** escolher o Gojo veste o traje na hora; trocar para outro personagem tira.
   - **Venda:** no rosto normalmente; some no Vazio Infinito e no R, com os olhos azuis brilhando, e volta no fim. Ver se os olhos caem em cima dos olhos da sua skin; se não, `olhosBrilhando = false` na config.

@@ -1,10 +1,10 @@
 ---
 tags: [desenvolvimento, spec]
-estado: aguardando revisão
+estado: aprovado
 ---
 # Spec: maestria e árvore de habilidades
 
-Voltar para [[Roadmap]]. Adianta o item 1 da Fase 4 ("RPG e Despertar"), porque o boss [[Toji]] depende dele. Nada foi programado: é para o autor aprovar ou mudar.
+Voltar para [[Roadmap]]. Adianta o item 1 da Fase 4 ("RPG e Despertar"), porque o boss [[Toji]] depende dele. Aprovado pelo autor em 10/11; parte 1 feita.
 
 ## Escolhas do autor (10/11)
 1. **Ordem:** a maestria e a árvore vêm primeiro, num spec só delas. O despertar e o Toji ficam no spec seguinte.

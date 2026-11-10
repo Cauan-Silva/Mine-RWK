@@ -23,7 +23,8 @@ public final class HudKit {
     private static final int ESPACO = 2;
     private static final int ALTURA_BARRA = 4;
     /** Folga acima da pilha vanilla (vida, armadura, fome, montaria, ar). */
-    private static final int FOLGA = 2;
+    private static final int FOLGA = 5;
+    private static final int COR_XP = 0xFFE8B84A;
 
     private static final int FUNDO = 0xAA000000;
     private static final int SOMBRA_RECARGA = 0xB0000000;
@@ -106,5 +107,15 @@ public final class HudKit {
         g.fill(xb, yBarra, xb + cheio, yBarra + ALTURA_BARRA, 0xFF000000 | s.corRecurso());
         String texto = s.nomeRecurso() + " " + (int) Math.floor(s.recurso()) + "/" + (int) maximo;
         g.drawString(fonte, texto, xb - fonte.width(texto) - 4, yBarra - 2, TEXTO, true);
+
+        // Maestria: o nível à direita da barra e uma linha fina de XP embaixo dela.
+        if (s.nivel() > 0) {
+            int yXp = yBarra + ALTURA_BARRA + 2;
+            int cheioXp = (int) Math.round(larguraBarra * LogicaHud.fracaoXp(s.xpNoNivel(), s.xpProximo()));
+            g.fill(xb - 1, yXp, xb + larguraBarra + 1, yXp + 2, FUNDO);
+            g.fill(xb, yXp, xb + cheioXp, yXp + 1, COR_XP);
+            g.drawString(fonte, net.minecraft.network.chat.Component.translatable("hud.minerwk.nivel", s.nivel()),
+                    xb + larguraBarra + 4, yBarra - 2, COR_XP, true);
+        }
     }
 }

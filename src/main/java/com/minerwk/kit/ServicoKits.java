@@ -3,6 +3,7 @@ package com.minerwk.kit;
 import com.minerwk.MineRWK;
 import com.minerwk.core.kit.EstadoDoJogador;
 import com.minerwk.core.kit.Tecla;
+import com.minerwk.core.maestria.Maestria;
 import com.minerwk.core.kit.KitDoJogador;
 import com.minerwk.core.kit.Personagem;
 import com.minerwk.core.kit.Personagens;
@@ -27,6 +28,8 @@ public final class ServicoKits {
     private static final Map<UUID, KitDoJogador> KITS = new HashMap<>();
     private static final Set<UUID> APANHOU = new HashSet<>();
     private static final Set<UUID> CAUSOU_DANO = new HashSet<>();
+    /** O jogador cujo golpe do kit está causando dano agora (o servidor roda numa thread só). */
+    private static ServerPlayer golpeDoKit;
 
     private ServicoKits() {
     }
@@ -35,6 +38,7 @@ public final class ServicoKits {
         NeoForge.EVENT_BUS.addListener(ServicoKits::aoComecarAVer);
         NeoForge.EVENT_BUS.addListener(ServicoKits::aoTick);
         NeoForge.EVENT_BUS.addListener(ServicoKits::aoDano);
+        NeoForge.EVENT_BUS.addListener(ServicoKits::aoMorrer);
         NeoForge.EVENT_BUS.addListener(ServicoKits::aoEntrar);
         NeoForge.EVENT_BUS.addListener(ServicoKits::aoSair);
         NeoForge.EVENT_BUS.addListener(ServicoKits::aoClonar);
@@ -112,8 +116,65 @@ public final class ServicoKits {
     }
 
     private static void salvar(ServerPlayer jogador, KitDoJogador kit) {
-        jogador.setData(Anexos.DADOS_KIT,
-                new DadosKit(kit.personagem().id(), kit.recurso().salvar(), kit.recargas().salvar()));
+        jogador.setData(Anexos.DADOS_KIT, new DadosKit(kit.personagem().id(), kit.recurso().salvar(),
+                kit.recargas().salvar(), dados(jogador).maestria));
+    }
+
+    /**
+     * Roda {@code golpe} marcando o dano como vindo do kit do {@code jogador}: só esse dano (e o abate que
+     * ele causar) dá XP de maestria. Um soco ou uma espada não contam.
+     */
+    static void comoGolpeDoKit(ServerPlayer jogador, Runnable golpe) {
+        ServerPlayer antes = golpeDoKit;
+        golpeDoKit = jogador;
+        try {
+            golpe.run();
+        } finally {
+            golpeDoKit = antes;
+        }
+    }
+
+    private static boolean inimigo(net.minecraft.world.entity.Entity alvo) {
+        return alvo instanceof net.minecraft.world.entity.monster.Enemy;
+    }
+
+    private static void aoMorrer(net.neoforged.neoforge.event.entity.living.LivingDeathEvent evento) {
+        if (golpeDoKit != null && evento.getSource().getEntity() == golpeDoKit) {
+            ganharXp(golpeDoKit, Maestria.xpPorAbate(inimigo(evento.getEntity())));
+        }
+    }
+
+    /** Dá XP de maestria ao jogador no personagem atual; avisa e festeja se subiu de nível. */
+    public static void ganharXp(ServerPlayer jogador, long ganho) {
+        DadosKit dados = dados(jogador);
+        if (ganho <= 0 || !dados.temPersonagem()) return;
+        DadosMaestria m = dados.maestriaAtual();
+        definirXp(jogador, Maestria.somar(m.xp, ganho));
+    }
+
+    /** Define o XP total no personagem atual (também usado pelos comandos de teste). */
+    public static void definirXp(ServerPlayer jogador, long xp) {
+        DadosKit dados = dados(jogador);
+        if (!dados.temPersonagem()) return;
+        DadosMaestria m = dados.maestriaAtual();
+        int antes = Maestria.nivel(m.xp);
+        m.xp = Math.max(0, Math.min(Maestria.XP_MAX, xp));
+        int depois = Maestria.nivel(m.xp);
+        if (depois > antes) aoSubirDeNivel(jogador, depois, depois - antes);
+    }
+
+    private static void aoSubirDeNivel(ServerPlayer jogador, int nivel, int pontos) {
+        // Jogador sem conexão (GameTest) não recebe mensagem.
+        if (jogador.connection != null) {
+            jogador.displayClientMessage(net.minecraft.network.chat.Component.translatable(
+                    "mensagem.minerwk.maestria", nivel, pontos), true);
+        }
+        if (jogador.level() instanceof net.minecraft.server.level.ServerLevel mundo) {
+            mundo.playSound(null, jogador.getX(), jogador.getY(), jogador.getZ(),
+                    net.minecraft.sounds.SoundEvents.PLAYER_LEVELUP, net.minecraft.sounds.SoundSource.PLAYERS, .8f, 1f);
+            mundo.sendParticles(net.minecraft.core.particles.ParticleTypes.TOTEM_OF_UNDYING, jogador.getX(),
+                    jogador.getY() + 1, jogador.getZ(), 30, .4, .6, .4, .25);
+        }
     }
 
     private static void aoTick(PlayerTickEvent.Post evento) {
@@ -148,7 +209,12 @@ public final class ServicoKits {
             kit(vitima).ifPresent(k -> k.levouDano(evento.getNewDamage(), vitima.level().getGameTime(),
                     new ContextoServidor(vitima)));
         }
-        if (evento.getSource().getEntity() instanceof ServerPlayer atacante) CAUSOU_DANO.add(atacante.getUUID());
+        if (evento.getSource().getEntity() instanceof ServerPlayer atacante) {
+            CAUSOU_DANO.add(atacante.getUUID());
+            if (atacante == golpeDoKit) {
+                ganharXp(atacante, Maestria.xpPorDano(evento.getNewDamage(), inimigo(evento.getEntity())));
+            }
+        }
     }
 
     private static void aoEntrar(PlayerEvent.PlayerLoggedInEvent evento) {

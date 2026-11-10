@@ -68,5 +68,7 @@
   "subtitles.minerwk.gojo_r_fusao": "O Vazio Roxo se forma",
   "subtitles.minerwk.gojo_r_explosao": "Vazio Roxo máximo explode",
   "config.minerwk.armaduraSobreTraje": "Armadura por cima do traje",
-  "config.minerwk.olhosBrilhando": "Olhos brilhando sem a venda"
+  "config.minerwk.olhosBrilhando": "Olhos brilhando sem a venda",
+  "mensagem.minerwk.maestria": "Maestria %s: +%s ponto(s)",
+  "hud.minerwk.nivel": "Nv %s"
 }

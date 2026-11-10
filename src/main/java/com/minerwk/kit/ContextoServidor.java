@@ -189,17 +189,21 @@ public final class ContextoServidor implements Contexto {
     @Override
     public void danoEm(Vetor centro, double raio, float dano) {
         var fonte = jogador.damageSources().playerAttack(jogador);
-        for (LivingEntity alvo : naEsfera(LivingEntity.class, vec(centro), raio, e -> true)) alvo.hurt(fonte, dano);
+        ServicoKits.comoGolpeDoKit(jogador, () -> {
+            for (LivingEntity alvo : naEsfera(LivingEntity.class, vec(centro), raio, e -> true)) alvo.hurt(fonte, dano);
+        });
     }
 
     @Override
     public int danoUmaVez(Vetor centro, double raio, float dano, Set<Object> atingidos) {
         var fonte = jogador.damageSources().playerAttack(jogador);
-        int feridos = 0;
-        for (LivingEntity alvo : naEsfera(LivingEntity.class, vec(centro), raio, e -> true)) {
-            if (atingidos.add(alvo.getUUID()) && alvo.hurt(fonte, dano)) feridos++;
-        }
-        return feridos;
+        int[] feridos = {0};
+        ServicoKits.comoGolpeDoKit(jogador, () -> {
+            for (LivingEntity alvo : naEsfera(LivingEntity.class, vec(centro), raio, e -> true)) {
+                if (atingidos.add(alvo.getUUID()) && alvo.hurt(fonte, dano)) feridos[0]++;
+            }
+        });
+        return feridos[0];
     }
 
     @Override
@@ -298,7 +302,7 @@ public final class ContextoServidor implements Contexto {
     @Override
     public void ferir(Object alvo, float dano) {
         LivingEntity e = marcado(alvo);
-        if (e != null) e.hurt(jogador.damageSources().playerAttack(jogador), dano);
+        if (e != null) ServicoKits.comoGolpeDoKit(jogador, () -> e.hurt(jogador.damageSources().playerAttack(jogador), dano));
     }
 
     @Override

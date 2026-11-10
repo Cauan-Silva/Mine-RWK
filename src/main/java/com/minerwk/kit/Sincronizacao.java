@@ -17,12 +17,12 @@ import net.minecraft.server.level.ServerPlayer;
 
 /**
  * Manda ao jogador o estado do kit: na entrada, ao escolher/trocar, quando uma recarga começa,
- * quando a habilidade em uso muda e a cada 10 ticks se o recurso mudou.
+ * quando a habilidade em uso ou o XP de maestria muda e a cada 10 ticks se o recurso mudou.
  */
 final class Sincronizacao {
     private static final int RECURSO_A_CADA = 10;
 
-    private record Enviado(double recurso, Map<String, Long> recargas, String emUso) {
+    private record Enviado(double recurso, Map<String, Long> recargas, String emUso, long xp) {
     }
 
     private static final Map<UUID, Enviado> ULTIMO = new HashMap<>();
@@ -43,12 +43,15 @@ final class Sincronizacao {
                         h.numeros().custo(), prontas.getOrDefault(h.id(), 0L), k.recargas().duracao(h.id()))));
             }
             String emUso = emUso(k);
+            long xp = ServicoKits.dados(jogador).maestriaAtual().xp;
+            var progresso = com.minerwk.core.maestria.Maestria.progresso(xp);
             pacote = new SincronizarKit(k.personagem().id(), k.recurso().nome(), k.recurso().cor(),
-                    k.recurso().atual(), k.recurso().maximo(), habilidades, emUso, List.of());
-            ULTIMO.put(jogador.getUUID(), new Enviado(k.recurso().atual(), prontas, emUso));
+                    k.recurso().atual(), k.recurso().maximo(), habilidades, emUso, List.of(),
+                    progresso.nivel(), progresso.xpNoNivel(), progresso.xpParaProximo());
+            ULTIMO.put(jogador.getUUID(), new Enviado(k.recurso().atual(), prontas, emUso, xp));
         } else {
             List<PersonagemEscolha> lista = Personagens.escolhiveis().stream().map(PersonagemEscolha::de).toList();
-            pacote = new SincronizarKit("", "", 0, 0, 0, List.of(), "", lista);
+            pacote = new SincronizarKit("", "", 0, 0, 0, List.of(), "", lista, 0, 0, 0);
             ULTIMO.remove(jogador.getUUID());
         }
         Envio.para(jogador, pacote);
@@ -67,7 +70,9 @@ final class Sincronizacao {
         boolean recargaMudou = !ultimo.recargas().equals(kit.recargas().salvar());
         boolean usoMudou = !ultimo.emUso().equals(emUso(kit));
         boolean recursoMudou = jogador.tickCount % RECURSO_A_CADA == 0 && ultimo.recurso() != kit.recurso().atual();
-        if (recargaMudou || usoMudou || recursoMudou) enviar(jogador);
+        // Um golpe em área dá XP várias vezes no mesmo tick: o envio é um só, aqui.
+        boolean xpMudou = ultimo.xp() != ServicoKits.dados(jogador).maestriaAtual().xp;
+        if (recargaMudou || usoMudou || recursoMudou || xpMudou) enviar(jogador);
     }
 
     static void esquecer(ServerPlayer jogador) {

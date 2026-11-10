@@ -49,4 +49,12 @@ class LogicaHudTest {
         assertEquals(List.of(Tecla.Z, Tecla.X, Tecla.R), LogicaHud.teclasVisiveis(EnumSet.of(Tecla.R, Tecla.X, Tecla.Z)));
         assertEquals(List.of(), LogicaHud.teclasVisiveis(EnumSet.noneOf(Tecla.class)));
     }
+
+    @Test
+    void barraDeXpFicaEntreZeroEUmECheiaNoNivelMaximo() {
+        assertEquals(.5, LogicaHud.fracaoXp(55, 110), 1e-9);
+        assertEquals(0, LogicaHud.fracaoXp(-3, 110), 1e-9);
+        assertEquals(1, LogicaHud.fracaoXp(500, 110), 1e-9);
+        assertEquals(1, LogicaHud.fracaoXp(0, 0), 1e-9);
+    }
 }
