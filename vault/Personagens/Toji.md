@@ -16,7 +16,12 @@ estado: boss do despertar do Gojo; pesquisa feita em parte, spec ainda não escr
 - **O que ele desperta:** como na obra. O Gojo começa só com **Azul** e **Infinito**. Vencer o Toji libera a **Técnica Reversa**, o **Vermelho** e o **Roxo**, como no arco do Inventário Oculto.
 - **Como a luta começa:** o jogador **invoca com um item**, e o Toji aparece ali com a entrada dele.
 - **Quando fazer:** depois do traje e das passivas do Gojo.
-- **A decidir no spec:** se o Vazio Infinito (G) e o Vazio Roxo máximo (R) vêm junto com a vitória ou têm outro requisito. Na obra o domínio aparece depois do arco do Toji, e o Roxo 200% só contra o Sukuna.
+- **Segunda rodada (10/11):**
+  - **A luta:** o despertar acontece **no meio**. O Toji derruba o Gojo com a lança; em vez de morrer, ele desperta a Técnica Reversa, ganha o resto do kit ali e termina a luta.
+  - **G e R:** vêm junto. Vencer o Toji libera o kit inteiro.
+  - **Requisito:** maestria no nível exigido e o nó **Despertar** comprado na árvore. Por isso a maestria e a árvore são feitas antes; ver o spec [[2026-11-10 Maestria e árvore de habilidades]].
+  - **Item de invocação:** receita de bancada com itens comuns, que só o Gojo consegue usar; dá para repetir a luta.
+  - **Tamanho:** em partes. Primeiro o essencial (modelo, barra de vida e três golpes: investida, lança que anula o Infinito e corrente); depois os outros golpes, as fases, o VFX e o som.
 
 ## Kit canônico
 Toji (伏黒 甚爾 *Fushiguro Tōji*), nascido Zen'in, é o "Matador de Feiticeiros". Não tem técnica amaldiçoada: tudo o que faz vem do corpo e das ferramentas amaldiçoadas que carrega.
