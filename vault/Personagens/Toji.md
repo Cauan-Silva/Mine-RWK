@@ -1,6 +1,6 @@
 ---
 tags: [personagem]
-estado: pesquisa feita, kit aguardando aprovação
+estado: pesquisa feita em parte, escolhas do kit feitas, aguardando a aprovação final
 ---
 # Toji Fushiguro
 
@@ -46,13 +46,13 @@ Recurso: **Fôlego** em vez de energia amaldiçoada (enche parado, como o do per
 | G | Nuvem Brincalhona | 16 de dano em área de 5 blocos, recarga 14 s | Três giros que arremessam quem estiver em volta. O dano cresce com o Fôlego que ele tem. |
 | R | Execução do Assassino | 40 de dano num alvo, recarga 5 min | Ultimate com cutscene, na cena do cap. 71: solta o enxame de maldições, some, e a lança entra por trás. |
 
-Passivas: **Restrição Celestial** (anda e pula mais, sem dano de queda até certa altura, e não aparece para quem depende de sentir energia) e **Maldição inventário** (o verme no ombro; a troca de arma é só visual, cada golpe puxa a sua).
+Passivas: **Restrição Celestial** (anda e pula mais, sem dano de queda até certa altura, não aparece para quem depende de sentir energia e é imune à paralisia do Vazio Infinito) e **Maldição inventário** (o verme no ombro; a troca de arma é só visual, cada golpe puxa a sua).
 
-Pontos a decidir com o autor:
-1. **Sem energia amaldiçoada:** uso o Fôlego como recurso, ou golpes só com recarga?
-2. **Anular técnica (X):** vale contra todo personagem (cancela a carga e os efeitos de qualquer kit) ou só contra golpes de energia amaldiçoada?
-3. **Imunidade ao Vazio Infinito:** na obra o domínio acerta o Toji normalmente; proponho que ele **não** seja imune.
-4. **Versão:** só o Toji do Inventário Oculto, ou a Nuvem Brincalhona (que ele só usa em Shibuya) entra mesmo assim?
+Escolhas do autor (10/11):
+1. **Recurso:** Fôlego, que enche parado.
+2. **Lança (X):** anula qualquer kit. Cancela a carga em andamento e tira os efeitos ativos do alvo por 3 s, seja qual for o personagem.
+3. **Vazio Infinito:** o Toji é **imune** ao domínio do Gojo. É decisão de jogo do autor: na obra o domínio o acertaria, e a imunidade por não ter energia amaldiçoada é da Maki, mais tarde.
+4. **Nuvem Brincalhona:** entra no kit (G), mesmo sendo só da volta em Shibuya.
 
 ## Diferenças em relação ao Minezin
 - No Minezin ele é boss. Aqui vira personagem jogável.
