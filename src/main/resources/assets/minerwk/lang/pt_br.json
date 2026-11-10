@@ -48,5 +48,16 @@
   "cutscene.minerwk.gojo_roxo_200.4.jp": "表裏の間",
   "cutscene.minerwk.gojo_roxo_200.5": "Técnica Vazia: Roxo",
   "cutscene.minerwk.gojo_roxo_200.5.jp": "虚式「茈」",
-  "config.minerwk.cutscenes": "Cutscenes das ultimates"
+  "config.minerwk.cutscenes": "Cutscenes das ultimates",
+  "subtitles.minerwk.gojo_azul": "Azul puxa tudo para o centro",
+  "subtitles.minerwk.gojo_vermelho_carga": "Vermelho se concentra na ponta do dedo",
+  "subtitles.minerwk.gojo_vermelho_disparo": "Vermelho é disparado",
+  "subtitles.minerwk.gojo_vermelho_explosao": "Vermelho explode",
+  "subtitles.minerwk.gojo_infinito_ativa": "Infinito se ergue",
+  "subtitles.minerwk.gojo_infinito_desativa": "Infinito se desfaz",
+  "subtitles.minerwk.gojo_infinito_tic": "Infinito para o golpe",
+  "subtitles.minerwk.gojo_roxo_carga": "Azul e Vermelho se fundem",
+  "subtitles.minerwk.gojo_roxo_disparo": "Vazio Roxo apaga o caminho",
+  "subtitles.minerwk.gojo_dominio": "Expansão de Domínio: Vazio Infinito",
+  "subtitles.minerwk.gojo_dominio_fim": "O domínio racha"
 }

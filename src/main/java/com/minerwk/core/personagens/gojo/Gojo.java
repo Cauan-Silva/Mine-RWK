@@ -18,7 +18,6 @@ import java.util.Map;
  */
 public final class Gojo {
     public static final String ID = "gojo";
-    private static final String SOM = "teste";
     /** Animações do R depois do avanço: o uppercut e o resto, ou só as mãos abrindo quando não há alvo. */
     public static final String ANIM_R_UPPERCUT = "gojo_roxo_maximo";
     public static final String ANIM_R_SEM_ALVO = "gojo_roxo_maximo_sem_alvo";
@@ -60,7 +59,12 @@ public final class Gojo {
         /** A animação do golpe (mesmo id) começa com a carga e cobre o golpe inteiro. */
         @Override
         public void aoIniciarCarga(Contexto ctx) {
-            ctx.apresentacao(id, "", "");
+            ctx.apresentacao(id, "", somDaCarga());
+        }
+
+        /** Som que começa junto com a carga (vazio = nenhum). Só para cargas de duração fixa. */
+        protected String somDaCarga() {
+            return "";
         }
 
         @Override
@@ -77,7 +81,6 @@ public final class Gojo {
 
         @Override
         public void aoDisparar(Contexto ctx, float forca) {
-            ctx.apresentacao("", "", SOM);
             Vetor centro = ctx.alvoAte(6);
             ctx.visual("gojo_azul", centro, ctx.olhar(), 1f, CampoAzul.DURACAO);
             ctx.criarEfeito(new CampoAzul(centro));
@@ -133,7 +136,7 @@ public final class Gojo {
         @Override
         public void aoDisparar(Contexto ctx, float forca) {
             // A carga tem tamanho variável: o disparo sempre pula para a pose do coice.
-            ctx.apresentacao("gojo_vermelho_disparo", "", SOM);
+            ctx.apresentacao("gojo_vermelho_disparo", "", SonsGojo.VERMELHO_DISPARO);
             Vetor dir = ctx.olhar();
             Vetor inicio = ctx.olhos().mais(dir);
             ctx.visualFim("gojo_vermelho_carga", ctx.olhos());
@@ -192,7 +195,7 @@ public final class Gojo {
 
         @Override
         public void aoDisparar(Contexto ctx, float forca) {
-            ctx.apresentacao("", "", SOM);
+            ctx.apresentacao("", "", SonsGojo.INFINITO_ATIVA);
             ctx.visual("gojo_infinito", ctx.olhos(), ctx.olhar(), 0f, InfinitoAtivo.DURACAO);
             ctx.criarEfeito(new InfinitoAtivo());
         }
@@ -224,6 +227,11 @@ public final class Gojo {
         public boolean encerrado() {
             return semEnergia;
         }
+
+        @Override
+        public void aoAcabar(Contexto ctx) {
+            ctx.apresentacao("", "", SonsGojo.INFINITO_DESATIVA);
+        }
     }
 
     /** V: Roxo, 1,5 s de carga; avança 40 blocos em 2 s apagando o caminho. */
@@ -239,6 +247,11 @@ public final class Gojo {
         }
 
         @Override
+        protected String somDaCarga() {
+            return SonsGojo.ROXO_CARGA;
+        }
+
+        @Override
         public void aoInterromper(Contexto ctx) {
             super.aoInterromper(ctx);
             ctx.visualFim("gojo_roxo_carga", ctx.olhos());
@@ -246,7 +259,7 @@ public final class Gojo {
 
         @Override
         public void aoDisparar(Contexto ctx, float forca) {
-            ctx.apresentacao("", "", SOM);
+            ctx.apresentacao("", "", SonsGojo.ROXO_DISPARO);
             ctx.tremor(0.6f, 15, 24);
             ctx.visual("gojo_roxo", ctx.olhos(), ctx.olhar(), 1f, 40);
             ctx.criarEfeito(new FeixeRoxo(ctx.olhos(), ctx.olhar(), TrajetoriaGojo.PASSO_ROXO, 40, 1.5, 30f, 2, 4));
@@ -290,7 +303,6 @@ public final class Gojo {
 
         @Override
         public void aoDisparar(Contexto ctx, float forca) {
-            ctx.apresentacao("", "", SOM);
             ctx.tremor(1.2f, 30, 64);
             ctx.criarEfeito(new ComboRoxoMaximo(ctx));
         }
@@ -486,8 +498,12 @@ public final class Gojo {
         }
 
         @Override
+        protected String somDaCarga() {
+            return SonsGojo.DOMINIO;
+        }
+
+        @Override
         public void aoDisparar(Contexto ctx, float forca) {
-            ctx.apresentacao("", "", SOM);
             ctx.tremor(0.5f, 20, 24);
             ctx.visual("gojo_vazio_infinito", ctx.olhos(), ctx.olhar(), 0f, 160);
             // O domínio é fechado e tem chão próprio, no nível dos pés: ninguém sai, entra ou cai.

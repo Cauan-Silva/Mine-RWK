@@ -14,6 +14,13 @@ public final class Sons {
     public static final DeferredHolder<SoundEvent, SoundEvent> TESTE =
             REGISTRO.register("teste", () -> SoundEvent.createVariableRangeEvent(MineRWK.id("teste")));
 
+    static {
+        // Sons do Gojo, gerados por ferramentas/gerar_sfx_gojo.py; os ids ficam em core (SonsGojo).
+        for (String id : com.minerwk.core.personagens.gojo.SonsGojo.TODOS) {
+            REGISTRO.register(id, () -> SoundEvent.createVariableRangeEvent(MineRWK.id(id)));
+        }
+    }
+
     private Sons() {
     }
 }

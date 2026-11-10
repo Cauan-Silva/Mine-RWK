@@ -48,5 +48,16 @@
   "cutscene.minerwk.gojo_roxo_200.4.jp": "表裏の間",
   "cutscene.minerwk.gojo_roxo_200.5": "Hollow Technique: Purple",
   "cutscene.minerwk.gojo_roxo_200.5.jp": "虚式「茈」",
-  "config.minerwk.cutscenes": "Ultimate cutscenes"
+  "config.minerwk.cutscenes": "Ultimate cutscenes",
+  "subtitles.minerwk.gojo_azul": "Blue pulls everything in",
+  "subtitles.minerwk.gojo_vermelho_carga": "Red gathers at the fingertip",
+  "subtitles.minerwk.gojo_vermelho_disparo": "Red is fired",
+  "subtitles.minerwk.gojo_vermelho_explosao": "Red explodes",
+  "subtitles.minerwk.gojo_infinito_ativa": "Infinity rises",
+  "subtitles.minerwk.gojo_infinito_desativa": "Infinity fades",
+  "subtitles.minerwk.gojo_infinito_tic": "Infinity stops the blow",
+  "subtitles.minerwk.gojo_roxo_carga": "Blue and Red fuse",
+  "subtitles.minerwk.gojo_roxo_disparo": "Hollow Purple erases its path",
+  "subtitles.minerwk.gojo_dominio": "Domain Expansion: Infinite Void",
+  "subtitles.minerwk.gojo_dominio_fim": "The domain shatters"
 }

@@ -1,6 +1,6 @@
 ---
 tags: [desenvolvimento, spec]
-estado: aguardando revisão
+estado: aprovado
 ---
 # Spec: som do Gojo e pipeline de áudio (Fase 2, parte 9; fecha o item de áudio do 1.4)
 
