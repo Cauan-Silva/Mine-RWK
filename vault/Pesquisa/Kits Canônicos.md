@@ -23,6 +23,7 @@ Ver [[Modelo de Personagem]].
 | Personagem | Pesquisa | Revisão do kit |
 | --- | --- | --- |
 | [[Gojo]] | feita (09/11) | aprovado (09/11) |
+| [[Toji]] | feita em parte (10/11): falta conferir as armas na wiki da obra | aguardando o autor |
 | (demais) | pendente | pendente |
 
 Ordem sugerida em [[Roadmap]].

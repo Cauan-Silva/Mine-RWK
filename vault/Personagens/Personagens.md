@@ -21,6 +21,6 @@ Personagens que existem no Minezin (estado de 08/11/2026) e serão portados. Vol
 | Rudeus | Mushoku Tensei | pendente | não |
 | Subaru e Beatrice | Re:Zero | pendente | não |
 | Tanjiro | Demon Slayer | pendente | não |
-| Toji | Jujutsu Kaisen | pendente | não |
+| [[Toji]] | Jujutsu Kaisen | feita em parte (10/11), kit aguardando aprovação | não |
 
 Bosses e Nemesis: ver [[Sistemas]] (World Bosses, Raids).
