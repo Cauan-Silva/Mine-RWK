@@ -227,4 +227,84 @@ public final class TestesToji {
         toji.discard();
         helper.succeed();
     }
+
+    @GameTest(template = "vazio", batch = "toji_9")
+    public static void entradaSeguraOPrimeiroGolpe(GameTestHelper helper) {
+        ServerPlayer jogador = TestesGojo.gojo(helper);
+        TojiEntity toji = toji(helper, jogador, 3);
+        helper.startSequence()
+                .thenIdle(TojiBoss.ENTRADA - 10)
+                .thenExecute(() -> {
+                    helper.assertTrue(toji.golpe() == null, "na entrada ele ainda não ataca");
+                    helper.assertTrue(jogador.getHealth() == 20, "nem fere");
+                })
+                .thenWaitUntil(() -> helper.assertTrue(toji.golpe() != null, "depois da entrada vem o primeiro golpe"))
+                .thenExecute(toji::discard)
+                .thenSucceed();
+    }
+
+    @GameTest(template = "vazio", batch = "toji_10")
+    public static void nuvemBateTresVezes(GameTestHelper helper) {
+        ServerPlayer jogador = TestesGojo.gojo(helper);
+        TojiEntity toji = toji(helper, jogador, 2);
+        toji.forcar(TojiBoss.NUVEM);
+        float esperado = 20 - 3 * TojiBoss.DANO_NUVEM;
+        helper.startSequence()
+                .thenWaitUntil(() -> helper.assertTrue(jogador.getHealth() == esperado,
+                        "3 golpes de 3 de dano, sobrou " + jogador.getHealth()))
+                .thenIdle(TojiBoss.NUVEM.pausa() - 2)
+                .thenExecute(() -> {
+                    helper.assertTrue(jogador.getHealth() == esperado, "e nenhum a mais, sobrou " + jogador.getHealth());
+                    toji.discard();
+                })
+                .thenSucceed();
+    }
+
+    @GameTest(template = "vazio", batch = "toji_11")
+    public static void nuvemNaoPegaQuemEstaForaDoRaio(GameTestHelper helper) {
+        ServerPlayer jogador = TestesGojo.gojo(helper);
+        TojiEntity toji = toji(helper, jogador, 5);
+        toji.forcar(TojiBoss.NUVEM);
+        helper.startSequence()
+                .thenWaitUntil(() -> helper.assertTrue(toji.golpe() == null, "o golpe termina"))
+                .thenExecute(() -> {
+                    helper.assertTrue(jogador.getHealth() == 20, "a 5 blocos o bastão não alcança, sobrou " + jogador.getHealth());
+                    toji.discard();
+                })
+                .thenSucceed();
+    }
+
+    @GameTest(template = "vazio", batch = "toji_12")
+    public static void desaparecerSurgeAoLadoEFere(GameTestHelper helper) {
+        ServerPlayer jogador = TestesGojo.gojo(helper);
+        TojiEntity toji = toji(helper, jogador, 7);
+        toji.forcar(TojiBoss.DESAPARECER);
+        helper.startSequence()
+                .thenExecute(() -> helper.assertTrue(toji.isInvisible(), "ele some"))
+                .thenWaitUntil(() -> helper.assertFalse(toji.isInvisible(), "e volta a aparecer"))
+                .thenExecute(() -> {
+                    helper.assertTrue(toji.distanceTo(jogador) < 2.5, "colado no alvo, está a " + toji.distanceTo(jogador));
+                    helper.assertTrue(jogador.getHealth() == 20, "a sombra avisa antes do golpe");
+                })
+                .thenWaitUntil(() -> helper.assertTrue(jogador.getHealth() == 20 - TojiBoss.DANO_SURGIR,
+                        "o golpe tira 8, sobrou " + jogador.getHealth()))
+                .thenExecute(toji::discard)
+                .thenSucceed();
+    }
+
+    @GameTest(template = "vazio", batch = "toji_13", timeoutTicks = 300)
+    public static void fase3ComecaComAExecucao(GameTestHelper helper) {
+        ServerPlayer jogador = TestesGojo.gojo(helper);
+        TojiEntity toji = toji(helper, jogador, 4);
+        helper.assertTrue(toji.fase() == 2, "contra quem já despertou a luta começa na fase 2");
+        toji.setHealth(TojiBoss.VIDA * .3f);
+        helper.startSequence()
+                .thenWaitUntil(() -> helper.assertTrue(toji.fase() == 3, "abaixo de 35% de vida vem a fase 3"))
+                .thenExecute(() -> helper.assertTrue(toji.golpe() == null, "ele para um instante na troca de fase"))
+                .thenWaitUntil(() -> helper.assertTrue(toji.golpe() == TojiBoss.EXECUCAO, "e emenda a Execução do Assassino"))
+                .thenWaitUntil(() -> helper.assertTrue(jogador.getHealth() <= 20 - TojiBoss.DANO_EXECUCAO,
+                        "a investida acerta quem fica parado, sobrou " + jogador.getHealth()))
+                .thenExecute(toji::discard)
+                .thenSucceed();
+    }
 }

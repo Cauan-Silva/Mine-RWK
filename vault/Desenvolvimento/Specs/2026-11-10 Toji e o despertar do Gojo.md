@@ -90,6 +90,8 @@ Se algum falhar, eu paro e trago as alternativas.
 
 Cada parte termina com build, testes e uma prévia gravada; a revisão por subagente fica para o fim.
 
+**Estado (10/11):** as três partes estão feitas; ver [[2026-11-10 Toji parte 1]], [[2026-11-10 Toji parte 2]] e [[2026-11-10 Toji parte 3]]. Os números dos golpes da parte 3 não estavam neste spec e foram decididos na implementação (lista no diário da parte 3).
+
 ## Pontos que eu assumi
 Mude o que quiser antes de aprovar:
 - **O Vazio Infinito não paralisa o Toji.** Segue a obra (ele não tem energia amaldiçoada) e impede que o G decida a luta sozinho.

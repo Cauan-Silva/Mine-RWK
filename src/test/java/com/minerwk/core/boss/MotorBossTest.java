@@ -106,6 +106,17 @@ class MotorBossTest {
     }
 
     @Test
+    void trocarGolpesMudaAEscolhaEMantemARecarga() {
+        MotorBoss m = new MotorBoss(List.of(PERTO), 0);
+        rodar(m, 8, 2, 0);
+        m.trocarGolpes(List.of(PERTO, LONGE));
+        assertEquals(Evento.COMECOU, m.tick(10, 8, .5), "o golpe novo já pode ser escolhido");
+        assertSame(LONGE, m.atual());
+        m.parar(8);
+        assertEquals(Evento.NADA, m.tick(2, 9, .5), "o antigo continua em recarga até o tick 20");
+    }
+
+    @Test
     void golpeInvalidoERecusado() {
         assertThrows(IllegalArgumentException.class, () -> new Golpe("x", "a", -1, 1, 1, 0, 0, 4, 1));
         assertThrows(IllegalArgumentException.class, () -> new Golpe("x", "a", 1, 0, 1, 0, 0, 4, 1));

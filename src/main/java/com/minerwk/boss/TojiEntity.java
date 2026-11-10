@@ -1,12 +1,19 @@
 package com.minerwk.boss;
 
 import com.minerwk.MineRWK;
+import com.minerwk.core.boss.CutsceneDespertar;
 import com.minerwk.core.boss.Golpe;
 import com.minerwk.core.boss.MotorBoss;
+import com.minerwk.core.boss.SonsToji;
 import com.minerwk.core.boss.TojiBoss;
+import com.minerwk.core.kit.Vetor;
 import com.minerwk.kit.ProtecoesServidor;
 import com.minerwk.kit.ServicoKits;
+import com.minerwk.rede.Cutscene;
+import com.minerwk.rede.Envio;
+import com.minerwk.rede.MostrarVisual;
 import com.minerwk.registro.Efeitos;
+import com.minerwk.registro.Sons;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -20,8 +27,6 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerBossEvent;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.sounds.SoundEvent;
-import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
 import net.minecraft.world.BossEvent;
@@ -56,6 +61,13 @@ public final class TojiEntity extends Monster implements GeoEntity {
     /** Dano que não muda com a dificuldade do mundo (os números do kit do jogador também não mudam). */
     public static final ResourceKey<DamageType> DANO = ResourceKey.create(Registries.DAMAGE_TYPE, MineRWK.id("toji"));
     private static final String CONTROLE = "principal";
+    /**
+     * Invisível no Desaparecer. Não é a invisibilidade comum do Minecraft: essa é recalculada pelos efeitos
+     * de poção e o faria reaparecer no meio do golpe.
+     */
+    private static final net.minecraft.network.syncher.EntityDataAccessor<Boolean> SUMIDO =
+            net.minecraft.network.syncher.SynchedEntityData.defineId(TojiEntity.class,
+                    net.minecraft.network.syncher.EntityDataSerializers.BOOLEAN);
     private static final RawAnimation PARADO = RawAnimation.begin().thenLoop("idle");
     private static final RawAnimation ANDANDO = RawAnimation.begin().thenLoop("walk");
     private static final RawAnimation MORTE = RawAnimation.begin().thenPlayAndHold("morte");
@@ -78,6 +90,8 @@ public final class TojiEntity extends Monster implements GeoEntity {
     private boolean lancaDoDespertar;
     /** Tick de jogo em que quem invocou se levanta; -1 se não está caído. */
     private long quedaAte = -1;
+    /** Tick de jogo em que a cutscene do despertar acaba sozinha (0 sem cutscene). */
+    private long quedaAteDaCutscene;
     private boolean venceu;
     private boolean lutaEncerrada;
     private Vec3 direcao = new Vec3(0, 0, 1);
@@ -85,6 +99,15 @@ public final class TojiEntity extends Monster implements GeoEntity {
     private boolean puxando;
     private UUID revide;
     private long revideAte;
+    /** Tick de jogo até o qual ele não age: a entrada, a troca de fase e o fim da cutscene do despertar. */
+    private long paradoAte;
+    private boolean entrou;
+    /** Ao acabar a troca para a fase 3, emenda a Execução do Assassino. */
+    private boolean execucaoPendente;
+    /** Onde o golpe do Desaparecer cai (null até ele surgir). */
+    private Vec3 pontoDoGolpe;
+    /** A frente dele quando a Execução começou: os ângulos das investidas contam a partir dela. */
+    private Vec3 baseDaExecucao = new Vec3(0, 0, 1);
 
     public TojiEntity(EntityType<? extends TojiEntity> tipo, Level nivel) {
         super(tipo, nivel);
@@ -102,6 +125,21 @@ public final class TojiEntity extends Monster implements GeoEntity {
     }
 
     @Override
+    protected void defineSynchedData(net.minecraft.network.syncher.SynchedEntityData.Builder dados) {
+        super.defineSynchedData(dados);
+        dados.define(SUMIDO, false);
+    }
+
+    private void sumido(boolean valor) {
+        entityData.set(SUMIDO, valor);
+    }
+
+    @Override
+    public boolean isInvisible() {
+        return entityData.get(SUMIDO) || super.isInvisible();
+    }
+
+    @Override
     protected void registerGoals() {
         goalSelector.addGoal(0, new FloatGoal(this));
     }
@@ -115,10 +153,11 @@ public final class TojiEntity extends Monster implements GeoEntity {
         LutasToji.registrar(this);
         if (ServicoKits.desperto(dono)) {
             despertarFeito = true;
-            passarParaFase2();
+            passarParaFase(2);
         }
-        // Um respiro antes do primeiro golpe.
-        motor.parar(level().getGameTime() + TojiBoss.INTERVALO);
+        // A entrada: ele chega, fala e só então ataca.
+        paradoAte = level().getGameTime() + TojiBoss.ENTRADA;
+        motor.parar(paradoAte);
     }
 
     public UUID invocadorId() {
@@ -136,7 +175,11 @@ public final class TojiEntity extends Monster implements GeoEntity {
 
     /** Começa {@code golpe} agora contra quem invocou, sem olhar alcance nem recarga (testes e prévia). */
     public void forcar(Golpe golpe) {
-        if (invocador == null) return;
+        // Com quem invocou caído a luta está parada: o golpe nunca andaria.
+        if (invocador == null || quedaAte >= 0) return;
+        paradoAte = 0;
+        execucaoPendente = false;
+        lancaDoDespertar = false;
         motor.forcar(golpe, level().getGameTime());
         comecar(golpe, invocador);
     }
@@ -167,6 +210,22 @@ public final class TojiEntity extends Monster implements GeoEntity {
             getNavigation().stop();
             encarar(dono.position().subtract(position()));
             if (agora >= quedaAte) levantar(dono);
+            return;
+        }
+        // No segundo tick quem está perto já recebeu a entidade e vê a animação.
+        if (!entrou && ticksDeLuta >= 2) entrar(dono);
+        if (agora < paradoAte) {
+            getNavigation().stop();
+            setDeltaMovement(0, getDeltaMovement().y, 0);
+            encarar(dono.position().subtract(position()));
+            return;
+        }
+        if (execucaoPendente) {
+            execucaoPendente = false;
+            motor.forcar(TojiBoss.EXECUCAO, agora);
+            comecar(TojiBoss.EXECUCAO, dono);
+        } else if (fase == 2 && motor.atual() == null && TojiBoss.fase(true, getHealth() / getMaxHealth()) == 3) {
+            passarParaFase3(dono, agora);
             return;
         }
         if (!despertarFeito && !lancaDoDespertar && TojiBoss.horaDeDespertar(getHealth() / getMaxHealth(), ticksDeLuta)) {
@@ -224,58 +283,77 @@ public final class TojiEntity extends Monster implements GeoEntity {
         return position().add(0, getBbHeight() * .6, 0);
     }
 
+    private static boolean nuvem(Golpe golpe) {
+        return golpe == TojiBoss.NUVEM || golpe == TojiBoss.NUVEM_5;
+    }
+
     private void comecar(Golpe golpe, LivingEntity alvo) {
         getNavigation().stop();
         atingidos.clear();
         puxando = false;
+        pontoDoGolpe = null;
+        sumido(false);
         encarar(alvo.position().subtract(position()));
         triggerAnim(CONTROLE, golpe.animacao());
-        som(SoundEvents.ARMOR_EQUIP_IRON.value(), 1.2f, .7f);
+        // Na fase 3 os golpes perdem o aviso sonoro: sobra a marca no chão.
+        if (fase < 3) tocar(SonsToji.AVISO, 1.2f, 1f);
+        int ate = golpe.aviso() + golpe.janela();
+        if (golpe == TojiBoss.INVESTIDA) {
+            visual("toji_linha", getId(), position(), direcao, (float) TojiBoss.ALCANCE_INVESTIDA, ate);
+        } else if (nuvem(golpe)) {
+            visual("toji_setor", getId(), position(), direcao, (float) TojiBoss.RAIO_NUVEM, ate);
+        } else if (golpe == TojiBoss.CORRENTE) {
+            corrente(alvo, golpe.aviso());
+        } else if (golpe == TojiBoss.DESAPARECER) {
+            tocar(SonsToji.SUMIR, 1.4f, 1f);
+            particulas(ParticleTypes.LARGE_SMOKE, getX(), getY() + 1, getZ(), 16, .3, .7, .3, .02);
+            sumido(true);
+        } else if (golpe == TojiBoss.EXECUCAO) {
+            baseDaExecucao = direcao;
+            // A marca é o único aviso da Execução, e toca em qualquer fase.
+            tocar(SonsToji.MARCA, 1.6f, 1f);
+            visual("toji_marca", alvo.getId(), alvo.position(), direcao, 1.2f, ate);
+        }
     }
 
     private void duranteGolpe(Golpe golpe, LivingEntity alvo) {
-        boolean investindo = golpe == TojiBoss.INVESTIDA && motor.naJanela();
-        if (!investindo) setDeltaMovement(0, getDeltaMovement().y, 0);
+        boolean naJanela = motor.naJanela();
+        int tj = naJanela ? motor.tempoNaJanela() : -1;
+        boolean investindo = golpe == TojiBoss.INVESTIDA && naJanela;
+        boolean executando = golpe == TojiBoss.EXECUCAO && naJanela && TojiBoss.avancaNaExecucao(tj);
+        if (!investindo && !executando) setDeltaMovement(0, getDeltaMovement().y, 0);
+        if (golpe == TojiBoss.DESAPARECER) {
+            desaparecer(alvo);
+            return;
+        }
+        if (golpe == TojiBoss.EXECUCAO) {
+            executar(alvo, tj);
+            return;
+        }
         if (motor.noAviso()) {
-            // A investida trava a linha no começo (dá para sair dela); os outros dois acompanham o alvo.
-            if (golpe != TojiBoss.INVESTIDA) encarar(alvo.position().subtract(position()));
-            else encarar(direcao);
-            avisar(golpe, alvo);
+            // A investida e a Nuvem travam a direção no começo (dá para sair); a Lança e a corrente acompanham o alvo.
+            if (golpe == TojiBoss.INVESTIDA || nuvem(golpe)) encarar(direcao);
+            else encarar(alvo.position().subtract(position()));
+            if (golpe == TojiBoss.LANCA) {
+                Vec3 ponta = peito().add(direcao.scale(1.6));
+                particulas(ParticleTypes.CRIT, ponta.x, ponta.y, ponta.z, 2, .05, .05, .05, .01);
+            }
         } else {
             encarar(direcao);
         }
-        if (investindo) investir();
-        if (golpe == TojiBoss.CORRENTE && motor.naJanela() && puxando) puxar(alvo);
-    }
-
-    /** A marca que avisa o golpe: a linha da investida no chão, o brilho na ponta da lança, a corrente esticando. */
-    private void avisar(Golpe golpe, LivingEntity alvo) {
-        int t = motor.tempoNoGolpe();
-        if (golpe == TojiBoss.INVESTIDA && t % 2 == 0) {
-            for (double d = 1; d <= TojiBoss.ALCANCE_INVESTIDA; d += 1) {
-                Vec3 p = position().add(direcao.scale(d));
-                particulas(ParticleTypes.CRIT, p.x, getY() + .15, p.z, 1, .15, 0, .15, 0);
-            }
-        } else if (golpe == TojiBoss.LANCA) {
-            Vec3 ponta = peito().add(direcao.scale(1.6));
-            particulas(ParticleTypes.END_ROD, ponta.x, ponta.y, ponta.z, 2, .05, .05, .05, .01);
-        } else if (golpe == TojiBoss.CORRENTE && t % 3 == 0) {
-            Vec3 ate = alvo.getBoundingBox().getCenter().subtract(peito());
-            double alcance = Math.min(ate.length(), TojiBoss.ALCANCE_CORRENTE);
-            Vec3 passo = ate.lengthSqr() < 1e-6 ? direcao : ate.normalize();
-            for (double d = 1; d <= alcance; d += 1.5) {
-                Vec3 p = peito().add(passo.scale(d));
-                particulas(ParticleTypes.ENCHANTED_HIT, p.x, p.y, p.z, 1, .05, .05, .05, 0);
-            }
-        }
+        if (investindo) avancar(TojiBoss.ALCANCE_INVESTIDA / TojiBoss.INVESTIDA.janela(), TojiBoss.DANO_INVESTIDA, 1.2);
+        if (nuvem(golpe) && naJanela && TojiBoss.nuvemBate(golpe, tj)) baterNuvem();
+        if (golpe == TojiBoss.CORRENTE && naJanela && puxando) puxar(alvo);
     }
 
     private void abrirJanela(Golpe golpe, LivingEntity alvo, ServerPlayer dono) {
         if (golpe == TojiBoss.LANCA) estocar(dono);
-        else if (golpe == TojiBoss.INVESTIDA) som(SoundEvents.PLAYER_ATTACK_SWEEP, 1.4f, .6f);
+        else if (golpe == TojiBoss.INVESTIDA) tocar(SonsToji.INVESTIDA, 1.4f, 1f);
+        else if (golpe == TojiBoss.DESAPARECER) golpearAoSurgir();
         else if (golpe == TojiBoss.CORRENTE) {
             puxando = alvo.distanceTo(this) <= TojiBoss.ALCANCE_CORRENTE && hasLineOfSight(alvo);
-            som(SoundEvents.CHAIN_BREAK, 1.6f, .7f);
+            tocar(SonsToji.CORRENTE, 1.6f, 1f);
+            corrente(alvo, golpe.janela());
         }
     }
 
@@ -285,38 +363,148 @@ public final class TojiEntity extends Monster implements GeoEntity {
         if (alvo.distanceTo(this) <= TojiBoss.ALCANCE_SOCO && ferir(alvo, TojiBoss.DANO_SOCO)) {
             alvo.knockback(.9, -direcao.x, -direcao.z);
             alvo.hurtMarked = true;
-            som(SoundEvents.PLAYER_ATTACK_STRONG, 1.2f, .7f);
+            tocar(SonsToji.SOCO, 1.2f, 1f);
         }
     }
 
-    /** Investida Celeste: 3 blocos por tick pela linha travada; cada um no caminho leva o golpe uma vez. */
-    private void investir() {
+    /** A corrente esticada do peito dele até o alvo (ou até onde ela alcança). */
+    private void corrente(LivingEntity alvo, int duracao) {
+        Vec3 ate = alvo.getBoundingBox().getCenter().subtract(peito());
+        if (ate.lengthSqr() < 1e-6) return;
+        visual("toji_corrente", getId(), peito(), ate.normalize(),
+                (float) Math.min(ate.length(), TojiBoss.ALCANCE_CORRENTE), duracao);
+    }
+
+    /** Um tick de avanço pela linha travada (Investida Celeste, Execução): cada um no caminho leva o golpe uma vez. */
+    private void avancar(double passo, float dano, double empurrao) {
         Vec3 de = position();
-        move(MoverType.SELF, direcao.scale(TojiBoss.ALCANCE_INVESTIDA / TojiBoss.INVESTIDA.janela()));
+        move(MoverType.SELF, direcao.scale(passo));
         Vec3 ate = position();
         particulas(ParticleTypes.CLOUD, ate.x, getY() + .4, ate.z, 6, .3, .3, .3, .02);
         for (LivingEntity e : naLinha(de.add(0, 1, 0), ate.add(0, 1, 0), 1.3)) {
             if (!atingidos.add(e.getUUID())) continue;
-            if (ferir(e, TojiBoss.DANO_INVESTIDA)) {
-                e.knockback(1.2, -direcao.x, -direcao.z);
+            if (ferir(e, dano)) {
+                e.knockback(empurrao, -direcao.x, -direcao.z);
                 e.hurtMarked = true;
             }
         }
+    }
+
+    /** Nuvem Brincalhona: um golpe do bastão em todos no setor à frente. São 3 (ou 5) por uso. */
+    private void baterNuvem() {
+        tocar(SonsToji.NUVEM, 1.3f, .9f + random.nextFloat() * .2f);
+        Vec3 frente = position().add(direcao.scale(1.8));
+        particulas(ParticleTypes.SWEEP_ATTACK, frente.x, getY() + 1.1, frente.z, 1, .3, .1, .3, 0);
+        for (LivingEntity e : candidatos(getBoundingBox().inflate(TojiBoss.RAIO_NUVEM + 1))) {
+            Vec3 d = e.position().subtract(position());
+            if (Math.abs(d.y) > 2.5 || paredeAte(peito(), e) || !TojiBoss.noSetor(d.x, d.z, direcao.x, direcao.z,
+                    TojiBoss.RAIO_NUVEM + e.getBbWidth() / 2, TojiBoss.ANGULO_NUVEM)) continue;
+            // Os golpes vêm a menos de meio segundo um do outro: sem isto só o primeiro feriria.
+            e.invulnerableTime = 0;
+            if (ferir(e, TojiBoss.DANO_NUVEM)) {
+                e.knockback(.3, -direcao.x, -direcao.z);
+                e.hurtMarked = true;
+            }
+        }
+    }
+
+    /** Desaparecer: invisível até o tick de surgir; aí aparece atrás do alvo e a sombra marca onde o golpe cai. */
+    private void desaparecer(LivingEntity alvo) {
+        if (motor.tempoNoGolpe() < TojiBoss.TICK_DE_SURGIR) return;
+        if (pontoDoGolpe == null) surgir(alvo);
+        encarar(direcao);
+    }
+
+    private void surgir(LivingEntity alvo) {
+        Vec3 centro = alvo.position();
+        Vec3 olhar = horizontal(alvo.getLookAngle());
+        if (olhar == null) olhar = horizontal(centro.subtract(position()));
+        if (olhar == null) olhar = direcao;
+        Vec3 destino = centro.subtract(olhar.scale(TojiBoss.ATRAS_DO_ALVO));
+        if (!cabeEm(destino)) destino = centro.add(olhar.scale(TojiBoss.ATRAS_DO_ALVO));
+        if (cabeEm(destino)) teleportTo(destino.x, destino.y, destino.z);
+        pontoDoGolpe = centro;
+        sumido(false);
+        encarar(centro.subtract(position()));
+        tocar(SonsToji.SURGIR, 1.4f, 1f);
+        particulas(ParticleTypes.LARGE_SMOKE, getX(), getY() + 1, getZ(), 10, .3, .7, .3, .02);
+        visual("toji_sombra", getId(), centro, direcao, (float) TojiBoss.RAIO_SURGIR,
+                TojiBoss.DESAPARECER.aviso() - TojiBoss.TICK_DE_SURGIR + TojiBoss.DESAPARECER.janela());
+    }
+
+    /** O golpe do Desaparecer: fere todos no círculo marcado pela sombra. */
+    private void golpearAoSurgir() {
+        // Sem lugar para surgir ele ficou onde estava: de longe o golpe não alcança.
+        if (pontoDoGolpe == null || position().distanceTo(pontoDoGolpe) > TojiBoss.RAIO_SURGIR + 2) return;
+        tocar(SonsToji.SOCO, 1.4f, .85f);
+        Vec3 centro = pontoDoGolpe;
+        for (LivingEntity e : candidatos(new AABB(centro, centro).inflate(TojiBoss.RAIO_SURGIR + 1, 2.5, TojiBoss.RAIO_SURGIR + 1))) {
+            Vec3 d = e.position().subtract(centro);
+            if (Math.abs(d.y) > 2.5 || d.horizontalDistance() > TojiBoss.RAIO_SURGIR + e.getBbWidth() / 2
+                    || paredeAte(peito(), e)) continue;
+            if (ferir(e, TojiBoss.DANO_SURGIR)) {
+                e.knockback(.8, -direcao.x, -direcao.z);
+                e.hurtMarked = true;
+            }
+        }
+    }
+
+    /** Execução do Assassino: 4 investidas seguidas, cada uma de um ângulo em volta do alvo marcado. */
+    private void executar(LivingEntity alvo, int tj) {
+        int i = tj < 0 ? -1 : TojiBoss.investidaDaExecucao(tj);
+        if (i < 0) {
+            encarar(alvo.position().subtract(position()));
+            return;
+        }
+        int t = TojiBoss.tickDaInvestida(tj);
+        if (t == 0) posicionarInvestida(alvo, i);
+        encarar(direcao);
+        if (t == TojiBoss.AVISO_DA_EXECUCAO) tocar(SonsToji.INVESTIDA, 1.3f, 1.2f);
+        if (TojiBoss.avancaNaExecucao(tj)) {
+            avancar(TojiBoss.ALCANCE_DA_EXECUCAO / TojiBoss.AVANCO_DA_EXECUCAO, TojiBoss.DANO_EXECUCAO, .6);
+        }
+    }
+
+    /** Salta para o lado do alvo de onde a investida {@code i} vem e trava a linha, que aparece no chão. */
+    private void posicionarInvestida(LivingEntity alvo, int i) {
+        atingidos.clear();
+        double a = Math.toRadians(TojiBoss.anguloDaExecucao(i));
+        Vec3 b = baseDaExecucao;
+        Vec3 rumo = new Vec3(b.x * Math.cos(a) - b.z * Math.sin(a), 0, b.x * Math.sin(a) + b.z * Math.cos(a));
+        for (double recuo : new double[] {TojiBoss.RECUO_DA_EXECUCAO, 4, 2}) {
+            Vec3 p = alvo.position().subtract(rumo.scale(recuo));
+            if (!cabeEm(p)) continue;
+            particulas(ParticleTypes.POOF, getX(), getY() + 1, getZ(), 8, .3, .6, .3, .02);
+            teleportTo(p.x, p.y, p.z);
+            break;
+        }
+        encarar(alvo.position().subtract(position()));
+        visual("toji_linha", getId(), position(), direcao, (float) TojiBoss.ALCANCE_DA_EXECUCAO,
+                TojiBoss.AVISO_DA_EXECUCAO + TojiBoss.AVANCO_DA_EXECUCAO);
+    }
+
+    /** Se ele pode surgir nesse ponto: cabe de pé, fora de água e lava, com chão até 2 blocos abaixo. */
+    private boolean cabeEm(Vec3 p) {
+        AABB caixa = getType().getDimensions().makeBoundingBox(p.x, p.y, p.z);
+        if (!level().noCollision(this, caixa) || level().containsAnyLiquid(caixa)) return false;
+        for (double abaixo = .1; abaixo <= 2.1; abaixo += 1) {
+            if (level().getBlockState(net.minecraft.core.BlockPos.containing(p.x, p.y - abaixo, p.z)).blocksMotion()) return true;
+        }
+        return false;
     }
 
     /** Lança Invertida do Céu: atravessa o Infinito, que cai e fica em recarga, e só então fere. */
     private void estocar(ServerPlayer dono) {
         Vec3 de = peito();
         Vec3 ate = de.add(direcao.scale(TojiBoss.ALCANCE_LANCA));
-        som(SoundEvents.TRIDENT_THROW.value(), 1.5f, .6f);
-        for (double d = 1; d <= TojiBoss.ALCANCE_LANCA; d += .75) {
-            Vec3 p = de.add(direcao.scale(d));
-            particulas(ParticleTypes.CRIT, p.x, p.y, p.z, 2, .05, .05, .05, .02);
-        }
+        tocar(SonsToji.LANCA, 1.5f, 1f);
+        visual("toji_estocada", getId(), de, direcao, (float) TojiBoss.ALCANCE_LANCA, 8);
         boolean derrubar = lancaDoDespertar;
         lancaDoDespertar = false;
         for (LivingEntity e : naLinha(de, ate, 1.1)) {
-            if (e instanceof ServerPlayer jogador) ProtecoesServidor.desligarInfinito(jogador);
+            if (e instanceof ServerPlayer jogador && ProtecoesServidor.desligarInfinito(jogador)) {
+                tocar(SonsToji.ANULA, 1.6f, 1f);
+            }
             if (derrubar && e == dono) continue;
             ferir(e, TojiBoss.DANO_LANCA);
         }
@@ -342,11 +530,17 @@ public final class TojiEntity extends Monster implements GeoEntity {
 
     /** Os vivos a até {@code raio} do segmento, mais quem invocou (o jogador dos GameTests não está no mundo). */
     private List<LivingEntity> naLinha(Vec3 de, Vec3 ate, double raio) {
-        List<LivingEntity> perto = new ArrayList<>(level().getEntitiesOfClass(LivingEntity.class,
-                new AABB(de, ate).inflate(raio + 1), e -> e != this && e.isAlive() && !(e instanceof TojiEntity)));
-        if (invocador != null && !perto.contains(invocador)) perto.add(invocador);
+        List<LivingEntity> perto = candidatos(new AABB(de, ate).inflate(raio + 1));
         perto.removeIf(e -> distanciaAoSegmento(e.getBoundingBox().getCenter(), de, ate) > raio + e.getBbWidth() / 2
                 || paredeAte(de, e));
+        return perto;
+    }
+
+    /** Os vivos na caixa (menos outros Tojis), mais quem invocou: o jogador dos GameTests não está no mundo. */
+    private List<LivingEntity> candidatos(AABB caixa) {
+        List<LivingEntity> perto = new ArrayList<>(level().getEntitiesOfClass(LivingEntity.class, caixa,
+                e -> e != this && e.isAlive() && !(e instanceof TojiEntity)));
+        if (invocador != null && !perto.contains(invocador)) perto.add(invocador);
         return perto;
     }
 
@@ -372,9 +566,15 @@ public final class TojiEntity extends Monster implements GeoEntity {
             Vec3 lado = horizontal(position().subtract(dono.position()));
             if (lado == null) lado = horizontal(dono.getLookAngle());
             if (lado == null) lado = new Vec3(0, 0, 1);
-            Vec3 p = dono.position().add(lado.scale(3));
-            particulas(ParticleTypes.POOF, getX(), getY() + 1, getZ(), 12, .3, .6, .3, .02);
-            teleportTo(p.x, dono.getY(), p.z);
+            // O lado de onde ele vinha; sem lugar ali (parede, vazio, água), os outros três.
+            Vec3 perpendicular = new Vec3(-lado.z, 0, lado.x);
+            for (Vec3 rumo : new Vec3[] {lado, perpendicular, perpendicular.scale(-1), lado.scale(-1)}) {
+                Vec3 p = dono.position().add(rumo.scale(3));
+                if (!cabeEm(p)) continue;
+                particulas(ParticleTypes.POOF, getX(), getY() + 1, getZ(), 12, .3, .6, .3, .02);
+                teleportTo(p.x, p.y, p.z);
+                break;
+            }
         }
         motor.forcar(TojiBoss.LANCA, agora);
         comecar(TojiBoss.LANCA, dono);
@@ -386,7 +586,9 @@ public final class TojiEntity extends Monster implements GeoEntity {
         despertarFeito = true;
         lancaDoDespertar = false;
         quedaAte = agora + TojiBoss.QUEDA;
+        quedaAteDaCutscene = quedaAte;
         motor.parar(agora);
+        sumido(false);
         getNavigation().stop();
         ProtecoesServidor.desligarInfinito(dono);
         LutasToji.CAIDOS.add(dono.getUUID());
@@ -400,40 +602,79 @@ public final class TojiEntity extends Monster implements GeoEntity {
         dono.setForcedPose(Pose.SWIMMING);
         triggerAnim(CONTROLE, "fase");
         particulas(ParticleTypes.DAMAGE_INDICATOR, dono.getX(), dono.getY() + 1, dono.getZ(), 14, .3, .4, .3, .1);
-        som(SoundEvents.PLAYER_HURT, 1.4f, .6f);
+        tocar(SonsToji.QUEDA, 1.6f, 1f);
         avisar(dono, "mensagem.minerwk.toji.caiu");
+        // A câmera olha de cima e fecha em quem caiu; a frente da cutscene aponta para o Toji.
+        Vec3 para = horizontal(position().subtract(dono.position()));
+        Envio.para(dono, new Cutscene(CutsceneDespertar.ID, dono.getId(), vetor(dono.getEyePosition()),
+                vetor(para != null ? para : direcao.scale(-1)), agora));
     }
 
     /** Quem invocou se levanta desperto: vida e energia cheias, recargas zeradas e os golpes trancados liberados. */
     private void levantar(ServerPlayer dono) {
         quedaAte = -1;
+        sumido(false);
         soltar(dono);
         dono.setHealth(dono.getMaxHealth());
         ServicoKits.kit(dono).ifPresent(k -> k.recarregar());
         ServicoKits.definirDespertoNaLuta(dono, true);
-        passarParaFase2();
-        motor.parar(level().getGameTime());
-        particulas(ParticleTypes.TOTEM_OF_UNDYING, dono.getX(), dono.getY() + 1, dono.getZ(), 60, .4, .8, .4, .4);
-        som(SoundEvents.TOTEM_USE, 1f, 1.3f);
+        passarParaFase(2);
+        // Ele espera o fim da cutscene para voltar a atacar.
+        paradoAte = level().getGameTime() + CutsceneDespertar.DEPOIS;
+        motor.parar(paradoAte);
+        particulas(ParticleTypes.END_ROD, dono.getX(), dono.getY() + 1, dono.getZ(), 40, .4, .8, .4, .15);
+        tocar(SonsToji.DESPERTAR, 1.6f, 1f);
         avisar(dono, "mensagem.minerwk.toji.despertou");
     }
 
     /** Tira quem invocou do chão. */
     private void soltar(ServerPlayer dono) {
+        // Fora da hora (o Toji morreu ou sumiu durante a queda) a cutscene é cortada.
+        if (level().getGameTime() < quedaAteDaCutscene) {
+            Envio.para(dono, new Cutscene(Cutscene.FIM, dono.getId(), vetor(dono.getEyePosition()), vetor(direcao),
+                    level().getGameTime()));
+        }
+        quedaAteDaCutscene = 0;
         LutasToji.CAIDOS.remove(dono.getUUID());
         dono.setForcedPose(null);
         dono.removeEffect(Efeitos.PARALISIA);
     }
 
-    private void passarParaFase2() {
-        fase = 2;
-        motor.acelerar(TojiBoss.RITMO_FASE_2);
+    private void passarParaFase(int nova) {
+        fase = nova;
+        motor.acelerar(TojiBoss.ritmo(nova));
+        motor.trocarGolpes(TojiBoss.golpes(nova));
+    }
+
+    /** Abaixo de 35% de vida: para um instante, os golpes perdem o aviso sonoro e vem a Execução do Assassino. */
+    private void passarParaFase3(ServerPlayer dono, long agora) {
+        passarParaFase(3);
+        paradoAte = agora + TojiBoss.TROCA_DE_FASE;
+        motor.parar(paradoAte);
+        execucaoPendente = true;
+        getNavigation().stop();
+        triggerAnim(CONTROLE, "fase");
+        tocar(SonsToji.FASE, 1.6f, 1f);
+        barra.setColor(BossEvent.BossBarColor.PURPLE);
+        avisar(dono, "mensagem.minerwk.toji.fase3");
+    }
+
+    /** A chegada: a animação, o impacto no chão e a fala. */
+    private void entrar(ServerPlayer dono) {
+        entrou = true;
+        triggerAnim(CONTROLE, "entrada");
+        tocar(SonsToji.ENTRADA, 1.8f, 1f);
+        particulas(ParticleTypes.CAMPFIRE_COSY_SMOKE, getX(), getY() + .1, getZ(), 14, .6, .05, .6, .01);
+        if (dono.connection != null) {
+            dono.displayClientMessage(Component.translatable("mensagem.minerwk.toji.fala_entrada"), false);
+        }
     }
 
     // --- O fim ---
 
     /** A luta acabou sem vitória: o Toji vai embora. */
     private void sumir() {
+        tocar(SonsToji.SUMIR, 1.2f, 1f);
         particulas(ParticleTypes.POOF, getX(), getY() + 1, getZ(), 24, .3, .7, .3, .03);
         ServerPlayer dono = jogadorAtual();
         if (dono != null) avisar(dono, "mensagem.minerwk.toji.sumiu");
@@ -453,6 +694,8 @@ public final class TojiEntity extends Monster implements GeoEntity {
         if (level().isClientSide || venceu) return;
         venceu = true;
         barra.setProgress(0);
+        sumido(false);
+        tocar(SonsToji.MORTE, 1.6f, 1f);
         ServerPlayer dono = jogadorAtual();
         if (dono == null) return;
         if (quedaAte >= 0) {
@@ -572,8 +815,19 @@ public final class TojiEntity extends Monster implements GeoEntity {
         if (level() instanceof ServerLevel nivel) nivel.sendParticles(tipo, x, y, z, quantidade, dx, dy, dz, velocidade);
     }
 
-    private void som(SoundEvent som, float volume, float tom) {
-        level().playSound(null, getX(), getY(), getZ(), som, SoundSource.HOSTILE, volume, tom);
+    private void tocar(String id, float volume, float tom) {
+        level().playSound(null, getX(), getY(), getZ(), Sons.doToji(id), SoundSource.HOSTILE, volume, tom);
+    }
+
+    private static Vetor vetor(Vec3 v) {
+        return new Vetor(v.x, v.y, v.z);
+    }
+
+    /** Manda um visual de golpe a quem está vendo o Toji; {@code dono} é a entidade que o visual segue. */
+    private void visual(String tipo, int dono, Vec3 origem, Vec3 rumo, float forca, int duracao) {
+        if (!(level() instanceof ServerLevel nivel)) return;
+        MostrarVisual pacote = new MostrarVisual(dono, tipo, vetor(origem), vetor(rumo), forca, duracao, nivel.getGameTime());
+        for (ServerPlayer p : nivel.getChunkSource().chunkMap.getPlayers(chunkPosition(), false)) Envio.para(p, pacote);
     }
 
     private static void avisar(ServerPlayer jogador, String chave) {
@@ -589,7 +843,7 @@ public final class TojiEntity extends Monster implements GeoEntity {
             if (isDeadOrDying()) return estado.setAndContinue(MORTE);
             return estado.setAndContinue(estado.isMoving() ? ANDANDO : PARADO);
         });
-        for (String nome : List.of("investida", "estocada", "arremesso", "fase")) {
+        for (String nome : List.of("investida", "estocada", "arremesso", "fase", "giro", "sumir", "execucao", "entrada")) {
             principal.triggerableAnim(nome, RawAnimation.begin().thenPlay(nome));
         }
         controladores.add(principal);

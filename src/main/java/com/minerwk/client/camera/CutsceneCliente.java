@@ -2,6 +2,7 @@ package com.minerwk.client.camera;
 
 import com.minerwk.MineRWK;
 import com.minerwk.client.ConfigCliente;
+import com.minerwk.core.boss.CutsceneDespertar;
 import com.minerwk.core.camera.Coreografia;
 import com.minerwk.core.kit.Vetor;
 import com.minerwk.core.personagens.gojo.CutsceneRoxo200;
@@ -48,7 +49,10 @@ public final class CutsceneCliente {
 
     private static final Map<String, Roteiro> ROTEIROS = Map.of(
             CutsceneRoxo200.ID, new Roteiro(CutsceneRoxo200.COREOGRAFIA, CutsceneRoxo200.PALAVRAS,
-                    "gojo_roxo_200_carga", false, true, -1));
+                    "gojo_roxo_200_carga", false, true, -1),
+            // O despertar no meio da luta contra o Toji: só quem caiu assiste; nenhum visual a corta.
+            CutsceneDespertar.ID, new Roteiro(CutsceneDespertar.COREOGRAFIA, CutsceneDespertar.PALAVRAS,
+                    "", false, false, -1));
 
     private static Roteiro roteiroDe(String id) {
         Roteiro r = ROTEIROS.get(id);

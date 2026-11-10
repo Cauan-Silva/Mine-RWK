@@ -14,7 +14,7 @@ public final class MotorBoss {
     /** O que aconteceu num tick. */
     public enum Evento { NADA, COMECOU, ABRIU_JANELA, FECHOU_JANELA, TERMINOU }
 
-    private final List<Golpe> golpes;
+    private List<Golpe> golpes;
     private final int intervalo;
     /** Tick a partir do qual cada golpe pode ser repetido. */
     private final Map<String, Long> prontoEm = new HashMap<>();
@@ -28,6 +28,11 @@ public final class MotorBoss {
     public MotorBoss(List<Golpe> golpes, int intervalo) {
         this.golpes = List.copyOf(golpes);
         this.intervalo = Math.max(0, intervalo);
+    }
+
+    /** Troca os golpes que o boss pode escolher (mudou de fase). O golpe em andamento e as recargas continuam. */
+    public void trocarGolpes(List<Golpe> novos) {
+        golpes = List.copyOf(novos);
     }
 
     /** O golpe em andamento, ou null. */

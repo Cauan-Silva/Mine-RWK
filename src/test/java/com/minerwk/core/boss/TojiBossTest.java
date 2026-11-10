@@ -21,6 +21,75 @@ class TojiBossTest {
     }
 
     @Test
+    void golpesNovosCabemNasAnimacoes() {
+        // "giro" dura 2 s, "sumir" 2,1 s e "execucao" 4,5 s.
+        assertTrue(TojiBoss.NUVEM.duracao() <= 40);
+        assertEquals(40, TojiBoss.NUVEM_5.duracao());
+        assertEquals(42, TojiBoss.DESAPARECER.duracao());
+        assertEquals(90, TojiBoss.EXECUCAO.duracao());
+        assertEquals(TojiBoss.INVESTIDAS_DA_EXECUCAO * TojiBoss.PASSO_DA_EXECUCAO, TojiBoss.EXECUCAO.janela());
+        assertTrue(TojiBoss.TICK_DE_SURGIR < TojiBoss.DESAPARECER.aviso(), "surge antes de golpear, para a sombra avisar");
+    }
+
+    @Test
+    void cadaFaseTemOsSeusGolpes() {
+        assertFalse(TojiBoss.golpes(1).contains(TojiBoss.DESAPARECER), "a fase 1 é contra quem só tem Azul e Infinito");
+        assertTrue(TojiBoss.golpes(1).contains(TojiBoss.NUVEM));
+        assertTrue(TojiBoss.golpes(2).contains(TojiBoss.DESAPARECER));
+        assertTrue(TojiBoss.golpes(2).contains(TojiBoss.NUVEM_5));
+        assertFalse(TojiBoss.golpes(2).contains(TojiBoss.EXECUCAO));
+        assertTrue(TojiBoss.golpes(3).contains(TojiBoss.EXECUCAO));
+    }
+
+    @Test
+    void faseDependeDoDespertarEDaVida() {
+        assertEquals(1, TojiBoss.fase(false, 1));
+        assertEquals(1, TojiBoss.fase(false, .1), "sem despertar a luta não passa da fase 1");
+        assertEquals(2, TojiBoss.fase(true, .36));
+        assertEquals(3, TojiBoss.fase(true, .35));
+        assertTrue(TojiBoss.ritmo(3) < TojiBoss.ritmo(2) && TojiBoss.ritmo(2) < TojiBoss.ritmo(1));
+    }
+
+    @Test
+    void nuvemBateTresOuCincoVezesNaJanela() {
+        int tres = 0, cinco = 0;
+        for (int t = 0; t < 20; t++) {
+            if (TojiBoss.nuvemBate(TojiBoss.NUVEM, t)) tres++;
+            if (TojiBoss.nuvemBate(TojiBoss.NUVEM_5, t)) cinco++;
+        }
+        assertEquals(3, tres);
+        assertEquals(5, cinco);
+        assertTrue(TojiBoss.nuvemBate(TojiBoss.NUVEM, 0), "o primeiro golpe é quando a janela abre");
+        assertFalse(TojiBoss.nuvemBate(TojiBoss.NUVEM, 10), "fora da janela não bate");
+    }
+
+    @Test
+    void setorDaNuvemPegaAFrenteENaoAsCostas() {
+        // Olhando para +Z, setor de 160 graus e raio 3,5.
+        assertTrue(TojiBoss.noSetor(0, 3, 0, 1, 3.5, 160));
+        assertTrue(TojiBoss.noSetor(2.9, .6, 0, 1, 3.5, 160), "quase de lado ainda pega (78 graus)");
+        assertFalse(TojiBoss.noSetor(3, -.6, 0, 1, 3.5, 160), "um pouco para trás não");
+        assertFalse(TojiBoss.noSetor(0, -2, 0, 1, 3.5, 160));
+        assertFalse(TojiBoss.noSetor(0, 3.6, 0, 1, 3.5, 160), "fora do raio");
+        assertTrue(TojiBoss.noSetor(0, 0, 0, 1, 3.5, 160), "em cima dele");
+    }
+
+    @Test
+    void execucaoSaoQuatroInvestidasComAvisoEAvanco() {
+        assertEquals(0, TojiBoss.investidaDaExecucao(0));
+        assertEquals(3, TojiBoss.investidaDaExecucao(55));
+        assertEquals(-1, TojiBoss.investidaDaExecucao(56));
+        assertFalse(TojiBoss.avancaNaExecucao(9), "os 10 primeiros ticks de cada investida são aviso");
+        assertTrue(TojiBoss.avancaNaExecucao(10));
+        assertTrue(TojiBoss.avancaNaExecucao(12));
+        assertFalse(TojiBoss.avancaNaExecucao(13));
+        assertTrue(TojiBoss.avancaNaExecucao(14 + 11));
+        java.util.Set<Double> angulos = new java.util.HashSet<>();
+        for (int i = 0; i < TojiBoss.INVESTIDAS_DA_EXECUCAO; i++) angulos.add(TojiBoss.anguloDaExecucao(i));
+        assertEquals(4, angulos.size(), "cada investida vem de um ângulo");
+    }
+
+    @Test
     void sempreHaGolpeEntreZeroECatorzeBlocos() {
         for (double d = 0; d <= 14; d += .5) {
             double distancia = d;

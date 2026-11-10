@@ -1,0 +1,394 @@
+{
+  "toji_entrada": {
+    "duration": 1.6,
+    "sample_rate": 48000,
+    "channels": 1,
+    "peak": 0.57841,
+    "rms": 0.1262,
+    "sha256": "e7da3c32e40fd1d6188170fd3aad107a046c6e0af8a1a4f705952cf6d447880b",
+    "ticks": 32,
+    "marcos": {}
+  },
+  "toji_entrada_2": {
+    "duration": 1.5385,
+    "sample_rate": 48000,
+    "channels": 1,
+    "peak": 0.6056,
+    "rms": 0.15136,
+    "sha256": "d5ede05b118e88ecfd8bdad702d276336102b367f0fd8a80e0a58042011992dc"
+  },
+  "toji_entrada_3": {
+    "duration": 1.6666,
+    "sample_rate": 48000,
+    "channels": 1,
+    "peak": 0.61985,
+    "rms": 0.15928,
+    "sha256": "afa2dcef3ee5e33bbb2dbf8dac28e3045276b6dd9466b00a006a746754e433c1"
+  },
+  "toji_aviso": {
+    "duration": 0.35,
+    "sample_rate": 48000,
+    "channels": 1,
+    "peak": 0.64083,
+    "rms": 0.07442,
+    "sha256": "7807822ff6becf6ebabd79984b740b7b344118fbdf7abd86732b77dcfe74d15b",
+    "ticks": 7,
+    "marcos": {}
+  },
+  "toji_aviso_2": {
+    "duration": 0.3365,
+    "sample_rate": 48000,
+    "channels": 1,
+    "peak": 0.62774,
+    "rms": 0.07718,
+    "sha256": "588d66dfe69f4f05ddc2bbab3079c497d7bb075f322707739cd0bfe2dbb770a5"
+  },
+  "toji_aviso_3": {
+    "duration": 0.3646,
+    "sample_rate": 48000,
+    "channels": 1,
+    "peak": 0.60498,
+    "rms": 0.07673,
+    "sha256": "cdaff882f7c456b3c82b2b95c9dd60bd47194cb23c4291b27e547b3661b73e0f"
+  },
+  "toji_investida": {
+    "duration": 0.7,
+    "sample_rate": 48000,
+    "channels": 1,
+    "peak": 0.61983,
+    "rms": 0.12543,
+    "sha256": "3b102177394a459d839d7e21df1c21868c2f0b538db125477a9503e1ca531620",
+    "ticks": 14,
+    "marcos": {}
+  },
+  "toji_investida_2": {
+    "duration": 0.6731,
+    "sample_rate": 48000,
+    "channels": 1,
+    "peak": 0.60638,
+    "rms": 0.12475,
+    "sha256": "588439d59d97b10d8d2207d6b232e5e3f93471473e8b70e205ff77725e8bc7a0"
+  },
+  "toji_investida_3": {
+    "duration": 0.7291,
+    "sample_rate": 48000,
+    "channels": 1,
+    "peak": 0.68487,
+    "rms": 0.13378,
+    "sha256": "41cf98adc782b933ddab36411848a32517d1a2367bbbe30fccae0345326f3023"
+  },
+  "toji_lanca": {
+    "duration": 0.6,
+    "sample_rate": 48000,
+    "channels": 1,
+    "peak": 0.64776,
+    "rms": 0.07517,
+    "sha256": "1bf49d989670ccf692eea01b47c6ed30f9450fb5c96b26f92e6d9e5e6d3d317a",
+    "ticks": 12,
+    "marcos": {}
+  },
+  "toji_lanca_2": {
+    "duration": 0.5769,
+    "sample_rate": 48000,
+    "channels": 1,
+    "peak": 0.63492,
+    "rms": 0.08219,
+    "sha256": "be2c7672b95d3bed84cd7e5dca87c71852bcad9be76bf81cd848adb7910bdc22"
+  },
+  "toji_lanca_3": {
+    "duration": 0.625,
+    "sample_rate": 48000,
+    "channels": 1,
+    "peak": 0.70015,
+    "rms": 0.08967,
+    "sha256": "405591ff7a46a0cc86e225298cc4e910f98d1db6a5dfe391ae0d76c18bbfdd86"
+  },
+  "toji_anula": {
+    "duration": 1.1,
+    "sample_rate": 48000,
+    "channels": 1,
+    "peak": 0.61595,
+    "rms": 0.15124,
+    "sha256": "52d5c7fe06ec77b7ab0fc731d72562059042733ef74d0d6465954cc9dc106a06",
+    "ticks": 22,
+    "marcos": {}
+  },
+  "toji_anula_2": {
+    "duration": 1.0577,
+    "sample_rate": 48000,
+    "channels": 1,
+    "peak": 0.60734,
+    "rms": 0.17662,
+    "sha256": "155b92e88607640ccf340a7f283a8bc1920eebbe705c9313a6c756c3872f1494"
+  },
+  "toji_anula_3": {
+    "duration": 1.1458,
+    "sample_rate": 48000,
+    "channels": 1,
+    "peak": 0.59881,
+    "rms": 0.14284,
+    "sha256": "485c17ec5eb8020cd835d0eb08a4710beae39914c84191fcf5ab60cc879d59e9"
+  },
+  "toji_corrente": {
+    "duration": 0.9,
+    "sample_rate": 48000,
+    "channels": 1,
+    "peak": 0.65072,
+    "rms": 0.11324,
+    "sha256": "867137c8b18febdfbb19fe333c1188caa703252f4360a81e9a2a67667f623b6f",
+    "ticks": 18,
+    "marcos": {}
+  },
+  "toji_corrente_2": {
+    "duration": 0.8654,
+    "sample_rate": 48000,
+    "channels": 1,
+    "peak": 0.6051,
+    "rms": 0.11935,
+    "sha256": "e577b7875e9b16ffc373912af7acd488a7317b2e5369ea8557b8f18c627f9142"
+  },
+  "toji_corrente_3": {
+    "duration": 0.9375,
+    "sample_rate": 48000,
+    "channels": 1,
+    "peak": 0.63037,
+    "rms": 0.11724,
+    "sha256": "ac538e336a195557482256ed0483b01cb2072b7053b57984b5333c7434501f9e"
+  },
+  "toji_soco": {
+    "duration": 0.5,
+    "sample_rate": 48000,
+    "channels": 1,
+    "peak": 0.60686,
+    "rms": 0.15361,
+    "sha256": "b214d5ddbf7b85988c913d20b47f2e0d51cb7345120616b9b268fb62befa911e",
+    "ticks": 10,
+    "marcos": {}
+  },
+  "toji_soco_2": {
+    "duration": 0.4808,
+    "sample_rate": 48000,
+    "channels": 1,
+    "peak": 0.6074,
+    "rms": 0.16118,
+    "sha256": "89dc0bcc7b63100da844ea3f1b70b2cd08472063cc4e42aa1dd7286e5b5beeb5"
+  },
+  "toji_soco_3": {
+    "duration": 0.5208,
+    "sample_rate": 48000,
+    "channels": 1,
+    "peak": 0.59588,
+    "rms": 0.13932,
+    "sha256": "4a09a79794b3f349fd9627c010c4a2d9e65da1cceb918e0802e11bfe4603e9f5"
+  },
+  "toji_nuvem": {
+    "duration": 0.45,
+    "sample_rate": 48000,
+    "channels": 1,
+    "peak": 0.60575,
+    "rms": 0.10521,
+    "sha256": "8a19cf2a827d0d2d98f7f67f227cb0589021ccf62cb7f1547dfb5eea053189af",
+    "ticks": 9,
+    "marcos": {}
+  },
+  "toji_nuvem_2": {
+    "duration": 0.4327,
+    "sample_rate": 48000,
+    "channels": 1,
+    "peak": 0.61937,
+    "rms": 0.10396,
+    "sha256": "67a895025cfaf4af70ae3a1f661c00dd1bfb321ce8414364aba4b6b504788908"
+  },
+  "toji_nuvem_3": {
+    "duration": 0.4687,
+    "sample_rate": 48000,
+    "channels": 1,
+    "peak": 0.61788,
+    "rms": 0.10464,
+    "sha256": "856450a62df85dc3025e8665834f7c8a477c288a415bb243a702554879395761"
+  },
+  "toji_sumir": {
+    "duration": 0.6,
+    "sample_rate": 48000,
+    "channels": 1,
+    "peak": 0.62401,
+    "rms": 0.13583,
+    "sha256": "48f5d4fbe35e5ae0a671531a4c0b8f3a8c90335c0d7916a4704af0fac3d79264",
+    "ticks": 12,
+    "marcos": {}
+  },
+  "toji_sumir_2": {
+    "duration": 0.5769,
+    "sample_rate": 48000,
+    "channels": 1,
+    "peak": 0.66064,
+    "rms": 0.13678,
+    "sha256": "a80abb8305711913b017cb4487ecbce917e641fcc6d851148e74ae719a769fcd"
+  },
+  "toji_sumir_3": {
+    "duration": 0.625,
+    "sample_rate": 48000,
+    "channels": 1,
+    "peak": 0.61935,
+    "rms": 0.13177,
+    "sha256": "069893b522b0065daaeb547d62ebe9cb28a1708f81ad4925392bb05703ef98b6"
+  },
+  "toji_surgir": {
+    "duration": 0.5,
+    "sample_rate": 48000,
+    "channels": 1,
+    "peak": 0.66122,
+    "rms": 0.09572,
+    "sha256": "8a4eac5ef73b4e19818720ccade9e6a0d3a7cc7f111a06ae7ada944621dda7ba",
+    "ticks": 10,
+    "marcos": {}
+  },
+  "toji_surgir_2": {
+    "duration": 0.4808,
+    "sample_rate": 48000,
+    "channels": 1,
+    "peak": 0.58399,
+    "rms": 0.08753,
+    "sha256": "53983b1f6ed1cd4562c40316e5bfaf21488110f37a65b9fcf583c4a02a62a37b"
+  },
+  "toji_surgir_3": {
+    "duration": 0.5208,
+    "sample_rate": 48000,
+    "channels": 1,
+    "peak": 0.58542,
+    "rms": 0.09817,
+    "sha256": "78680f5dff1a23f43a0374b1659928443be1a201df1cff5b1cce13098155cb93"
+  },
+  "toji_marca": {
+    "duration": 1.0,
+    "sample_rate": 48000,
+    "channels": 1,
+    "peak": 0.65793,
+    "rms": 0.12206,
+    "sha256": "3bf16e06202d4521bfbcdd89047a7b513b80b5b5e22c9a02c5ffbd9d7faebe48",
+    "ticks": 20,
+    "marcos": {}
+  },
+  "toji_marca_2": {
+    "duration": 0.9615,
+    "sample_rate": 48000,
+    "channels": 1,
+    "peak": 0.69987,
+    "rms": 0.13436,
+    "sha256": "6ef914a77b5c88a7360eec77ecfc5ebbb503d0e79b365db5598db829b5105349"
+  },
+  "toji_marca_3": {
+    "duration": 1.0416,
+    "sample_rate": 48000,
+    "channels": 1,
+    "peak": 0.5513,
+    "rms": 0.10249,
+    "sha256": "c496aab38415ce13ddf2a21db2f73ec47ddb4875f69c8441112c02f489888c6c"
+  },
+  "toji_fase": {
+    "duration": 1.8,
+    "sample_rate": 48000,
+    "channels": 1,
+    "peak": 0.61351,
+    "rms": 0.14513,
+    "sha256": "116c8536dc3d6065ed8b4146ee2b5be94587a034dcb81cc6c124c00266521c26",
+    "ticks": 36,
+    "marcos": {}
+  },
+  "toji_fase_2": {
+    "duration": 1.7308,
+    "sample_rate": 48000,
+    "channels": 1,
+    "peak": 0.72521,
+    "rms": 0.15763,
+    "sha256": "96c5e0f197634e0a1cd5d15ea1124df8232536278b03a2f3e7315663ea99a0e7"
+  },
+  "toji_fase_3": {
+    "duration": 1.875,
+    "sample_rate": 48000,
+    "channels": 1,
+    "peak": 0.57756,
+    "rms": 0.14497,
+    "sha256": "6a3cbeb04c83ee6386198afa1d0c56bfb703d7add973b7b07fdb1561404f3b39"
+  },
+  "toji_queda": {
+    "duration": 3.3,
+    "sample_rate": 48000,
+    "channels": 1,
+    "peak": 0.58268,
+    "rms": 0.13794,
+    "sha256": "e535266db8a7bf320bfac09b19a4dd2c745037a1fd135305dd85cbe1cf5b5c05",
+    "ticks": 66,
+    "marcos": {
+      "levanta": 60
+    }
+  },
+  "toji_queda_2": {
+    "duration": 3.1731,
+    "sample_rate": 48000,
+    "channels": 1,
+    "peak": 0.6181,
+    "rms": 0.14698,
+    "sha256": "636c0f835b8e98b9e3ddf6b4179daff32aa9a3795d98f360ecff1c1395e35312"
+  },
+  "toji_queda_3": {
+    "duration": 3.4375,
+    "sample_rate": 48000,
+    "channels": 1,
+    "peak": 0.60361,
+    "rms": 0.13553,
+    "sha256": "94d4222559249b398cef1c60a4aae2a736efcd9e7582a6205711abcc86e0209b"
+  },
+  "toji_despertar": {
+    "duration": 2.2,
+    "sample_rate": 48000,
+    "channels": 1,
+    "peak": 0.62701,
+    "rms": 0.15845,
+    "sha256": "4e521530a1f05f255d7ac4abacbd94140e5b2812467cad886dcb56293b1808e5",
+    "ticks": 44,
+    "marcos": {}
+  },
+  "toji_despertar_2": {
+    "duration": 2.1154,
+    "sample_rate": 48000,
+    "channels": 1,
+    "peak": 0.59344,
+    "rms": 0.15786,
+    "sha256": "55e943e8da7cb968e533ecf22eab5118e292af2fdfbfbaef900baf8d99f5ac3b"
+  },
+  "toji_despertar_3": {
+    "duration": 2.2916,
+    "sample_rate": 48000,
+    "channels": 1,
+    "peak": 0.62567,
+    "rms": 0.15965,
+    "sha256": "64d6dd14799318325b95c982faad29d2a8e0a013f3a7540ea79f23dba65d7a19"
+  },
+  "toji_morte": {
+    "duration": 1.8,
+    "sample_rate": 48000,
+    "channels": 1,
+    "peak": 0.62083,
+    "rms": 0.17095,
+    "sha256": "b4e64163e6edfd3d6e14e07d5e2db87357903db06bae2f9ef05c64ea9b3af1b9",
+    "ticks": 36,
+    "marcos": {}
+  },
+  "toji_morte_2": {
+    "duration": 1.7308,
+    "sample_rate": 48000,
+    "channels": 1,
+    "peak": 0.59624,
+    "rms": 0.1751,
+    "sha256": "3b73db83321d7cb15425462268464d41073841241b19a9b140f30fa69f3e267a"
+  },
+  "toji_morte_3": {
+    "duration": 1.875,
+    "sample_rate": 48000,
+    "channels": 1,
+    "peak": 0.61075,
+    "rms": 0.1806,
+    "sha256": "2171d7967c4fd6109c5b4c5abc2a0306150aad84990637f1299364cefa63f3b1"
+  }
+}

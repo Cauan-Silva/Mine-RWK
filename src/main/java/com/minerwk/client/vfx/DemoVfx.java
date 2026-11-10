@@ -38,13 +38,13 @@ public final class DemoVfx {
     private static boolean vestiuPeitoral;
     /** {@code arvore}: a tela da árvore do Gojo em três momentos (sem pontos, com compras e desperto). */
     private static final boolean ARVORE = MODO.equals("arvore");
-    /** {@code toji}: a luta contra o Toji, com a queda, o despertar no meio e um Vermelho nele. */
+    /** {@code toji}: a luta contra o Toji: a entrada, a Nuvem, a investida, a queda com a cutscene, o Desaparecer e a fase 3. */
     private static final boolean TOJI = MODO.equals("toji");
     private static final int CARGA = 100;
     private static final Path PASTA = Path.of("demo");
     private static final int ESFERAS = RoxoMaximo.TICKS_ESFERAS;
     private static final int ESTOURO = ESFERAS + RoxoMaximo.TICKS_FUSAO;
-    private static final int FIM_PREVIA = TOJI ? 300 : ARVORE ? 100 : TRAJE ? 260 : R_COMPLETO ? 360
+    private static final int FIM_PREVIA = TOJI ? 520 : ARVORE ? 100 : TRAJE ? 260 : R_COMPLETO ? 360
             : ENCANTAMENTO ? CARGA + 90 : ESTOURO + RoxoMaximo.TICKS_EXPLOSAO + 110;
     private static int ticks;
     private static int quadro;
@@ -64,6 +64,11 @@ public final class DemoVfx {
         LocalPlayer jogador = mc.player;
         if (jogador == null || mc.isPaused()) return;
         ticks++;
+        // Uma gravação anterior pode ter acabado com o jogador morto: o mundo de testes guarda isso.
+        if (DEMO && ticks == 10 && jogador.isDeadOrDying()) {
+            jogador.respawn();
+            mc.setScreen(null);
+        }
         if (DEMO && ticks == 40) {
             jogador.connection.sendCommand(ENCANTAMENTO || R_COMPLETO || TRAJE || TOJI ? "time set noon" : "time set midnight");
             if (ARVORE) jogador.connection.sendCommand("rwk trocar @s gojo");
@@ -129,27 +134,37 @@ public final class DemoVfx {
             return;
         }
         if (TOJI) {
-            mc.gui.getChat().clearMessages(false);
             // No sobrevivência, para os golpes do Toji valerem; o comando de teste dispensa o Contrato.
-            if (t == 0) jogador.connection.sendCommand("gamemode survival");
+            if (t == 0) {
+                jogador.connection.sendCommand("gamerule sendCommandFeedback false");
+                jogador.connection.sendCommand("gamemode survival");
+            }
+            if (t <= 2) mc.gui.getChat().clearMessages(false);
+            // A entrada: ele chega e fala antes do primeiro golpe.
             if (t == 2) jogador.connection.sendCommand("rwk toji @s");
-            // Tira mais de 20% da vida dele: o Toji arma a Lança que derruba, e o jogador desperta.
-            if (t == 90) jogador.connection.sendCommand("damage @e[type=minerwk:toji,limit=1,sort=nearest] 60");
-            // De fora durante a queda e o despertar; o resto em primeira pessoa.
-            mc.options.setCameraType(t >= 100 && t < 190 ? net.minecraft.client.CameraType.THIRD_PERSON_BACK
-                    : net.minecraft.client.CameraType.FIRST_PERSON);
+            if (t == 70) golpeDoToji(com.minerwk.core.boss.TojiBoss.NUVEM);
+            if (t == 115) golpeDoToji(com.minerwk.core.boss.TojiBoss.INVESTIDA);
+            // Tira mais de 20% da vida dele: o Toji arma a Lança que derruba, e a cutscene mostra o despertar.
+            if (t == 160) jogador.connection.sendCommand("damage @e[type=minerwk:toji,limit=1,sort=nearest] 60");
             // A gravação não pode acabar numa tela de morte: depois do despertar o jogador aguenta mais.
-            if (t == 185) jogador.connection.sendCommand("effect give @s minecraft:resistance 20 2 true");
-            for (net.minecraft.world.entity.Entity e : mc.level.entitiesForRendering()) {
-                if (e instanceof com.minerwk.boss.TojiEntity) {
-                    jogador.lookAt(net.minecraft.commands.arguments.EntityAnchorArgument.Anchor.EYES, e.position().add(0, 1.2, 0));
+            if (t >= 262 && t % 10 == 0) curarJogador();
+            if (t == 285) golpeDoToji(com.minerwk.core.boss.TojiBoss.DESAPARECER);
+            // Abaixo de 35% de vida: a fase 3 e a Execução do Assassino.
+            if (t == 335) jogador.connection.sendCommand("damage @e[type=minerwk:toji,limit=1,sort=nearest] 110");
+            // De fora nos golpes que se leem pelo chão; a cutscene cuida da própria câmera.
+            boolean deFora = (t >= 60 && t < 160) || t >= 330;
+            if (!com.minerwk.client.camera.CutsceneCliente.ativa()) {
+                mc.options.setCameraType(deFora ? net.minecraft.client.CameraType.THIRD_PERSON_BACK
+                        : net.minecraft.client.CameraType.FIRST_PERSON);
+                for (net.minecraft.world.entity.Entity e : mc.level.entitiesForRendering()) {
+                    if (e instanceof com.minerwk.boss.TojiEntity && !e.isInvisible()) {
+                        jogador.lookAt(net.minecraft.commands.arguments.EntityAnchorArgument.Anchor.EYES, e.position().add(0, 1.2, 0));
+                    }
                 }
             }
-            if (t == 215) tecla(com.minerwk.core.kit.Tecla.X, true);
-            if (t == 232) tecla(com.minerwk.core.kit.Tecla.X, false);
             // Longe demais o Toji vai embora sem vitória: o mundo de testes não fica com o despertar da demonstração.
             if (t == FIM_PREVIA - 6) {
-                jogador.connection.sendCommand("effect clear @s minecraft:resistance");
+                jogador.connection.sendCommand("gamerule sendCommandFeedback true");
                 jogador.connection.sendCommand("gamemode creative");
                 jogador.connection.sendCommand("tp @s ~-150 ~ ~-10");
             }
@@ -243,6 +258,28 @@ public final class DemoVfx {
                     (float) RoxoMaximo.RAIO_EXPLOSAO, RoxoMaximo.TICKS_EXPLOSAO + RoxoMaximo.TICKS_RESTO, agora));
         }
         if (t >= FIM_PREVIA) previa = -1;
+    }
+
+    /** Manda o Toji da demonstração começar um golpe (o servidor é o do próprio jogo). */
+    private static void golpeDoToji(com.minerwk.core.boss.Golpe golpe) {
+        net.minecraft.server.MinecraftServer servidor = Minecraft.getInstance().getSingleplayerServer();
+        if (servidor == null) return;
+        servidor.execute(() -> {
+            for (net.minecraft.server.level.ServerLevel nivel : servidor.getAllLevels()) {
+                for (net.minecraft.world.entity.Entity e : nivel.getAllEntities()) {
+                    if (e instanceof com.minerwk.boss.TojiEntity toji) toji.forcar(golpe);
+                }
+            }
+        });
+    }
+
+    /** Enche a vida de quem joga a demonstração, para a gravação não acabar numa tela de morte. */
+    private static void curarJogador() {
+        net.minecraft.server.MinecraftServer servidor = Minecraft.getInstance().getSingleplayerServer();
+        if (servidor == null) return;
+        servidor.execute(() -> servidor.getPlayerList().getPlayers().forEach(p -> {
+            if (p.isAlive()) p.setHealth(p.getMaxHealth());
+        }));
     }
 
     private static void tecla(com.minerwk.core.kit.Tecla tecla, boolean apertou) {

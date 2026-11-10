@@ -313,5 +313,260 @@
         "attenuation_distance": 128
       }
     ]
+  },
+  "toji_entrada": {
+    "subtitle": "subtitles.minerwk.toji_entrada",
+    "sounds": [
+      {
+        "name": "minerwk:toji/toji_entrada",
+        "attenuation_distance": 48
+      },
+      {
+        "name": "minerwk:toji/toji_entrada_2",
+        "attenuation_distance": 48
+      },
+      {
+        "name": "minerwk:toji/toji_entrada_3",
+        "attenuation_distance": 48
+      }
+    ]
+  },
+  "toji_aviso": {
+    "subtitle": "subtitles.minerwk.toji_aviso",
+    "sounds": [
+      {
+        "name": "minerwk:toji/toji_aviso",
+        "attenuation_distance": 32
+      },
+      {
+        "name": "minerwk:toji/toji_aviso_2",
+        "attenuation_distance": 32
+      },
+      {
+        "name": "minerwk:toji/toji_aviso_3",
+        "attenuation_distance": 32
+      }
+    ]
+  },
+  "toji_investida": {
+    "subtitle": "subtitles.minerwk.toji_investida",
+    "sounds": [
+      {
+        "name": "minerwk:toji/toji_investida",
+        "attenuation_distance": 48
+      },
+      {
+        "name": "minerwk:toji/toji_investida_2",
+        "attenuation_distance": 48
+      },
+      {
+        "name": "minerwk:toji/toji_investida_3",
+        "attenuation_distance": 48
+      }
+    ]
+  },
+  "toji_lanca": {
+    "subtitle": "subtitles.minerwk.toji_lanca",
+    "sounds": [
+      {
+        "name": "minerwk:toji/toji_lanca",
+        "attenuation_distance": 48
+      },
+      {
+        "name": "minerwk:toji/toji_lanca_2",
+        "attenuation_distance": 48
+      },
+      {
+        "name": "minerwk:toji/toji_lanca_3",
+        "attenuation_distance": 48
+      }
+    ]
+  },
+  "toji_anula": {
+    "subtitle": "subtitles.minerwk.toji_anula",
+    "sounds": [
+      {
+        "name": "minerwk:toji/toji_anula",
+        "attenuation_distance": 48
+      },
+      {
+        "name": "minerwk:toji/toji_anula_2",
+        "attenuation_distance": 48
+      },
+      {
+        "name": "minerwk:toji/toji_anula_3",
+        "attenuation_distance": 48
+      }
+    ]
+  },
+  "toji_corrente": {
+    "subtitle": "subtitles.minerwk.toji_corrente",
+    "sounds": [
+      {
+        "name": "minerwk:toji/toji_corrente",
+        "attenuation_distance": 48
+      },
+      {
+        "name": "minerwk:toji/toji_corrente_2",
+        "attenuation_distance": 48
+      },
+      {
+        "name": "minerwk:toji/toji_corrente_3",
+        "attenuation_distance": 48
+      }
+    ]
+  },
+  "toji_soco": {
+    "subtitle": "subtitles.minerwk.toji_soco",
+    "sounds": [
+      {
+        "name": "minerwk:toji/toji_soco",
+        "attenuation_distance": 32
+      },
+      {
+        "name": "minerwk:toji/toji_soco_2",
+        "attenuation_distance": 32
+      },
+      {
+        "name": "minerwk:toji/toji_soco_3",
+        "attenuation_distance": 32
+      }
+    ]
+  },
+  "toji_nuvem": {
+    "subtitle": "subtitles.minerwk.toji_nuvem",
+    "sounds": [
+      {
+        "name": "minerwk:toji/toji_nuvem",
+        "attenuation_distance": 32
+      },
+      {
+        "name": "minerwk:toji/toji_nuvem_2",
+        "attenuation_distance": 32
+      },
+      {
+        "name": "minerwk:toji/toji_nuvem_3",
+        "attenuation_distance": 32
+      }
+    ]
+  },
+  "toji_sumir": {
+    "subtitle": "subtitles.minerwk.toji_sumir",
+    "sounds": [
+      {
+        "name": "minerwk:toji/toji_sumir",
+        "attenuation_distance": 32
+      },
+      {
+        "name": "minerwk:toji/toji_sumir_2",
+        "attenuation_distance": 32
+      },
+      {
+        "name": "minerwk:toji/toji_sumir_3",
+        "attenuation_distance": 32
+      }
+    ]
+  },
+  "toji_surgir": {
+    "subtitle": "subtitles.minerwk.toji_surgir",
+    "sounds": [
+      {
+        "name": "minerwk:toji/toji_surgir",
+        "attenuation_distance": 32
+      },
+      {
+        "name": "minerwk:toji/toji_surgir_2",
+        "attenuation_distance": 32
+      },
+      {
+        "name": "minerwk:toji/toji_surgir_3",
+        "attenuation_distance": 32
+      }
+    ]
+  },
+  "toji_marca": {
+    "subtitle": "subtitles.minerwk.toji_marca",
+    "sounds": [
+      {
+        "name": "minerwk:toji/toji_marca",
+        "attenuation_distance": 48
+      },
+      {
+        "name": "minerwk:toji/toji_marca_2",
+        "attenuation_distance": 48
+      },
+      {
+        "name": "minerwk:toji/toji_marca_3",
+        "attenuation_distance": 48
+      }
+    ]
+  },
+  "toji_fase": {
+    "subtitle": "subtitles.minerwk.toji_fase",
+    "sounds": [
+      {
+        "name": "minerwk:toji/toji_fase",
+        "attenuation_distance": 64
+      },
+      {
+        "name": "minerwk:toji/toji_fase_2",
+        "attenuation_distance": 64
+      },
+      {
+        "name": "minerwk:toji/toji_fase_3",
+        "attenuation_distance": 64
+      }
+    ]
+  },
+  "toji_queda": {
+    "subtitle": "subtitles.minerwk.toji_queda",
+    "sounds": [
+      {
+        "name": "minerwk:toji/toji_queda",
+        "attenuation_distance": 48
+      },
+      {
+        "name": "minerwk:toji/toji_queda_2",
+        "attenuation_distance": 48
+      },
+      {
+        "name": "minerwk:toji/toji_queda_3",
+        "attenuation_distance": 48
+      }
+    ]
+  },
+  "toji_despertar": {
+    "subtitle": "subtitles.minerwk.toji_despertar",
+    "sounds": [
+      {
+        "name": "minerwk:toji/toji_despertar",
+        "attenuation_distance": 64
+      },
+      {
+        "name": "minerwk:toji/toji_despertar_2",
+        "attenuation_distance": 64
+      },
+      {
+        "name": "minerwk:toji/toji_despertar_3",
+        "attenuation_distance": 64
+      }
+    ]
+  },
+  "toji_morte": {
+    "subtitle": "subtitles.minerwk.toji_morte",
+    "sounds": [
+      {
+        "name": "minerwk:toji/toji_morte",
+        "attenuation_distance": 64
+      },
+      {
+        "name": "minerwk:toji/toji_morte_2",
+        "attenuation_distance": 64
+      },
+      {
+        "name": "minerwk:toji/toji_morte_3",
+        "attenuation_distance": 64
+      }
+    ]
   }
 }
