@@ -1,6 +1,6 @@
 ---
 tags: [personagem, boss]
-estado: boss do despertar do Gojo; pesquisa feita em parte, spec ainda não escrito
+estado: boss do despertar do Gojo; spec escrito, aguardando revisão
 ---
 # Toji Fushiguro (boss)
 
@@ -21,6 +21,7 @@ estado: boss do despertar do Gojo; pesquisa feita em parte, spec ainda não escr
   - **G e R:** vêm junto. Vencer o Toji libera o kit inteiro.
   - **Requisito:** maestria no nível exigido e o nó **Despertar** comprado na árvore. Por isso a maestria e a árvore são feitas antes; ver o spec [[2026-11-10 Maestria e árvore de habilidades]].
   - **Item de invocação:** receita de bancada com itens comuns, que só o Gojo consegue usar; dá para repetir a luta.
+  - **Terceira rodada (10/11), no spec [[2026-11-10 Toji e o despertar do Gojo]]:** o despertar só fica se o jogador vencer; qualquer jogador pode ajudar na luta, mas só quem invocou desperta; os sons são sintetizados aqui, e o modelo, a textura e as animações vêm do Minezin.
   - **Tamanho:** em partes. Primeiro o essencial (modelo, barra de vida e três golpes: investida, lança que anula o Infinito e corrente); depois os outros golpes, as fases, o VFX e o som.
 
 ## Kit canônico
