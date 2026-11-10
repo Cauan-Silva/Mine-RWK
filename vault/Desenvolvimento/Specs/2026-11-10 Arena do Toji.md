@@ -1,6 +1,6 @@
 ---
 tags: [desenvolvimento, spec]
-estado: aguardando revisão
+estado: aprovado
 ---
 # Spec: a arena da luta do Toji
 
@@ -66,7 +66,7 @@ Montado por código, com blocos do Minecraft. Tudo cabe numa caixa de 81 × 64 �
   - o ponto de retorno é um Data Attachment novo do jogador, salvo em disco.
 - **Mudanças no que existe:**
   - `LutasToji.invocar` passa a pedir a arena e só cria o Toji quando ela está pronta;
-  - `BarreirasServidor` ganha a forma de caixa;
+  - a barreira em caixa fica em `CaixaArena` (a caixa depende só da posição, então cliente e servidor a aplicam sem pacote novo; o `BarreirasServidor` do domínio não muda);
   - `ApagadorServidor` e o arranque de blocos do Azul respeitam o limite da caixa quando o golpe acontece na dimensão da arena;
   - `TojiEntity` perde a regra dos 64 blocos e a do ajudante.
 - **GameTests:** entrar e voltar ao lugar exato; vitória; morte sem perder itens; sair no meio e voltar ao ponto de retorno; duas lutas em vagas diferentes; o R não apaga blocos fora da caixa.
