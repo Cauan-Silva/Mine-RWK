@@ -142,5 +142,9 @@
   "subtitles.minerwk.toji_fase": "Toji gets serious",
   "subtitles.minerwk.toji_queda": "A heart beats slowly",
   "subtitles.minerwk.toji_despertar": "Gojo awakens",
-  "subtitles.minerwk.toji_morte": "Toji falls"
+  "subtitles.minerwk.toji_morte": "Toji falls",
+  "mensagem.minerwk.arena.foi": "You are in the arena (test): /rwk arena voltar to leave",
+  "mensagem.minerwk.arena.voltou": "Back where you left from",
+  "mensagem.minerwk.arena.ja_esta": "You are already in the arena",
+  "mensagem.minerwk.arena.sem_retorno": "No return point saved: you were sent to your respawn, or were not in the arena"
 }

@@ -15,6 +15,15 @@ public final class Anexos {
     public static final Supplier<AttachmentType<DadosKit>> DADOS_KIT = REGISTRO.register("dados_kit",
             () -> AttachmentType.builder(() -> new DadosKit()).serialize(DadosKit.CODEC).copyOnDeath().build());
 
+    /**
+     * De onde o jogador saiu para a arena. Só existe enquanto ele está lá (ver com {@code hasData}); o
+     * valor padrão nunca é usado. Salvo no disco e mantido na morte.
+     */
+    public static final Supplier<AttachmentType<com.minerwk.arena.PontoRetorno>> RETORNO_ARENA = REGISTRO.register("retorno_arena",
+            () -> AttachmentType.builder(() -> new com.minerwk.arena.PontoRetorno(
+                            net.minecraft.world.level.Level.OVERWORLD.location(), 0, 0, 0, 0, 0))
+                    .serialize(com.minerwk.arena.PontoRetorno.CODEC).copyOnDeath().build());
+
     private Anexos() {
     }
 }
