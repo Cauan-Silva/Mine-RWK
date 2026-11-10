@@ -68,6 +68,21 @@ Voltar para [[00 Início]].
   - **Céu e chão no encantamento (10/11):** conferir o céu escurecendo na carga e cheio na fusão e na explosão, voltando devagar depois; as rachaduras de luz saindo dos pés (em chão irregular elas ficam na altura dos pés, não acompanham o relevo); as pedras subindo devagar. Ver de noite, na chuva, debaixo d'água e com Iris (no Nether e no End o véu não é desenhado). O chão continua claro com o céu escuro: ver se incomoda.
   - **`/rwk recarregar`:** conferir que enche a energia, zera as recargas e o HUD acompanha.
   - Com teto baixo sobre o Gojo, a explosão sai um pouco acima dele (o centro vem da conta do movimento, não de onde ele parou).
+- Traje do Gojo (10/11), conferir no jogo:
+  - **Vestir:** escolher o Gojo veste o traje na hora; trocar para outro personagem tira.
+  - **Venda:** no rosto normalmente; some no Vazio Infinito e no R, com os olhos azuis brilhando, e volta no fim. Ver se os olhos caem em cima dos olhos da sua skin; se não, `olhosBrilhando = false` na config.
+  - **Barra do casaco:** correndo, pulando e caindo, sem entrar nas pernas.
+  - **Primeira pessoa:** a manga na mão parada e nos braços durante os golpes.
+  - **Armadura:** vestida, protege mas não aparece; com `armaduraSobreTraje = true` aparece por cima.
+  - **Skins:** uma de braço fino (a manga fica um pixel mais larga) e uma com camada de chapéu.
+  - **Outro jogador:** vê o traje de quem escolheu o Gojo, ao chegar perto e quando ele troca; depois de morrer e renascer também.
+  - **Outros casos:** invisível (o traje some), F3+T (recarregar recursos), elytra e capa por cima, e com Iris.
+  - **Achados menores da revisão (sem correção ainda):**
+    - `CamadaTraje.aoAdicionarCamadas` troca qualquer subclasse de `HumanoidArmorLayer`; a de outro mod perderia o comportamento. Trocar só a classe exata, se aparecer conflito.
+    - O balanço sobrescreve a rotação do osso da barra; conferir no jogo que a animação do GeckoLib não zera isso.
+    - `ServicoKits.aoComecarAVer` usa `kit(visto)`, que cria o kit como efeito colateral; ler só o personagem salvo.
+    - `PersonagensVistos` só é limpo ao sair do mundo (vazamento pequeno).
+    - O `PersonagemDe` também vai para o próprio jogador, que não o usa.
 - Som do Gojo (10/11): **aprovado pelo autor pela prévia** (áudio em fila e o vídeo do R com som). Ainda vale conferir no jogo o que a prévia não mostra, que é o volume com a distância, o corte na interrupção e outro jogador ouvindo:
   - **Z:** a sucção do Azul sai do ponto de atração e dura os 3 s do campo.
   - **X:** o agudo da carga subindo enquanto segura, cortado ao soltar; estalo no disparo e o boom no ponto do impacto (de longe soa de longe).
