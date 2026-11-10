@@ -30,7 +30,8 @@ class CutsceneRoxoMaximoTest {
             assertPlanoAberto(c, e, CutsceneRoxoMaximo.CENTRO_COM_ALVO);
             // Na fusão, close no rosto olhando para o núcleo atrás.
             Coreografia.Quadro fusao = c.quadro(RoxoMaximo.inicioFusao(a) + 5);
-            assertTrue(fusao.posicao().comprimento() < 2.5, "close no Gojo");
+            assertTrue(fusao.posicao().comprimento() < 3, "close no Gojo");
+            assertTrue(fusao.posicao().z() > 0 && fusao.posicao().x() < 0, "três quartos pela esquerda, vendo o rosto");
             assertTrue(fusao.alvo().z() < 0, "olha para trás dele");
             assertVolta(c);
         }
@@ -44,6 +45,45 @@ class CutsceneRoxoMaximoTest {
         assertEquals(new Vetor(0, 0, 42), c.quadro(RoxoMaximo.TICKS_ESFERAS_SEM_ALVO).alvo(), "olha para onde as esferas vão");
         assertPlanoAberto(c, e, new Vetor(0, 0, 42));
         assertVolta(c);
+    }
+
+    @Test
+    void corridaBaixaAtrasECorteSecoDeLadoNoUppercut() {
+        for (int a : new int[] {0, 10, 20}) {
+            Coreografia c = CutsceneRoxoMaximo.coreografia(a);
+            if (a > 0) {
+                for (double t = 0; t < a; t += .5) {
+                    Coreografia.Quadro q = c.quadro(t);
+                    assertTrue(q.posicao().z() < 0, "atrás do Gojo correndo");
+                    assertTrue(q.posicao().y() < -.9, "câmera baixa, perto do chão: " + q.posicao().y());
+                }
+            }
+            Coreografia.Quadro soco = c.quadro(a + 1);
+            assertTrue(Math.abs(soco.posicao().x()) > 3, "de lado no soco");
+            assertTrue(soco.posicao().y() < -1, "de baixo");
+            if (a > 0) {
+                assertTrue(c.quadro(a + .5).posicao().distancia(soco.posicao()) > 3, "corte seco, não deslize");
+            }
+        }
+    }
+
+    @Test
+    void depoisDoUppercutACameraNuncaEntraNoAlvo() {
+        for (int a : new int[] {0, 10, 20}) {
+            Coreografia c = CutsceneRoxoMaximo.coreografia(a);
+            for (double t = a; t <= RoxoMaximo.inicioExplosao(a); t += .25) {
+                Vetor p = c.quadro(t).posicao();
+                assertTrue(distanciaDoAlvo(p) >= 2, "tick " + t + ": a " + distanciaDoAlvo(p) + " do alvo");
+            }
+        }
+    }
+
+    /** O alvo fica suspenso na frente do Gojo: uma caixa em volta de (0, 0, 1,5) na base dos olhos dele. */
+    private static double distanciaDoAlvo(Vetor p) {
+        double dx = Math.max(0, Math.abs(p.x()) - .5);
+        double dy = Math.max(0, Math.max(-1.5 - p.y(), p.y() - 1.5));
+        double dz = Math.max(0, Math.max(1 - p.z(), p.z() - 2));
+        return Math.sqrt(dx * dx + dy * dy + dz * dz);
     }
 
     /** Do começo da explosão até o fim do plano aberto: a pelo menos 60 do centro, parado e olhando para ele. */

@@ -58,20 +58,22 @@ public final class CutsceneRoxoMaximo {
     public static Coreografia coreografia(int avanco) {
         int a = avanco;
         List<Quadro> q = new ArrayList<>();
-        // Avanço: atrás do ombro, baixa, o FOV abrindo com a velocidade.
-        q.add(new Quadro(0, new Vetor(.8, .2, -2.2), new Vetor(0, 0, 6), 1, 0));
-        if (a > 0) q.add(new Quadro(a, new Vetor(.9, .1, -2), new Vetor(0, 0, 5), 1.25, 0));
-        // Uppercut: de baixo e de lado, perto do soco, com tranco.
-        q.add(new Quadro(a + 2, new Vetor(2.2, -1.6, 2.4), new Vetor(0, .5, 1.5), .85, -8));
-        q.add(new Quadro(a + 6, new Vetor(2.4, -1.2, 2.2), new Vetor(0, 1.5, 1.5), .9, -4));
+        // Corrida: câmera baixa, perto do chão, atrás e um pouco ao lado, o FOV abrindo com a velocidade.
+        if (a > 0) {
+            q.add(new Quadro(0, new Vetor(.7, -1.1, -2.4), new Vetor(0, -.3, 6), 1, 0));
+            q.add(new Quadro(a, new Vetor(.8, -1.15, -2.1), new Vetor(0, -.2, 5), 1.25, 0));
+        }
+        // Uppercut: corte seco para um plano de lado e de baixo, vendo o alvo ser lançado (com o impact frame).
+        q.add(new Quadro(a + 1, new Vetor(4, -1.4, 1.2), new Vetor(0, -.2, 1.5), .9, -6, a > 0));
+        q.add(new Quadro(a + 8, new Vetor(4.2, -1.2, 1.2), new Vetor(0, .8, 1.5), .95, -3));
         // Subida: de lado, os dois subindo juntos.
         q.add(new Quadro(RoxoMaximo.inicioEsferas(a), new Vetor(4.5, .5, .8), new Vetor(0, 0, 1), 1, 0));
-        // Esferas: de frente, um pouco acima, as mãos abrindo e as esferas indo para trás dele.
-        q.add(new Quadro(RoxoMaximo.inicioEsferas(a) + 2, new Vetor(.3, 1, 4), Vetor.ZERO, 1, 0));
-        q.add(new Quadro(RoxoMaximo.inicioFusao(a), new Vetor(.3, 1.2, 4.6), new Vetor(0, 0, -1), 1.05, 0));
-        // Fusão: close no rosto, o núcleo crescendo atrás.
-        q.add(new Quadro(RoxoMaximo.inicioFusao(a) + 2, new Vetor(0, .1, 1.6), CENTRO_COM_ALVO, .85, 0));
-        q.add(new Quadro(RoxoMaximo.inicioExplosao(a), new Vetor(0, .05, 1.3), CENTRO_COM_ALVO, .8, 0));
+        // Conjurar e viagem: corte para a esquerda (sem atravessar o alvo), vendo os braços abrindo e as esferas indo para trás dele.
+        q.add(new Quadro(RoxoMaximo.inicioEsferas(a) + 3, new Vetor(-4, .8, .2), new Vetor(0, 0, -.8), 1, 0, true));
+        q.add(new Quadro(RoxoMaximo.inicioFusao(a), new Vetor(-4.4, 1, -.4), new Vetor(0, 0, -2.5), 1.05, 0));
+        // Fusão: close de três quartos pela esquerda, o rosto do Gojo e o núcleo crescendo atrás (longe do alvo).
+        q.add(new Quadro(RoxoMaximo.inicioFusao(a) + 2, new Vetor(-2.7, .5, .9), new Vetor(0, .1, -1), .85, 0));
+        q.add(new Quadro(RoxoMaximo.inicioExplosao(a), new Vetor(-2.6, .45, .8), new Vetor(0, .1, -1.5), .8, 0));
         explosaoEVolta(q, RoxoMaximo.inicioExplosao(a), CENTRO_COM_ALVO);
         return new Coreografia(q);
     }

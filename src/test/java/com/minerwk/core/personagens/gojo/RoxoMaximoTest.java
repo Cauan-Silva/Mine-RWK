@@ -19,7 +19,7 @@ class RoxoMaximoTest {
     void fasesEmSequencia() {
         int a = 10;
         assertEquals(40, RoxoMaximo.inicioEsferas(a), "subida de 30");
-        assertEquals(70, RoxoMaximo.inicioFusao(a), "esferas em 30 (18 de viagem e 12 de dança)");
+        assertEquals(70, RoxoMaximo.inicioFusao(a), "esferas em 30 (8 conjurando, 10 de viagem e 12 de dança)");
         assertEquals(106, RoxoMaximo.inicioSilencio(a), "4 ticks de silêncio antes do estouro");
         assertEquals(110, RoxoMaximo.inicioExplosao(a), "fusão carregando 40");
         assertEquals(140, RoxoMaximo.fim(a), "explosão em 30");
@@ -28,7 +28,10 @@ class RoxoMaximoTest {
     @Test
     void ritmoCercaDoDobroDoAntigo() {
         assertEquals(130, RoxoMaximo.fim(0) - 0, "do uppercut ao fim da explosão: ~6,5 s");
-        assertEquals(RoxoMaximo.TICKS_ESFERAS, RoxoMaximo.TICKS_VIAGEM + RoxoMaximo.TICKS_DANCA);
+        assertEquals(RoxoMaximo.TICKS_ESFERAS, RoxoMaximo.TICKS_CONJURAR + RoxoMaximo.TICKS_VIAGEM + RoxoMaximo.TICKS_DANCA);
+        assertEquals(8, RoxoMaximo.TICKS_CONJURAR, "lá no céu ele conjura os dois nas mãos");
+        assertEquals(10, RoxoMaximo.TICKS_VIAGEM);
+        assertEquals(12, RoxoMaximo.TICKS_DANCA);
         assertEquals(30, RoxoMaximo.TICKS_ESFERAS_SEM_ALVO);
     }
 

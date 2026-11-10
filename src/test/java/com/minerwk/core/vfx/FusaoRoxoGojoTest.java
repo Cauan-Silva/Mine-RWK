@@ -43,6 +43,16 @@ class FusaoRoxoGojoTest {
     }
 
     @Test
+    void esferasNascemNasMaosECrescemAteOTamanhoDaFusao() {
+        assertEquals(0, FusaoRoxoGojo.raioConjurando(0), 1e-9);
+        assertEquals(FusaoRoxoGojo.RAIO_ESFERA, FusaoRoxoGojo.raioConjurando(RoxoMaximo.TICKS_CONJURAR), 1e-9);
+        for (int c = 1; c <= RoxoMaximo.TICKS_CONJURAR; c++) {
+            assertTrue(FusaoRoxoGojo.raioConjurando(c) > FusaoRoxoGojo.raioConjurando(c - 1));
+        }
+        assertEquals(FusaoRoxoGojo.RAIO_ESFERA, FusaoRoxoGojo.raioConjurando(50), 1e-9);
+    }
+
+    @Test
     void comecaOndeOArcoTermina() {
         // A viagem em arco chega com o azul à esquerda e o vermelho à direita, na distância da órbita.
         assertEquals(new Vetor(-FusaoRoxoGojo.ORBITA, 0, 0), FusaoRoxoGojo.posicao(-1, 0));

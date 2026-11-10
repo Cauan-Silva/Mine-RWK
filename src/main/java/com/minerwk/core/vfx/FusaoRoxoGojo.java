@@ -30,6 +30,11 @@ public final class FusaoRoxoGojo {
     private FusaoRoxoGojo() {
     }
 
+    /** Raio de uma esfera nascendo na mão, {@code c} ticks depois de começar a conjurar. */
+    public static double raioConjurando(double c) {
+        return RAIO_ESFERA * PerfilVfxGojo.suave(c / RoxoMaximo.TICKS_CONJURAR);
+    }
+
     /** Tick da dança em que as esferas encostam. */
     public static int encosta() {
         return RoxoMaximo.TICKS_DANCA - TOQUE - AFUNDA;

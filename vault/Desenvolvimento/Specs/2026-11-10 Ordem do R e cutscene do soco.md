@@ -1,6 +1,6 @@
 ---
 tags: [desenvolvimento, spec]
-estado: aguardando revisão
+estado: aprovado
 ---
 # Spec e plano: nova ordem do R, cutscene da corrida e do uppercut, impact frame (Fase 2, parte 8b)
 

@@ -17,10 +17,14 @@ public final class RoxoMaximo {
     public static final int AVANCO_MAX = 20;
     public static final double SUBIDA = 25;
     public static final int TICKS_SUBIDA = 30;
-    /** As esferas: {@link #TICKS_VIAGEM} em arco das mãos até atrás do Gojo e {@link #TICKS_DANCA} de dança e toque. */
-    public static final int TICKS_VIAGEM = 18;
+    /**
+     * As esferas, lá no céu: {@link #TICKS_CONJURAR} nascendo nas mãos, {@link #TICKS_VIAGEM} em arco das
+     * mãos até atrás do Gojo e {@link #TICKS_DANCA} de dança e toque.
+     */
+    public static final int TICKS_CONJURAR = 8;
+    public static final int TICKS_VIAGEM = 10;
     public static final int TICKS_DANCA = 12;
-    public static final int TICKS_ESFERAS = TICKS_VIAGEM + TICKS_DANCA;
+    public static final int TICKS_ESFERAS = TICKS_CONJURAR + TICKS_VIAGEM + TICKS_DANCA;
     /** O núcleo roxo carregando; os últimos {@link #TICKS_SILENCIO} são o silêncio antes do estouro. */
     public static final int TICKS_FUSAO = 40;
     public static final int TICKS_SILENCIO = 4;
