@@ -15,3 +15,8 @@
 | Arquivo | Origem |
 | --- | --- |
 | `assets/minerwk/shaders/core/gojo_energy*` | Minezin (mesmo autor) |
+
+## Modelos e texturas
+| Arquivo | Origem |
+| --- | --- |
+| `assets/minerwk/geo/traje/gojo.geo.json`, `assets/minerwk/textures/traje/gojo.png` | Minezin (mesmo autor) |

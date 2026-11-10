@@ -1,6 +1,6 @@
 ---
 tags: [desenvolvimento, spec]
-estado: aguardando revisão
+estado: aprovado
 ---
 # Spec: traje do Gojo e passivas (Fase 2, parte 10)
 
@@ -72,9 +72,10 @@ Se algum falhar, eu paro e trago as alternativas antes de seguir.
 - **Prévia:** um modo da demo gravável em terceira pessoa, girando em volta do jogador, com a venda saindo num G. Eu gravo e mando o vídeo antes do teste no jogo.
 - **No jogo:** o traje em 1ª e 3ª pessoa, com armadura vestida, com skins diferentes (clássica e de braço fino), outro jogador vendo, trocar de personagem tirando o traje, e a venda no G e no R.
 
-## Perguntas em aberto
-1. **Braço fino:** as skins de braço fino (modelo Alex) ficam com a manga do traje um pixel mais larga. Aceito isso, ou faço as duas larguras?
-2. **Sem cabelo e a venda:** a venda dá a volta na cabeça da skin, por cima do cabelo que a skin tiver. Tudo bem?
+## Pontos assumidos
+O autor aprovou o spec em 10/11 sem responder às duas perguntas que estavam abertas, então vale o mais simples, e ele pode mudar ao ver a prévia:
+1. **Braço fino:** uma largura só; em skins de braço fino a manga fica um pixel mais larga.
+2. **Venda:** dá a volta na cabeça por cima do cabelo que a skin tiver.
 
 ## Fora deste spec
 O traje dos outros personagens, o boss [[Toji]] e o despertar, ícones das habilidades e retrato na tela de escolha.

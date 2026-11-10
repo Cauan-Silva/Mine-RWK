@@ -33,11 +33,14 @@ public final class DemoVfx {
     /** {@code r}: o R de verdade num alvo invocado, com a cutscene inteira, longe do spawn. */
     private static final boolean R_COMPLETO = MODO.equals("r");
     private static final int LONGE_DO_SPAWN = 300;
+    /** {@code traje}: o jogador como Gojo de frente, de costas, num golpe, com armadura vestida e em 1ª pessoa. */
+    private static final boolean TRAJE = MODO.equals("traje");
+    private static boolean vestiuPeitoral;
     private static final int CARGA = 100;
     private static final Path PASTA = Path.of("demo");
     private static final int ESFERAS = RoxoMaximo.TICKS_ESFERAS;
     private static final int ESTOURO = ESFERAS + RoxoMaximo.TICKS_FUSAO;
-    private static final int FIM_PREVIA = R_COMPLETO ? 360
+    private static final int FIM_PREVIA = TRAJE ? 200 : R_COMPLETO ? 360
             : ENCANTAMENTO ? CARGA + 90 : ESTOURO + RoxoMaximo.TICKS_EXPLOSAO + 110;
     private static int ticks;
     private static int quadro;
@@ -58,7 +61,8 @@ public final class DemoVfx {
         if (jogador == null || mc.isPaused()) return;
         ticks++;
         if (DEMO && ticks == 40) {
-            jogador.connection.sendCommand(ENCANTAMENTO || R_COMPLETO ? "time set noon" : "time set midnight");
+            jogador.connection.sendCommand(ENCANTAMENTO || R_COMPLETO || TRAJE ? "time set noon" : "time set midnight");
+            if (TRAJE) jogador.connection.sendCommand("rwk trocar @s gojo");
             // A explosão apaga blocos: a demo do R acontece longe do spawn e o jogador volta no fim.
             if (R_COMPLETO) jogador.connection.sendCommand("tp @s ~" + LONGE_DO_SPAWN + " ~12 ~"); // do alto: o chão de lá pode ser mais alto
             jogador.connection.sendCommand("weather clear");
@@ -88,6 +92,32 @@ public final class DemoVfx {
     }
 
     private static void tocarPrevia(Minecraft mc, LocalPlayer jogador, int t) {
+        if (TRAJE) {
+            mc.gui.getChat().clearMessages(false);
+            var tipo = net.minecraft.client.CameraType.THIRD_PERSON_FRONT;
+            if (t >= 50 && t < 100) tipo = net.minecraft.client.CameraType.THIRD_PERSON_BACK;
+            if (t >= 150) tipo = net.minecraft.client.CameraType.FIRST_PERSON;
+            mc.options.setCameraType(tipo);
+            jogador.setXRot(t >= 150 ? 20 : 8);
+            if (t == 2) jogador.connection.sendCommand("rwk recarregar");
+            // Um Azul de frente e outro em primeira pessoa: o traje tem de seguir os braços da animação.
+            if (t == 20 || t == 160) net.neoforged.neoforge.network.PacketDistributor.sendToServer(
+                    new com.minerwk.rede.UsarTecla(com.minerwk.core.kit.Tecla.Z, true));
+            if (t == 22 || t == 162) net.neoforged.neoforge.network.PacketDistributor.sendToServer(
+                    new com.minerwk.rede.UsarTecla(com.minerwk.core.kit.Tecla.Z, false));
+            // Armadura normal vestida não pode aparecer por cima (só testa se o espaço do peito estiver vazio).
+            if (t == 100 && jogador.getItemBySlot(net.minecraft.world.entity.EquipmentSlot.CHEST).isEmpty()) {
+                vestiuPeitoral = true;
+                jogador.connection.sendCommand("item replace entity @s armor.chest with minecraft:diamond_chestplate");
+            }
+            if (t == 148 && vestiuPeitoral) jogador.connection.sendCommand("item replace entity @s armor.chest with minecraft:air");
+            if (t == 150) jogador.connection.sendCommand("rwk recarregar");
+            if (t >= FIM_PREVIA) {
+                mc.options.setCameraType(net.minecraft.client.CameraType.FIRST_PERSON);
+                previa = -1;
+            }
+            return;
+        }
         if (R_COMPLETO) {
             mc.gui.getChat().clearMessages(false); // sem as respostas dos comandos na gravação
             // O R de verdade: aperta e solta a tecla; o servidor faz o resto (cutscene, alvo, explosão).

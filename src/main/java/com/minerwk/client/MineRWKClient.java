@@ -41,6 +41,7 @@ public final class MineRWKClient {
         modBus.addListener(TeclasKit::registrar);
         RecepcaoKit.ligar();
         modBus.addListener(Pincel::registrarShaders);
+        modBus.addListener(com.minerwk.client.traje.CamadaTraje::aoAdicionarCamadas);
         NeoForge.EVENT_BUS.addListener(RenderVisuaisGojo::aoTick);
         NeoForge.EVENT_BUS.addListener(RenderVisuaisGojo::aoRenderizar);
         NeoForge.EVENT_BUS.addListener(RenderVisuaisGojo::aoCorDaNeblina);

@@ -36,6 +36,7 @@ public final class MineRWK {
         Anexos.REGISTRO.register(modBus);
         Efeitos.REGISTRO.register(modBus);
         Blocos.REGISTRO.register(modBus);
+        com.minerwk.registro.Itens.REGISTRO.register(modBus);
         Regras.registrar();
         Personagens.registrar(PersonagemTeste.criar());
         Personagens.registrar(Gojo.criar());
