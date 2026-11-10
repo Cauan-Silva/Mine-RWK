@@ -68,7 +68,14 @@ Voltar para [[00 Início]].
   - **Céu e chão no encantamento (10/11):** conferir o céu escurecendo na carga e cheio na fusão e na explosão, voltando devagar depois; as rachaduras de luz saindo dos pés (em chão irregular elas ficam na altura dos pés, não acompanham o relevo); as pedras subindo devagar. Ver de noite, na chuva, debaixo d'água e com Iris (no Nether e no End o véu não é desenhado). O chão continua claro com o céu escuro: ver se incomoda.
   - **`/rwk recarregar`:** conferir que enche a energia, zera as recargas e o HUD acompanha.
   - Com teto baixo sobre o Gojo, a explosão sai um pouco acima dele (o centro vem da conta do movimento, não de onde ele parou).
-- Maestria, parte 2 (10/11), conferir no jogo (por comando, enquanto a tela não existe):
+- Maestria, parte 3 (10/11), conferir no jogo:
+  - **Tela:** H abre e fecha a árvore; os textos em português; o mouse sobre cada nó mostra "Agora" e "Próximo nível".
+  - **Comprar:** clicar num nó dourado gasta os pontos e o número sobe; nó sem pontos só faz o clique surdo.
+  - **Despertar:** com maestria 20 e 5 pontos, o nó vira "Pronto para o desafio"; `/rwk despertar <jogador> sim` abre os nós de baixo.
+  - **Tamanhos:** janela pequena e escala de interface grande (a árvore rola com a roda do mouse e mostra a barra).
+  - **Dois jogadores:** a compra de um não muda a tela do outro.
+  - **Achados menores da revisão (sem correção):** `zerar` não desfaz o "despertou" (use `/rwk despertar <jogador> nao`); o Roxo e o R leem o tempo de carga sem as melhorias (só importa se ganharem nó de carga); comprar um nó no meio de uma carga aplica a recarga nova com a carga antiga.
+- Maestria, parte 2 (10/11), conferir no jogo (por comando ou pela tela):
   - **Compra:** `/rwk maestria <jogador> nivel 20` e depois `comprar gojo_azul_alcance`; sem pontos ou sem nível a compra é recusada com o motivo.
   - **Efeito:** o Azul puxa de mais longe, o Infinito dura mais, as recargas no HUD ficam menores, a energia máxima sobe (o HUD mostra 220, 240, 260).
   - **Depois do despertar:** os nós do Vermelho, do Roxo, da Técnica Reversa, do G e do R são recusados com `NAO_DESPERTOU`.

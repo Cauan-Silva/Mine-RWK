@@ -119,6 +119,15 @@ public final class ComandoTrocar {
                 ServicoKits.atualizarMelhorias(jogador);
             }
             ServicoKits.definirXp(jogador, xp);
+            // Baixar o nível abaixo do que já foi gasto: os nós voltam, para não sobrar melhoria sem ponto.
+            DadosMaestria m = dados.maestriaAtual();
+            boolean gastouDemais = Personagens.porId(dados.personagem)
+                    .map(p -> p.arvore().gasto(m.nos) > Maestria.pontos(Maestria.nivel(m.xp))).orElse(false);
+            if (gastouDemais) {
+                m.nos.clear();
+                ServicoKits.atualizarMelhorias(jogador);
+            }
+            Sincronizacao.enviar(jogador);
         }
         var p = Maestria.progresso(dados.maestriaAtual().xp);
         String texto = jogador.getName().getString() + ": maestria " + p.nivel() + " (" + p.xpNoNivel() + "/" + p.xpParaProximo() + " XP)";
