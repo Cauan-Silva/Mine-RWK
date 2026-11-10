@@ -359,19 +359,45 @@ public final class RenderVisuaisGojo {
 
     // ---------------------------------------------------------------- R (Vazio Roxo máximo)
 
-    /** No encantamento do R: o Azul na mão esquerda e o Vermelho na direita, crescendo. */
+    /**
+     * No encantamento do R, sem esferas (elas só nascem lá no céu): uma aura de fitas azuis e vermelhas
+     * subindo em espiral em volta do Gojo, mais forte a cada palavra, e os olhos brilhando.
+     */
     private static void encantamento(Quadro q, VisuaisAtivos.Visual v, double t, float op) {
         Entity e = dono(v);
         if (e == null) return;
-        double r = .12 + .3 * Math.min(1, t / Math.max(1, v.duracao));
-        Vec3 azul = q.rel(mao(e, q.parcial, -1));
-        Vec3 verm = q.rel(mao(e, q.parcial, 1));
-        esfera(q, Pincel.AZUL, false, azul, r, 0x0A1830, op);
-        esfera(q, Pincel.AZUL, true, azul, r * 1.8, CIANO, op * .4f);
-        brilho(q, azul, r * 4, CIANO, op * .5f);
-        esfera(q, Pincel.VERMELHO, false, verm, r, CARMESIM, op);
-        esfera(q, Pincel.VERMELHO, true, verm, r * 1.8, CARMESIM, op * .35f);
-        brilho(q, verm, r * 4, CARMESIM, op * .5f);
+        double k = Math.min(1, t / Math.max(1, v.duracao));
+        Vec3 pe = q.rel(e.getPosition(q.parcial));
+        if (q.longe(pe)) return;
+        double tempo = q.tempo;
+        double altura = 1.2 + 1.3 * k;
+        int fitas = q.detalhe.faixas() < 64 ? 4 : 6, n = 16;
+        Pincel p = Pincel.novo().comecar(Pincel.FITA, true, q.tempo, new Vec3(0, 0, 1));
+        for (int f = 0; f < fitas; f++) {
+            int cor = f % 2 == 0 ? CIANO : CARMESIM;
+            double fase = 2 * Math.PI * f / fitas;
+            List<Vec3> pts = new ArrayList<>(n + 1);
+            float[] al = new float[n + 1];
+            for (int j = 0; j <= n; j++) {
+                double u = (double) j / n;
+                // O giro andando com o tempo faz a espiral parecer subir.
+                double ang = fase + u * 2.4 - tempo * .22;
+                double raio = .75 + .15 * Math.sin(tempo * .3 + f) - .25 * u;
+                pts.add(pe.add(Math.cos(ang) * raio, u * altura, Math.sin(ang) * raio));
+                al[j] = (float) (op * (.25 + .5 * k) * Math.sin(Math.PI * u));
+            }
+            p.fita(pts, .1 + .12 * k, cor, al);
+        }
+        p.terminar();
+        // Olhos brilhando: dois pontos de luz azul-claro um pouco à frente do rosto.
+        Vec3 olho = e.getEyePosition(q.parcial);
+        Vec3 olhar = e.getViewVector(q.parcial);
+        Vec3 l = olhar.cross(new Vec3(0, 1, 0));
+        l = l.lengthSqr() < 1e-6 ? new Vec3(1, 0, 0) : l.normalize();
+        for (int lado = -1; lado <= 1; lado += 2) {
+            Vec3 c = q.rel(olho.add(olhar.scale(.3)).add(l.scale(.11 * lado)));
+            brilho(q, c, .25 + .2 * k, 0x9FE8FF, op * (float) (.45 + .55 * k));
+        }
     }
 
     /** Avanço até o alvo (rastro), clarão do uppercut e o rastro do alvo subindo. */
@@ -426,16 +452,26 @@ public final class RenderVisuaisGojo {
         Vec3 centro = q.rel(v.origem);
         if (q.longe(centro)) return;
         int danca = com.minerwk.core.personagens.gojo.RoxoMaximo.TICKS_DANCA;
-        double esferas = Math.max(danca + 1, v.forca);
-        double viagem = esferas - danca;
+        int conjurar = com.minerwk.core.personagens.gojo.RoxoMaximo.TICKS_CONJURAR;
+        double esferas = Math.max(danca + conjurar + 1, v.forca);
+        double viagem = esferas - danca - conjurar;
         Base b = Base.de(v.direcao);
         Entity e = dono(v);
-        if (t < viagem) {
-            if (e != null) viagemEsferas(q, centro, b, e, t / viagem, op);
+        if (t < conjurar) {
+            // Lá no céu: o Azul nasce na mão esquerda e o Vermelho na direita, crescendo.
+            if (e != null) {
+                double r = FusaoRoxoGojo.raioConjurando(t);
+                bolaDaFusao(q, -1, q.rel(mao(e, q.parcial, -1)), null, 1, op, r);
+                bolaDaFusao(q, 1, q.rel(mao(e, q.parcial, 1)), null, 1, op, r);
+            }
+            return;
+        }
+        if (t < conjurar + viagem) {
+            if (e != null) viagemEsferas(q, centro, b, e, (t - conjurar) / viagem, op);
             return;
         }
         if (t < esferas) {
-            dancaEsferas(q, centro, b, t - viagem, op);
+            dancaEsferas(q, centro, b, t - conjurar - viagem, op);
             return;
         }
         nucleoRoxoMaximo(q, centro, t - esferas, op);
@@ -532,8 +568,11 @@ public final class RenderVisuaisGojo {
      * dela (duas esferas menores puxadas para a frente fazem a ponta).
      */
     private static void bolaDaFusao(Quadro q, int lado, Vec3 c, Vec3 outra, double estica, float op) {
-        if (op <= .004f) return;
-        double r = FusaoRoxoGojo.RAIO_ESFERA;
+        bolaDaFusao(q, lado, c, outra, estica, op, FusaoRoxoGojo.RAIO_ESFERA);
+    }
+
+    private static void bolaDaFusao(Quadro q, int lado, Vec3 c, Vec3 outra, double estica, float op, double r) {
+        if (op <= .004f || r <= .005) return;
         int cor = lado < 0 ? CIANO : CARMESIM;
         int miolo = lado < 0 ? 0x0A1830 : CARMESIM;
         float modo = lado < 0 ? Pincel.AZUL : Pincel.VERMELHO;
@@ -548,7 +587,7 @@ public final class RenderVisuaisGojo {
                 esfera(q, modo, true, c.add(dir.scale(alonga * 1.6)), r * .5, cor, op * .8f);
             }
         }
-        brilho(q, c, 2.2, cor, op * .6f);
+        brilho(q, c, 2.2 * r / FusaoRoxoGojo.RAIO_ESFERA, cor, op * .6f);
     }
 
     /**
