@@ -6,7 +6,7 @@ tags: [planejamento]
 Voltar para [[00 Início]].
 
 ## Para conferir
-- **Aguardando o autor (10/11):** aprovação final do kit do [[Toji]] (as quatro escolhas já foram feitas). No Toji, conferir na wiki da obra as linhas marcadas como "secundária".
+- **[[Toji]] (10/11):** ele é o boss do despertar do Gojo, não um personagem jogável. Antes do spec: conferir na wiki da obra as linhas marcadas como "secundária" e decidir se o domínio (G) e o R vêm junto com a vitória ou têm outro requisito.
 - `vfxReduzido` já reduz faixas e segmentos do VFX do Gojo; os emissores de brilho do Photon (`GolpesGojoPhoton` do Minezin) ficaram de fora: a API do Photon2 mudou e o shader já carrega o visual. Retomar se faltar brilho. `LogicaHud.teclasVisiveis` não é usada (a sincronização já manda só as teclas existentes).
 - O tremor continua decaindo com o jogo pausado (até 15 ticks): irrelevante por ora.
 - Animações do Minezin estão travadas na Player Animation Library: refazer/suavizar no Blockbench na Fase 2 (Gojo).

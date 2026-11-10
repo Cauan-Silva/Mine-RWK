@@ -46,4 +46,4 @@ O autor achou que "melhorou bastante" e deixou quatro tópicos rodando.
 - **`/rwk recarregar [jogador]`:** enche a energia e zera as recargas, para testar sem trocar de kit.
 - **Guia:** primeira versão de [[Como portar um personagem]].
 - **Som:** [[2026-11-10 Som do Gojo]], aguardando aprovação. O Minezin já tem um motor de síntese do próprio autor, então a proposta é portá-lo, sem áudio de terceiros.
-- **Próximo personagem:** pesquisa e proposta de kit do [[Toji]], aguardando aprovação. A wiki da obra recusou a leitura automática; parte das armas veio só de fontes secundárias e está marcada na nota.
+- **Toji:** pesquisa canônica do [[Toji]]. A wiki da obra recusou a leitura automática; parte das armas veio só de fontes secundárias e está marcada na nota. A primeira versão propunha um kit jogável; o autor corrigiu no mesmo dia: ele é o boss do despertar do Gojo, e a nota foi refeita.
