@@ -1,5 +1,6 @@
 package com.minerwk.core.personagens.gojo;
 
+import com.minerwk.core.kit.Vetor;
 import java.util.List;
 import java.util.Optional;
 
@@ -19,9 +20,22 @@ public final class SonsGojo {
     public static final String ROXO_DISPARO = "gojo_roxo_disparo";
     public static final String DOMINIO = "gojo_dominio";
     public static final String DOMINIO_FIM = "gojo_dominio_fim";
+    public static final String R_ENCANTAMENTO = "gojo_r_encantamento";
+    public static final String R_AVANCO = "gojo_r_avanco";
+    public static final String R_UPPERCUT = "gojo_r_uppercut";
+    public static final String R_SUBIDA = "gojo_r_subida";
+    public static final String R_ESFERAS = "gojo_r_esferas";
+    public static final String R_FUSAO = "gojo_r_fusao";
+    public static final String R_EXPLOSAO = "gojo_r_explosao";
+
+    /** O vento da subida começa esses ticks depois do soco, quando o impact frame acaba. */
+    public static final int ATRASO_SUBIDA = 3;
+    /** Um som marcado para o meio de um visual ainda toca se o tick atrasar menos que isso. */
+    public static final int JANELA = 5;
 
     public static final List<String> TODOS = List.of(AZUL, VERMELHO_CARGA, VERMELHO_DISPARO, VERMELHO_EXPLOSAO,
-            INFINITO_ATIVA, INFINITO_DESATIVA, INFINITO_TIC, ROXO_CARGA, ROXO_DISPARO, DOMINIO, DOMINIO_FIM);
+            INFINITO_ATIVA, INFINITO_DESATIVA, INFINITO_TIC, ROXO_CARGA, ROXO_DISPARO, DOMINIO, DOMINIO_FIM,
+            R_ENCANTAMENTO, R_AVANCO, R_UPPERCUT, R_SUBIDA, R_ESFERAS, R_FUSAO, R_EXPLOSAO);
 
     private SonsGojo() {
     }
@@ -37,13 +51,44 @@ public final class SonsGojo {
             case "gojo_roxo_carga" -> ROXO_CARGA;
             case "gojo_vermelho_explosao" -> VERMELHO_EXPLOSAO;
             case "gojo_infinito_toque" -> INFINITO_TIC;
+            case "gojo_roxo_200_carga" -> R_ENCANTAMENTO;
+            case "gojo_roxo_maximo" -> R_AVANCO;
+            case "gojo_roxo_maximo_esferas" -> R_ESFERAS;
+            case "gojo_roxo_explosao" -> R_EXPLOSAO;
             default -> null;
         });
     }
 
     /** Se o som do visual {@code tipo} para quando o visual é encerrado antes da hora (as cargas). */
     public static boolean cortaComOVisual(String tipo) {
-        return tipo.equals("gojo_vermelho_carga") || tipo.equals("gojo_roxo_carga");
+        return tipo.equals("gojo_vermelho_carga") || tipo.equals("gojo_roxo_carga") || tipo.equals("gojo_roxo_200_carga");
+    }
+
+    /** Um som que toca no meio de um visual: no {@code tick} dele, em {@code onde} a partir da origem do visual. */
+    public record NoMeio(String som, int tick, Vetor onde) {
+        /** Janela, não tick exato: o relógio do cliente pode pular. Quem chama garante que toca uma vez só. */
+        public boolean naJanela(long idade) {
+            return idade >= tick && idade < tick + JANELA;
+        }
+    }
+
+    /**
+     * Os sons que tocam no meio do visual {@code tipo} (a {@code direcao} e a {@code forca} são as do
+     * visual): o uppercut e a subida do R, no ponto onde o Gojo bate, e a fusão, quando o núcleo nasce.
+     */
+    public static List<NoMeio> noMeio(String tipo, Vetor direcao, float forca) {
+        if (tipo.equals("gojo_roxo_maximo")) {
+            // A forca do visual é a distância até o alvo.
+            int a = RoxoMaximo.avanco(forca);
+            return List.of(new NoMeio(R_UPPERCUT, a, RoxoMaximo.deslocamentoGojo(a, direcao, forca)),
+                    new NoMeio(R_SUBIDA, a + ATRASO_SUBIDA,
+                            RoxoMaximo.deslocamentoGojo(a + RoxoMaximo.TICKS_SUBIDA / 2.0, direcao, forca)));
+        }
+        if (tipo.equals("gojo_roxo_maximo_esferas")) {
+            // A forca do visual são os ticks das esferas: a fusão começa quando elas somem.
+            return List.of(new NoMeio(R_FUSAO, Math.round(forca), Vetor.ZERO));
+        }
+        return List.of();
     }
 
     /** Um som que começa {@code antes} ticks antes de o visual acabar. */

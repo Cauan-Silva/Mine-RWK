@@ -34,6 +34,8 @@ public final class VisuaisAtivos {
         boolean deixouRastro;
         /** Se o som de fim (o domínio rachando) já tocou. */
         boolean somDeFimTocado;
+        /** Quais sons do meio do visual já tocaram (um bit por som, na ordem de SonsGojo.noMeio). */
+        int sonsDoMeioTocados;
 
         Visual(int dono, String tipo, Vetor origem, Vetor direcao, float forca, int duracao, long inicio) {
             this.dono = dono;

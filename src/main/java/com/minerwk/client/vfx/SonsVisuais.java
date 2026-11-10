@@ -15,8 +15,8 @@ import net.minecraft.sounds.SoundSource;
 
 /**
  * O som preso ao visual: toca no ponto do visual quando ele começa, para junto se o visual for encerrado
- * antes da hora (carga solta cedo ou interrompida) e, para alguns, toca um pouco antes de o visual acabar
- * (o domínio rachando). Qual som vai com qual visual fica no núcleo ({@link SonsGojo}).
+ * antes da hora (carga solta cedo ou interrompida) e, para alguns, toca no meio do visual (uppercut,
+ * subida e fusão do R) ou um pouco antes de ele acabar (o domínio rachando). Qual som vai com qual visual fica no núcleo ({@link SonsGojo}).
  */
 public final class SonsVisuais {
     /** Sons que param junto com o visual, enquanto ele existe. */
@@ -62,6 +62,17 @@ public final class SonsVisuais {
                 it.remove();
             } else if (v.acabou(agora) || !VisuaisAtivos.ativos().contains(v)) {
                 it.remove(); // chegou ao fim natural: o som acaba sozinho
+            }
+        }
+        // Sons no meio do visual (uppercut, subida, fusão): cada um toca uma vez, na janela do seu tick.
+        for (VisuaisAtivos.Visual v : VisuaisAtivos.ativos()) {
+            if (v.fimEm >= 0) continue;
+            java.util.List<SonsGojo.NoMeio> sons = SonsGojo.noMeio(v.tipo, v.direcao, v.forca);
+            for (int i = 0; i < sons.size(); i++) {
+                SonsGojo.NoMeio som = sons.get(i);
+                if ((v.sonsDoMeioTocados & 1 << i) != 0 || !som.naJanela(agora - v.inicio)) continue;
+                v.sonsDoMeioTocados |= 1 << i;
+                tocar(som.som(), v.origem.mais(som.onde()));
             }
         }
         for (VisuaisAtivos.Visual v : VisuaisAtivos.ativos()) {

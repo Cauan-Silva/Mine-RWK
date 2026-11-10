@@ -194,5 +194,124 @@
         "attenuation_distance": 48
       }
     ]
+  },
+  "gojo_r_encantamento": {
+    "subtitle": "subtitles.minerwk.gojo_r_encantamento",
+    "sounds": [
+      {
+        "name": "minerwk:gojo/gojo_r_encantamento",
+        "attenuation_distance": 48
+      },
+      {
+        "name": "minerwk:gojo/gojo_r_encantamento_2",
+        "attenuation_distance": 48
+      },
+      {
+        "name": "minerwk:gojo/gojo_r_encantamento_3",
+        "attenuation_distance": 48
+      }
+    ]
+  },
+  "gojo_r_avanco": {
+    "subtitle": "subtitles.minerwk.gojo_r_avanco",
+    "sounds": [
+      {
+        "name": "minerwk:gojo/gojo_r_avanco",
+        "attenuation_distance": 48
+      },
+      {
+        "name": "minerwk:gojo/gojo_r_avanco_2",
+        "attenuation_distance": 48
+      },
+      {
+        "name": "minerwk:gojo/gojo_r_avanco_3",
+        "attenuation_distance": 48
+      }
+    ]
+  },
+  "gojo_r_uppercut": {
+    "subtitle": "subtitles.minerwk.gojo_r_uppercut",
+    "sounds": [
+      {
+        "name": "minerwk:gojo/gojo_r_uppercut",
+        "attenuation_distance": 64
+      },
+      {
+        "name": "minerwk:gojo/gojo_r_uppercut_2",
+        "attenuation_distance": 64
+      },
+      {
+        "name": "minerwk:gojo/gojo_r_uppercut_3",
+        "attenuation_distance": 64
+      }
+    ]
+  },
+  "gojo_r_subida": {
+    "subtitle": "subtitles.minerwk.gojo_r_subida",
+    "sounds": [
+      {
+        "name": "minerwk:gojo/gojo_r_subida",
+        "attenuation_distance": 64
+      },
+      {
+        "name": "minerwk:gojo/gojo_r_subida_2",
+        "attenuation_distance": 64
+      },
+      {
+        "name": "minerwk:gojo/gojo_r_subida_3",
+        "attenuation_distance": 64
+      }
+    ]
+  },
+  "gojo_r_esferas": {
+    "subtitle": "subtitles.minerwk.gojo_r_esferas",
+    "sounds": [
+      {
+        "name": "minerwk:gojo/gojo_r_esferas",
+        "attenuation_distance": 64
+      },
+      {
+        "name": "minerwk:gojo/gojo_r_esferas_2",
+        "attenuation_distance": 64
+      },
+      {
+        "name": "minerwk:gojo/gojo_r_esferas_3",
+        "attenuation_distance": 64
+      }
+    ]
+  },
+  "gojo_r_fusao": {
+    "subtitle": "subtitles.minerwk.gojo_r_fusao",
+    "sounds": [
+      {
+        "name": "minerwk:gojo/gojo_r_fusao",
+        "attenuation_distance": 96
+      },
+      {
+        "name": "minerwk:gojo/gojo_r_fusao_2",
+        "attenuation_distance": 96
+      },
+      {
+        "name": "minerwk:gojo/gojo_r_fusao_3",
+        "attenuation_distance": 96
+      }
+    ]
+  },
+  "gojo_r_explosao": {
+    "subtitle": "subtitles.minerwk.gojo_r_explosao",
+    "sounds": [
+      {
+        "name": "minerwk:gojo/gojo_r_explosao",
+        "attenuation_distance": 128
+      },
+      {
+        "name": "minerwk:gojo/gojo_r_explosao_2",
+        "attenuation_distance": 128
+      },
+      {
+        "name": "minerwk:gojo/gojo_r_explosao_3",
+        "attenuation_distance": 128
+      }
+    ]
   }
 }

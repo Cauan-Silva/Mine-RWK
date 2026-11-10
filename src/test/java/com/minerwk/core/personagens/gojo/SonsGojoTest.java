@@ -78,6 +78,73 @@ class SonsGojoTest {
     }
 
     @Test
+    void marcosDosSonsDoRBatemComAsFasesDoJava() throws IOException {
+        JsonObject m = ler(MANIFESTO);
+        for (int i = 0; i < CutsceneRoxo200.PALAVRAS.size(); i++) {
+            assertEquals(CutsceneRoxo200.PALAVRAS.get(i).inicio(), marco(m, "gojo_r_encantamento", "palavra" + (i + 1)),
+                    "uma batida em cada palavra do encantamento");
+        }
+        assertEquals(cargaMax(Tecla.R), marco(m, "gojo_r_encantamento", "fim"));
+        assertEquals(com.minerwk.core.vfx.ImpactFrameGojo.TICKS, marco(m, "gojo_r_uppercut", "impacto"),
+                "quase mudo durante o impact frame; o impacto entra logo depois");
+        assertEquals(RoxoMaximo.TICKS_SUBIDA - SonsGojo.ATRASO_SUBIDA, marco(m, "gojo_r_subida", "fim"));
+        assertEquals(RoxoMaximo.TICKS_CONJURAR, marco(m, "gojo_r_esferas", "conjurou"));
+        assertEquals(RoxoMaximo.TICKS_CONJURAR + RoxoMaximo.TICKS_VIAGEM + com.minerwk.core.vfx.FusaoRoxoGojo.encosta(),
+                marco(m, "gojo_r_esferas", "toque"), "o tic do toque cai quando as esferas encostam");
+        assertEquals(RoxoMaximo.TICKS_ESFERAS, marco(m, "gojo_r_esferas", "fim"));
+        assertEquals(RoxoMaximo.TICKS_FUSAO - RoxoMaximo.TICKS_SILENCIO, marco(m, "gojo_r_fusao", "silencio"),
+                "o silêncio antes do estouro");
+        assertEquals(RoxoMaximo.TICKS_FUSAO, marco(m, "gojo_r_fusao", "estouro"));
+        assertEquals(RoxoMaximo.TICKS_EXPLOSAO, marco(m, "gojo_r_explosao", "cresceu"));
+        assertEquals(RoxoMaximo.TICKS_EXPLOSAO + RoxoMaximo.TICKS_RESTO, marco(m, "gojo_r_explosao", "fim"));
+    }
+
+    @Test
+    void sonsDoRSaemDosVisuaisDoR() {
+        assertEquals(SonsGojo.R_ENCANTAMENTO, SonsGojo.doVisual("gojo_roxo_200_carga").orElseThrow());
+        assertTrue(SonsGojo.cortaComOVisual("gojo_roxo_200_carga"), "golpe forte na carga corta o encantamento");
+        assertEquals(SonsGojo.R_AVANCO, SonsGojo.doVisual("gojo_roxo_maximo").orElseThrow());
+        assertEquals(SonsGojo.R_ESFERAS, SonsGojo.doVisual("gojo_roxo_maximo_esferas").orElseThrow());
+        assertEquals(SonsGojo.R_EXPLOSAO, SonsGojo.doVisual("gojo_roxo_explosao").orElseThrow());
+    }
+
+    @Test
+    void uppercutESubidaSoamNoPontoDoSocoNaHoraDoSoco() {
+        com.minerwk.core.kit.Vetor frente = new com.minerwk.core.kit.Vetor(1, 0, 0);
+        int a = RoxoMaximo.avanco(31.5);
+        List<SonsGojo.NoMeio> sons = SonsGojo.noMeio("gojo_roxo_maximo", frente, 31.5f);
+        assertEquals(2, sons.size());
+        assertEquals(SonsGojo.R_UPPERCUT, sons.get(0).som());
+        assertEquals(a, sons.get(0).tick(), "no tick do soco");
+        assertEquals(31.5 - RoxoMaximo.PARADA, sons.get(0).onde().x(), 1e-9, "onde o Gojo para, não onde ele saiu");
+        assertEquals(SonsGojo.R_SUBIDA, sons.get(1).som());
+        assertEquals(a + SonsGojo.ATRASO_SUBIDA, sons.get(1).tick(), "depois do impact frame");
+        assertTrue(sons.get(1).onde().y() > 0, "a subida soa no ar");
+    }
+
+    @Test
+    void fusaoSoaQuandoONucleoNasceComOuSemAlvo() {
+        com.minerwk.core.kit.Vetor frente = new com.minerwk.core.kit.Vetor(1, 0, 0);
+        for (float esferas : new float[] {RoxoMaximo.TICKS_ESFERAS, RoxoMaximo.TICKS_ESFERAS_SEM_ALVO}) {
+            List<SonsGojo.NoMeio> sons = SonsGojo.noMeio("gojo_roxo_maximo_esferas", frente, esferas);
+            assertEquals(1, sons.size());
+            assertEquals(SonsGojo.R_FUSAO, sons.get(0).som());
+            assertEquals(Math.round(esferas), sons.get(0).tick());
+            assertEquals(com.minerwk.core.kit.Vetor.ZERO, sons.get(0).onde(), "no centro da fusão");
+        }
+        assertTrue(SonsGojo.noMeio("gojo_azul", frente, 1).isEmpty());
+    }
+
+    @Test
+    void somDoMeioTocaNumaJanelaCurta() {
+        SonsGojo.NoMeio s = new SonsGojo.NoMeio("x", 10, com.minerwk.core.kit.Vetor.ZERO);
+        assertFalse(s.naJanela(9));
+        assertTrue(s.naJanela(10));
+        assertTrue(s.naJanela(12), "o tick do cliente pulou");
+        assertFalse(s.naJanela(10 + SonsGojo.JANELA), "atrasado demais: melhor não tocar fora de hora");
+    }
+
+    @Test
     void cargaDoRoxoNaoTocaDuasVezes() {
         java.util.List<String> sons = new java.util.ArrayList<>();
         com.minerwk.core.kit.Contexto ctx = new com.minerwk.core.kit.Contexto() {

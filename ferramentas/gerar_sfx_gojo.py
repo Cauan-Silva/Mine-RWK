@@ -17,6 +17,14 @@ AZUL = 60 * T             # Gojo.CampoAzul.DURACAO
 VERMELHO_CARGA = 30 * T   # cargaMax do Vermelho (X)
 ROXO_CARGA = 30 * T       # carga do Roxo (V)
 DOMINIO_ABERTURA = 10 * T  # carga do Vazio Infinito (G)
+# R (RoxoMaximo e CutsceneRoxo200)
+ENCANTAMENTO = 80 * T                       # carga do R
+PALAVRAS = (2 * T, 22 * T, 42 * T, 62 * T)   # início de cada palavra do encantamento
+IMPACTO = 3 * T                             # ImpactFrameGojo.TICKS: o soco fica quase mudo e entra depois
+SUBIDA = 27 * T                             # TICKS_SUBIDA menos o atraso do impact frame
+CONJUROU, TOQUE, ESFERAS = 8 * T, 26 * T, 30 * T  # conjurar; conjurar + viagem + encosta(); TICKS_ESFERAS
+SILENCIO, ESTOURO = 36 * T, 40 * T          # TICKS_FUSAO - TICKS_SILENCIO; TICKS_FUSAO
+CRESCEU, RESTO = 60 * T, 110 * T            # TICKS_EXPLOSAO; mais TICKS_RESTO
 
 # nome -> (duração em s, alcance em blocos, legenda pt, legenda en)
 SONS = {
@@ -31,6 +39,13 @@ SONS = {
     'gojo_roxo_disparo': (5.0, 64, 'Vazio Roxo apaga o caminho', 'Hollow Purple erases its path'),
     'gojo_dominio': (DOMINIO_ABERTURA + 5.5, 64, 'Expansão de Domínio: Vazio Infinito', 'Domain Expansion: Infinite Void'),
     'gojo_dominio_fim': (1.6, 48, 'O domínio racha', 'The domain shatters'),
+    'gojo_r_encantamento': (ENCANTAMENTO + .1, 48, 'Gojo recita o encantamento', 'Gojo recites the incantation'),
+    'gojo_r_avanco': (.7, 48, 'Gojo dispara até o alvo', 'Gojo dashes to the target'),
+    'gojo_r_uppercut': (1.6, 64, 'Uppercut lança o alvo para o céu', 'Uppercut launches the target skyward'),
+    'gojo_r_subida': (SUBIDA + .35, 64, 'Os dois sobem', 'Both rise'),
+    'gojo_r_esferas': (ESFERAS + .25, 64, 'Azul e Vermelho dançam e se tocam', 'Blue and Red dance and touch'),
+    'gojo_r_fusao': (ESTOURO + .05, 96, 'O Vazio Roxo se forma', 'Hollow Purple gathers'),
+    'gojo_r_explosao': (RESTO + 1.0, 128, 'Vazio Roxo máximo explode', 'Maximum Hollow Purple detonates'),
 }
 
 # Marcos em ticks, conferidos contra o Java pelo SonsGojoTest.
@@ -40,6 +55,12 @@ MARCOS = {
     'gojo_roxo_carga': {'dispara': 30},
     'gojo_dominio': {'abertura': 10},
     'gojo_dominio_fim': {'estilhaco': 8},
+    'gojo_r_encantamento': {'palavra1': 2, 'palavra2': 22, 'palavra3': 42, 'palavra4': 62, 'fim': 80},
+    'gojo_r_uppercut': {'impacto': 3},
+    'gojo_r_subida': {'fim': 27},
+    'gojo_r_esferas': {'conjurou': 8, 'toque': 26, 'fim': 30},
+    'gojo_r_fusao': {'silencio': 36, 'estouro': 40},
+    'gojo_r_explosao': {'cresceu': 60, 'fim': 110},
 }
 
 
@@ -110,6 +131,63 @@ def sintese(nome, s):
                     for d, f in ((.02, 2900), (.17, 3700), (.34, 4600), (E + .03, 2300), (E + .08, 5200)))
         estilhaco = .45 * s.estalos(E, 1.2, 140, 9000) * s.env(E, .01, 3.5) + .5 * s.transiente(E, 5000, .02)
         return trincas + s.reverb(vidro + estilhaco + .6 * s.sub(E, 80, 30, 3, 2), 1.8, .35, 9000)
+    if nome == 'gojo_r_encantamento':
+        # Hum grave crescendo a carga inteira; em cada palavra, uma batida grave e um toque vítreo mais agudo.
+        g = s.crescer(0, ENCANTAMENTO, 1.6)
+        hum = s.tom(41, 62, 1.2, 0, ENCANTAMENTO, (1, 2, 3), vibrato=.01, vib_hz=1.3)
+        ar = s.passa_baixa(s.ruido(40, 2500, .8), 700) * s.crescer(0, ENCANTAMENTO, 2.5)
+        x = (.55 * np.tanh(2.2 * hum) + .18 * ar) * (.12 + .88 * g)
+        for i, p in enumerate(PALAVRAS):
+            x += (.55 + .12 * i) * s.sub(p, 70 + 6 * i, 34, 4, 2.5) + .18 * s.transiente(p, 2200, .02)
+            x += .14 * s.tom(880 * (1 + .19 * i), harmonicos=(1, 2.76), pesos=(1, .4)) * s.env(p + .01, .003, 6)
+        return s.reverb(x * s.janela(0, ENCANTAMENTO, .04), 2.2, .32, 3500)
+    if nome == 'gojo_r_avanco':
+        # Arrancada: baque seco nos pés e o ar rasgando, cada vez mais agudo.
+        ar = s.ruido(300, 7000, .35) * s.crescer(0, .5, 2.2) * s.janela(0, .58, .03)
+        assobio = .15 * s.tom(300, 1400, 1.4, 0, .55) * s.crescer(0, .55, 2)
+        return 1.0 * s.sub(0, 95, 40, 7, 2) + .35 * s.transiente(0, 3000, .01) + s.reverb(.6 * ar + assobio, .9, .2, 6000)
+    if nome == 'gojo_r_uppercut':
+        # Os 3 ticks do impact frame quase mudos (só um fio agudo); depois o impacto seco e a cauda.
+        fio = .035 * s.tom(5200, harmonicos=(1, 2.76), pesos=(1, .3)) * s.janela(0, IMPACTO, .01)
+        estalo = 1.3 * s.transiente(IMPACTO, 7000, .01) + .5 * s.ruido(1500, 12000) * s.env(IMPACTO, .001, 30)
+        corpo = 1.2 * s.sub(IMPACTO, 110, 30, 2.6, 4) + .6 * s.passa_baixa(s.ruido(30, 1500, .9), 380) * s.env(IMPACTO, .01, 3)
+        cauda = .25 * s.estalos(IMPACTO + .03, IMPACTO + .6, 50, 3500) + .3 * s.ruido(200, 4000, .4) * s.env(IMPACTO + .02, .03, 3.5)
+        return fio + estalo + s.reverb(corpo + cauda, 2.4, .38, 3000)
+    if nome == 'gojo_r_subida':
+        # Vento subindo de tom enquanto os dois sobem.
+        vento = s.girar(s.ruido(180, 5500, .4), hz=2.4, prof=.5) * s.crescer(0, SUBIDA * .6, 1.5) * s.janela(0, SUBIDA + .2, .15)
+        tom = s.tom(160, 520, 1.3, 0, SUBIDA, (1, 2)) * s.janela(0, SUBIDA + .1, .15)
+        return s.reverb(.6 * vento + .2 * np.tanh(2 * tom), 1.6, .3, 5000)
+    if nome == 'gojo_r_esferas':
+        # Dois "tics" quando nascem nas mãos; o Azul grave e o Vermelho agudo giram e se aproximam em altura
+        # até o toque (um tic de vidro e um baque curto); depois afundam um no outro.
+        nasce = sum(.3 * s.tom(f, harmonicos=(1, 2.76), pesos=(1, .4)) * s.env(d, .002, 12) for d, f in ((.05, 660), (.14, 1760)))
+        azul = s.girar(s.passa_baixa(s.ruido(40, 2500, .7), 700), hz=3.5, prof=.8) + .6 * s.tom(55, 110, 1.2, CONJUROU, TOQUE, (1, 2))
+        verm = .35 * s.tom(1500, 440, 1.2, CONJUROU, TOQUE, (1, 2, 3)) + .4 * s.estalos(CONJUROU, TOQUE, 80, 6000)
+        danca = (.5 * np.tanh(1.6 * azul) + .32 * np.tanh(2 * verm)) * s.janela(CONJUROU, TOQUE, .1) * (.3 + .7 * s.crescer(CONJUROU, TOQUE, 1.5))
+        toque = .4 * s.tom(3300, harmonicos=(1, 2.76, 5.4), pesos=(1, .5, .25)) * s.env(TOQUE, .001, 18) + .7 * s.sub(TOQUE, 80, 38, 5, 2)
+        afunda = .3 * s.passa_baixa(s.ruido(40, 1800, .8), 500) * s.crescer(TOQUE, ESFERAS, 2) * s.janela(TOQUE, ESFERAS, .03)
+        return s.reverb(nasce + danca + toque + afunda, 1.6, .3, 5000)
+    if nome == 'gojo_r_fusao':
+        # Zumbido roxo batendo cada vez mais rápido, sub inchando e o ar sendo sugado; silêncio no fim.
+        g = s.crescer(0, SILENCIO, 1.6)
+        nasce = .8 * s.sub(0, 90, 40, 4, 2.5) + .3 * s.transiente(0, 4000, .015)
+        zum = s.tom(196, 392, 1.4, 0, SILENCIO, (1, 2, 3)) + s.tom(203, 394, 1.4, 0, SILENCIO, (1, 2, 3))
+        sub = s.tom(32, 50, 1., 0, SILENCIO, (1, 2), vibrato=.02, vib_hz=1.1)
+        ar = s.ruido(800, 12000, .2) * s.crescer(0, SILENCIO, 3)
+        x = nasce + (.35 * np.tanh(1.6 * zum) + .65 * np.tanh(2.6 * sub) + .25 * ar) * (.2 + .8 * g)
+        # O respiro antes do estouro: tudo some nos últimos ticks.
+        return s.reverb(x * (1 - s.janela(SILENCIO, ESTOURO + .3, .02)), 1.2, .25, 4000)
+    if nome == 'gojo_r_explosao':
+        # Estalo enorme, sub distorcido e um corpo de ruído grave rasgando enquanto a casca cresce (3 s);
+        # depois a cauda rola e some junto com o que sobra no ar.
+        estalo = 1.3 * s.transiente(0, 5000, .02) + .5 * s.ruido(1500, 12000) * s.env(0, .001, 14)
+        sub = 1.3 * s.sub(0, 70, 18, .45, 5)
+        corpo = np.tanh(3 * s.passa_baixa(s.ruido(20, 4000, .9), 700)) * s.env(0, .02, .55)
+        rasga = .55 * s.girar(s.passa_baixa(s.ruido(20, 1600, 1.), 420), hz=1.6, prof=.45) * s.janela(.05, CRESCEU, .5) * (1 - .5 * s.crescer(0, CRESCEU, 1))
+        crocante = .35 * s.estalos(.02, CRESCEU, 90, 3500) * (1 - .7 * s.crescer(0, CRESCEU, 1))
+        rolar = .4 * s.girar(s.passa_baixa(s.ruido(20, 900, 1.), 220), hz=.7, prof=.5) * s.env(CRESCEU * .6, 1.2, .5)
+        return s.reverb(estalo + sub + .9 * corpo + rasga + crocante + rolar, 6.5, .55, 2500)
     raise ValueError(nome)
 
 
