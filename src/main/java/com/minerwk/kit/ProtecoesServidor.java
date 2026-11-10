@@ -40,8 +40,20 @@ public final class ProtecoesServidor {
         });
     }
 
-    static void ligarInfinito(ServerPlayer jogador, int ticks) {
+    public static void ligarInfinito(ServerPlayer jogador, int ticks) {
         INFINITO.merge(jogador.getUUID(), jogador.level().getGameTime() + ticks, Math::max);
+    }
+
+    /**
+     * Um golpe que anula técnicas (a Lança Invertida do Céu) acertou: o Infinito cai na hora, com a bolha, e
+     * fica na recarga que já corria desde o disparo. Devolve se havia Infinito.
+     */
+    public static boolean desligarInfinito(ServerPlayer jogador) {
+        boolean ligado = INFINITO.remove(jogador.getUUID()) != null;
+        ContextoServidor contexto = new ContextoServidor(jogador);
+        boolean efeito = ServicoKits.kit(jogador).map(k -> k.anularTecnicas(contexto)).orElse(false);
+        if (efeito) contexto.visualFim("gojo_infinito", contexto.olhos());
+        return ligado || efeito;
     }
 
     public static boolean infinitoAtivo(Player jogador) {
@@ -70,7 +82,9 @@ public final class ProtecoesServidor {
     }
 
     public static boolean paralisado(LivingEntity entidade) {
-        return entidade.hasEffect(Efeitos.PARALISIA);
+        // Quem o Toji derrubou também não age, até se levantar.
+        return entidade.hasEffect(Efeitos.PARALISIA)
+                || entidade instanceof Player jogador && com.minerwk.boss.LutasToji.caido(jogador);
     }
 
     private static void aoReceberDano(LivingIncomingDamageEvent evento) {

@@ -60,6 +60,23 @@ public final class ComandoTrocar {
     }
 
     /** {@code /rwk despertar <jogador> <sim|nao>}: liga ou desliga o despertar no personagem atual (teste). */
+    /** {@code /rwk toji <jogador>}: invoca o Toji para o jogador sem o Contrato e sem exigir o nó (teste). */
+    public static void registrarToji(CommandDispatcher<CommandSourceStack> d) {
+        d.register(Commands.literal("rwk").then(Commands.literal("toji")
+                .requires(s -> s.hasPermission(2))
+                .then(Commands.argument("jogador", EntityArgument.player()).executes(c -> {
+                    ServerPlayer jogador = EntityArgument.getPlayer(c, "jogador");
+                    var resposta = com.minerwk.boss.LutasToji.invocar(jogador, false);
+                    Component texto = Component.translatable(com.minerwk.boss.ContratoToji.chave(resposta));
+                    if (resposta != com.minerwk.core.boss.TojiBoss.Invocacao.OK) {
+                        c.getSource().sendFailure(texto);
+                        return 0;
+                    }
+                    c.getSource().sendSuccess(() -> texto, true);
+                    return 1;
+                }))));
+    }
+
     public static void registrarDespertar(CommandDispatcher<CommandSourceStack> d) {
         d.register(Commands.literal("rwk").then(Commands.literal("despertar")
                 .requires(s -> s.hasPermission(2))

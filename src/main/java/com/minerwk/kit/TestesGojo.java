@@ -35,7 +35,7 @@ public final class TestesGojo {
     private TestesGojo() {
     }
 
-    private static ServerPlayer gojo(GameTestHelper helper) {
+    static ServerPlayer gojo(GameTestHelper helper) {
         // Jogador real sem conexão, no sobrevivência: o falso do GameTest é criativo e ignoraria o dano.
         ServerPlayer jogador = new ServerPlayer(helper.getLevel().getServer(), helper.getLevel(),
                 new GameProfile(UUID.randomUUID(), "gojo_teste"), ClientInformation.createDefault());

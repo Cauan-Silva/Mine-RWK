@@ -112,5 +112,16 @@
   "no.minerwk.gojo_dominio_duracao": "Vazio Infinito: duração",
   "no.minerwk.gojo_dominio_duracao.desc": "+%s%% na duração do domínio",
   "no.minerwk.gojo_roxo_maximo_recarga": "Roxo máximo: recarga",
-  "no.minerwk.gojo_roxo_maximo_recarga.desc": "-%s%% na recarga do Vazio Roxo máximo"
+  "no.minerwk.gojo_roxo_maximo_recarga.desc": "-%s%% na recarga do Vazio Roxo máximo",
+  "entity.minerwk.toji": "Toji Fushiguro",
+  "item.minerwk.contrato_toji": "Contrato do Matador de Feiticeiros",
+  "death.attack.minerwk.toji": "%1$s foi morto por %2$s",
+  "mensagem.minerwk.toji.outro_personagem": "Só o Gojo pode chamar o Toji",
+  "mensagem.minerwk.toji.sem_no": "Falta o nó Despertar da árvore (tecla H)",
+  "mensagem.minerwk.toji.ja_existe": "O seu Toji ainda está vivo",
+  "mensagem.minerwk.toji.invocado": "O Toji aceitou o contrato",
+  "mensagem.minerwk.toji.caiu": "A Lança Invertida do Céu atravessou o Infinito...",
+  "mensagem.minerwk.toji.despertou": "Você despertou: os golpes trancados estão liberados",
+  "mensagem.minerwk.toji.venceu": "Toji derrotado: o despertar agora é seu",
+  "mensagem.minerwk.toji.sumiu": "O Toji foi embora: os golpes voltaram a trancar"
 }

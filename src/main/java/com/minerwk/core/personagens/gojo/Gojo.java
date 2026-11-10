@@ -257,6 +257,11 @@ public final class Gojo {
         }
 
         @Override
+        public boolean anulavel() {
+            return true;
+        }
+
+        @Override
         public void aoAcabar(Contexto ctx) {
             ctx.apresentacao("", "", SonsGojo.INFINITO_DESATIVA);
         }

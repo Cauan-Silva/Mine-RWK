@@ -16,6 +16,14 @@ public final class Itens {
     /** O traje do Gojo. O jogador não veste o item: o cliente desenha o modelo em quem escolheu o Gojo. */
     public static final DeferredItem<Traje> TRAJE_GOJO = REGISTRO.register("traje_gojo", () -> new Traje("gojo"));
 
+    /** Invoca o Toji; feito na bancada com papel, lingote de ouro e espada de ferro. */
+    public static final DeferredItem<com.minerwk.boss.ContratoToji> CONTRATO_TOJI =
+            REGISTRO.register("contrato_toji", com.minerwk.boss.ContratoToji::new);
+
+    public static void naAbaCriativa(net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent evento) {
+        if (evento.getTabKey() == net.minecraft.world.item.CreativeModeTabs.COMBAT) evento.accept(CONTRATO_TOJI.get());
+    }
+
     private Itens() {
     }
 

@@ -55,6 +55,23 @@ class KitDoJogadorTest {
     }
 
     @Test
+    void anularTecnicasDerrubaSoOsEfeitosAnulaveis() {
+        KitDoJogador k = kit(100);
+        List<String> acabou = new ArrayList<>();
+        record Solto(String nome, boolean anulavel, List<String> acabou) implements Efeito {
+            public int duracao() { return 100; }
+            public void tick(Contexto c, int t) { }
+            public void aoAcabar(Contexto c) { acabou.add(nome); }
+        }
+        k.adicionarEfeito(new Solto("infinito", true, acabou));
+        k.adicionarEfeito(new Solto("campo", false, acabou));
+        assertTrue(k.anularTecnicas(CTX));
+        assertEquals(List.of("infinito"), acabou);
+        assertEquals(1, k.efeitos().size());
+        assertFalse(k.anularTecnicas(CTX), "nada mais para anular");
+    }
+
+    @Test
     void custoCobradoSoNoDisparo() {
         KitDoJogador k = kit(100);
         assertTrue(k.apertar(Tecla.Z, 0));

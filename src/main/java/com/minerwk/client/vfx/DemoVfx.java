@@ -38,11 +38,13 @@ public final class DemoVfx {
     private static boolean vestiuPeitoral;
     /** {@code arvore}: a tela da árvore do Gojo em três momentos (sem pontos, com compras e desperto). */
     private static final boolean ARVORE = MODO.equals("arvore");
+    /** {@code toji}: a luta contra o Toji, com a queda, o despertar no meio e um Vermelho nele. */
+    private static final boolean TOJI = MODO.equals("toji");
     private static final int CARGA = 100;
     private static final Path PASTA = Path.of("demo");
     private static final int ESFERAS = RoxoMaximo.TICKS_ESFERAS;
     private static final int ESTOURO = ESFERAS + RoxoMaximo.TICKS_FUSAO;
-    private static final int FIM_PREVIA = ARVORE ? 100 : TRAJE ? 260 : R_COMPLETO ? 360
+    private static final int FIM_PREVIA = TOJI ? 300 : ARVORE ? 100 : TRAJE ? 260 : R_COMPLETO ? 360
             : ENCANTAMENTO ? CARGA + 90 : ESTOURO + RoxoMaximo.TICKS_EXPLOSAO + 110;
     private static int ticks;
     private static int quadro;
@@ -63,8 +65,13 @@ public final class DemoVfx {
         if (jogador == null || mc.isPaused()) return;
         ticks++;
         if (DEMO && ticks == 40) {
-            jogador.connection.sendCommand(ENCANTAMENTO || R_COMPLETO || TRAJE ? "time set noon" : "time set midnight");
+            jogador.connection.sendCommand(ENCANTAMENTO || R_COMPLETO || TRAJE || TOJI ? "time set noon" : "time set midnight");
             if (ARVORE) jogador.connection.sendCommand("rwk trocar @s gojo");
+            if (TOJI) {
+                jogador.connection.sendCommand("rwk trocar @s gojo");
+                jogador.connection.sendCommand("rwk despertar @s nao");
+                jogador.connection.sendCommand("tp @s ~150 ~12 ~");
+            }
             if (TRAJE) {
                 jogador.connection.sendCommand("rwk trocar @s gojo");
                 jogador.connection.sendCommand("rwk despertar @s sim");
@@ -119,6 +126,37 @@ public final class DemoVfx {
             if (t == FIM_PREVIA - 4) jogador.connection.sendCommand("rwk maestria @s zerar");
             if (t == FIM_PREVIA - 3) jogador.connection.sendCommand("rwk despertar @s nao");
             if (t >= FIM_PREVIA) previa = -1;
+            return;
+        }
+        if (TOJI) {
+            mc.gui.getChat().clearMessages(false);
+            // No sobrevivência, para os golpes do Toji valerem; o comando de teste dispensa o Contrato.
+            if (t == 0) jogador.connection.sendCommand("gamemode survival");
+            if (t == 2) jogador.connection.sendCommand("rwk toji @s");
+            // Tira mais de 20% da vida dele: o Toji arma a Lança que derruba, e o jogador desperta.
+            if (t == 90) jogador.connection.sendCommand("damage @e[type=minerwk:toji,limit=1,sort=nearest] 60");
+            // De fora durante a queda e o despertar; o resto em primeira pessoa.
+            mc.options.setCameraType(t >= 100 && t < 190 ? net.minecraft.client.CameraType.THIRD_PERSON_BACK
+                    : net.minecraft.client.CameraType.FIRST_PERSON);
+            // A gravação não pode acabar numa tela de morte: depois do despertar o jogador aguenta mais.
+            if (t == 185) jogador.connection.sendCommand("effect give @s minecraft:resistance 20 2 true");
+            for (net.minecraft.world.entity.Entity e : mc.level.entitiesForRendering()) {
+                if (e instanceof com.minerwk.boss.TojiEntity) {
+                    jogador.lookAt(net.minecraft.commands.arguments.EntityAnchorArgument.Anchor.EYES, e.position().add(0, 1.2, 0));
+                }
+            }
+            if (t == 215) tecla(com.minerwk.core.kit.Tecla.X, true);
+            if (t == 232) tecla(com.minerwk.core.kit.Tecla.X, false);
+            // Longe demais o Toji vai embora sem vitória: o mundo de testes não fica com o despertar da demonstração.
+            if (t == FIM_PREVIA - 6) {
+                jogador.connection.sendCommand("effect clear @s minecraft:resistance");
+                jogador.connection.sendCommand("gamemode creative");
+                jogador.connection.sendCommand("tp @s ~-150 ~ ~-10");
+            }
+            if (t >= FIM_PREVIA) {
+                mc.options.setCameraType(net.minecraft.client.CameraType.FIRST_PERSON);
+                previa = -1;
+            }
             return;
         }
         if (TRAJE) {

@@ -37,6 +37,8 @@ public final class MineRWKClient {
         NeoForge.EVENT_BUS.addListener(HudKit::aoTick);
         NeoForge.EVENT_BUS.addListener(TremorCamera::aoTick);
         NeoForge.EVENT_BUS.addListener(TremorCamera::aoCalcularCamera);
+        modBus.addListener((net.neoforged.neoforge.client.event.EntityRenderersEvent.RegisterRenderers e) ->
+                e.registerEntityRenderer(com.minerwk.registro.Entidades.TOJI.get(), com.minerwk.client.boss.RenderToji::new));
         modBus.addListener(this::clientSetup);
         modBus.addListener(TeclasKit::registrar);
         RecepcaoKit.ligar();

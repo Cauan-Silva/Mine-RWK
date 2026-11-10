@@ -207,6 +207,11 @@ public final class ServicoKits {
         atualizarDespertar(jogador);
     }
 
+    /** O servidor fechou: nenhuma luta sobrevive a ele. */
+    public static void esquecerDespertosNaLuta() {
+        DESPERTOS_NA_LUTA.clear();
+    }
+
     private static void atualizarDespertar(ServerPlayer jogador) {
         boolean desperto = desperto(jogador);
         kit(jogador).ifPresent(k -> k.definirDesperto(desperto));

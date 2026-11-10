@@ -151,7 +151,9 @@ public final class ContextoServidor implements Contexto {
             }
             Vec3 dir = centro.subtract(e.getBoundingBox().getCenter());
             if (dir.lengthSqr() < 0.25 && puxar) continue; // já está no centro
-            Vec3 passo = dir.normalize().scale(puxar ? forca : -forca);
+            // O Toji não tem energia amaldiçoada para o Azul agarrar: é puxado com metade da força.
+            double f = puxar && e instanceof com.minerwk.boss.TojiEntity ? forca * .5 : forca;
+            Vec3 passo = dir.normalize().scale(puxar ? f : -f);
             if (!puxar) passo = passo.add(0, 0.1 * forca, 0);
             e.setDeltaMovement(e.getDeltaMovement().add(passo));
             e.hurtMarked = true; // manda a velocidade para o cliente (jogadores)

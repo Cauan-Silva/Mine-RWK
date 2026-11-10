@@ -27,3 +27,4 @@ Voltar para [[00 Início]].
 - [[2026-11-10 Maestria parte 2]]: nós do Gojo, compra no servidor e o efeito das melhorias nos golpes
 - [[2026-11-10 Maestria parte 3]]: tela da árvore (tecla H), compra pelo cliente e o estado "despertou"
 - [[2026-11-10 Toji parte 1]]: golpes trancados até o despertar, cadeado no HUD e o "desperto na luta"
+- [[2026-11-10 Toji parte 2]]: o boss essencial (motor de golpes, três golpes, Contrato, despertar no meio da luta)

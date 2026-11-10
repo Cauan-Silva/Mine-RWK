@@ -68,11 +68,23 @@ Voltar para [[00 Início]].
   - **Céu e chão no encantamento (10/11):** conferir o céu escurecendo na carga e cheio na fusão e na explosão, voltando devagar depois; as rachaduras de luz saindo dos pés (em chão irregular elas ficam na altura dos pés, não acompanham o relevo); as pedras subindo devagar. Ver de noite, na chuva, debaixo d'água e com Iris (no Nether e no End o véu não é desenhado). O chão continua claro com o céu escuro: ver se incomoda.
   - **`/rwk recarregar`:** conferir que enche a energia, zera as recargas e o HUD acompanha.
   - Com teto baixo sobre o Gojo, a explosão sai um pouco acima dele (o centro vem da conta do movimento, não de onde ele parou).
+- Toji, parte 2 (10/11), conferir no jogo:
+  - **Contrato:** a receita na bancada (papel, lingote de ouro, espada de ferro); sem ser Gojo, sem o nó Despertar ou com um Toji vivo, o item não é gasto e a mensagem diz o que falta. `/rwk toji <jogador>` invoca sem nada disso.
+  - **Golpes:** dá para sair da linha da investida (18 ticks de aviso)? A Lança (14 ticks) e a Corrente (12 ticks) dão tempo de reagir? O Toji persegue bem em terreno com degraus, água e paredes?
+  - **Infinito:** para a investida e a corrente; a Lança o desliga e ele volta só depois da recarga.
+  - **Despertar:** com o Toji a 80% de vida, aos 45 segundos ou num golpe que mataria, o jogador cai deitado por 3 segundos, sem levar dano, e se levanta com tudo cheio e os cadeados abertos.
+  - **Vitória e derrota:** vencer deixa os golpes liberados para sempre e dá 500 de XP; morrer, sair, trocar de dimensão ou se afastar 64 blocos faz o Toji sumir e os cadeados voltarem.
+  - **Balanceamento:** 240 de vida e danos 8, 10 e 6 são ponto de partida; a fase 2 é só mais rápida (70% das recargas).
+  - **Domínio e Azul:** o G não paralisa o Toji; o Azul o puxa com metade da força.
+  - **Com outro jogador:** quem ajuda vira alvo por 5 segundos e não desperta.
+  - **Mensagens sobre o HUD:** os avisos da luta saem na linha acima da barra de itens e encostam no HUD do kit (visto na prévia). Decidir se viram título na tela.
+  - **Provisório até a parte 3:** sons e partículas do Minecraft, sem entrada, sem fala e sem cutscene.
+  - **Achados da revisão sem correção:** qualquer morte do Toji (lava, `/kill`, outro mob) dá a vitória a quem invocou; o golpe mortal que vira o despertar é medido antes da armadura e da resistência, então pode derrubar quem sobreviveria.
 - Toji, parte 1 (10/11), conferir no jogo:
   - **Trancado:** um Gojo sem despertar só usa o Z e o C; X, V, G e R mostram o cadeado e não fazem nada; a Técnica Reversa não cura.
   - **Liberar:** `/rwk despertar <jogador> sim` tira os cadeados na hora, e `nao` os põe de volta.
   - **Persistência:** sair e entrar e morrer mantêm o despertou.
-  - **Atenção:** até o Toji existir, o seu Gojo do mundo de testes precisa do comando para usar os golpes.
+  - **Atenção:** o seu Gojo do mundo de testes está trancado: use `/rwk despertar <jogador> sim`, ou vença o Toji.
 - Maestria, parte 3 (10/11), conferir no jogo:
   - **Tela:** H abre e fecha a árvore; os textos em português; o mouse sobre cada nó mostra "Agora" e "Próximo nível".
   - **Comprar:** clicar num nó dourado gasta os pontos e o número sobe; nó sem pontos só faz o clique surdo.

@@ -138,6 +138,21 @@ public final class KitDoJogador {
         return efeitos.stream().map(a -> a.efeito).toList();
     }
 
+    /**
+     * Um golpe que anula técnicas acertou o jogador: os efeitos anuláveis acabam na hora, com o
+     * {@code aoAcabar} deles. A recarga da habilidade já corre desde o disparo. Devolve se anulou algum.
+     */
+    public boolean anularTecnicas(Contexto contexto) {
+        boolean anulou = false;
+        for (Ativo a : List.copyOf(efeitos)) {
+            if (a.efeito.anulavel() && efeitos.remove(a)) {
+                a.efeito.aoAcabar(contexto);
+                anulou = true;
+            }
+        }
+        return anulou;
+    }
+
     /** Cancela sem cobrar nem punir e encerra os efeitos sem {@code aoAcabar} (jogador saiu ou morreu). */
     public void descartar() {
         descartar(Contexto.NULO);

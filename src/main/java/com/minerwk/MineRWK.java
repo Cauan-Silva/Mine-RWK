@@ -37,11 +37,16 @@ public final class MineRWK {
         Efeitos.REGISTRO.register(modBus);
         Blocos.REGISTRO.register(modBus);
         com.minerwk.registro.Itens.REGISTRO.register(modBus);
+        com.minerwk.registro.Entidades.REGISTRO.register(modBus);
+        modBus.addListener(com.minerwk.registro.Entidades::atributos);
+        modBus.addListener(com.minerwk.registro.Itens::naAbaCriativa);
         Regras.registrar();
         Personagens.registrar(PersonagemTeste.criar());
         Personagens.registrar(Gojo.criar());
         ServicoKits.registrarEventos();
         ProtecoesServidor.registrarEventos();
+        // Depois das proteções: um golpe que o Infinito parou não chega à luta do Toji.
+        com.minerwk.boss.LutasToji.registrarEventos();
         ArremessosServidor.registrarEventos();
         BarreirasServidor.registrarEventos();
         SuspensosServidor.registrarEventos();
@@ -50,6 +55,7 @@ public final class MineRWK {
         NeoForge.EVENT_BUS.addListener((RegisterCommandsEvent e) -> ComandoTrocar.registrarRecarregar(e.getDispatcher()));
         NeoForge.EVENT_BUS.addListener((RegisterCommandsEvent e) -> ComandoTrocar.registrarMaestria(e.getDispatcher()));
         NeoForge.EVENT_BUS.addListener((RegisterCommandsEvent e) -> ComandoTrocar.registrarDespertar(e.getDispatcher()));
+        NeoForge.EVENT_BUS.addListener((RegisterCommandsEvent e) -> ComandoTrocar.registrarToji(e.getDispatcher()));
         modBus.addListener(Pacotes::registrar);
         modBus.addListener(this::commonSetup);
     }

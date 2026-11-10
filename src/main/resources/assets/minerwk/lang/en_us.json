@@ -112,5 +112,16 @@
   "no.minerwk.gojo_dominio_duracao": "Unlimited Void: duration",
   "no.minerwk.gojo_dominio_duracao.desc": "+%s%% domain duration",
   "no.minerwk.gojo_roxo_maximo_recarga": "Maximum Purple: cooldown",
-  "no.minerwk.gojo_roxo_maximo_recarga.desc": "-%s%% Maximum Hollow Purple cooldown"
+  "no.minerwk.gojo_roxo_maximo_recarga.desc": "-%s%% Maximum Hollow Purple cooldown",
+  "entity.minerwk.toji": "Toji Fushiguro",
+  "item.minerwk.contrato_toji": "Sorcerer Killer's Contract",
+  "death.attack.minerwk.toji": "%1$s was slain by %2$s",
+  "mensagem.minerwk.toji.outro_personagem": "Only Gojo can call Toji",
+  "mensagem.minerwk.toji.sem_no": "You need the Awakening node of the tree (H key)",
+  "mensagem.minerwk.toji.ja_existe": "Your Toji is still alive",
+  "mensagem.minerwk.toji.invocado": "Toji took the contract",
+  "mensagem.minerwk.toji.caiu": "The Inverted Spear of Heaven pierced the Infinity...",
+  "mensagem.minerwk.toji.despertou": "You awakened: the locked moves are now open",
+  "mensagem.minerwk.toji.venceu": "Toji defeated: the awakening is yours",
+  "mensagem.minerwk.toji.sumiu": "Toji left: the moves are locked again"
 }
