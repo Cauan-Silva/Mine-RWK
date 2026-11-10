@@ -42,6 +42,9 @@ public final class MineRWKClient {
         RecepcaoKit.ligar();
         modBus.addListener(Pincel::registrarShaders);
         modBus.addListener(com.minerwk.client.traje.CamadaTraje::aoAdicionarCamadas);
+        NeoForge.EVENT_BUS.addListener(com.minerwk.client.traje.CamadaTraje::aoDesenharBraco);
+        com.minerwk.rede.Pacotes.aoPersonagemDe = com.minerwk.client.traje.PersonagensVistos::receber;
+        NeoForge.EVENT_BUS.addListener((ClientPlayerNetworkEvent.LoggingOut e) -> com.minerwk.client.traje.PersonagensVistos.limpar());
         NeoForge.EVENT_BUS.addListener(RenderVisuaisGojo::aoTick);
         NeoForge.EVENT_BUS.addListener(RenderVisuaisGojo::aoRenderizar);
         NeoForge.EVENT_BUS.addListener(RenderVisuaisGojo::aoCorDaNeblina);

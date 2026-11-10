@@ -14,6 +14,7 @@ public final class Pacotes {
     public static volatile Consumer<SincronizarKit> aoSincronizar = p -> { };
     public static volatile Consumer<TocarApresentacao> aoTocar = p -> { };
     public static volatile Consumer<Tremer> aoTremer = p -> { };
+    public static volatile Consumer<PersonagemDe> aoPersonagemDe = p -> { };
     public static volatile Consumer<MostrarVisual> aoMostrarVisual = p -> { };
     public static volatile Consumer<EncerrarVisual> aoEncerrarVisual = p -> { };
     public static volatile Consumer<Acertou> aoAcertar = p -> { };
@@ -33,6 +34,7 @@ public final class Pacotes {
         r.playToClient(SincronizarKit.TIPO, SincronizarKit.CODEC, (p, ctx) -> aoSincronizar.accept(p));
         r.playToClient(TocarApresentacao.TIPO, TocarApresentacao.CODEC, (p, ctx) -> aoTocar.accept(p));
         r.playToClient(Tremer.TIPO, Tremer.CODEC, (p, ctx) -> aoTremer.accept(p));
+        r.playToClient(PersonagemDe.TIPO, PersonagemDe.CODEC, (p, ctx) -> aoPersonagemDe.accept(p));
         r.playToClient(MostrarVisual.TIPO, MostrarVisual.CODEC, (p, ctx) -> aoMostrarVisual.accept(p));
         r.playToClient(EncerrarVisual.TIPO, EncerrarVisual.CODEC, (p, ctx) -> aoEncerrarVisual.accept(p));
         r.playToClient(Acertou.TIPO, Acertou.CODEC, (p, ctx) -> aoAcertar.accept(p));

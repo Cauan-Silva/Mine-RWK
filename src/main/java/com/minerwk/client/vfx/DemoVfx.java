@@ -40,7 +40,7 @@ public final class DemoVfx {
     private static final Path PASTA = Path.of("demo");
     private static final int ESFERAS = RoxoMaximo.TICKS_ESFERAS;
     private static final int ESTOURO = ESFERAS + RoxoMaximo.TICKS_FUSAO;
-    private static final int FIM_PREVIA = TRAJE ? 200 : R_COMPLETO ? 360
+    private static final int FIM_PREVIA = TRAJE ? 260 : R_COMPLETO ? 360
             : ENCANTAMENTO ? CARGA + 90 : ESTOURO + RoxoMaximo.TICKS_EXPLOSAO + 110;
     private static int ticks;
     private static int quadro;
@@ -62,7 +62,11 @@ public final class DemoVfx {
         ticks++;
         if (DEMO && ticks == 40) {
             jogador.connection.sendCommand(ENCANTAMENTO || R_COMPLETO || TRAJE ? "time set noon" : "time set midnight");
-            if (TRAJE) jogador.connection.sendCommand("rwk trocar @s gojo");
+            if (TRAJE) {
+                jogador.connection.sendCommand("rwk trocar @s gojo");
+                // Terreno limpo, longe dos blocos soltos do spawn; volta no fim.
+                jogador.connection.sendCommand("tp @s ~150 ~12 ~");
+            }
             // A explosão apaga blocos: a demo do R acontece longe do spawn e o jogador volta no fim.
             if (R_COMPLETO) jogador.connection.sendCommand("tp @s ~" + LONGE_DO_SPAWN + " ~12 ~"); // do alto: o chão de lá pode ser mais alto
             jogador.connection.sendCommand("weather clear");
@@ -96,22 +100,39 @@ public final class DemoVfx {
             mc.gui.getChat().clearMessages(false);
             var tipo = net.minecraft.client.CameraType.THIRD_PERSON_FRONT;
             if (t >= 50 && t < 100) tipo = net.minecraft.client.CameraType.THIRD_PERSON_BACK;
-            if (t >= 150) tipo = net.minecraft.client.CameraType.FIRST_PERSON;
+            if (t >= 150 && t < 190) tipo = net.minecraft.client.CameraType.FIRST_PERSON;
             mc.options.setCameraType(tipo);
-            jogador.setXRot(t >= 150 ? 20 : 8);
-            if (t == 2) jogador.connection.sendCommand("rwk recarregar");
-            // Um Azul de frente e outro em primeira pessoa: o traje tem de seguir os braços da animação.
-            if (t == 20 || t == 160) net.neoforged.neoforge.network.PacketDistributor.sendToServer(
-                    new com.minerwk.rede.UsarTecla(com.minerwk.core.kit.Tecla.Z, true));
-            if (t == 22 || t == 162) net.neoforged.neoforge.network.PacketDistributor.sendToServer(
-                    new com.minerwk.rede.UsarTecla(com.minerwk.core.kit.Tecla.Z, false));
+            jogador.setXRot(t >= 150 && t < 190 ? 20 : 8);
+            if (t == 2 || t == 150 || t == 188) jogador.connection.sendCommand("rwk recarregar");
+            if (t == 1) {
+                // Mão vazia, para o braço aparecer em primeira pessoa.
+                for (int espaco = 0; espaco < 9; espaco++) {
+                    if (jogador.getInventory().getItem(espaco).isEmpty()) {
+                        jogador.getInventory().selected = espaco;
+                        jogador.connection.send(new net.minecraft.network.protocol.game.ServerboundSetCarriedItemPacket(espaco));
+                        break;
+                    }
+                }
+            }
+            // Um Vermelho de frente e outro em primeira pessoa (não arranca blocos, que tapariam a câmera):
+            // o traje tem de seguir os braços, e a manga tem de aparecer na mão parada antes do golpe.
+            if (t == 20 || t == 168) tecla(com.minerwk.core.kit.Tecla.X, true);
+            if (t == 34 || t == 180) tecla(com.minerwk.core.kit.Tecla.X, false);
+            // Uma corrida vista de costas: a barra do casaco balança.
+            if (t >= 60 && t < 95) {
+                Vec3 frente = new Vec3(jogador.getLookAngle().x, 0, jogador.getLookAngle().z).normalize();
+                jogador.setDeltaMovement(frente.scale(.28).add(0, jogador.getDeltaMovement().y, 0));
+            }
             // Armadura normal vestida não pode aparecer por cima (só testa se o espaço do peito estiver vazio).
             if (t == 100 && jogador.getItemBySlot(net.minecraft.world.entity.EquipmentSlot.CHEST).isEmpty()) {
                 vestiuPeitoral = true;
                 jogador.connection.sendCommand("item replace entity @s armor.chest with minecraft:diamond_chestplate");
             }
             if (t == 148 && vestiuPeitoral) jogador.connection.sendCommand("item replace entity @s armor.chest with minecraft:air");
-            if (t == 150) jogador.connection.sendCommand("rwk recarregar");
+            // O domínio: a venda sai e os olhos brilham.
+            if (t == 192) tecla(com.minerwk.core.kit.Tecla.G, true);
+            if (t == 194) tecla(com.minerwk.core.kit.Tecla.G, false);
+            if (t == FIM_PREVIA - 3) jogador.connection.sendCommand("tp @s ~-150 ~ ~-10");
             if (t >= FIM_PREVIA) {
                 mc.options.setCameraType(net.minecraft.client.CameraType.FIRST_PERSON);
                 previa = -1;
@@ -159,6 +180,10 @@ public final class DemoVfx {
                     (float) RoxoMaximo.RAIO_EXPLOSAO, RoxoMaximo.TICKS_EXPLOSAO + RoxoMaximo.TICKS_RESTO, agora));
         }
         if (t >= FIM_PREVIA) previa = -1;
+    }
+
+    private static void tecla(com.minerwk.core.kit.Tecla tecla, boolean apertou) {
+        net.neoforged.neoforge.network.PacketDistributor.sendToServer(new com.minerwk.rede.UsarTecla(tecla, apertou));
     }
 
     private static Vetor vetor(Vec3 v) {

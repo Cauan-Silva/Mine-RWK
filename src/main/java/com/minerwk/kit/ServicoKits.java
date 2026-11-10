@@ -32,6 +32,7 @@ public final class ServicoKits {
     }
 
     public static void registrarEventos() {
+        NeoForge.EVENT_BUS.addListener(ServicoKits::aoComecarAVer);
         NeoForge.EVENT_BUS.addListener(ServicoKits::aoTick);
         NeoForge.EVENT_BUS.addListener(ServicoKits::aoDano);
         NeoForge.EVENT_BUS.addListener(ServicoKits::aoEntrar);
@@ -67,6 +68,16 @@ public final class ServicoKits {
         KITS.put(jogador.getUUID(), novo);
         salvar(jogador, novo);
         Sincronizacao.enviar(jogador);
+        // Quem já está vendo o jogador passa a vê-lo com o traje do personagem novo.
+        com.minerwk.rede.Envio.paraQuemVe(jogador, new com.minerwk.rede.PersonagemDe(jogador.getId(), personagem.id()));
+    }
+
+    /** Um jogador passou a ver outro: recebe o personagem dele, para desenhar o traje. */
+    private static void aoComecarAVer(PlayerEvent.StartTracking evento) {
+        if (evento.getTarget() instanceof ServerPlayer visto && evento.getEntity() instanceof ServerPlayer quemVe) {
+            String personagem = kit(visto).map(k -> k.personagem().id()).orElse("");
+            com.minerwk.rede.Envio.para(quemVe, new com.minerwk.rede.PersonagemDe(visto.getId(), personagem));
+        }
     }
 
     /** Só jogador vivo e fora do modo espectador usa habilidades. */

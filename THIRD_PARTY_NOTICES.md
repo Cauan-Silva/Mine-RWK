@@ -19,4 +19,5 @@
 ## Modelos e texturas
 | Arquivo | Origem |
 | --- | --- |
-| `assets/minerwk/geo/traje/gojo.geo.json`, `assets/minerwk/textures/traje/gojo.png` | Minezin (mesmo autor) |
+| `ferramentas/traje/gojo_base.geo.json`, `ferramentas/traje/gojo_base.png` | Minezin (mesmo autor): o uniforme do Gojo |
+| `assets/minerwk/geo/traje/gojo.geo.json`, `assets/minerwk/textures/traje/gojo*.png` | Gerados por `ferramentas/gerar_traje_gojo.py` a partir da base acima, com a venda e os olhos |
