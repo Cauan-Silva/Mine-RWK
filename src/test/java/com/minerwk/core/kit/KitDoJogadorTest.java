@@ -169,4 +169,16 @@ class KitDoJogadorTest {
         assertEquals(List.of("carga", "disparo", "fim"), z.chamadas);
         assertTrue(k.execucao().isEmpty());
     }
+
+    @Test
+    void recarregarEncheORecursoEZeraAsRecargasSemTrocarDeKit() {
+        KitDoJogador k = kit(100);
+        k.apertar(Tecla.Z, 0);
+        long t = rodar(k, 0, 9); // disparou: gastou 20 e entrou em recarga
+        assertFalse(k.recargas().pronta("z", t));
+        k.recarregar();
+        assertEquals(100, k.recurso().atual());
+        assertTrue(k.recargas().pronta("z", t));
+        assertTrue(k.apertar(Tecla.Z, t), "pronto para usar de novo na hora");
+    }
 }

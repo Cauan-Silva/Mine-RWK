@@ -47,6 +47,12 @@ public final class KitDoJogador {
         return recargas;
     }
 
+    /** Ferramenta de teste: enche o recurso e zera todas as recargas, sem trocar de kit. */
+    public void recarregar() {
+        recargas.limpar();
+        recurso.carregar(recurso.maximo());
+    }
+
     public Optional<Execucao> execucao() {
         return Optional.ofNullable(execucao);
     }

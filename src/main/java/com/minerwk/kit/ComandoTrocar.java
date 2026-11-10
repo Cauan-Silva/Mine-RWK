@@ -14,7 +14,7 @@ import net.minecraft.commands.arguments.EntityArgument;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 
-/** {@code /rwk trocar <jogador> <personagem>}: só para operadores (administração e testes). */
+/** {@code /rwk trocar <jogador> <personagem>} e {@code /rwk recarregar [jogador]}: só para operadores (administração e testes). */
 public final class ComandoTrocar {
     private ComandoTrocar() {
     }
@@ -27,6 +27,27 @@ public final class ComandoTrocar {
                                 .suggests((c, b) -> SharedSuggestionProvider.suggest(
                                         Personagens.todos().stream().map(Personagem::id), b))
                                 .executes(ComandoTrocar::trocar)))));
+    }
+
+    /** {@code /rwk recarregar [jogador]}: enche a energia e zera as recargas (teste), só para operadores. */
+    public static void registrarRecarregar(CommandDispatcher<CommandSourceStack> d) {
+        d.register(Commands.literal("rwk").then(Commands.literal("recarregar")
+                .requires(s -> s.hasPermission(2))
+                .executes(c -> recarregar(c, c.getSource().getPlayerOrException()))
+                .then(Commands.argument("jogador", EntityArgument.player())
+                        .executes(c -> recarregar(c, EntityArgument.getPlayer(c, "jogador"))))));
+    }
+
+    private static int recarregar(CommandContext<CommandSourceStack> c, ServerPlayer jogador) {
+        var kit = ServicoKits.kit(jogador);
+        if (kit.isEmpty()) {
+            c.getSource().sendFailure(Component.literal(jogador.getName().getString() + " ainda não escolheu um personagem"));
+            return 0;
+        }
+        kit.get().recarregar();
+        String nome = jogador.getName().getString() + ": energia cheia e recargas zeradas";
+        c.getSource().sendSuccess(() -> Component.literal(nome), true);
+        return 1;
     }
 
     private static int trocar(CommandContext<CommandSourceStack> c) throws CommandSyntaxException {
