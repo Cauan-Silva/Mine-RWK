@@ -40,7 +40,8 @@ neoForge {
             // Prévia gravável: entra direto no mundo e toca a demonstração de VFX (client/vfx/DemoVfx).
             client()
             programArguments.addAll('--quickPlaySingleplayer', 'New World')
-            systemProperty 'minerwk.demo', 'true'
+            // -Pdemo=encantamento grava a carga do R em vez da fusão e da explosão.
+            systemProperty 'minerwk.demo', (project.findProperty('demo') ?: 'true').toString()
         }
         server {
             server()

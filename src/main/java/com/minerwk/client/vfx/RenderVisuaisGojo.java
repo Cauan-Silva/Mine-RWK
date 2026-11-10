@@ -403,7 +403,8 @@ public final class RenderVisuaisGojo {
 
     /**
      * No encantamento do R, sem esferas (elas só nascem lá no céu): uma aura de fitas azuis e vermelhas
-     * subindo em espiral em volta do Gojo, mais forte a cada palavra, e os olhos brilhando.
+     * subindo em espiral em volta do Gojo, mais forte a cada palavra, os olhos brilhando e rachaduras de
+     * luz abrindo no chão a partir dos pés.
      */
     private static void encantamento(Quadro q, VisuaisAtivos.Visual v, double t, float op) {
         Entity e = dono(v);
@@ -429,6 +430,20 @@ public final class RenderVisuaisGojo {
                 al[j] = (float) (op * (.25 + .5 * k) * Math.sin(Math.PI * u));
             }
             p.fita(pts, .1 + .12 * k, cor, al);
+        }
+        // Rachaduras de luz abrindo no chão a partir dos pés, cada vez mais compridas.
+        for (int r = 0; r < com.minerwk.core.vfx.EncantamentoGojo.RACHADURAS; r++) {
+            List<Vetor> linha = com.minerwk.core.vfx.EncantamentoGojo.rachadura(v.inicio, r, k);
+            if (linha.size() < 2) continue;
+            List<Vec3> pts = new ArrayList<>(linha.size());
+            float[] al = new float[linha.size()];
+            for (int j = 0; j < linha.size(); j++) {
+                pts.add(pe.add(linha.get(j).x(), .04, linha.get(j).z()));
+                // Mais forte perto dos pés, sumindo na ponta, pulsando de leve.
+                al[j] = (float) (op * (.9 - .7 * j / (linha.size() - 1)) * (.8 + .2 * Math.sin(tempo * .6 + r)));
+            }
+            p.fita(pts, .16, VIOLETA, al);
+            p.fita(pts, .05, 0xFFFFFF, al);
         }
         p.terminar();
         // Olhos brilhando: dois pontos de luz azul-claro um pouco à frente do rosto.
@@ -1021,7 +1036,8 @@ public final class RenderVisuaisGojo {
     public static void aoCorDaNeblina(ViewportEvent.ComputeFogColor evento) {
         Minecraft mc = Minecraft.getInstance();
         if (mc.level == null || evento.getCamera().getFluidInCamera() != net.minecraft.world.level.material.FogType.NONE) return;
-        double presenca = presencaDominio(evento.getCamera().getPosition(), (float) evento.getPartialTick());
+        double presenca = Math.max(CeuRoxo.escuro() * .85,
+                presencaDominio(evento.getCamera().getPosition(), (float) evento.getPartialTick()));
         if (presenca <= 0) return;
         float k = (float) (1 - presenca);
         evento.setRed(evento.getRed() * k + .004f * (1 - k));

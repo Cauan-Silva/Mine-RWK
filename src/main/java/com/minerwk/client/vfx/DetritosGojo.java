@@ -128,6 +128,12 @@ public final class DetritosGojo {
             if (v.fimEm >= 0 || v.opacidade(agora, 0) <= .05f) continue;
             double t = v.idade(agora, 0);
             switch (v.tipo) {
+                case "gojo_roxo_200_carga" -> {
+                    // Pedras e terra soltam do chão em volta do Gojo e sobem devagar (só visual).
+                    if (((int) t) % 8 == 0 && perto(v.origem)) {
+                        PhotonRoxoMaximo.pedrasFlutuando(l, v.origem.mais(new Vetor(0, -1.5, 0)));
+                    }
+                }
                 case "gojo_roxo_maximo_esferas" -> {
                     // A fusão nasce depois das esferas; o silêncio vem nos últimos ticks antes do estouro.
                     int nasce = Math.round(v.forca);

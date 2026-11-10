@@ -74,6 +74,16 @@ public final class PhotonRoxoMaximo {
                 .cor(0xFFB070FF).textura(FxCodigo.CIRCULO, .8f, .3f, 1.6f, FxCodigo.ADITIVO).tocar(nivel, c);
     }
 
+    /** No encantamento: pedaços de terra e pedra soltam do {@code chao} em volta do Gojo e sobem devagar. */
+    public static void pedrasFlutuando(Level nivel, Vetor chao) {
+        FxCodigo.emissor(8).rajada(0, 5).circulo(4, 1).velocidade(.1f, .4f).vida(35, 55).tamanho(.2f)
+                .cor(0xFF4A3F38).gravidade(-.05f, false).textura(FxCodigo.CIRCULO, 0, 0, 0, FxCodigo.TRANSLUCIDO)
+                .tocar(nivel, vec(chao));
+        FxCodigo.emissor(8).rajada(0, 3).circulo(3, 1).velocidade(.1f, .3f).vida(40, 60).tamanho(.1f)
+                .cor(0xFFC8A0FF).gravidade(-.08f, false).textura(FxCodigo.CIRCULO, .9f, .4f, 1.8f, FxCodigo.ADITIVO)
+                .tocar(nivel, vec(chao));
+    }
+
     /** A fumaça da cratera, por 5 s. Só sai depois de a explosão crescer, para não cobrir a casca. */
     public static void fumaca(Level nivel, Vetor centro, double raio) {
         float r = (float) raio;

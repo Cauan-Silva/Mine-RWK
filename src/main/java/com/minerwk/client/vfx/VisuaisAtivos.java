@@ -172,6 +172,7 @@ public final class VisuaisAtivos {
         ATIVOS.removeIf(v -> v.acabou(agora));
         ImpactoCamera.tick();
         ImpactFrame.tick();
+        CeuRoxo.tick();
         DetritosGojo.tick();
     }
 
@@ -220,6 +221,7 @@ public final class VisuaisAtivos {
         ATIVOS.clear();
         ImpactoCamera.limpar();
         ImpactFrame.limpar();
+        CeuRoxo.limpar();
         mundo = null;
     }
 }

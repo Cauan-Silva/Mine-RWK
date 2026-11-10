@@ -26,11 +26,15 @@ public final class DemoVfx {
     private DemoVfx() {
     }
 
-    private static final boolean DEMO = Boolean.getBoolean("minerwk.demo");
+    /** {@code true}: fusão e explosão; {@code encantamento}: a carga do R de dia, em terceira pessoa. */
+    private static final String MODO = System.getProperty("minerwk.demo", "");
+    private static final boolean DEMO = !MODO.isEmpty();
+    private static final boolean ENCANTAMENTO = MODO.equals("encantamento");
+    private static final int CARGA = 100;
     private static final Path PASTA = Path.of("demo");
     private static final int ESFERAS = RoxoMaximo.TICKS_ESFERAS;
     private static final int ESTOURO = ESFERAS + RoxoMaximo.TICKS_FUSAO;
-    private static final int FIM_PREVIA = ESTOURO + RoxoMaximo.TICKS_EXPLOSAO + 110;
+    private static final int FIM_PREVIA = ENCANTAMENTO ? CARGA + 90 : ESTOURO + RoxoMaximo.TICKS_EXPLOSAO + 110;
     private static int ticks;
     private static int quadro;
     /** Tick (do contador da demo) em que a prévia começou; -1 parada. */
@@ -50,21 +54,36 @@ public final class DemoVfx {
         if (jogador == null || mc.isPaused()) return;
         ticks++;
         if (DEMO && ticks == 40) {
-            jogador.connection.sendCommand("time set midnight");
+            jogador.connection.sendCommand(ENCANTAMENTO ? "time set noon" : "time set midnight");
+            jogador.connection.sendCommand("weather clear");
             jogador.connection.sendCommand("gamemode creative");
             jogador.setYRot(0);
-            jogador.setXRot(-8);
+            jogador.setXRot(ENCANTAMENTO ? 6 : -8);
+            if (ENCANTAMENTO) mc.options.setCameraType(net.minecraft.client.CameraType.THIRD_PERSON_BACK);
         }
         // Espera o servidor integrado assentar depois de carregar o mundo (senão o tempo do visual trava e pula).
         if (DEMO && ticks == 200) previa();
-        if (previa >= 0) tocarPrevia(mc, jogador, ticks - previa);
-        if (DEMO && previa >= 0 && ticks - previa >= 0) {
+        if (previa < 0) return;
+        int t = ticks - previa;
+        tocarPrevia(mc, jogador, t);
+        if (DEMO) {
             gravarQuadro(mc);
-            if (ticks - previa >= FIM_PREVIA) mc.stop();
+            // A prévia zera a si mesma no último tick: a parada usa o t guardado antes.
+            if (t >= FIM_PREVIA) mc.stop();
         }
     }
 
     private static void tocarPrevia(Minecraft mc, LocalPlayer jogador, int t) {
+        if (ENCANTAMENTO) {
+            // Só a carga: aura, olhos, rachaduras, pedras e o céu escurecendo, e depois o céu voltando.
+            if (t == 0) {
+                VisuaisAtivos.receber(new MostrarVisual(jogador.getId(), "gojo_roxo_200_carga",
+                        vetor(jogador.getEyePosition()), new Vetor(jogador.getLookAngle().x, 0, jogador.getLookAngle().z),
+                        0, CARGA, mc.level.getGameTime()));
+            }
+            if (t >= FIM_PREVIA) previa = -1;
+            return;
+        }
         if (DEMO) {
             jogador.setNoGravity(true);
             jogador.setDeltaMovement(Vec3.ZERO);
