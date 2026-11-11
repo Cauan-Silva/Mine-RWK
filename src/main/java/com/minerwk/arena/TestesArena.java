@@ -28,7 +28,10 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.network.CommonListenerCookie;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;
+import net.minecraft.server.level.ClientInformation;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.ExperienceOrb;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -331,5 +334,89 @@ public final class TestesArena {
         helper.assertFalse(ArenasServidor.naArena(jogador), "sem ponto de retorno também");
         jogador.remove(Entity.RemovalReason.DISCARDED);
         helper.succeed();
+    }
+
+    // --- Morrer na arena ---
+
+    /** Quem renasce é um jogador novo que copia o antigo: é aí que o jogo decide o que ele mantém. */
+    private static ServerPlayer renascer(GameTestHelper helper, ServerPlayer morto) {
+        ServerPlayer novo = new ServerPlayer(helper.getLevel().getServer(), helper.getLevel(), morto.getGameProfile(),
+                ClientInformation.createDefault());
+        // Os avanços do jogo passam a apontar para o jogador novo: sem conexão, o próximo avanço quebraria.
+        novo.connection = morto.connection;
+        novo.restoreFrom(morto, false);
+        return novo;
+    }
+
+    private static int diamantes(ServerPlayer jogador) {
+        return jogador.getInventory().countItem(Items.DIAMOND);
+    }
+
+    @GameTest(template = "vazio", batch = "arena_12")
+    public static void morrerNaArenaMantemItensEXp(GameTestHelper helper) {
+        ServerPlayer jogador = jogador(helper);
+        CaixaArena caixa = CaixaArena.daVaga(51);
+        ArenasServidor.levar(jogador, caixa);
+        jogador.getInventory().add(new ItemStack(Items.DIAMOND, 3));
+        jogador.setItemSlot(EquipmentSlot.HEAD, new ItemStack(Items.IRON_HELMET));
+        jogador.setExperienceLevels(10);
+        // Um cliente de verdade confirma a troca de dimensão; sem isso o jogador fica imune a dano.
+        jogador.hasChangedDimension();
+        jogador.kill();
+        helper.assertTrue(jogador.isDeadOrDying(), "o jogador deveria ter morrido");
+        ServerPlayer novo = renascer(helper, jogador);
+        helper.assertTrue(diamantes(novo) == 3, "os 3 diamantes voltam, voltaram " + diamantes(novo));
+        helper.assertTrue(novo.getItemBySlot(EquipmentSlot.HEAD).is(Items.IRON_HELMET), "a armadura volta no lugar");
+        helper.assertTrue(novo.experienceLevel == 10, "os 10 níveis voltam, voltaram " + novo.experienceLevel);
+        ServerLevel arena = ArenasServidor.nivel(helper.getLevel().getServer());
+        helper.assertTrue(arena.getEntitiesOfClass(ItemEntity.class, ObrasArena.volume(caixa)).isEmpty(), "nada cai na arena");
+        helper.assertTrue(arena.getEntitiesOfClass(ExperienceOrb.class, ObrasArena.volume(caixa)).isEmpty(), "nem XP");
+        helper.assertTrue(diamantes(renascer(helper, jogador)) == 0, "o que foi guardado só é devolvido uma vez");
+        jogador.remove(Entity.RemovalReason.DISCARDED);
+        helper.succeed();
+    }
+
+    @GameTest(template = "vazio", batch = "arena_13")
+    public static void morrerForaDaArenaDerrubaItens(GameTestHelper helper) {
+        ServerPlayer jogador = jogador(helper);
+        jogador.getInventory().add(new ItemStack(Items.DIAMOND, 3));
+        jogador.setExperienceLevels(10);
+        jogador.kill();
+        ServerPlayer novo = renascer(helper, jogador);
+        helper.assertTrue(diamantes(novo) == 0 && novo.experienceLevel == 0, "fora da arena a morte continua como no jogo");
+        helper.assertFalse(helper.getLevel().getEntitiesOfClass(ItemEntity.class, jogador.getBoundingBox().inflate(4)).isEmpty(),
+                "os itens caem no chão");
+        helper.succeed();
+    }
+
+    @GameTest(template = "vazio", batch = "arena_14", timeoutTicks = 400)
+    public static void morrerDepoisDaVitoriaNaoTeleporta(GameTestHelper helper) {
+        ServerPlayer jogador = jogador(helper);
+        ServicoKits.definirDespertou(jogador, false);
+        jogador.getInventory().add(new ItemStack(Items.DIAMOND, 3));
+        LutasToji.invocar(jogador, false);
+        long[] vitoria = {-1};
+        boolean[] morreu = {false};
+        helper.succeedWhen(() -> {
+            long agora = helper.getLevel().getGameTime();
+            if (vitoria[0] < 0) {
+                TojiEntity toji = LutasToji.de(jogador.getUUID()).orElse(null);
+                helper.assertTrue(toji != null && ArenasServidor.naArena(jogador), "esperando a luta começar");
+                toji.kill();
+                vitoria[0] = agora;
+            }
+            helper.assertTrue(agora - vitoria[0] >= 40, "esperando 2 s");
+            if (!morreu[0]) {
+                jogador.hasChangedDimension();
+                jogador.kill();
+                morreu[0] = true;
+            }
+            helper.assertTrue(agora - vitoria[0] >= 110, "esperando passar a hora da volta");
+            helper.assertTrue(ArenasServidor.naArena(jogador), "o morto não é teleportado");
+            helper.assertFalse(jogador.hasData(Anexos.RETORNO_ARENA), "o ponto de retorno é apagado: ele renasce no lugar normal");
+            helper.assertTrue(ArenasServidor.de(jogador.getUUID()).isEmpty(), "a arena dele acabou");
+            helper.assertTrue(ServicoKits.dados(jogador).maestriaAtual().despertou, "a vitória continua valendo");
+            helper.assertTrue(diamantes(renascer(helper, jogador)) == 3, "e os itens voltam ao renascer");
+        });
     }
 }

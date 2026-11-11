@@ -69,6 +69,7 @@ public final class ArenasServidor {
 
     public static void registrarEventos() {
         ObrasArena.registrarEventos();
+        RegrasArena.registrarEventos();
         // Sem a dimensão nada da arena funciona: melhor saber ao abrir o mundo do que no meio da luta.
         NeoForge.EVENT_BUS.addListener((ServerStartedEvent e) -> {
             ServerLevel arena = nivel(e.getServer());
