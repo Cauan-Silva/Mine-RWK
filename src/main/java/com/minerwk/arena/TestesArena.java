@@ -2,12 +2,14 @@ package com.minerwk.arena;
 
 import com.minerwk.MineRWK;
 import com.minerwk.core.arena.CaixaArena;
+import com.minerwk.core.arena.PlantaEscola;
 import com.minerwk.core.kit.Vetor;
 import com.minerwk.kit.Anexos;
 import com.minerwk.kit.TestesGojo;
 import io.netty.channel.embedded.EmbeddedChannel;
 import java.util.List;
 import java.util.Optional;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.gametest.framework.GameTest;
@@ -23,9 +25,14 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.network.CommonListenerCookie;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.biome.Biome;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.biome.Biomes;
 import net.minecraft.world.level.chunk.status.ChunkStatus;
 import net.minecraft.world.level.dimension.DimensionType;
@@ -33,6 +40,7 @@ import net.minecraft.world.level.dimension.LevelStem;
 import net.minecraft.world.level.levelgen.FlatLevelSource;
 import net.minecraft.world.level.levelgen.flat.FlatLevelGeneratorSettings;
 import net.minecraft.world.level.storage.DerivedLevelData;
+import net.minecraft.world.phys.AABB;
 import net.neoforged.neoforge.gametest.GameTestHolder;
 import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
@@ -148,5 +156,40 @@ public final class TestesArena {
         helper.assertFalse(jogador.hasData(Anexos.RETORNO_ARENA), "e o ponto de retorno é apagado");
         jogador.remove(Entity.RemovalReason.DISCARDED);
         helper.succeed();
+    }
+
+    @GameTest(template = "vazio", batch = "arena_5", timeoutTicks = 200)
+    public static void montarPoePlataformaEApagarLimpa(GameTestHelper helper) {
+        ServerLevel arena = garantirDimensao(helper.getLevel().getServer());
+        CaixaArena caixa = CaixaArena.daVaga(40);
+        BlockPos centro = new BlockPos(caixa.centroX(), CaixaArena.Y_PATIO, caixa.centroZ());
+        BlockPos sujeira = centro.offset(35, 20, -35);
+        arena.setBlock(sujeira, Blocks.DIRT.defaultBlockState(), Block.UPDATE_CLIENTS);
+        boolean[] montou = {false};
+        boolean[] apagou = {false};
+        long comeco = arena.getGameTime();
+        // O retorno roda dentro do tick do servidor: os erros são guardados e cobrados depois.
+        String[] erro = {null};
+        ObrasArena.montar(arena, caixa, PlantaEscola.plataforma(), () -> {
+            montou[0] = true;
+            long levou = arena.getGameTime() - comeco;
+            if (levou > 40) erro[0] = "a montagem deveria levar até 40 ticks, levou " + levou;
+            else if (!arena.getBlockState(centro.below()).is(Blocks.STONE_BRICKS)) erro[0] = "tijolo de pedra sob o centro";
+            else if (!arena.getBlockState(centro.below(4).offset(30, 0, -30)).is(Blocks.STONE)) erro[0] = "pedra no canto de baixo";
+            else if (!arena.getBlockState(centro).isAir()) erro[0] = "ar na altura dos pés";
+            else if (!arena.getBlockState(sujeira).isAir()) erro[0] = "o que havia na caixa é limpo antes de montar";
+            arena.addFreshEntity(new ItemEntity(arena, centro.getX() + .5, centro.getY() + 1, centro.getZ() + .5,
+                    new ItemStack(Items.DIAMOND)));
+            ObrasArena.apagar(arena, caixa, () -> apagou[0] = true);
+        });
+        helper.succeedWhen(() -> {
+            helper.assertTrue(montou[0] && apagou[0], "montar e apagar deveriam terminar");
+            helper.assertTrue(erro[0] == null, String.valueOf(erro[0]));
+            helper.assertTrue(arena.getBlockState(centro.below()).isAir() && arena.getBlockState(centro.below(4)).isAir(),
+                    "a caixa deveria ficar só com ar");
+            AABB tudo = new AABB(centro).inflate(41, 64, 41);
+            helper.assertTrue(arena.getEntitiesOfClass(ItemEntity.class, tudo).isEmpty(), "sem itens caídos na caixa");
+            helper.assertTrue(ObrasArena.ocioso(), "sem obra pendente");
+        });
     }
 }

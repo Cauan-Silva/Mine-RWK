@@ -1,0 +1,152 @@
+package com.minerwk.arena;
+
+import com.minerwk.core.arena.CaixaArena;
+import com.minerwk.core.arena.PlantaEscola;
+import java.util.ArrayDeque;
+import java.util.Deque;
+import java.util.Iterator;
+import java.util.List;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.LeavesBlock;
+import net.minecraft.world.level.block.StairBlock;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.AABB;
+import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.event.server.ServerStoppingEvent;
+import net.neoforged.neoforge.event.tick.ServerTickEvent;
+
+/**
+ * Monta e apaga a arena de uma vaga aos poucos, para o servidor não travar: no máximo {@link #POR_TICK}
+ * blocos mexidos e {@link #OLHADOS_POR_TICK} posições olhadas por tick, somando todas as obras. Os chunks
+ * da vaga ficam forçados do começo da montagem até o fim da limpeza.
+ */
+public final class ObrasArena {
+    /** Blocos postos ou apagados por tick. */
+    static final int POR_TICK = 4000;
+    /** Posições olhadas por tick na limpeza (a caixa tem cerca de 420 mil: uns 21 ticks). */
+    static final int OLHADOS_POR_TICK = 20000;
+    /** Sem avisar vizinhos nem recalcular formas: a planta já diz como cada bloco fica. */
+    private static final int MARCAS = Block.UPDATE_CLIENTS | Block.UPDATE_KNOWN_SHAPE;
+
+    private static final class Obra {
+        final ServerLevel nivel;
+        final CaixaArena caixa;
+        final Iterator<BlockPos> limpeza;
+        final Iterator<PlantaEscola.Bloco> blocos;
+        final boolean soltarChunks;
+        final Runnable aoTerminar;
+
+        Obra(ServerLevel nivel, CaixaArena caixa, List<PlantaEscola.Bloco> blocos, boolean soltarChunks, Runnable aoTerminar) {
+            this.nivel = nivel;
+            this.caixa = caixa;
+            this.limpeza = BlockPos.betweenClosed(
+                    caixa.centroX() - CaixaArena.MEIA, CaixaArena.Y_FUNDO, caixa.centroZ() - CaixaArena.MEIA,
+                    caixa.centroX() + CaixaArena.MEIA, CaixaArena.Y_TETO - 1, caixa.centroZ() + CaixaArena.MEIA).iterator();
+            this.blocos = blocos.iterator();
+            this.soltarChunks = soltarChunks;
+            this.aoTerminar = aoTerminar;
+        }
+    }
+
+    private static final Deque<Obra> FILA = new ArrayDeque<>();
+
+    private ObrasArena() {
+    }
+
+    static void registrarEventos() {
+        NeoForge.EVENT_BUS.addListener((ServerTickEvent.Post e) -> tick());
+        NeoForge.EVENT_BUS.addListener((ServerStoppingEvent e) -> FILA.clear());
+    }
+
+    /** Limpa a caixa, põe os blocos da planta e chama {@code aoTerminar}. */
+    static void montar(ServerLevel nivel, CaixaArena caixa, List<PlantaEscola.Bloco> blocos, Runnable aoTerminar) {
+        forcarChunks(nivel, caixa, true);
+        FILA.addLast(new Obra(nivel, caixa, blocos, false, aoTerminar));
+    }
+
+    /** Tira da caixa tudo o que não é jogador, apaga todos os blocos, solta os chunks e chama {@code aoTerminar}. */
+    static void apagar(ServerLevel nivel, CaixaArena caixa, Runnable aoTerminar) {
+        forcarChunks(nivel, caixa, true);
+        tirarEntidades(nivel, caixa);
+        FILA.addLast(new Obra(nivel, caixa, List.of(), true, aoTerminar));
+    }
+
+    static boolean ocioso() {
+        return FILA.isEmpty();
+    }
+
+    /** A coluna inteira da caixa, com folga para o que estiver encostado nas faces ou caindo no vazio. */
+    static AABB volume(CaixaArena caixa) {
+        return new AABB(caixa.centroX() - CaixaArena.MEIA - 2, CaixaArena.Y_FUNDO - 64, caixa.centroZ() - CaixaArena.MEIA - 2,
+                caixa.centroX() + CaixaArena.MEIA + 3, CaixaArena.Y_TETO + 64, caixa.centroZ() + CaixaArena.MEIA + 3);
+    }
+
+    private static void tirarEntidades(ServerLevel nivel, CaixaArena caixa) {
+        for (Entity e : nivel.getEntities((Entity) null, volume(caixa), e -> !(e instanceof Player))) e.discard();
+    }
+
+    private static void forcarChunks(ServerLevel nivel, CaixaArena caixa, boolean forcar) {
+        int x0 = (caixa.centroX() - CaixaArena.MEIA) >> 4, x1 = (caixa.centroX() + CaixaArena.MEIA) >> 4;
+        int z0 = (caixa.centroZ() - CaixaArena.MEIA) >> 4, z1 = (caixa.centroZ() + CaixaArena.MEIA) >> 4;
+        for (int x = x0; x <= x1; x++) {
+            for (int z = z0; z <= z1; z++) nivel.setChunkForced(x, z, forcar);
+        }
+    }
+
+    private static void tick() {
+        int mexidos = 0;
+        int olhados = 0;
+        while (!FILA.isEmpty() && mexidos < POR_TICK && olhados < OLHADOS_POR_TICK) {
+            Obra o = FILA.peekFirst();
+            while (o.limpeza.hasNext() && mexidos < POR_TICK && olhados < OLHADOS_POR_TICK) {
+                BlockPos p = o.limpeza.next();
+                olhados++;
+                if (o.nivel.getBlockState(p).isAir()) continue;
+                // Baús e afins soltariam o conteúdo: o bloco-entidade sai antes do bloco.
+                o.nivel.removeBlockEntity(p);
+                o.nivel.setBlock(p, Blocks.AIR.defaultBlockState(), MARCAS);
+                mexidos++;
+            }
+            if (o.limpeza.hasNext()) break;
+            int cx = o.caixa.centroX(), cz = o.caixa.centroZ();
+            BlockPos.MutableBlockPos p = new BlockPos.MutableBlockPos();
+            while (o.blocos.hasNext() && mexidos < POR_TICK) {
+                PlantaEscola.Bloco b = o.blocos.next();
+                p.set(cx + b.dx(), CaixaArena.Y_PATIO + b.dy(), cz + b.dz());
+                o.nivel.setBlock(p, estado(b.material()), MARCAS);
+                mexidos++;
+            }
+            if (o.blocos.hasNext()) break;
+            FILA.pollFirst();
+            if (o.soltarChunks) {
+                // O que caiu durante a limpeza (itens de blocos, flechas) também sai.
+                tirarEntidades(o.nivel, o.caixa);
+                forcarChunks(o.nivel, o.caixa, false);
+            }
+            o.aoTerminar.run();
+        }
+    }
+
+    /** O bloco do Minecraft de cada material da planta. */
+    static BlockState estado(PlantaEscola.Material material) {
+        return switch (material) {
+            case PEDRA -> Blocks.STONE.defaultBlockState();
+            case TIJOLO_PEDRA -> Blocks.STONE_BRICKS.defaultBlockState();
+            case LAJE_PEDRA -> Blocks.STONE_BRICK_SLAB.defaultBlockState();
+            case ANDESITO_POLIDO -> Blocks.POLISHED_ANDESITE.defaultBlockState();
+            case ESCADA_PEDRA -> Blocks.STONE_BRICK_STAIRS.defaultBlockState().setValue(StairBlock.FACING, Direction.NORTH);
+            case MADEIRA_ESCURA -> Blocks.DARK_OAK_PLANKS.defaultBlockState();
+            case MADEIRA_VERMELHA -> Blocks.MANGROVE_PLANKS.defaultBlockState();
+            case TRONCO -> Blocks.SPRUCE_LOG.defaultBlockState();
+            case FOLHA -> Blocks.SPRUCE_LEAVES.defaultBlockState().setValue(LeavesBlock.PERSISTENT, true);
+            case LANTERNA -> Blocks.LANTERN.defaultBlockState();
+            case MURO -> Blocks.STONE_BRICK_WALL.defaultBlockState();
+        };
+    }
+}
