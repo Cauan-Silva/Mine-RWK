@@ -124,7 +124,7 @@ public final class TestesArena {
     public static void dimensaoExiste(GameTestHelper helper) {
         ServerLevel nivel = garantirDimensao(helper.getLevel().getServer());
         helper.assertTrue(nivel != null, "a dimensão minerwk:arena deveria existir");
-        helper.assertTrue(nivel.dimensionType().fixedTime().orElse(-1) == 11500, "hora fixa no fim de tarde (11500)");
+        helper.assertTrue(nivel.dimensionType().fixedTime().orElse(-1) == 12400, "hora fixa no pôr do sol (12400)");
         helper.succeed();
     }
 
@@ -207,7 +207,7 @@ public final class TestesArena {
             helper.assertTrue(erro[0] == null, String.valueOf(erro[0]));
             helper.assertTrue(arena.getBlockState(centro.below()).isAir() && arena.getBlockState(centro.below(4)).isAir(),
                     "a caixa deveria ficar só com ar");
-            AABB tudo = new AABB(centro).inflate(41, 64, 41);
+            AABB tudo = new AABB(centro).inflate(CaixaArena.MEIA + 1, 64, CaixaArena.MEIA + 1);
             helper.assertTrue(arena.getEntitiesOfClass(ItemEntity.class, tudo).isEmpty(), "sem itens caídos na caixa");
             helper.assertTrue(ObrasArena.ocioso(), "sem obra pendente");
         });
@@ -457,7 +457,7 @@ public final class TestesArena {
         // Pérola, fruta do coro, golpe que empurra: de qualquer jeito que ele pare do lado de fora.
         jogador.teleportTo(caixa.centroX() + 60.5, CaixaArena.Y_PATIO, caixa.centroZ() - 55.5);
         helper.runAfterDelay(2, () -> {
-            helper.assertTrue(jogador.getX() <= caixa.centroX() + 41 && jogador.getZ() >= caixa.centroZ() - 40,
+            helper.assertTrue(jogador.getX() <= caixa.centroX() + CaixaArena.MEIA + 1 && jogador.getZ() >= caixa.centroZ() - CaixaArena.MEIA,
                     "deveria estar de volta dentro da caixa, está em " + jogador.position());
             helper.assertTrue(jogador.getY() == CaixaArena.Y_PATIO, "na mesma altura");
             jogador.remove(Entity.RemovalReason.DISCARDED);
@@ -479,11 +479,11 @@ public final class TestesArena {
             CaixaArena caixa = ArenasServidor.de(jogador.getUUID()).orElseThrow();
             if (!empurrado[0]) {
                 // Fora da caixa, mas ainda nos chunks carregados da vaga (mais longe ele seria descarregado).
-                toji.setPos(caixa.centroX() - 44.5, CaixaArena.Y_PATIO, caixa.centroZ() + .5);
+                toji.setPos(caixa.centroX() - CaixaArena.MEIA - 4.5, CaixaArena.Y_PATIO, caixa.centroZ() + .5);
                 empurrado[0] = true;
                 helper.assertTrue(false, "esperando o tick seguinte");
             }
-            helper.assertTrue(toji.getX() >= caixa.centroX() - 40, "o Toji deveria voltar para dentro, está em " + toji.position());
+            helper.assertTrue(toji.getX() >= caixa.centroX() - CaixaArena.MEIA, "o Toji deveria voltar para dentro, está em " + toji.position());
             toji.discard();
         });
     }

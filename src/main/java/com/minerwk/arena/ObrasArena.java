@@ -30,8 +30,8 @@ import net.neoforged.neoforge.event.tick.ServerTickEvent;
 public final class ObrasArena {
     /** Blocos postos ou apagados por tick. */
     static final int POR_TICK = 4000;
-    /** Posições olhadas por tick na limpeza (a caixa tem cerca de 420 mil: uns 21 ticks). */
-    static final int OLHADOS_POR_TICK = 20000;
+    /** Posições olhadas por tick na limpeza (a caixa tem cerca de 775 mil: uns 20 ticks). */
+    static final int OLHADOS_POR_TICK = 40000;
     /** Sem avisar vizinhos nem recalcular formas: a planta já diz como cada bloco fica. */
     private static final int MARCAS = Block.UPDATE_CLIENTS | Block.UPDATE_KNOWN_SHAPE;
 
@@ -166,6 +166,12 @@ public final class ObrasArena {
             case FOLHA -> Blocks.SPRUCE_LEAVES.defaultBlockState().setValue(LeavesBlock.PERSISTENT, true);
             case LANTERNA -> Blocks.LANTERN.defaultBlockState();
             case MURO -> Blocks.STONE_BRICK_WALL.defaultBlockState();
+            case GRAMA -> Blocks.GRASS_BLOCK.defaultBlockState();
+            case PAREDE_BRANCA -> Blocks.SMOOTH_QUARTZ.defaultBlockState();
+            case PILAR -> Blocks.DARK_OAK_LOG.defaultBlockState();
+            case ASSOALHO -> Blocks.SPRUCE_PLANKS.defaultBlockState();
+            case TELHA -> Blocks.DEEPSLATE_TILES.defaultBlockState();
+            case LAJE_TELHA -> Blocks.DEEPSLATE_TILE_SLAB.defaultBlockState();
         };
     }
 }

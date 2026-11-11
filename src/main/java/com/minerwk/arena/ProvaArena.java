@@ -63,7 +63,7 @@ final class ProvaArena {
                     }
                     case 5 -> {
                         MineRWK.LOGGER.info("Prova da arena: 2 s depois de posto fora da caixa, posição {} (a parede leste fica em x = {})",
-                                j.position(), ArenasServidor.de(j.getUUID()).map(c -> c.centroX() + 41).orElse(-1));
+                                j.position(), ArenasServidor.de(j.getUUID()).map(c -> c.centroX() + com.minerwk.core.arena.CaixaArena.MEIA + 1).orElse(-1));
                         fila.add(new Passo(j, agora + 90, 2, p.origem()));
                     }
                     case 2 -> {

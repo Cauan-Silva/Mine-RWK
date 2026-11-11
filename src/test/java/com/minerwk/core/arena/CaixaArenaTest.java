@@ -33,11 +33,11 @@ class CaixaArenaTest {
 
     @Test
     void blocosDaFaceContamComoDentro() {
-        assertTrue(VAGA0.contemBloco(216, 56, 216));
-        assertTrue(VAGA0.contemBloco(296, 119, 296));
-        assertFalse(VAGA0.contemBloco(215, 64, 256));
-        assertFalse(VAGA0.contemBloco(297, 64, 256));
-        assertFalse(VAGA0.contemBloco(256, 55, 256));
+        assertTrue(VAGA0.contemBloco(206, 44, 206));
+        assertTrue(VAGA0.contemBloco(306, 119, 306));
+        assertFalse(VAGA0.contemBloco(205, 64, 256));
+        assertFalse(VAGA0.contemBloco(307, 64, 256));
+        assertFalse(VAGA0.contemBloco(256, 43, 256));
         assertFalse(VAGA0.contemBloco(256, 120, 256));
     }
 
@@ -49,20 +49,20 @@ class CaixaArenaTest {
         assertEquals(16, jogador.z() - toji.z(), 1e-9);
         assertEquals(CaixaArena.Y_PATIO, jogador.y(), 1e-9);
         for (Vetor p : new Vetor[] {jogador, toji}) {
-            assertTrue(Math.abs(p.x() - VAGA0.centro().x()) <= 30);
-            assertTrue(Math.abs(p.z() - VAGA0.centro().z()) <= 30);
+            assertTrue(Math.abs(p.x() - VAGA0.centro().x()) <= 20);
+            assertTrue(Math.abs(p.z() - VAGA0.centro().z()) <= 20);
         }
     }
 
     @Test
     void paredeSeguraQuemVaiParaFora() {
-        Vetor pes = new Vetor(VAGA0.centroX() + 40.9, 64, VAGA0.centroZ() + .5);
+        Vetor pes = new Vetor(VAGA0.centroX() + 50.9, 64, VAGA0.centroZ() + .5);
         Barreira.Correcao c = VAGA0.corrigir(pes, new Vetor(.4, 0, 0), .3, 1.8);
-        assertEquals(VAGA0.centroX() + 41 - .3 - Barreira.MARGEM, c.posicao().x(), 1e-9);
+        assertEquals(VAGA0.centroX() + 51 - .3 - Barreira.MARGEM, c.posicao().x(), 1e-9);
         assertTrue(c.velocidade().x() <= 0);
-        Vetor oeste = new Vetor(VAGA0.centroX() - 39.9, 64, VAGA0.centroZ() + .5);
+        Vetor oeste = new Vetor(VAGA0.centroX() - 49.9, 64, VAGA0.centroZ() + .5);
         Barreira.Correcao o = VAGA0.corrigir(oeste, new Vetor(-.4, 0, 0), .3, 1.8);
-        assertEquals(VAGA0.centroX() - 40 + .3 + Barreira.MARGEM, o.posicao().x(), 1e-9);
+        assertEquals(VAGA0.centroX() - 50 + .3 + Barreira.MARGEM, o.posicao().x(), 1e-9);
         assertTrue(o.velocidade().x() >= 0);
     }
 
@@ -84,11 +84,11 @@ class CaixaArenaTest {
 
     @Test
     void fundoEAberto() {
-        Vetor pes = new Vetor(VAGA0.centroX(), 50, VAGA0.centroZ());
+        Vetor pes = new Vetor(VAGA0.centroX(), 40, VAGA0.centroZ());
         Barreira.Correcao c = VAGA0.corrigir(pes, new Vetor(0, -1, 0), .3, 1.8);
-        assertEquals(50, c.posicao().y(), 1e-9);
+        assertEquals(40, c.posicao().y(), 1e-9);
         assertEquals(-1, c.velocidade().y(), 1e-9);
-        assertTrue(VAGA0.abaixoDoFundo(55.9));
-        assertFalse(VAGA0.abaixoDoFundo(56));
+        assertTrue(VAGA0.abaixoDoFundo(43.9));
+        assertFalse(VAGA0.abaixoDoFundo(44));
     }
 }
