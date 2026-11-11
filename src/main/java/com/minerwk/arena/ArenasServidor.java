@@ -12,6 +12,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.function.BiConsumer;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.MinecraftServer;
@@ -102,6 +103,15 @@ public final class ArenasServidor {
 
     public static boolean naArena(Entity e) {
         return e.level().dimension() == DIMENSAO;
+    }
+
+    /**
+     * Se um golpe pode apagar ou arrancar o bloco. Fora da dimensão da arena, sempre; dentro, só o que está
+     * na caixa da vaga daquela posição: a destruição não vaza para o vazio em volta.
+     */
+    public static boolean podeMexer(Level nivel, BlockPos pos) {
+        if (nivel.dimension() != DIMENSAO) return true;
+        return CaixaArena.daPosicao(pos.getX(), pos.getZ()).contemBloco(pos.getX(), pos.getY(), pos.getZ());
     }
 
     /** A caixa da arena desse jogador, do pedido até ele sair dela. */

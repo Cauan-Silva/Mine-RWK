@@ -92,8 +92,10 @@ public final class ObrasArena {
     }
 
     private static void forcarChunks(ServerLevel nivel, CaixaArena caixa, boolean forcar) {
-        int x0 = (caixa.centroX() - CaixaArena.MEIA) >> 4, x1 = (caixa.centroX() + CaixaArena.MEIA) >> 4;
-        int z0 = (caixa.centroZ() - CaixaArena.MEIA) >> 4, z1 = (caixa.centroZ() + CaixaArena.MEIA) >> 4;
+        // Um anel a mais em volta da caixa: quem é empurrado para fora da parede continua num chunk ativo
+        // até a barreira o puxar de volta (num chunk parado o boss sairia do mundo e a luta acabaria).
+        int x0 = ((caixa.centroX() - CaixaArena.MEIA) >> 4) - 1, x1 = ((caixa.centroX() + CaixaArena.MEIA) >> 4) + 1;
+        int z0 = ((caixa.centroZ() - CaixaArena.MEIA) >> 4) - 1, z1 = ((caixa.centroZ() + CaixaArena.MEIA) >> 4) + 1;
         for (int x = x0; x <= x1; x++) {
             for (int z = z0; z <= z1; z++) nivel.setChunkForced(x, z, forcar);
         }

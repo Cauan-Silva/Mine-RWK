@@ -9,11 +9,13 @@ import com.minerwk.core.arena.CaixaArena;
 import com.minerwk.core.arena.PlantaEscola;
 import com.minerwk.core.kit.Vetor;
 import com.minerwk.kit.Anexos;
+import com.minerwk.kit.ContextoServidor;
 import com.minerwk.kit.TestesGojo;
 import io.netty.channel.embedded.EmbeddedChannel;
 import java.util.List;
 import java.util.Optional;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.gametest.framework.GameTest;
@@ -29,13 +31,16 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.network.CommonListenerCookie;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;
 import net.minecraft.server.level.ClientInformation;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.ExperienceOrb;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.ChunkPos;
+import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.Block;
@@ -48,6 +53,7 @@ import net.minecraft.world.level.levelgen.FlatLevelSource;
 import net.minecraft.world.level.levelgen.flat.FlatLevelGeneratorSettings;
 import net.minecraft.world.level.storage.DerivedLevelData;
 import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.gametest.GameTestHolder;
 import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
@@ -418,5 +424,160 @@ public final class TestesArena {
             helper.assertTrue(ServicoKits.dados(jogador).maestriaAtual().despertou, "a vitória continua valendo");
             helper.assertTrue(diamantes(renascer(helper, jogador)) == 3, "e os itens voltam ao renascer");
         });
+    }
+
+    // --- Barreira e queda no vazio ---
+
+    @GameTest(template = "vazio", batch = "arena_15")
+    public static void foraDaCaixaVoltaParaDentro(GameTestHelper helper) {
+        ServerPlayer jogador = jogador(helper);
+        CaixaArena caixa = CaixaArena.daVaga(52);
+        ArenasServidor.levar(jogador, caixa);
+        // Pérola, fruta do coro, golpe que empurra: de qualquer jeito que ele pare do lado de fora.
+        jogador.teleportTo(caixa.centroX() + 60.5, CaixaArena.Y_PATIO, caixa.centroZ() - 55.5);
+        helper.runAfterDelay(2, () -> {
+            helper.assertTrue(jogador.getX() <= caixa.centroX() + 41 && jogador.getZ() >= caixa.centroZ() - 40,
+                    "deveria estar de volta dentro da caixa, está em " + jogador.position());
+            helper.assertTrue(jogador.getY() == CaixaArena.Y_PATIO, "na mesma altura");
+            jogador.remove(Entity.RemovalReason.DISCARDED);
+            helper.succeed();
+        });
+    }
+
+    @GameTest(template = "vazio", batch = "arena_16", timeoutTicks = 300)
+    public static void tojiNaoSaiDaCaixa(GameTestHelper helper) {
+        ServerPlayer jogador = jogador(helper);
+        LutasToji.invocar(jogador, false);
+        boolean[] empurrado = {false};
+        TojiEntity[] visto = {null};
+        helper.succeedWhen(() -> {
+            TojiEntity toji = LutasToji.de(jogador.getUUID()).orElse(null);
+            if (toji != null) visto[0] = toji;
+            helper.assertTrue(toji != null, "esperando o Toji" + (visto[0] == null ? "" : ": sumiu por "
+                    + visto[0].getRemovalReason() + " em " + visto[0].position() + " com vida " + visto[0].getHealth()));
+            CaixaArena caixa = ArenasServidor.de(jogador.getUUID()).orElseThrow();
+            if (!empurrado[0]) {
+                // Fora da caixa, mas ainda nos chunks carregados da vaga (mais longe ele seria descarregado).
+                toji.setPos(caixa.centroX() - 44.5, CaixaArena.Y_PATIO, caixa.centroZ() + .5);
+                empurrado[0] = true;
+                helper.assertTrue(false, "esperando o tick seguinte");
+            }
+            helper.assertTrue(toji.getX() >= caixa.centroX() - 40, "o Toji deveria voltar para dentro, está em " + toji.position());
+            toji.discard();
+        });
+    }
+
+    @GameTest(template = "vazio", batch = "arena_17")
+    public static void quedaNoVazioVoltaAoCentro(GameTestHelper helper) {
+        ServerPlayer jogador = jogador(helper);
+        CaixaArena caixa = CaixaArena.daVaga(53);
+        ServerLevel arena = ArenasServidor.nivel(helper.getLevel().getServer());
+        ArenasServidor.levar(jogador, caixa);
+        jogador.hasChangedDimension();
+        jogador.teleportTo(caixa.centroX() + 10.5, CaixaArena.Y_FUNDO - 6, caixa.centroZ() + 10.5);
+        helper.runAfterDelay(2, () -> {
+            helper.assertTrue(perto(jogador, vec(caixa.centro())), "deveria voltar ao centro, está em " + jogador.position());
+            helper.assertTrue(jogador.getHealth() == 16, "a queda tira 4 de vida, sobrou " + jogador.getHealth());
+            BlockPos piso = BlockPos.containing(caixa.centro().x(), CaixaArena.Y_PATIO - 1, caixa.centro().z());
+            for (int dx = -2; dx <= 2; dx++) {
+                for (int dz = -2; dz <= 2; dz++) {
+                    helper.assertTrue(arena.getBlockState(piso.offset(dx, 0, dz)).is(Blocks.STONE_BRICKS), "o 5 × 5 do centro é refeito");
+                }
+            }
+            helper.assertTrue(arena.getBlockState(piso.offset(3, 0, 0)).isAir(), "e só ele");
+            jogador.remove(Entity.RemovalReason.DISCARDED);
+            ObrasArena.apagar(arena, caixa, () -> { });
+            helper.succeed();
+        });
+    }
+
+    @GameTest(template = "vazio", batch = "arena_18")
+    public static void espectadorPassa(GameTestHelper helper) {
+        ServerPlayer jogador = jogador(helper);
+        CaixaArena caixa = CaixaArena.daVaga(54);
+        ArenasServidor.levar(jogador, caixa);
+        jogador.setGameMode(GameType.SPECTATOR);
+        jogador.teleportTo(caixa.centroX() + 60.5, CaixaArena.Y_FUNDO - 6, caixa.centroZ() + .5);
+        helper.runAfterDelay(2, () -> {
+            helper.assertTrue(jogador.getX() > caixa.centroX() + 60 && jogador.getY() < CaixaArena.Y_FUNDO,
+                    "o espectador não é corrigido, está em " + jogador.position());
+            jogador.remove(Entity.RemovalReason.DISCARDED);
+            helper.succeed();
+        });
+    }
+
+    // --- Blocos da arena ---
+
+    @GameTest(template = "vazio", batch = "arena_19")
+    public static void jogadorNaoQuebraNemPoeNaArena(GameTestHelper helper) {
+        ServerPlayer jogador = jogador(helper);
+        CaixaArena caixa = CaixaArena.daVaga(55);
+        ServerLevel arena = ArenasServidor.nivel(helper.getLevel().getServer());
+        ArenasServidor.levar(jogador, caixa);
+        BlockPos chao = BlockPos.containing(caixa.centro().x(), CaixaArena.Y_PATIO - 1, caixa.centro().z());
+        arena.setBlockAndUpdate(chao, Blocks.STONE_BRICKS.defaultBlockState());
+
+        helper.assertFalse(jogador.gameMode.destroyBlock(chao), "em sobrevivência não se quebra bloco da arena à mão");
+        helper.assertTrue(arena.getBlockState(chao).is(Blocks.STONE_BRICKS), "o bloco continua lá");
+        jogador.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(Items.DIRT, 4));
+        BlockHitResult emCima = new BlockHitResult(Vec3.atCenterOf(chao).add(0, .5, 0), Direction.UP, chao, false);
+        jogador.getMainHandItem().useOn(new UseOnContext(jogador, InteractionHand.MAIN_HAND, emCima));
+        helper.assertTrue(arena.getBlockState(chao.above()).isAir(), "nem se põe bloco");
+
+        jogador.setGameMode(GameType.CREATIVE);
+        jogador.getMainHandItem().useOn(new UseOnContext(jogador, InteractionHand.MAIN_HAND, emCima));
+        helper.assertTrue(arena.getBlockState(chao.above()).is(Blocks.DIRT), "no criativo dá para pôr");
+        helper.assertTrue(jogador.gameMode.destroyBlock(chao.above()), "e para quebrar");
+
+        jogador.remove(Entity.RemovalReason.DISCARDED);
+        ObrasArena.apagar(arena, caixa, () -> { });
+        helper.succeed();
+    }
+
+    @GameTest(template = "vazio", batch = "arena_20")
+    public static void apagarNaoPassaDaCaixa(GameTestHelper helper) {
+        ServerPlayer jogador = jogador(helper);
+        CaixaArena caixa = CaixaArena.daVaga(56);
+        ServerLevel arena = ArenasServidor.nivel(helper.getLevel().getServer());
+        ArenasServidor.levar(jogador, caixa);
+        // A última coluna de dentro e a primeira de fora, lado a lado.
+        BlockPos dentro = new BlockPos(caixa.centroX() + CaixaArena.MEIA, 70, caixa.centroZ());
+        BlockPos fora = dentro.east();
+        arena.setChunkForced(dentro.getX() >> 4, dentro.getZ() >> 4, true);
+        arena.setChunkForced(fora.getX() >> 4, fora.getZ() >> 4, true);
+        arena.setBlockAndUpdate(dentro, Blocks.STONE.defaultBlockState());
+        arena.setBlockAndUpdate(fora, Blocks.STONE.defaultBlockState());
+        Vec3 meio = Vec3.atCenterOf(dentro).add(.5, 0, 0);
+        new ContextoServidor(jogador).apagarCasca(new Vetor(meio.x, meio.y, meio.z), 0, 6);
+        helper.runAfterDelay(4, () -> {
+            helper.assertTrue(arena.getBlockState(dentro).isAir(), "o bloco de dentro da caixa é apagado");
+            helper.assertTrue(arena.getBlockState(fora).is(Blocks.STONE), "o de fora fica");
+            arena.setBlockAndUpdate(fora, Blocks.AIR.defaultBlockState());
+            arena.setChunkForced(dentro.getX() >> 4, dentro.getZ() >> 4, false);
+            arena.setChunkForced(fora.getX() >> 4, fora.getZ() >> 4, false);
+            jogador.remove(Entity.RemovalReason.DISCARDED);
+            helper.succeed();
+        });
+    }
+
+    @GameTest(template = "vazio", batch = "arena_21")
+    public static void arrancarNaoPassaDaCaixa(GameTestHelper helper) {
+        ServerPlayer jogador = jogador(helper);
+        CaixaArena caixa = CaixaArena.daVaga(57);
+        ServerLevel arena = ArenasServidor.nivel(helper.getLevel().getServer());
+        ArenasServidor.levar(jogador, caixa);
+        BlockPos dentro = new BlockPos(caixa.centroX() + CaixaArena.MEIA, 70, caixa.centroZ());
+        BlockPos fora = dentro.east();
+        arena.setBlockAndUpdate(dentro, Blocks.DIRT.defaultBlockState());
+        arena.setBlockAndUpdate(fora, Blocks.DIRT.defaultBlockState());
+        Vec3 meio = Vec3.atCenterOf(dentro).add(.5, 0, 0);
+        ContextoServidor ctx = new ContextoServidor(jogador);
+        for (int i = 0; i < 80; i++) ctx.arrancarBlocos(new Vetor(meio.x, meio.y, meio.z), 1.5, 2, .6f);
+        helper.assertTrue(arena.getBlockState(dentro).isAir(), "a terra de dentro da caixa é arrancada");
+        helper.assertTrue(arena.getBlockState(fora).is(Blocks.DIRT), "a de fora fica");
+        arena.setBlockAndUpdate(fora, Blocks.AIR.defaultBlockState());
+        jogador.remove(Entity.RemovalReason.DISCARDED);
+        ObrasArena.apagar(arena, caixa, () -> { });
+        helper.succeed();
     }
 }

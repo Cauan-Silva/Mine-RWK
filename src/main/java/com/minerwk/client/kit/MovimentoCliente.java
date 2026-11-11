@@ -1,6 +1,8 @@
 package com.minerwk.client.kit;
 
 import com.minerwk.client.vfx.VisuaisAtivos;
+import com.minerwk.arena.ArenasServidor;
+import com.minerwk.core.arena.CaixaArena;
 import com.minerwk.core.kit.Barreira;
 import com.minerwk.core.kit.Vetor;
 import com.minerwk.core.personagens.gojo.RoxoMaximo;
@@ -44,7 +46,10 @@ public final class MovimentoCliente {
             voo = null;
             quedaLentaAte = -1;
         }
-        if (jogador.isSpectator() || jogador.getAbilities().flying || jogador.isPassenger() || jogador.isDeadOrDying()) return;
+        if (jogador.isSpectator() || jogador.isDeadOrDying()) return;
+        // Antes do resto: a barreira da arena vale também para quem voa no criativo ou está montado.
+        if (jogador.level().dimension() == ArenasServidor.DIMENSAO) arena(jogador);
+        if (jogador.getAbilities().flying || jogador.isPassenger()) return;
         long agora = jogador.level().getGameTime();
         VisuaisAtivos.Visual sequencia = null;
         for (VisuaisAtivos.Visual v : VisuaisAtivos.ativos()) {
@@ -69,6 +74,20 @@ public final class MovimentoCliente {
                 jogador.resetFallDistance();
             }
         }
+    }
+
+    /**
+     * A barreira da arena: paredes e teto da caixa da vaga onde o jogador está. A caixa sai só da posição,
+     * então não depende de nada que o servidor mande; ele confere a mesma regra do lado dele.
+     */
+    private static void arena(LocalPlayer jogador) {
+        Vetor pes = new Vetor(jogador.getX(), jogador.getY(), jogador.getZ());
+        Vec3 vel = jogador.getDeltaMovement();
+        Barreira.Correcao c = CaixaArena.daPosicao(pes.x(), pes.z())
+                .corrigir(pes, new Vetor(vel.x, vel.y, vel.z), jogador.getBbWidth() / 2, jogador.getBbHeight());
+        if (c.posicao().distancia(pes) < 1e-6) return;
+        jogador.setPos(c.posicao().x(), c.posicao().y(), c.posicao().z());
+        jogador.setDeltaMovement(c.velocidade().x(), c.velocidade().y(), c.velocidade().z());
     }
 
     private static void dominio(LocalPlayer jogador, VisuaisAtivos.Visual v) {

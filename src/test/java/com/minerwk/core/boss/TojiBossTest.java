@@ -122,10 +122,11 @@ class TojiBossTest {
     }
 
     @Test
-    void lutaAcabaSemOInvocadorLongeDemaisOuAosDezMinutos() {
-        assertEquals(Fim.CONTINUA, TojiBoss.fim(true, 64, 11999));
-        assertEquals(Fim.INVOCADOR_FORA, TojiBoss.fim(false, 2, 0));
-        assertEquals(Fim.LONGE, TojiBoss.fim(true, 64.5, 0));
-        assertEquals(Fim.TEMPO, TojiBoss.fim(true, 2, 12000));
+    void lutaAcabaSemOInvocadorOuAosDezMinutos() {
+        // A distância não conta mais: a barreira da arena segura os dois.
+        assertEquals(Fim.CONTINUA, TojiBoss.fim(true, 100));
+        assertEquals(Fim.CONTINUA, TojiBoss.fim(true, 11999));
+        assertEquals(Fim.INVOCADOR_FORA, TojiBoss.fim(false, 0));
+        assertEquals(Fim.TEMPO, TojiBoss.fim(true, 12000));
     }
 }

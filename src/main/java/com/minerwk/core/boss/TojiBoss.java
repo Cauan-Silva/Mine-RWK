@@ -149,8 +149,8 @@ public final class TojiBoss {
 
     /** A luta acaba sozinha aos 10 minutos. */
     public static final int TEMPO_LIMITE = 10 * 60 * 20;
-    /** Quem invocou não pode se afastar mais do que isto. */
-    public static final double DISTANCIA_MAXIMA = 64;
+    /** Até onde o Toji enxerga quem invocou: cobre a diagonal da caixa da arena. */
+    public static final double ALCANCE_DE_VISAO = 96;
 
     private TojiBoss() {
     }
@@ -181,16 +181,12 @@ public final class TojiBoss {
         return dano >= vida;
     }
 
-    /** Por que a luta acaba sem vitória. */
-    public enum Fim { CONTINUA, INVOCADOR_FORA, LONGE, TEMPO }
+    /** Por que a luta acaba sem vitória. A distância não conta: a barreira da arena segura os dois. */
+    public enum Fim { CONTINUA, INVOCADOR_FORA, TEMPO }
 
-    /**
-     * @param invocadorPresente vivo, conectado e na mesma dimensão
-     * @param distancia         de quem invocou até o Toji
-     */
-    public static Fim fim(boolean invocadorPresente, double distancia, int ticksDeLuta) {
+    /** @param invocadorPresente vivo, conectado e na mesma dimensão */
+    public static Fim fim(boolean invocadorPresente, int ticksDeLuta) {
         if (!invocadorPresente) return Fim.INVOCADOR_FORA;
-        if (distancia > DISTANCIA_MAXIMA) return Fim.LONGE;
         if (ticksDeLuta >= TEMPO_LIMITE) return Fim.TEMPO;
         return Fim.CONTINUA;
     }
