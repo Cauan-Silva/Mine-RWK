@@ -140,6 +140,22 @@ public final class VisuaisAtivos {
         DetritosGojo.aoComecar(p.tipo(), p.origem(), p.forca());
     }
 
+    /** Um visual que nasce neste cliente, sem aviso do servidor (o rastro do clique da espada). */
+    public static void local(int dono, String tipo, Vetor origem, Vetor direcao, float forca, int duracao) {
+        ClientLevel nivel = Minecraft.getInstance().level;
+        if (nivel == null) return;
+        if (ATIVOS.size() >= LIMITE) despejar();
+        ATIVOS.add(new Visual(dono, tipo, origem, direcao, forca, duracao, nivel.getGameTime()));
+    }
+
+    /** Se o dono tem um visual desse tipo em andamento (não encerrado). */
+    public static boolean tem(int dono, String tipo) {
+        for (Visual v : ATIVOS) {
+            if (v.dono == dono && v.fimEm < 0 && v.tipo.equals(tipo)) return true;
+        }
+        return false;
+    }
+
     public static void encerrar(EncerrarVisual p) {
         ClientLevel nivel = Minecraft.getInstance().level;
         if (nivel == null) return;

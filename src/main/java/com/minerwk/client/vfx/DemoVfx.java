@@ -215,6 +215,8 @@ public final class DemoVfx {
                 if (t == k[0]) tecla(qual[k[2]], true);
                 if (t == k[1]) tecla(qual[k[2]], false);
             }
+            // Cliques da espada: dois no Shikai, um no Bankai e dois com o Getsuga na lâmina.
+            if (t == 36 || t == 44 || t == 248 || t == 292 || t == 302) jogador.swing(net.minecraft.world.InteractionHand.MAIN_HAND);
             if (t == FIM_PREVIA - 3) {
                 jogador.connection.sendCommand("kill @e[type=minecraft:husk,distance=..60]");
                 jogador.connection.sendCommand("kill @e[type=minecraft:armor_stand,distance=..60]");

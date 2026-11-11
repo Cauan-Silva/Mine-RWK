@@ -52,8 +52,9 @@ final class RenderVisuaisIchigo {
         float sai = v.fimEm < 0 ? 1 : (float) Math.max(0, 1 - (t - (v.fimEm - v.inicio)) / VisuaisAtivos.SAIDA);
         try {
             switch (v.tipo) {
-                case "ichigo_getsuga" -> getsuga(v, o, t, false);
-                case "ichigo_getsuga_negro" -> getsuga(v, o, t, true);
+                case "ichigo_getsuga" -> getsuga(camera, v, o, t, false);
+                case "ichigo_getsuga_negro" -> getsuga(camera, v, o, t, true);
+                case "ichigo_corte" -> corte(v, o, t);
                 case "ichigo_carga" -> carga(camera, parcial, v, t, sai, false);
                 case "ichigo_bankai_carga" -> carga(camera, parcial, v, t, sai, true);
                 case "ichigo_shunpo" -> shunpo(v, o, t, false);
@@ -231,7 +232,7 @@ final class RenderVisuaisIchigo {
 
     // ---------------------------------------------------------------- Getsuga Tenshō
 
-    private static void getsuga(VisuaisAtivos.Visual v, Vec3 o, double t, boolean bankai) {
+    private static void getsuga(Vec3 camera, VisuaisAtivos.Visual v, Vec3 o, double t, boolean bankai) {
         Base b = Base.de(vec(v.direcao));
         // Parou onde o servidor avisou (bloco) ou no alcance máximo; depois se parte em lascas.
         double fim = GetsugaIchigo.voo(bankai);
@@ -244,6 +245,7 @@ final class RenderVisuaisIchigo {
         double e = GetsugaIchigo.escala(t) * (bankai ? 1 : .85 + .3 * v.forca);
         double andou = GetsugaIchigo.distancia(Math.min(t, fim), bankai);
         Vec3 c = o.add(b.frente.scale(andou));
+        sulco(camera, v, b, andou, t, bankai);
         int n = GetsugaIchigo.PONTOS, m = GetsugaIchigo.SECAO;
         if (dis < .6 && a > .01f) {
             float ac = a * (float) (1 - dis / .6);
@@ -265,7 +267,7 @@ final class RenderVisuaisIchigo {
                 double tk = t - k * 1.5;
                 if (tk <= 0) continue;
                 Vec3 recuo = b.frente.scale(GetsugaIchigo.distancia(Math.min(tk, fim), bankai) - andou);
-                malha(vol, null, null, recuo, bankai ? TINTA : AZUL, (k == 1 ? .34f : .15f) * ac);
+                malha(vol, null, null, recuo, bankai ? TINTA : AZUL, (bankai ? (k == 1 ? .6f : .32f) : (k == 1 ? .34f : .15f)) * ac);
             }
             fechar();
             // O corpo: opaco e com luz no Bankai, quase branco no Shikai.
@@ -312,6 +314,91 @@ final class RenderVisuaisIchigo {
             halo(c, 2.8, bankai ? RUBRO : BRANCO, a * .45f);
             fechar();
         }
+    }
+
+    /** O rasgo que a meia-lua deixa no chão, só onde ela passa rente ao terreno. */
+    private static void sulco(Vec3 camera, VisuaisAtivos.Visual v, Base b, double andou, double t, boolean bankai) {
+        Vec3 h = new Vec3(b.frente.x, 0, b.frente.z);
+        if (h.lengthSqr() < 1e-6) return;
+        h = h.normalize();
+        Vec3 lado = new Vec3(-h.z, 0, h.x), saida = vec(v.origem);
+        var mundo = Minecraft.getInstance().level;
+        java.util.List<Vec3[]> trechos = new java.util.ArrayList<>();
+        java.util.List<Float> alphas = new java.util.ArrayList<>();
+        for (double z = 1; z <= andou; z += 1) {
+            float a = (float) GetsugaIchigo.sulco(z, t, bankai);
+            if (a < .02f) continue;
+            Vec3 q = saida.add(b.frente.scale(z));
+            HitResult chao = mundo.clip(new ClipContext(q, q.add(0, -3, 0), ClipContext.Block.COLLIDER,
+                    ClipContext.Fluid.NONE, CollisionContext.empty()));
+            if (chao.getType() == HitResult.Type.MISS) continue;
+            Vec3 p = chao.getLocation().subtract(camera).add(0, .03, 0);
+            Vec3 l = lado.scale(GetsugaIchigo.larguraDoSulco(z, bankai));
+            trechos.add(new Vec3[] {p.subtract(l), p.add(l), p.add(h.scale(1.02)).add(l), p.add(h.scale(1.02)).subtract(l)});
+            alphas.add(a);
+        }
+        if (trechos.isEmpty()) return;
+        abrir(false, false);
+        for (int i = 0; i < trechos.size(); i++) {
+            Vec3[] q = trechos.get(i);
+            quad(q[0], q[1], q[2], q[3], bankai ? TINTA : 0x16222E, alphas.get(i) * .8f);
+        }
+        fechar();
+        abrir(true, false);
+        for (int i = 0; i < trechos.size(); i++) {
+            Vec3[] q = trechos.get(i);
+            float a = alphas.get(i) * .7f;
+            Vec3 sobe = new Vec3(0, .02, 0);
+            Vec3 borda = q[1].subtract(q[0]).scale(.12);
+            quad(q[0].add(sobe), q[0].add(borda).add(sobe), q[3].add(borda).add(sobe), q[3].add(sobe), bankai ? RUBRO : AZUL, a);
+            quad(q[1].add(sobe), q[1].subtract(borda).add(sobe), q[2].subtract(borda).add(sobe), q[2].add(sobe), bankai ? RUBRO : AZUL, a);
+        }
+        fechar();
+    }
+
+    /** O rastro do clique da espada: um arco na diagonal na frente do corpo, que a lâmina varre e que some. */
+    private static void corte(VisuaisAtivos.Visual v, Vec3 o, double t) {
+        int forma = Math.round(v.forca);
+        boolean bankai = forma >= 1;
+        Base b = Base.de(vec(v.direcao));
+        // Um clique desce da direita, o seguinte da esquerda.
+        double inclina = Math.toRadians(GetsugaIchigo.INCLINACAO) * ((v.inicio & 1) == 0 ? 1 : -1);
+        Vec3 eixo = b.lado.scale(Math.sin(inclina)).add(b.cima.scale(Math.cos(inclina)));
+        Vec3 c = o.add(0, -.3, 0);
+        double raio = FormasIchigo.raioDoCorte(forma), abertura = FormasIchigo.CORTE_ABERTURA;
+        int n = 22;
+        Vec3[] fora = new Vec3[n + 1], dentro = new Vec3[n + 1];
+        float[] alpha = new float[n + 1];
+        for (int i = 0; i <= n; i++) {
+            // De cima para baixo: o arco começa no alto, do lado da espada.
+            double a = -abertura + 2 * abertura * i / n, miolo = Math.pow(Math.cos(a / abertura * Math.PI / 2), .7);
+            Vec3 rumo = b.frente.scale(Math.cos(a)).subtract(eixo.scale(Math.sin(a)));
+            fora[i] = c.add(rumo.scale(raio));
+            dentro[i] = c.add(rumo.scale(raio * (1 - .3 * miolo)));
+            alpha[i] = (float) (FormasIchigo.corte(a, t) * miolo);
+        }
+        if (bankai) {
+            abrir(false, false);
+            for (int i = 0; i < n; i++) {
+                ponto(dentro[i], TINTA, 0);
+                ponto(fora[i], TINTA, alpha[i] * .9f);
+                ponto(fora[i + 1], TINTA, alpha[i + 1] * .9f);
+                ponto(dentro[i + 1], TINTA, 0);
+            }
+            fechar();
+        }
+        abrir(true, false);
+        for (int i = 0; i < n; i++) {
+            if (!bankai) {
+                ponto(dentro[i], AZUL, 0);
+                ponto(fora[i], BRANCO, alpha[i] * .8f);
+                ponto(fora[i + 1], BRANCO, alpha[i + 1] * .8f);
+                ponto(dentro[i + 1], AZUL, 0);
+            }
+            fita(fora[i], fora[i + 1], bankai ? .05 : .07, bankai ? RUBRO : BRANCO, alpha[i], alpha[i + 1]);
+            if (forma >= 2) fita(fora[i], fora[i + 1], .3, RUBRO, alpha[i] * .35f, alpha[i + 1] * .35f);
+        }
+        fechar();
     }
 
     /**

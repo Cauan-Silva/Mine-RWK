@@ -12,7 +12,37 @@ class FormasIchigoTest {
         assertEquals(24, GetsugaIchigo.distancia(GetsugaIchigo.voo(false), false), 1e-9);
         assertEquals(24, GetsugaIchigo.distancia(99, false), 1e-9);
         assertEquals(28, GetsugaIchigo.distancia(GetsugaIchigo.voo(true), true), 1e-9);
-        assertEquals(GetsugaIchigo.voo(true) + GetsugaIchigo.DISSIPA, GetsugaIchigo.duracao(true));
+        assertEquals(GetsugaIchigo.voo(true) + GetsugaIchigo.DISSIPA + GetsugaIchigo.RASTRO, GetsugaIchigo.duracao(true));
+    }
+
+    @Test
+    void oRasgoNoChaoAbreQuandoAMeiaLuaPassaESomeAntesDoFim() {
+        assertEquals(0, GetsugaIchigo.sulco(8, 4, false), 1e-9, "a meia-lua ainda não chegou a 8 blocos no tick 4");
+        assertTrue(GetsugaIchigo.sulco(8, 8, false) > .9);
+        assertTrue(GetsugaIchigo.sulco(8, 8, false) > GetsugaIchigo.sulco(8, 17, false));
+        for (double z = 0; z <= 24; z++) {
+            assertEquals(0, GetsugaIchigo.sulco(z, GetsugaIchigo.duracao(false), false), 1e-9);
+            assertTrue(GetsugaIchigo.larguraDoSulco(z, false) > .2);
+        }
+    }
+
+    @Test
+    void oCorteDoCliqueVarreOArcoESome() {
+        double abertura = FormasIchigo.CORTE_ABERTURA;
+        assertEquals(-abertura, FormasIchigo.frenteDoCorte(0), 1e-9);
+        assertEquals(abertura, FormasIchigo.frenteDoCorte(3), 1e-9);
+        assertEquals(0, FormasIchigo.corte(0, 0), 1e-9, "a lâmina ainda não passou pelo meio");
+        assertTrue(FormasIchigo.corte(0, 3) > FormasIchigo.corte(-abertura, 3), "mais forte perto da lâmina");
+        assertEquals(0, FormasIchigo.corte(0, FormasIchigo.CORTE), 1e-9);
+        assertTrue(FormasIchigo.raioDoCorte(2) > 4, "com o Getsuga na lâmina o rastro chega ao alcance maior");
+    }
+
+    @Test
+    void osGolpesFortesDoIchigoMexemNaCamera() {
+        for (String tipo : new String[] {"ichigo_getsuga", "ichigo_getsuga_negro", "ichigo_onda", "ichigo_bankai"}) {
+            assertTrue(ImpactoGojo.de(tipo).isPresent(), tipo);
+        }
+        assertTrue(ImpactoGojo.de("ichigo_shunpo").isEmpty());
     }
 
     @Test

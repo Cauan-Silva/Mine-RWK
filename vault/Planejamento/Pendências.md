@@ -27,6 +27,7 @@ Voltar para [[00 Início]].
 - Ichigo, parte 4 (11/11): VFX e animações (prévia em `previas/ichigo.mp4`); os golpes ainda não têm som:
   - **Getsuga (Z):** o reiatsu azul sobe enquanto segura; a meia-lua sai do corte, acompanha o dano e se parte em lascas na parede (atirar de perto numa parede e ver se as lascas aparecem do lado de cá). No Bankai é preta com borda vermelha. Ver de frente, de lado e em primeira pessoa se o tamanho e o brilho agradam.
   - **Shunpo (X):** riscos, vultos e poeira no caminho; conferir em primeira pessoa se não atrapalha a visão.
+  - **Ajustes ainda sem prévia** (gravar com `./gradlew runClientDemo -Pdemo=ichigo` ou ver no jogo): o rasgo no chão por onde o Getsuga passa; o rastro de corte em cada clique da espada (Shikai, Bankai e maior com o C do Bankai), em primeira e terceira pessoa; o tranco de câmera no Getsuga e o clarão na onda e na entrada do Bankai (ver se não ficou demais).
   - **C do Shikai:** a parede da onda abre até onde o golpe alcança (5 blocos).
   - **Arremesso (V):** a espada gira no ar presa pelo pano e volta à mão; atirar contra uma parede próxima e ver se ela para antes do bloco.
   - **Bankai (G):** a carga puxa o reiatsu e escurece; o pilar esconde a troca do traje. Levar dano durante a carga: o visual e a animação param.

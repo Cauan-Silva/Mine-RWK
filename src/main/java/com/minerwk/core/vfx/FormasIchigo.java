@@ -13,6 +13,10 @@ public final class FormasIchigo {
     public static final double ONDA_RAIO = 5;
     /** Quanto cada visual fica na tela, em ticks. */
     public static final int SHUNPO = 9, ONDA = 16, BANKAI = 34, SAIR = 14, ARREMESSO = ARREMESSO_IDA * 2;
+    /** O rastro do clique da espada: ticks na tela, ticks que a lâmina leva para varrer o arco e meia abertura. */
+    public static final int CORTE = 7;
+    private static final double CORTE_VARRE = 2.5;
+    public static final double CORTE_ABERTURA = Math.toRadians(80);
     /** Ticks até a onda chegar ao raio cheio, e até o pilar do Bankai subir. */
     private static final double ONDA_ABRE = 6, PILAR_SOBE = 4;
 
@@ -64,6 +68,24 @@ public final class FormasIchigo {
     public static double anelDoBankai(double t) {
         double x = Math.max(0, Math.min(1, t / 10));
         return 1 + 6 * (1 - (1 - x) * (1 - x));
+    }
+
+    /** Raio do rastro do clique: o alcance da espada no Shikai, no Bankai e com o Getsuga na lâmina. */
+    public static double raioDoCorte(int forma) {
+        return forma >= 2 ? 4.6 : forma == 1 ? 2.3 : 2.1;
+    }
+
+    /** Até que ângulo a lâmina já varreu no tick {@code t}: de -abertura a +abertura. */
+    public static double frenteDoCorte(double t) {
+        return -CORTE_ABERTURA + 2 * CORTE_ABERTURA * suave(t / CORTE_VARRE);
+    }
+
+    /** Opacidade do rastro no ângulo {@code a}: cheio logo atrás da lâmina, sumindo para trás e com o tempo. */
+    public static double corte(double a, double t) {
+        double frente = frenteDoCorte(t);
+        if (t < 0 || a > frente + 1e-9) return 0;
+        double atras = (frente - a) / (2 * CORTE_ABERTURA);
+        return Math.max(0, 1 - atras * .8) * Math.max(0, 1 - t / CORTE);
     }
 
     /** Opacidade da pós-imagem {@code k} (0 é a da partida) do Shunpo: as de trás somem primeiro. */

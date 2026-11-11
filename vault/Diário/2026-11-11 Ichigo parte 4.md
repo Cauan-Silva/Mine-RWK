@@ -19,13 +19,18 @@ As partículas do Minecraft que seguravam o lugar saíram do kit do [[Ichigo]]: 
 - **No código:** as formas e os tempos em `core/vfx/GetsugaIchigo` e `core/vfx/FormasIchigo` (o kit usa os mesmos números de passo, alcance e raio); o desenho em `client/vfx/RenderVisuaisIchigo`, em cor chapada com luz por vértice, sem textura e sem shader novo. Os visuais chegam pelo mesmo `MostrarVisual` do Gojo, com o tipo começando em `ichigo_`.
 - **Prévia:** `./gradlew runClientDemo -Pdemo=ichigo` (câmera fixa de lado: os quatro golpes do Shikai, a entrada do Bankai de frente, os golpes do Bankai e a saída). Vídeo em `previas/ichigo.mp4`.
 
+## Ajustes depois da primeira prévia
+O autor pediu para ajustar os VFX antes do som (sem dizer o quê; fui pelos pontos fracos que eu mesmo tinha listado):
+- **Câmera:** o corte do Getsuga dá um tranco curto (tremor, clarão leve e soco de FOV), e a onda e a liberação do Bankai dão um clarão forte, pela mesma tabela dos golpes do Gojo (`core/vfx/ImpactoGojo`).
+- **Rasgo no chão:** a meia-lua deixa um sulco escuro de borda acesa por onde passa rente ao terreno, que some uns 12 ticks depois.
+- **Clique da espada:** todo clique com a espada na mão deixa um rastro de corte na diagonal (alterna o lado a cada clique); preto e vermelho no Bankai, e chegando aos 5 blocos com o Getsuga na lâmina. Nasce no cliente de quem vê, sem pacote.
+- **Getsuga negro:** pós-imagens mais escuras.
+- **Não conferido em vídeo:** o autor precisou sair e pediu o commit sem a prévia nova. O build e os testes JUnit passam; os GameTests não foram rodados de novo depois destes ajustes (são de cliente e de forma), e `previas/ichigo.mp4` ainda é a gravação de antes deles.
+
 ## Ficou para depois
 - **Som:** parte 5. Os golpes ainda são mudos.
-- **O clique da espada** (ataque básico) não ganhou rastro de corte, nem o alcance maior do Getsuga na lâmina tem visual próprio além das chamas.
-- **O rasgo no chão** por onde o Getsuga passa (existe no Minezin) não veio.
 - **Em primeira pessoa** as chamas do Getsuga na lâmina não aparecem na espada da tela, só os fiapos em volta do corpo.
 - **Onda, pilar e saída** nascem a 1,62 abaixo dos olhos: agachado, ficam um pouco enterrados.
-- As pós-imagens do Getsuga negro ficam acinzentadas sobre a grama clara; dá para escurecer se incomodar.
 
 ## Revisão (subagente)
 - **Corrigido:** a meia-lua que batia num bloco era desenhada um passo dentro da parede, e as lascas nasciam escondidas. O cliente agora usa o ponto que o servidor manda.

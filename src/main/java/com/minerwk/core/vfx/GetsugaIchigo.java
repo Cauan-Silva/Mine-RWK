@@ -15,6 +15,8 @@ public final class GetsugaIchigo {
     public static final double PASSO_SHIKAI = 1.6, ALCANCE_SHIKAI = 24, PASSO_BANKAI = 2.4, ALCANCE_BANKAI = 28;
     /** Ticks crescendo ao sair da lâmina e ticks se desfazendo depois de parar. */
     public static final int CRESCE = 3, DISSIPA = 4;
+    /** Ticks que o rasgo no chão ainda fica depois que a meia-lua se desfez. */
+    public static final int RASTRO = 12;
     public static final int PONTOS = 20, SECAO = 10, CHAMAS = 14, LASCAS = 12, ECOS = 2, LINGUAS = 14;
     /** Inclinação do corte (de cima à direita para baixo à esquerda), em graus, e meia abertura do arco. */
     public static final double INCLINACAO = 35, ABERTURA = Math.toRadians(76);
@@ -46,9 +48,24 @@ public final class GetsugaIchigo {
         return (int) Math.ceil(alcance(bankai) / passo(bankai));
     }
 
-    /** Quanto o visual dura: o voo inteiro e o tempo de se desfazer. */
+    /** Quanto o visual dura: o voo inteiro, o tempo de se desfazer e o rasgo no chão sumindo. */
     public static int duracao(boolean bankai) {
-        return voo(bankai) + DISSIPA;
+        return voo(bankai) + DISSIPA + RASTRO;
+    }
+
+    /**
+     * Opacidade do rasgo no chão a {@code z} blocos da saída: abre quando a meia-lua passa por ali e some
+     * devagar, e de todo antes de o visual acabar.
+     */
+    public static double sulco(double z, double t, boolean bankai) {
+        double idade = t - z / passo(bankai);
+        if (idade < 0) return 0;
+        return suave(idade / 1.5) * (1 - suave((idade - 6) / 8)) * suave((duracao(bankai) - t) / 4);
+    }
+
+    /** Meia largura do rasgo, irregular ao longo do caminho. */
+    public static double larguraDoSulco(double z, boolean bankai) {
+        return (bankai ? .5 : .38) * (.85 + .15 * Math.sin(z * 1.3) + .1 * Math.sin(z * 3.7));
     }
 
     /** A que distância da saída está o centro da meia-lua no tick {@code t} (o primeiro passo é no tick 1). */

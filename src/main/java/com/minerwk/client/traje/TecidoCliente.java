@@ -1,6 +1,9 @@
 package com.minerwk.client.traje;
 
+import com.minerwk.client.vfx.VisuaisAtivos;
+import com.minerwk.core.kit.Vetor;
 import com.minerwk.core.traje.TrajeIchigo;
+import com.minerwk.core.vfx.FormasIchigo;
 import com.minerwk.core.traje.tecido.MolaManto;
 import com.minerwk.core.traje.tecido.TecidoEspada;
 import com.minerwk.core.traje.tecido.TecidoIchigo;
@@ -92,6 +95,13 @@ public final class TecidoCliente {
                 s.inclinacao = p.getXRot();
                 s.entidade = p.getId();
                 continue;
+            }
+            // O clique da espada deixa um rastro de corte (só quando ela está na mão).
+            if (p.swinging && p.swingTime == 0 && !PersonagensVistos.visto(p.getId()).semArma()) {
+                int forma = !TrajeIchigo.BANKAI.equals(traje) ? 0 : VisuaisAtivos.tem(p.getId(), "ichigo_lamina") ? 2 : 1;
+                Vec3 olhos = p.getEyePosition(), olhar = p.getLookAngle();
+                VisuaisAtivos.local(p.getId(), "ichigo_corte", new Vetor(olhos.x, olhos.y, olhos.z),
+                        new Vetor(olhar.x, olhar.y, olhar.z), forma, FormasIchigo.CORTE);
             }
             Vec3 d = pos.subtract(s.pos);
             double rad = Math.toRadians(p.yBodyRot);
