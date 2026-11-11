@@ -1,6 +1,6 @@
 ---
 tags: [personagem]
-estado: pesquisa feita, kit em aprovação (decisões do autor em 11/11)
+estado: kit aprovado pelo autor em 11/11; spec em [[2026-11-11 Ichigo]]
 ---
 # Ichigo Kurosaki
 
@@ -39,7 +39,7 @@ Zanpakutō: **Zangetsu** (斬月, "Lua Cortante"). Fica sempre liberada (Shikai)
 - **Mugetsu:** tudo preto; o céu escurece; silêncio antes do corte.
 - **Som:** o Getsuga é um corte de ar que cresce e estoura; o Bankai entra com um estouro de pressão; a máscara distorce a voz com eco. Sintetizado aqui, como o do Gojo.
 
-## No jogo (proposta, em aprovação)
+## No jogo (kit aprovado em 11/11)
 **Decisões do autor (11/11):**
 - O Ichigo é um personagem de **transformação**: o kit do Shikai na base e o kit do Bankai na transformação.
 - Getsuga **azul-claro** no Shikai e **preto com bordas vermelhas** no Bankai.

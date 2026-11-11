@@ -15,3 +15,10 @@ A Bleach Wiki (Fandom) recusa leitura automática (erro 402); as páginas foram 
 
 ## Falta
 O autor aprovar ou mudar o kit. Só depois vem o spec e o código (regra do projeto).
+
+## Depois, no mesmo dia: kit aprovado e spec
+- O autor respondeu às quatro perguntas: personagem de transformação (Shikai na base, Bankai na transformação); Getsuga azul-claro e, no Bankai, preto com bordas vermelhas; o boss libera o Mugetsu e a máscara; a forma Hollow completa entra no kit. Depois escolheu que ela ativa sozinha ao levar um golpe fatal no Bankai e que também depende do boss.
+- **Kit aprovado.** Spec escrito em [[2026-11-11 Ichigo]], em 8 partes, aguardando aprovação.
+- O núcleo ganha **formas** (um mapa de teclas por forma, recargas e trancas por id de habilidade): é a base para todo personagem de transformação.
+- O Minezin tem os modelos da Zangetsu, da Tensa Zangetsu e dos trajes; o Hollow de chifres e o Zangetsu branco precisam de modelo.
+- O spec lista seis pontos decididos sem perguntar (drenar do Bankai, máscara para o drenar, 60 s sem poderes, Hollow fora da luta do boss, maestria 20, Mugetsu sem quebrar blocos).
