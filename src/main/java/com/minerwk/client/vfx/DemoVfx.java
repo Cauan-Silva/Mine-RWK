@@ -36,6 +36,8 @@ public final class DemoVfx {
     /** {@code traje}: o jogador como Gojo de frente, de costas, num golpe, com armadura vestida e em 1ª pessoa. */
     private static final boolean TRAJE = MODO.equals("traje");
     private static boolean vestiuPeitoral;
+    /** {@code ichigo_traje}: o Ichigo no Shikai e no Bankai, de frente, correndo de costas e em 1ª pessoa. */
+    private static final boolean TRAJE_ICHIGO = MODO.equals("ichigo_traje");
     /** {@code arvore}: a tela da árvore do Gojo em três momentos (sem pontos, com compras e desperto). */
     private static final boolean ARVORE = MODO.equals("arvore");
     /** {@code toji}: a luta contra o Toji: a entrada, a Nuvem, a investida, a queda com a cutscene, o Desaparecer e a fase 3. */
@@ -44,7 +46,7 @@ public final class DemoVfx {
     private static final Path PASTA = Path.of("demo");
     private static final int ESFERAS = RoxoMaximo.TICKS_ESFERAS;
     private static final int ESTOURO = ESFERAS + RoxoMaximo.TICKS_FUSAO;
-    private static final int FIM_PREVIA = TOJI ? 520 : ARVORE ? 100 : TRAJE ? 260 : R_COMPLETO ? 360
+    private static final int FIM_PREVIA = TOJI ? 520 : ARVORE ? 100 : TRAJE ? 260 : TRAJE_ICHIGO ? 300 : R_COMPLETO ? 360
             : ENCANTAMENTO ? CARGA + 90 : ESTOURO + RoxoMaximo.TICKS_EXPLOSAO + 110;
     private static int ticks;
     private static int quadro;
@@ -70,11 +72,15 @@ public final class DemoVfx {
             mc.setScreen(null);
         }
         if (DEMO && ticks == 40) {
-            jogador.connection.sendCommand(ENCANTAMENTO || R_COMPLETO || TRAJE || TOJI ? "time set noon" : "time set midnight");
+            jogador.connection.sendCommand(ENCANTAMENTO || R_COMPLETO || TRAJE || TRAJE_ICHIGO || TOJI ? "time set noon" : "time set midnight");
             if (ARVORE) jogador.connection.sendCommand("rwk trocar @s gojo");
             if (TOJI) {
                 jogador.connection.sendCommand("rwk trocar @s gojo");
                 jogador.connection.sendCommand("rwk despertar @s nao");
+                jogador.connection.sendCommand("tp @s ~150 ~12 ~");
+            }
+            if (TRAJE_ICHIGO) {
+                jogador.connection.sendCommand("rwk trocar @s ichigo");
                 jogador.connection.sendCommand("tp @s ~150 ~12 ~");
             }
             if (TRAJE) {
@@ -168,6 +174,45 @@ public final class DemoVfx {
                 jogador.connection.sendCommand("gamemode creative");
                 jogador.connection.sendCommand("tp @s ~-150 ~ ~-10");
             }
+            if (t >= FIM_PREVIA) {
+                mc.options.setCameraType(net.minecraft.client.CameraType.FIRST_PERSON);
+                previa = -1;
+            }
+            return;
+        }
+        if (TRAJE_ICHIGO) {
+            mc.gui.getChat().clearMessages(false);
+            // Shikai de frente (um Getsuga), corrida de costas, 1ª pessoa com um ataque; depois o Bankai: a
+            // entrada de frente, corrida de costas (o casaco), de lado girando, e 1ª pessoa.
+            var tipo = net.minecraft.client.CameraType.THIRD_PERSON_FRONT;
+            if (t >= 45 && t < 85 || t >= 170 && t < 240) tipo = net.minecraft.client.CameraType.THIRD_PERSON_BACK;
+            boolean primeira = t >= 85 && t < 115 || t >= 260 && t < 290;
+            if (primeira) tipo = net.minecraft.client.CameraType.FIRST_PERSON;
+            mc.options.setCameraType(tipo);
+            jogador.setXRot(primeira ? 10 : 8);
+            if (t == 2 || t == 118) jogador.connection.sendCommand("rwk recarregar");
+            if (t == 1) {
+                for (int espaco = 0; espaco < 9; espaco++) {
+                    if (jogador.getInventory().getItem(espaco).isEmpty()) {
+                        jogador.getInventory().selected = espaco;
+                        jogador.connection.send(new net.minecraft.network.protocol.game.ServerboundSetCarriedItemPacket(espaco));
+                        break;
+                    }
+                }
+            }
+            if (t == 15) tecla(com.minerwk.core.kit.Tecla.Z, true);
+            if (t == 27) tecla(com.minerwk.core.kit.Tecla.Z, false);
+            if (t == 95 || t == 270) jogador.swing(net.minecraft.world.InteractionHand.MAIN_HAND);
+            if (t == 120) tecla(com.minerwk.core.kit.Tecla.G, true);
+            if (t == 122) tecla(com.minerwk.core.kit.Tecla.G, false);
+            boolean corre = t >= 50 && t < 82 || t >= 175 && t < 215;
+            if (corre) {
+                Vec3 frente = new Vec3(jogador.getLookAngle().x, 0, jogador.getLookAngle().z).normalize();
+                jogador.setDeltaMovement(frente.scale(.28).add(0, jogador.getDeltaMovement().y, 0));
+            }
+            // Um giro parado, visto de costas e depois de frente: o casaco e a corrente acompanham.
+            if (t >= 220 && t < 256) jogador.setYRot(jogador.getYRot() + 9);
+            if (t == FIM_PREVIA - 3) jogador.connection.sendCommand("tp @s ~-150 ~ ~-10");
             if (t >= FIM_PREVIA) {
                 mc.options.setCameraType(net.minecraft.client.CameraType.FIRST_PERSON);
                 previa = -1;

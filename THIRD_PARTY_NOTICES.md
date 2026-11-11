@@ -22,6 +22,13 @@
 | --- | --- |
 | `ferramentas/traje/gojo_base.geo.json`, `ferramentas/traje/gojo_base.png` | Minezin (mesmo autor): o uniforme do Gojo |
 | `assets/minerwk/geo/traje/gojo.geo.json`, `assets/minerwk/textures/traje/gojo*.png` | Gerados por `ferramentas/gerar_traje_gojo.py` a partir da base acima, com a venda e os olhos |
+| `ferramentas/traje/ichigo_base.*`, `ichigo_bankai_base.*`, `zangetsu_base.geo.json`, `tensa_zangetsu_base.geo.json` | Minezin (mesmo autor): o shihakushō, o casaco do Bankai e as duas espadas (`geo/armaduras/ichigo*.geo.json`, `textures/armor/trajes/ichigo*.png`, `geo/ichigo/*.geo.json`), feitos lá por `tools/build_ichigo_assets.py` e `build_ichigo_traje.py`, sem arte de terceiros |
+| `assets/minerwk/geo/traje/ichigo*.geo.json`, `assets/minerwk/textures/traje/ichigo*.png` | Gerados por `ferramentas/gerar_traje_ichigo.py` a partir das bases acima: a espada entra no traje, presa ao braço direito, com as cores dela pintadas num canto livre da textura (o atlas de cores do Minezin não é usado) |
 | `assets/minerwk/geo/boss/toji.geo.json`, `assets/minerwk/textures/boss/toji.png`, `toji_glowmask.png` | Minezin (mesmo autor): o modelo e a textura do Toji (`geo/nemesis/1.geo.json`, `textures/bosses/toji_skin*.png`), sem mudança |
 | `assets/minerwk/textures/item/contrato_toji.png` | Gerada por `ferramentas/gerar_item_contrato.py` |
 | `assets/minerwk/sounds/toji/*.ogg` | Sintetizados por `ferramentas/gerar_sfx_toji.py` (motor `sfx_motor.py`); sem áudio de terceiros |
+
+## Código
+| Arquivo | Origem |
+| --- | --- |
+| `core/traje/tecido/MolaManto.java`, `MalhaTecido.java`, `TecidoIchigo.java`, `TecidoEspada.java` e os testes deles | Minezin (mesmo autor): o tecido dos trajes (`MolaMantoCid`, `MalhaTecido`, `TecidoIchigo`, `TecidoEspadaIchigo`), com os nomes trocados e as mangas do Shikai acrescentadas |

@@ -24,6 +24,13 @@ Voltar para [[00 Início]].
 - Gojo (revisão 09/11, menores que ficaram): o Roxo pode derrubar plantas vizinhas (o `BreakEvent` para mods de proteção entrou em 09/11, no Gojo peso); o Vermelho atravessa parede fina encostada no rosto; bola de fogo e crânio de Wither voltam a acelerar no Infinito (o dano é cancelado mesmo assim); TNT sem dono passa pelo Infinito; sobram até 2 ticks de Infinito e 5 de Paralisia depois de morrer. Corrigidos na revisão: efeitos acabam ao mudar de dimensão; golpes não atingem pets, montaria nem projéteis do próprio Gojo; Paralisia não cancela Espinhos nem dano em si mesmo; ícone da Paralisia escondido (falta textura).
 
 ## Para testar no jogo
+- Ichigo, parte 3 (11/11): arma e traje (prévia em `previas/ichigo_traje.mp4`):
+  - **Shikai:** shihakushō e a Zangetsu na mão direita, sem item no inventário. As mangas e a faixa da espada balançam ao andar e ao virar a câmera.
+  - **Bankai (G):** o traje vira o casaco longo e a espada vira a Tensa Zangetsu; o casaco abre na entrada e balança ao correr, pular e girar. Olhar de perto se os painéis do casaco mostram fresta ou se a perna atravessa (se incomodar, dá para trazer a folha lisa do Minezin).
+  - **Arremesso (V):** a espada some da mão e volta depois de uns 16 ticks.
+  - **Primeira pessoa:** com a mão vazia, a espada aparece no braço; conferir se o tamanho e a posição agradam.
+  - **Outro jogador:** quem está vendo o Ichigo vê a troca de traje e de espada na hora (precisa de dois clientes).
+  - **Gojo:** conferir que o traje dele continua igual (venda, olhos e barra do casaco).
 - Ichigo, parte 2 (11/11): o kit das duas formas, ainda só com partículas (`/rwk trocar <jogador> ichigo`):
   - **Shikai:** Z segurado e solto cedo (o segurado fere mais), atravessando dois inimigos em fila e parando na parede; X avança 8 blocos e para antes de parede (testar olhando para baixo, para cima e num degrau); C empurra, fere e apaga flechas de esqueleto; V lança a espada e, até ela voltar, o clique é um soco.
   - **Bankai:** G leva 1,5 s e empurra quem está perto; a barra fica vermelho-escura e escorre. Z sai na hora; X com um inimigo na mira surge atrás dele já olhando para ele; C deixa o clique alcançar 5 blocos por 6 s; G volta e o Bankai fica 5 s em recarga.

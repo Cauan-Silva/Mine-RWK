@@ -84,14 +84,33 @@ public final class ServicoKits {
         novo.recarregar();
         Sincronizacao.enviar(jogador);
         // Quem já está vendo o jogador passa a vê-lo com o traje do personagem novo.
-        com.minerwk.rede.Envio.paraQuemVe(jogador, new com.minerwk.rede.PersonagemDe(jogador.getId(), personagem.id()));
+        APARENCIAS.remove(jogador.getUUID());
+        avisarAparencia(jogador, novo);
+    }
+
+    /** A última aparência avisada de cada jogador: entidade, personagem, forma e arma. */
+    private static final Map<UUID, com.minerwk.rede.PersonagemDe> APARENCIAS = new HashMap<>();
+
+    private static com.minerwk.rede.PersonagemDe aparencia(ServerPlayer jogador, KitDoJogador kit) {
+        boolean semArma = com.minerwk.core.kit.Arma.MAO.equals(ArmaServidor.atual(jogador));
+        return new com.minerwk.rede.PersonagemDe(jogador.getId(), kit.personagem().id(), kit.forma(), semArma);
+    }
+
+    /**
+     * Avisa o jogador e quem o vê quando a aparência dele muda: a forma (o traje e a arma trocam) ou a
+     * espada fora da mão. O id da entidade entra na conta, então quem renasce é avisado de novo.
+     */
+    private static void avisarAparencia(ServerPlayer jogador, KitDoJogador kit) {
+        com.minerwk.rede.PersonagemDe agora = aparencia(jogador, kit);
+        if (agora.equals(APARENCIAS.put(jogador.getUUID(), agora))) return;
+        com.minerwk.rede.Envio.paraQuemVe(jogador, agora);
     }
 
     /** Um jogador passou a ver outro: recebe o personagem dele, para desenhar o traje. */
     private static void aoComecarAVer(PlayerEvent.StartTracking evento) {
         if (evento.getTarget() instanceof ServerPlayer visto && evento.getEntity() instanceof ServerPlayer quemVe) {
-            String personagem = kit(visto).map(k -> k.personagem().id()).orElse("");
-            com.minerwk.rede.Envio.para(quemVe, new com.minerwk.rede.PersonagemDe(visto.getId(), personagem));
+            com.minerwk.rede.Envio.para(quemVe, kit(visto).map(k -> aparencia(visto, k))
+                    .orElseGet(() -> new com.minerwk.rede.PersonagemDe(visto.getId(), "")));
         }
     }
 
@@ -271,6 +290,7 @@ public final class ServicoKits {
         boolean parado = jogador.getDeltaMovement().horizontalDistanceSqr() < LIMIAR_PARADO * LIMIAR_PARADO;
         kit.get().tick(agora, new EstadoDoJogador(parado, apanhou, causou), contexto);
         ArmaServidor.aplicar(jogador);
+        avisarAparencia(jogador, kit.get());
         if (agora % SALVAR_A_CADA == 0) salvar(jogador, kit.get());
         Sincronizacao.aoTick(jogador, kit.get());
     }
@@ -301,6 +321,7 @@ public final class ServicoKits {
             salvar(jogador, kit);
         }
         Sincronizacao.esquecer(jogador);
+        APARENCIAS.remove(jogador.getUUID());
         DESPERTOS_NA_LUTA.remove(jogador.getUUID());
     }
 
