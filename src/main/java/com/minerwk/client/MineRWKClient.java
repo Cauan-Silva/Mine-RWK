@@ -70,6 +70,12 @@ public final class MineRWKClient {
         modBus.addListener((RegisterGuiLayersEvent e) -> e.registerAbove(VanillaGuiLayers.CAMERA_OVERLAYS,
                 com.minerwk.MineRWK.id("clarao_gojo"), ImpactoCamera::desenharClarao));
         NeoForge.EVENT_BUS.addListener((ClientPlayerNetworkEvent.LoggingOut e) -> VisuaisAtivos.limpar());
+        // Registrada depois da cutscene: a tela preta da arena fica por cima dela também.
+        com.minerwk.rede.Pacotes.aoEscurecer = com.minerwk.client.arena.Escurecer::receber;
+        modBus.addListener((RegisterGuiLayersEvent e) -> e.registerAboveAll(com.minerwk.client.arena.Escurecer.CAMADA,
+                com.minerwk.client.arena.Escurecer::desenhar));
+        NeoForge.EVENT_BUS.addListener(com.minerwk.client.arena.Escurecer::aoTick);
+        NeoForge.EVENT_BUS.addListener((ClientPlayerNetworkEvent.LoggingOut e) -> com.minerwk.client.arena.Escurecer.limpar());
         NeoForge.EVENT_BUS.addListener(TeclasKit::aoTick);
         NeoForge.EVENT_BUS.addListener((ClientPlayerNetworkEvent.LoggingOut e) -> RecepcaoKit.esquecer());
         NeoForge.EVENT_BUS.addListener((RegisterClientCommandsEvent e) -> ComandosTeste.registrar(e.getDispatcher()));

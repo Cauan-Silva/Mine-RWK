@@ -6,6 +6,8 @@ import com.minerwk.core.arena.PlantaEscola;
 import com.minerwk.core.arena.VagasArena;
 import com.minerwk.core.kit.Vetor;
 import com.minerwk.kit.Anexos;
+import com.minerwk.rede.Envio;
+import com.minerwk.rede.EscurecerTela;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -39,6 +41,11 @@ public final class ArenasServidor {
     public static final int TICKS_DEPOIS_DA_VITORIA = 100;
     /** Teto da espera pela montagem: os efeitos que seguram o jogador acabam sozinhos se algo der errado. */
     private static final int TICKS_DE_ESPERA = 80;
+    /** A tela leva este tempo para escurecer antes de um teleporte e este para clarear depois. */
+    private static final int TICKS_ESCURECENDO = 10;
+    private static final int TICKS_CLAREANDO = 15;
+    /** Tela preta logo depois de um teleporte, enquanto o cliente carrega o lugar novo. */
+    private static final int TICKS_PRETO_AO_CHEGAR = 5;
 
     private enum Estado { MONTANDO, LUTANDO, VOLTANDO }
 
@@ -52,6 +59,8 @@ public final class ArenasServidor {
         final BiConsumer<ServerPlayer, CaixaArena> aoChegar;
         Estado estado = Estado.MONTANDO;
         long voltarNoTick;
+        /** A tela do jogador já começou a escurecer para a volta. */
+        boolean escureceu;
 
         Arena(ServerPlayer pediu, int indice, BiConsumer<ServerPlayer, CaixaArena> aoChegar) {
             this.dono = pediu.getUUID();
@@ -140,7 +149,9 @@ public final class ArenasServidor {
         jogador.setData(Anexos.RETORNO_ARENA, PontoRetorno.de(jogador));
         jogador.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, TICKS_DE_ESPERA, 9, false, false, false));
         jogador.addEffect(new MobEffectInstance(MobEffects.DAMAGE_RESISTANCE, TICKS_DE_ESPERA, 4, false, false, false));
-        ObrasArena.montar(arena, a.caixa, PlantaEscola.plataforma(), () -> chegar(arena, a));
+        // Preta até a arena ficar pronta; ao chegar, outro pedido a clareia.
+        Envio.para(jogador, new EscurecerTela(TICKS_ESCURECENDO, TICKS_DE_ESPERA, TICKS_CLAREANDO));
+        ObrasArena.montar(arena, a.caixa, PlantaEscola.cenario(), () -> chegar(arena, a));
         return true;
     }
 
@@ -149,12 +160,16 @@ public final class ArenasServidor {
         ServerPlayer jogador = atual(arena.getServer(), a);
         // Saiu do jogo, morreu ou foi parar em outra arena enquanto ela era montada: a entrada é desfeita.
         if (ARENAS.get(a.dono) != a || jogador == null || !jogador.isAlive() || naArena(jogador)) {
-            if (ARENAS.remove(a.dono, a) && jogador != null) jogador.removeData(Anexos.RETORNO_ARENA);
+            if (ARENAS.remove(a.dono, a) && jogador != null) {
+                jogador.removeData(Anexos.RETORNO_ARENA);
+                clarear(jogador);
+            }
             apagar(arena, a);
             return;
         }
         soltar(jogador);
         levar(jogador, a.caixa);
+        clarear(jogador);
         a.estado = Estado.LUTANDO;
         a.aoChegar.accept(jogador, a.caixa);
     }
@@ -170,7 +185,8 @@ public final class ArenasServidor {
         // Nunca na hora: o boss avisa de dentro da própria remoção (até quando o chunk descarrega ou o
         // servidor fecha), e teleportar ou apagar entidades ali corrompe a lista que o jogo está percorrendo.
         a.estado = Estado.VOLTANDO;
-        a.voltarNoTick = servidor.getTickCount() + (venceu ? TICKS_DEPOIS_DA_VITORIA : 0);
+        // Sem vitória ele volta assim que a tela escurece.
+        a.voltarNoTick = servidor.getTickCount() + (venceu ? TICKS_DEPOIS_DA_VITORIA : TICKS_ESCURECENDO);
     }
 
     /** Tira o jogador da arena (se ele estiver lá, vivo e no jogo) e a apaga. */
@@ -178,7 +194,10 @@ public final class ArenasServidor {
         ARENAS.remove(a.dono, a);
         ServerPlayer jogador = atual(servidor, a);
         if (jogador != null) {
-            if (jogador.isAlive() && naArena(jogador)) trazer(jogador);
+            if (jogador.isAlive() && naArena(jogador)) {
+                trazer(jogador);
+                clarear(jogador);
+            }
             // Morreu (renasce no lugar normal) ou saiu da dimensão por comando: o ponto guardado já não vale.
             else jogador.removeData(Anexos.RETORNO_ARENA);
         }
@@ -195,7 +214,17 @@ public final class ArenasServidor {
     private static void tick(MinecraftServer servidor) {
         if (ARENAS.isEmpty()) return;
         for (Arena a : List.copyOf(ARENAS.values())) {
-            if (a.estado == Estado.VOLTANDO && servidor.getTickCount() >= a.voltarNoTick) fechar(servidor, a);
+            if (a.estado != Estado.VOLTANDO) continue;
+            if (servidor.getTickCount() >= a.voltarNoTick) {
+                fechar(servidor, a);
+            } else if (!a.escureceu && servidor.getTickCount() >= a.voltarNoTick - TICKS_ESCURECENDO) {
+                a.escureceu = true;
+                ServerPlayer jogador = atual(servidor, a);
+                // Só para quem vai ser teleportado: o morto vê a tela de morte, não a preta.
+                if (jogador != null && jogador.isAlive() && naArena(jogador)) {
+                    Envio.para(jogador, new EscurecerTela(TICKS_ESCURECENDO, TICKS_PRETO_AO_CHEGAR + 20, TICKS_CLAREANDO));
+                }
+            }
         }
     }
 
@@ -219,6 +248,11 @@ public final class ArenasServidor {
         ServerPlayer j = servidor.getPlayerList().getPlayer(a.dono);
         if (j == null) j = a.pediu;
         return j.hasDisconnected() ? null : j;
+    }
+
+    /** A tela, que estava preta para esconder o teleporte, fica mais um instante assim e clareia. */
+    private static void clarear(ServerPlayer jogador) {
+        Envio.para(jogador, new EscurecerTela(0, TICKS_PRETO_AO_CHEGAR, TICKS_CLAREANDO));
     }
 
     private static void soltar(ServerPlayer jogador) {
