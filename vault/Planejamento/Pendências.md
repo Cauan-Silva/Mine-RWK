@@ -24,6 +24,14 @@ Voltar para [[00 Início]].
 - Gojo (revisão 09/11, menores que ficaram): o Roxo pode derrubar plantas vizinhas (o `BreakEvent` para mods de proteção entrou em 09/11, no Gojo peso); o Vermelho atravessa parede fina encostada no rosto; bola de fogo e crânio de Wither voltam a acelerar no Infinito (o dano é cancelado mesmo assim); TNT sem dono passa pelo Infinito; sobram até 2 ticks de Infinito e 5 de Paralisia depois de morrer. Corrigidos na revisão: efeitos acabam ao mudar de dimensão; golpes não atingem pets, montaria nem projéteis do próprio Gojo; Paralisia não cancela Espinhos nem dano em si mesmo; ícone da Paralisia escondido (falta textura).
 
 ## Para testar no jogo
+- Arena, parte 1 (10/11): **a ida, a luta e a volta depois da vitória foram provadas no "New World" pela prova automática.** Conferir no jogo o que ela não vê:
+  - **Entrada:** `/rwk toji <jogador>` (ou o Contrato): você fica lento por 1 a 2 s e é levado a uma plataforma lisa; o Toji aparece 16 blocos à frente com a entrada dele. A espera incomoda? (a tela escurecendo só entra na parte 3)
+  - **Vitória:** 5 s na arena e volta ao lugar exato.
+  - **Morte:** renasce no lugar normal **com os itens e o XP**; os cadeados voltam.
+  - **Sair do jogo no meio da luta** e entrar de novo: aparece no lugar de onde saiu para a arena.
+  - **`/tp` para fora no meio:** o Toji some e você fica onde o comando pôs.
+  - **Invocar de novo logo depois** de uma luta: funciona (pega outra vaga enquanto a anterior é apagada).
+  - **Ainda não tem (parte 2):** barreira (dá para cair da plataforma no vazio e morrer), proteção de blocos, e o Toji ainda some se você se afastar 64 blocos.
 - Arena, parte 0 (10/11): **ida e volta provadas no "New World" pela prova automática** (dimensão carregou em mundo antigo, voltou ao lugar exato). Ainda vale olhar:
   - **Ir:** `/rwk arena ir` leva a uma plataforma de tijolos de pedra de 61 × 61, com vazio em volta e céu de fim de tarde. Se responder "Você já está na arena" estando fora dela, a dimensão não carregou: avisar.
   - **Voltar:** `/rwk arena voltar` devolve ao lugar exato, olhando para o mesmo lado. Testar saindo do mundo normal, do Nether e de dentro de uma construção.
