@@ -201,20 +201,27 @@ public final class TestesToji {
                 .thenSucceed();
     }
 
-    @GameTest(template = "vazio", batch = "toji_7")
+    @GameTest(template = "vazio", batch = "toji_7", timeoutTicks = 300)
     public static void contratoExigeONoDespertar(GameTestHelper helper) {
-        ServerPlayer jogador = TestesGojo.gojo(helper);
+        ServerPlayer jogador = com.minerwk.arena.TestesArena.jogador(helper);
         ServicoKits.definirDespertou(jogador, false);
         helper.assertTrue(LutasToji.invocar(jogador, true) == TojiBoss.Invocacao.SEM_NO, "sem o nó o Contrato não funciona");
         ServicoKits.dados(jogador).maestriaAtual().nos.put(ArvoreGojo.DESPERTAR, 1);
-        helper.assertTrue(LutasToji.invocar(jogador, true) == TojiBoss.Invocacao.OK, "com o nó o Toji aparece");
-        TojiEntity toji = LutasToji.de(jogador.getUUID()).orElseThrow();
-        double distancia = toji.distanceTo(jogador);
-        helper.assertTrue(distancia > 6 && distancia < 12, "a uns 8 blocos, está a " + distancia);
-        helper.assertTrue(LutasToji.invocar(jogador, true) == TojiBoss.Invocacao.JA_EXISTE, "um Toji por jogador");
-        toji.discard();
-        helper.assertTrue(LutasToji.de(jogador.getUUID()).isEmpty(), "sem o Toji dá para invocar de novo");
-        helper.succeed();
+        helper.assertTrue(LutasToji.invocar(jogador, true) == TojiBoss.Invocacao.OK, "com o nó a entrada na arena começa");
+        helper.assertTrue(LutasToji.invocar(jogador, true) == TojiBoss.Invocacao.NA_ARENA, "uma luta por jogador");
+        boolean[] sumiu = {false};
+        helper.succeedWhen(() -> {
+            if (!sumiu[0]) {
+                TojiEntity toji = LutasToji.de(jogador.getUUID()).orElse(null);
+                helper.assertTrue(toji != null, "esperando o Toji entrar na arena");
+                double distancia = toji.distanceTo(jogador);
+                helper.assertTrue(distancia > 15 && distancia < 17, "a 16 blocos, está a " + distancia);
+                toji.discard();
+                sumiu[0] = true;
+            }
+            helper.assertTrue(LutasToji.de(jogador.getUUID()).isEmpty(), "sem o Toji a luta acabou");
+            helper.assertTrue(LutasToji.invocar(jogador, true) == TojiBoss.Invocacao.OK, "e dá para invocar de novo");
+        });
     }
 
     @GameTest(template = "vazio", batch = "toji_8")

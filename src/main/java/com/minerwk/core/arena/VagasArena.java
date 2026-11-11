@@ -21,6 +21,11 @@ public final class VagasArena {
         return indice >= 0 && ocupadas.get(indice);
     }
 
+    /** Quantas vagas estão em uso. */
+    public int ocupadas() {
+        return ocupadas.cardinality();
+    }
+
     public void limpar() {
         ocupadas.clear();
     }

@@ -77,33 +77,6 @@ public final class ComandoTrocar {
                 }))));
     }
 
-    /**
-     * {@code /rwk arena ir} e {@code /rwk arena voltar}: prova da dimensão da arena (parte 0). Leva quem
-     * rodou o comando a uma plataforma lisa na vaga 0 e o traz de volta ao lugar de onde saiu.
-     */
-    public static void registrarArena(CommandDispatcher<CommandSourceStack> d) {
-        d.register(Commands.literal("rwk").then(Commands.literal("arena")
-                .requires(s -> s.hasPermission(2))
-                .then(Commands.literal("ir").executes(c -> {
-                    ServerPlayer jogador = c.getSource().getPlayerOrException();
-                    if (!com.minerwk.arena.ArenasServidor.provaIr(jogador)) {
-                        c.getSource().sendFailure(Component.translatable("mensagem.minerwk.arena.ja_esta"));
-                        return 0;
-                    }
-                    c.getSource().sendSuccess(() -> Component.translatable("mensagem.minerwk.arena.foi"), false);
-                    return 1;
-                }))
-                .then(Commands.literal("voltar").executes(c -> {
-                    ServerPlayer jogador = c.getSource().getPlayerOrException();
-                    if (!com.minerwk.arena.ArenasServidor.provaVoltar(jogador)) {
-                        c.getSource().sendFailure(Component.translatable("mensagem.minerwk.arena.sem_retorno"));
-                        return 0;
-                    }
-                    c.getSource().sendSuccess(() -> Component.translatable("mensagem.minerwk.arena.voltou"), false);
-                    return 1;
-                }))));
-    }
-
     public static void registrarDespertar(CommandDispatcher<CommandSourceStack> d) {
         d.register(Commands.literal("rwk").then(Commands.literal("despertar")
                 .requires(s -> s.hasPermission(2))

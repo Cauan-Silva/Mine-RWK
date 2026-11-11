@@ -2,25 +2,67 @@ package com.minerwk.arena;
 
 import com.minerwk.MineRWK;
 import com.minerwk.core.arena.CaixaArena;
+import com.minerwk.core.arena.PlantaEscola;
+import com.minerwk.core.arena.VagasArena;
 import com.minerwk.core.kit.Vetor;
 import com.minerwk.kit.Anexos;
-import net.minecraft.core.BlockPos;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
+import java.util.function.BiConsumer;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.portal.DimensionTransition;
 import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.server.ServerStartedEvent;
+import net.neoforged.neoforge.event.server.ServerStoppedEvent;
+import net.neoforged.neoforge.event.tick.ServerTickEvent;
 
-/** A dimensão da arena: quem vai, de onde saiu e como volta. */
+/**
+ * A dimensão da arena e o ciclo de cada luta nela: reservar a vaga, montar, levar o jogador, trazê-lo de
+ * volta quando a luta acaba, apagar e liberar a vaga.
+ */
 public final class ArenasServidor {
     public static final ResourceKey<Level> DIMENSAO = ResourceKey.create(Registries.DIMENSION, MineRWK.id("arena"));
+    /** Depois da vitória o jogador fica este tempo na arena antes de voltar. */
+    public static final int TICKS_DEPOIS_DA_VITORIA = 100;
+    /** Teto da espera pela montagem: os efeitos que seguram o jogador acabam sozinhos se algo der errado. */
+    private static final int TICKS_DE_ESPERA = 80;
+
+    private enum Estado { MONTANDO, LUTANDO, VOLTANDO }
+
+    /** A arena de um jogador, do pedido até ele sair dela. Depois disso só a limpeza segura a vaga. */
+    private static final class Arena {
+        final UUID dono;
+        /** Quem pediu; se ele morrer e renascer, o servidor conhece o objeto novo pelo {@link #dono}. */
+        final ServerPlayer pediu;
+        final int indice;
+        final CaixaArena caixa;
+        final BiConsumer<ServerPlayer, CaixaArena> aoChegar;
+        Estado estado = Estado.MONTANDO;
+        long voltarNoTick;
+
+        Arena(ServerPlayer pediu, int indice, BiConsumer<ServerPlayer, CaixaArena> aoChegar) {
+            this.dono = pediu.getUUID();
+            this.pediu = pediu;
+            this.indice = indice;
+            this.caixa = CaixaArena.daVaga(indice);
+            this.aoChegar = aoChegar;
+        }
+    }
+
+    private static final VagasArena VAGAS = new VagasArena();
+    private static final Map<UUID, Arena> ARENAS = new HashMap<>();
 
     private ArenasServidor() {
     }
@@ -37,40 +79,19 @@ public final class ArenasServidor {
                         arena.dimensionType().fixedTime().orElse(-1));
             }
         });
-        if (Boolean.getBoolean("minerwk.prova_arena")) provaAutomatica();
-    }
-
-    /**
-     * Prova sem ninguém no teclado (parte 0; sai junto com o comando de prova): com
-     * {@code -Dminerwk.prova_arena=true}, quem entra no mundo é levado à arena depois de 5 s e trazido de
-     * volta 5 s depois, e o log diz se voltou ao lugar exato.
-     */
-    private static void provaAutomatica() {
-        record Passo(ServerPlayer jogador, long tick, PontoRetorno origem) {
-        }
-        java.util.List<Passo> fila = new java.util.ArrayList<>();
-        NeoForge.EVENT_BUS.addListener((net.neoforged.neoforge.event.entity.player.PlayerEvent.PlayerLoggedInEvent e) -> {
-            if (e.getEntity() instanceof ServerPlayer j) fila.add(new Passo(j, j.server.getTickCount() + 100, null));
+        NeoForge.EVENT_BUS.addListener((ServerTickEvent.Post e) -> tick(e.getServer()));
+        NeoForge.EVENT_BUS.addListener((PlayerEvent.PlayerLoggedOutEvent e) -> {
+            if (e.getEntity() instanceof ServerPlayer j) aoSair(j);
         });
-        NeoForge.EVENT_BUS.addListener((net.neoforged.neoforge.event.tick.ServerTickEvent.Post e) -> {
-            for (Passo p : java.util.List.copyOf(fila)) {
-                if (e.getServer().getTickCount() < p.tick()) continue;
-                fila.remove(p);
-                ServerPlayer j = p.jogador();
-                if (p.origem() == null) {
-                    PontoRetorno origem = PontoRetorno.de(j);
-                    boolean foi = provaIr(j);
-                    MineRWK.LOGGER.info("Prova da arena: ir = {}, na arena = {}, posição {} em {}", foi, naArena(j),
-                            j.position(), j.level().dimension().location());
-                    fila.add(new Passo(j, e.getServer().getTickCount() + 100, origem));
-                } else {
-                    boolean voltou = provaVoltar(j);
-                    PontoRetorno agora = PontoRetorno.de(j);
-                    MineRWK.LOGGER.info("Prova da arena: voltar = {}, lugar exato = {}, antes {} depois {}", voltou,
-                            agora.equals(p.origem()), p.origem(), agora);
-                }
-            }
+        NeoForge.EVENT_BUS.addListener((PlayerEvent.PlayerLoggedInEvent e) -> {
+            if (e.getEntity() instanceof ServerPlayer j) aoEntrar(j);
         });
+        // Os mapas são estáticos: no jogo de um jogador só eles sobreviveriam ao fechar e abrir o mundo.
+        NeoForge.EVENT_BUS.addListener((ServerStoppedEvent e) -> {
+            ARENAS.clear();
+            VAGAS.limpar();
+        });
+        if (Boolean.getBoolean("minerwk.prova_arena")) ProvaArena.ligar();
     }
 
     /** A dimensão da arena, ou null se os dados do mod não a carregaram. */
@@ -81,6 +102,120 @@ public final class ArenasServidor {
     public static boolean naArena(Entity e) {
         return e.level().dimension() == DIMENSAO;
     }
+
+    /** A caixa da arena desse jogador, do pedido até ele sair dela. */
+    public static Optional<CaixaArena> de(UUID jogador) {
+        Arena a = ARENAS.get(jogador);
+        return a == null ? Optional.empty() : Optional.of(a.caixa);
+    }
+
+    /** Vagas em uso, contando as que ainda estão sendo apagadas. */
+    static int vagasOcupadas() {
+        return VAGAS.ocupadas();
+    }
+
+    // --- O ciclo ---
+
+    /**
+     * Reserva uma vaga, guarda de onde o jogador saiu e monta a arena. Quando ela fica pronta, o jogador é
+     * levado e {@code aoChegar} recebe quem chegou e a caixa. Durante a montagem ele fica parado e não
+     * leva dano. Devolve false se ele já tem arena, já está na dimensão ou a dimensão não existe.
+     */
+    public static boolean entrar(ServerPlayer jogador, BiConsumer<ServerPlayer, CaixaArena> aoChegar) {
+        ServerLevel arena = nivel(jogador.server);
+        if (arena == null || naArena(jogador) || ARENAS.containsKey(jogador.getUUID())) return false;
+        Arena a = new Arena(jogador, VAGAS.reservar(), aoChegar);
+        ARENAS.put(a.dono, a);
+        jogador.setData(Anexos.RETORNO_ARENA, PontoRetorno.de(jogador));
+        jogador.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, TICKS_DE_ESPERA, 9, false, false, false));
+        jogador.addEffect(new MobEffectInstance(MobEffects.DAMAGE_RESISTANCE, TICKS_DE_ESPERA, 4, false, false, false));
+        ObrasArena.montar(arena, a.caixa, PlantaEscola.plataforma(), () -> chegar(arena, a));
+        return true;
+    }
+
+    /** A arena ficou pronta. */
+    private static void chegar(ServerLevel arena, Arena a) {
+        ServerPlayer jogador = atual(arena.getServer(), a);
+        // Saiu do jogo, morreu ou foi parar em outra arena enquanto ela era montada: a entrada é desfeita.
+        if (ARENAS.get(a.dono) != a || jogador == null || !jogador.isAlive() || naArena(jogador)) {
+            if (ARENAS.remove(a.dono, a) && jogador != null) jogador.removeData(Anexos.RETORNO_ARENA);
+            apagar(arena, a);
+            return;
+        }
+        soltar(jogador);
+        levar(jogador, a.caixa);
+        a.estado = Estado.LUTANDO;
+        a.aoChegar.accept(jogador, a.caixa);
+    }
+
+    /**
+     * A luta do jogador acabou (o boss saiu do mundo). Com vitória ele volta em
+     * {@link #TICKS_DEPOIS_DA_VITORIA}; sem, volta já, se ainda estiver vivo na arena. Depois a arena é
+     * apagada e a vaga, liberada.
+     */
+    public static void lutaAcabou(MinecraftServer servidor, UUID dono, boolean venceu) {
+        Arena a = ARENAS.get(dono);
+        if (a == null || a.estado != Estado.LUTANDO) return;
+        // Nunca na hora: o boss avisa de dentro da própria remoção (até quando o chunk descarrega ou o
+        // servidor fecha), e teleportar ou apagar entidades ali corrompe a lista que o jogo está percorrendo.
+        a.estado = Estado.VOLTANDO;
+        a.voltarNoTick = servidor.getTickCount() + (venceu ? TICKS_DEPOIS_DA_VITORIA : 0);
+    }
+
+    /** Tira o jogador da arena (se ele estiver lá, vivo e no jogo) e a apaga. */
+    private static void fechar(MinecraftServer servidor, Arena a) {
+        ARENAS.remove(a.dono, a);
+        ServerPlayer jogador = atual(servidor, a);
+        if (jogador != null) {
+            if (jogador.isAlive() && naArena(jogador)) trazer(jogador);
+            // Morreu (renasce no lugar normal) ou saiu da dimensão por comando: o ponto guardado já não vale.
+            else jogador.removeData(Anexos.RETORNO_ARENA);
+        }
+        // Quem saiu do jogo continua com o ponto salvo: ao entrar de novo, é por ele que volta.
+        ServerLevel arena = nivel(servidor);
+        if (arena != null) apagar(arena, a);
+        else VAGAS.liberar(a.indice);
+    }
+
+    private static void apagar(ServerLevel arena, Arena a) {
+        ObrasArena.apagar(arena, a.caixa, () -> VAGAS.liberar(a.indice));
+    }
+
+    private static void tick(MinecraftServer servidor) {
+        if (ARENAS.isEmpty()) return;
+        for (Arena a : List.copyOf(ARENAS.values())) {
+            if (a.estado == Estado.VOLTANDO && servidor.getTickCount() >= a.voltarNoTick) fechar(servidor, a);
+        }
+    }
+
+    /** Quem saiu do jogo durante a montagem nunca foi levado: a entrada é desfeita e a vaga, liberada na limpeza. */
+    static void aoSair(ServerPlayer jogador) {
+        Arena a = ARENAS.get(jogador.getUUID());
+        if (a == null || a.estado != Estado.MONTANDO) return;
+        ARENAS.remove(a.dono, a);
+        soltar(jogador);
+        jogador.removeData(Anexos.RETORNO_ARENA);
+    }
+
+    /** Quem entra no jogo dentro da dimensão sem uma luta em andamento volta para de onde saiu. */
+    static void aoEntrar(ServerPlayer jogador) {
+        if (!naArena(jogador) || ARENAS.containsKey(jogador.getUUID())) return;
+        if (!trazer(jogador) && naArena(jogador)) paraORenascimento(jogador);
+    }
+
+    /** O jogador como está agora no servidor (depois de morrer ele é outro objeto); null se saiu do jogo. */
+    private static ServerPlayer atual(MinecraftServer servidor, Arena a) {
+        ServerPlayer j = servidor.getPlayerList().getPlayer(a.dono);
+        if (j == null) j = a.pediu;
+        return j.hasDisconnected() ? null : j;
+    }
+
+    private static void soltar(ServerPlayer jogador) {
+        jogador.removeEffect(MobEffects.MOVEMENT_SLOWDOWN);
+        jogador.removeEffect(MobEffects.DAMAGE_RESISTANCE);
+    }
+
+    // --- Ir e voltar ---
 
     /**
      * Guarda de onde o jogador saiu (se ainda não há ponto guardado) e o põe na entrada da vaga, olhando
@@ -113,27 +248,6 @@ public final class ArenasServidor {
         jogador.teleportTo(destino, ponto.x(), ponto.y(), ponto.z(), ponto.yaw(), ponto.pitch());
         jogador.resetFallDistance();
         return true;
-    }
-
-    /** Prova (parte 0): plataforma lisa de pedra na vaga 0 e o jogador levado para lá. False se ele já está na arena. */
-    public static boolean provaIr(ServerPlayer jogador) {
-        ServerLevel arena = nivel(jogador.server);
-        if (arena == null || naArena(jogador)) return false;
-        CaixaArena caixa = CaixaArena.daVaga(0);
-        BlockPos.MutableBlockPos p = new BlockPos.MutableBlockPos();
-        for (int dx = -30; dx <= 30; dx++) {
-            for (int dz = -30; dz <= 30; dz++) {
-                p.set(caixa.centroX() + dx, CaixaArena.Y_PATIO - 1, caixa.centroZ() + dz);
-                arena.setBlock(p, Blocks.STONE_BRICKS.defaultBlockState(), Block.UPDATE_CLIENTS);
-            }
-        }
-        levar(jogador, caixa);
-        return true;
-    }
-
-    /** Prova (parte 0): de volta ao ponto de retorno. */
-    public static boolean provaVoltar(ServerPlayer jogador) {
-        return trazer(jogador);
     }
 
     /** O lugar onde o jogador renasceria (cama, âncora ou o início do mundo), sem gastar a âncora. */

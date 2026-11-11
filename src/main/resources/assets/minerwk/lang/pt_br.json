@@ -119,6 +119,7 @@
   "mensagem.minerwk.toji.outro_personagem": "Só o Gojo pode chamar o Toji",
   "mensagem.minerwk.toji.sem_no": "Falta o nó Despertar da árvore (tecla H)",
   "mensagem.minerwk.toji.ja_existe": "O seu Toji ainda está vivo",
+  "mensagem.minerwk.toji.na_arena": "Você já está indo para a arena ou dentro dela",
   "mensagem.minerwk.toji.invocado": "O Toji aceitou o contrato",
   "mensagem.minerwk.toji.caiu": "A Lança Invertida do Céu atravessou o Infinito...",
   "mensagem.minerwk.toji.despertou": "Você despertou: os golpes trancados estão liberados",
@@ -142,9 +143,5 @@
   "subtitles.minerwk.toji_fase": "Toji fica sério",
   "subtitles.minerwk.toji_queda": "Um coração bate devagar",
   "subtitles.minerwk.toji_despertar": "Gojo desperta",
-  "subtitles.minerwk.toji_morte": "Toji cai",
-  "mensagem.minerwk.arena.foi": "Você está na arena (prova): /rwk arena voltar para sair",
-  "mensagem.minerwk.arena.voltou": "De volta ao lugar de onde você saiu",
-  "mensagem.minerwk.arena.ja_esta": "Você já está na arena",
-  "mensagem.minerwk.arena.sem_retorno": "Não há ponto de retorno guardado: você foi para o renascimento, ou não estava na arena"
+  "subtitles.minerwk.toji_morte": "Toji cai"
 }

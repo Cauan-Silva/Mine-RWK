@@ -1,6 +1,10 @@
 package com.minerwk.arena;
 
 import com.minerwk.MineRWK;
+import com.minerwk.boss.LutasToji;
+import com.minerwk.boss.TojiEntity;
+import com.minerwk.core.boss.TojiBoss;
+import com.minerwk.kit.ServicoKits;
 import com.minerwk.core.arena.CaixaArena;
 import com.minerwk.core.arena.PlantaEscola;
 import com.minerwk.core.kit.Vetor;
@@ -41,6 +45,7 @@ import net.minecraft.world.level.levelgen.FlatLevelSource;
 import net.minecraft.world.level.levelgen.flat.FlatLevelGeneratorSettings;
 import net.minecraft.world.level.storage.DerivedLevelData;
 import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.gametest.GameTestHolder;
 import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
@@ -90,7 +95,7 @@ public final class TestesArena {
     }
 
     /** O jogador dos testes do Gojo, com uma conexão de mentira (trocar de dimensão manda pacotes). */
-    private static ServerPlayer jogador(GameTestHelper helper) {
+    public static ServerPlayer jogador(GameTestHelper helper) {
         garantirDimensao(helper.getLevel().getServer());
         ServerPlayer jogador = TestesGojo.gojo(helper);
         Connection conexao = new Connection(PacketFlow.SERVERBOUND);
@@ -191,5 +196,140 @@ public final class TestesArena {
             helper.assertTrue(arena.getEntitiesOfClass(ItemEntity.class, tudo).isEmpty(), "sem itens caídos na caixa");
             helper.assertTrue(ObrasArena.ocioso(), "sem obra pendente");
         });
+    }
+
+    // --- A luta do Toji na arena ---
+
+    private static boolean perto(ServerPlayer jogador, Vec3 ponto) {
+        return jogador.position().distanceTo(ponto) < .05;
+    }
+
+    private static Vec3 vec(Vetor v) {
+        return new Vec3(v.x(), v.y(), v.z());
+    }
+
+    @GameTest(template = "vazio", batch = "arena_6", timeoutTicks = 300)
+    public static void invocarLevaParaAArenaComOToji(GameTestHelper helper) {
+        ServerPlayer jogador = jogador(helper);
+        helper.assertTrue(LutasToji.invocar(jogador, false) == TojiBoss.Invocacao.OK, "a invocação deveria começar");
+        helper.assertFalse(ArenasServidor.naArena(jogador), "durante a montagem o jogador ainda está no mundo dele");
+        helper.assertTrue(LutasToji.invocar(jogador, false) == TojiBoss.Invocacao.NA_ARENA, "com a arena reservada não dá para invocar de novo");
+        helper.succeedWhen(() -> {
+            CaixaArena caixa = ArenasServidor.de(jogador.getUUID()).orElseThrow();
+            helper.assertTrue(ArenasServidor.naArena(jogador) && perto(jogador, vec(caixa.entradaJogador())),
+                    "o jogador deveria estar na entrada da vaga, está em " + jogador.position());
+            TojiEntity toji = LutasToji.de(jogador.getUUID()).orElse(null);
+            helper.assertTrue(toji != null && ArenasServidor.naArena(toji), "o Toji deveria estar na arena");
+            helper.assertTrue(Math.abs(toji.distanceTo(jogador) - 16) < .5, "a 16 blocos, está a " + toji.distanceTo(jogador));
+            helper.assertTrue(LutasToji.invocar(jogador, false) == TojiBoss.Invocacao.NA_ARENA, "de dentro da arena não dá para invocar");
+            toji.discard();
+        });
+    }
+
+    @GameTest(template = "vazio", batch = "arena_7", timeoutTicks = 400)
+    public static void vitoriaTrazDeVoltaEm100Ticks(GameTestHelper helper) {
+        ServerPlayer jogador = jogador(helper);
+        ServicoKits.definirDespertou(jogador, false);
+        Level origem = jogador.level();
+        Vec3 antes = jogador.position();
+        LutasToji.invocar(jogador, false);
+        long[] morte = {-1};
+        helper.succeedWhen(() -> {
+            long agora = helper.getLevel().getGameTime();
+            if (morte[0] < 0) {
+                TojiEntity toji = LutasToji.de(jogador.getUUID()).orElse(null);
+                helper.assertTrue(toji != null && ArenasServidor.naArena(jogador), "esperando a luta começar");
+                toji.kill();
+                morte[0] = agora;
+            }
+            if (agora - morte[0] <= 90) {
+                helper.assertTrue(ArenasServidor.naArena(jogador), "antes dos 5 s o jogador ainda está na arena");
+            }
+            helper.assertTrue(agora - morte[0] >= 110, "esperando os 5 s");
+            helper.assertTrue(jogador.level() == origem && perto(jogador, antes), "deveria estar de volta, está em " + jogador.position());
+            helper.assertTrue(ServicoKits.dados(jogador).maestriaAtual().despertou, "a vitória dá o despertar");
+            helper.assertFalse(jogador.hasData(Anexos.RETORNO_ARENA), "o ponto de retorno é apagado");
+            helper.assertTrue(ArenasServidor.de(jogador.getUUID()).isEmpty(), "a arena dele acabou");
+        });
+    }
+
+    @GameTest(template = "vazio", batch = "arena_8", timeoutTicks = 300)
+    public static void tojiSomeTrazDeVoltaNaHora(GameTestHelper helper) {
+        ServerPlayer jogador = jogador(helper);
+        ServicoKits.definirDespertou(jogador, false);
+        Level origem = jogador.level();
+        Vec3 antes = jogador.position();
+        LutasToji.invocar(jogador, false);
+        boolean[] sumiu = {false};
+        helper.succeedWhen(() -> {
+            if (!sumiu[0]) {
+                TojiEntity toji = LutasToji.de(jogador.getUUID()).orElse(null);
+                helper.assertTrue(toji != null && ArenasServidor.naArena(jogador), "esperando a luta começar");
+                toji.discard();
+                sumiu[0] = true;
+            }
+            helper.assertTrue(jogador.level() == origem && perto(jogador, antes), "deveria voltar na hora, está em " + jogador.position());
+            helper.assertFalse(ServicoKits.dados(jogador).maestriaAtual().despertou, "sem vitória não há despertar");
+            helper.assertFalse(jogador.hasData(Anexos.RETORNO_ARENA), "o ponto de retorno é apagado");
+        });
+    }
+
+    @GameTest(template = "vazio", batch = "arena_9", timeoutTicks = 300)
+    public static void sairDuranteAMontagemLiberaAVaga(GameTestHelper helper) {
+        ServerPlayer jogador = jogador(helper);
+        int ocupadasAntes = ArenasServidor.vagasOcupadas();
+        Vec3 antes = jogador.position();
+        LutasToji.invocar(jogador, false);
+        helper.assertTrue(ArenasServidor.vagasOcupadas() == ocupadasAntes + 1, "a vaga é reservada ao invocar");
+        helper.runAfterDelay(1, () -> ArenasServidor.aoSair(jogador));
+        helper.runAfterDelay(2, () -> helper.succeedWhen(() -> {
+            helper.assertTrue(ArenasServidor.vagasOcupadas() == ocupadasAntes, "a vaga deveria ser liberada depois da limpeza");
+            helper.assertTrue(ArenasServidor.de(jogador.getUUID()).isEmpty(), "sem arena para ele");
+            helper.assertTrue(!ArenasServidor.naArena(jogador) && perto(jogador, antes), "ele nunca foi levado");
+            helper.assertFalse(jogador.hasData(Anexos.RETORNO_ARENA), "sem ponto de retorno guardado");
+            helper.assertTrue(LutasToji.de(jogador.getUUID()).isEmpty(), "e sem Toji");
+        }));
+    }
+
+    @GameTest(template = "vazio", batch = "arena_10", timeoutTicks = 300)
+    public static void duasLutasFicamEmVagasDiferentes(GameTestHelper helper) {
+        ServerPlayer um = jogador(helper);
+        ServerPlayer dois = jogador(helper);
+        LutasToji.invocar(um, false);
+        LutasToji.invocar(dois, false);
+        helper.succeedWhen(() -> {
+            CaixaArena a = ArenasServidor.de(um.getUUID()).orElseThrow();
+            CaixaArena b = ArenasServidor.de(dois.getUUID()).orElseThrow();
+            helper.assertFalse(a.equals(b), "cada luta na sua vaga");
+            TojiEntity ta = LutasToji.de(um.getUUID()).orElse(null);
+            TojiEntity tb = LutasToji.de(dois.getUUID()).orElse(null);
+            helper.assertTrue(ta != null && tb != null, "esperando os dois Tojis");
+            helper.assertTrue(perto(um, vec(a.entradaJogador())) && perto(dois, vec(b.entradaJogador())), "cada um na sua entrada");
+            ta.discard();
+            tb.discard();
+        });
+    }
+
+    @GameTest(template = "vazio", batch = "arena_11")
+    public static void entrarNoJogoNaArenaSemLutaVolta(GameTestHelper helper) {
+        ServerPlayer jogador = jogador(helper);
+        Level origem = jogador.level();
+        Vec3 antes = jogador.position();
+        ArenasServidor.levar(jogador, CaixaArena.daVaga(50));
+        ArenasServidor.aoEntrar(jogador);
+        helper.assertTrue(jogador.level() == origem && perto(jogador, antes), "quem entra no jogo na arena sem luta volta ao ponto de retorno");
+
+        ArenasServidor.levar(jogador, CaixaArena.daVaga(50));
+        jogador.setData(Anexos.RETORNO_ARENA, new PontoRetorno(
+                ResourceLocation.fromNamespaceAndPath(MineRWK.MOD_ID, "nao_existe"), 0, 80, 0, 0, 0));
+        ArenasServidor.aoEntrar(jogador);
+        helper.assertFalse(ArenasServidor.naArena(jogador), "com retorno inválido vai para o renascimento normal");
+
+        ArenasServidor.levar(jogador, CaixaArena.daVaga(50));
+        jogador.removeData(Anexos.RETORNO_ARENA);
+        ArenasServidor.aoEntrar(jogador);
+        helper.assertFalse(ArenasServidor.naArena(jogador), "sem ponto de retorno também");
+        jogador.remove(Entity.RemovalReason.DISCARDED);
+        helper.succeed();
     }
 }

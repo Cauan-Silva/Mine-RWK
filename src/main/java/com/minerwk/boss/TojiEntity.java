@@ -732,15 +732,21 @@ public final class TojiEntity extends Monster implements GeoEntity {
         barra.removeAllPlayers();
         LutasToji.esquecer(this);
         ServerPlayer dono = jogadorAtual();
-        if (dono == null) return;
-        LutasToji.CAIDOS.remove(dono.getUUID());
-        // Quem saiu do jogo já foi limpo na saída; mexer no kit dele o recriaria.
-        if (dono.hasDisconnected()) return;
-        if (quedaAte >= 0) {
-            quedaAte = -1;
-            soltar(dono);
+        if (dono != null) {
+            LutasToji.CAIDOS.remove(dono.getUUID());
+            // Quem saiu do jogo já foi limpo na saída; mexer no kit dele o recriaria.
+            if (!dono.hasDisconnected()) {
+                if (quedaAte >= 0) {
+                    quedaAte = -1;
+                    soltar(dono);
+                }
+                if (!venceu) ServicoKits.definirDespertoNaLuta(dono, false);
+            }
         }
-        if (!venceu) ServicoKits.definirDespertoNaLuta(dono, false);
+        // Por último: a arena leva o jogador de volta, e ele já tem de estar solto e com o kit certo.
+        if (invocadorId != null && getServer() != null) {
+            com.minerwk.arena.ArenasServidor.lutaAcabou(getServer(), invocadorId, venceu);
+        }
     }
 
     @Override

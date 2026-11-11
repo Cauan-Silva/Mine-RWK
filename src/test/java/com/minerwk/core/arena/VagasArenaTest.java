@@ -43,4 +43,15 @@ class VagasArenaTest {
         assertDoesNotThrow(() -> v.liberar(7));
         assertEquals(0, v.reservar());
     }
+
+    @Test
+    void contaAsOcupadas() {
+        VagasArena v = new VagasArena();
+        assertEquals(0, v.ocupadas());
+        v.reservar();
+        v.reservar();
+        assertEquals(2, v.ocupadas());
+        v.liberar(0);
+        assertEquals(1, v.ocupadas());
+    }
 }

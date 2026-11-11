@@ -151,14 +151,12 @@ public final class TojiBoss {
     public static final int TEMPO_LIMITE = 10 * 60 * 20;
     /** Quem invocou não pode se afastar mais do que isto. */
     public static final double DISTANCIA_MAXIMA = 64;
-    /** A que distância de quem invocou o Toji aparece. */
-    public static final double DISTANCIA_DA_INVOCACAO = 8;
 
     private TojiBoss() {
     }
 
     /** O que o Contrato responde a quem tenta invocar. */
-    public enum Invocacao { OK, OUTRO_PERSONAGEM, SEM_NO, JA_EXISTE }
+    public enum Invocacao { OK, OUTRO_PERSONAGEM, SEM_NO, JA_EXISTE, NA_ARENA }
 
     /**
      * @param personagem  id do personagem de quem usa o item ("" se não escolheu)
