@@ -438,6 +438,16 @@ public final class ContextoServidor implements Contexto {
     }
 
     @Override
+    public String forma() {
+        return kit().map(KitDoJogador::forma).orElse(com.minerwk.core.kit.Forma.BASE);
+    }
+
+    @Override
+    public boolean mudarForma(String forma) {
+        return kit().map(k -> k.mudarForma(forma, this)).orElse(false);
+    }
+
+    @Override
     public void criarEfeito(Efeito efeito) {
         kit().ifPresent(k -> k.adicionarEfeito(efeito));
     }

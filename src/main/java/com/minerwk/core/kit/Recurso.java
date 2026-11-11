@@ -27,6 +27,10 @@ public interface Recurso {
     default void melhorias(com.minerwk.core.maestria.Melhorias melhorias) {
     }
 
+    /** O jogador mudou de forma ({@link Forma#BASE} ou o id de uma transformação). */
+    default void forma(String forma) {
+    }
+
     /** Valor para salvar nos dados do jogador. */
     double salvar();
 

@@ -32,12 +32,12 @@ public final class Gojo {
     }
 
     public static Personagem criar() {
-        return new Personagem(ID, "Satoru Gojo", "Jujutsu Kaisen", EnergiaAmaldicoada::new,
-                Map.of(Tecla.Z, new Azul(), Tecla.X, new Vermelho(), Tecla.C, new Infinito(),
-                        Tecla.V, new Roxo(), Tecla.G, new VazioInfinito(), Tecla.R, new Roxo200()),
+        Map<Tecla, com.minerwk.core.kit.Habilidade> golpes = Map.of(Tecla.Z, new Azul(), Tecla.X, new Vermelho(),
+                Tecla.C, new Infinito(), Tecla.V, new Roxo(), Tecla.G, new VazioInfinito(), Tecla.R, new Roxo200());
+        return new Personagem(ID, "Satoru Gojo", "Jujutsu Kaisen", EnergiaAmaldicoada::new, golpes,
                 List.of(TecnicaReversa::new), ArvoreGojo.ARVORE,
                 // Como na obra: antes do Toji ele só tem o Azul e o Infinito.
-                new Trancas(java.util.Set.of(Tecla.X, Tecla.V, Tecla.G, Tecla.R), true));
+                Trancas.dasTeclas(golpes, java.util.Set.of(Tecla.X, Tecla.V, Tecla.G, Tecla.R), true));
     }
 
     /** Base das habilidades do Gojo: id e números fixos. */

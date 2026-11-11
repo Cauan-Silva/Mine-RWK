@@ -127,7 +127,9 @@ public final class TelaEscolha extends Screen {
 
     private void desenharPainel(GuiGraphics g, PersonagemEscolha p) {
         LayoutEscolha.Retangulo r = layout.painel();
-        int golpesA = p.golpes().size() * LINHA;
+        int linhas = p.golpes().size();
+        for (PersonagemEscolha.FormaEscolha f : p.transformacoes()) linhas += 1 + f.golpes().size();
+        int golpesA = linhas * LINHA;
         boolean cabeInteiro = r.altura() >= EMBLEMA_GRANDE_A + 6 + golpesA + BOTAO_A + 4
                 && r.largura() >= EMBLEMA_GRANDE_L + 40;
         int el = cabeInteiro ? EMBLEMA_GRANDE_L : EMBLEMA_GRANDE_L / 2;
@@ -142,7 +144,19 @@ public final class TelaEscolha extends Screen {
 
         int y = r.y() + ea + 6;
         int limite = r.y() + r.altura() - BOTAO_A - 4;
-        for (PersonagemEscolha.GolpeEscolha golpe : p.golpes()) {
+        y = desenharGolpes(g, p.golpes(), r, y, limite);
+        for (PersonagemEscolha.FormaEscolha forma : p.transformacoes()) {
+            if (y + font.lineHeight > limite) break;
+            // O nome da transformação, e abaixo os golpes que as mesmas teclas passam a ter nela.
+            String nome = Component.translatable("forma." + MineRWK.MOD_ID + "." + forma.id()).getString();
+            g.drawString(font, cortar(nome, r.largura()), r.x(), y, 0xFFD27F);
+            y = desenharGolpes(g, forma.golpes(), r, y + LINHA, limite);
+        }
+    }
+
+    private int desenharGolpes(GuiGraphics g, List<PersonagemEscolha.GolpeEscolha> golpes, LayoutEscolha.Retangulo r,
+                               int y, int limite) {
+        for (PersonagemEscolha.GolpeEscolha golpe : golpes) {
             if (y + font.lineHeight > limite) break;
             String chave = "habilidade." + MineRWK.MOD_ID + "." + golpe.id();
             String texto = golpe.tecla().name() + "  " + Component.translatable(chave).getString()
@@ -150,6 +164,7 @@ public final class TelaEscolha extends Screen {
             g.drawString(font, cortar(texto, r.largura()), r.x(), y, 0xE0E0E0);
             y += LINHA;
         }
+        return y;
     }
 
     private String cortar(String texto, int largura) {

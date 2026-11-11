@@ -181,6 +181,16 @@ public interface Contexto {
         return true;
     }
 
+    /** A forma em que o jogador está. */
+    default String forma() {
+        return Forma.BASE;
+    }
+
+    /** Passa o jogador para outra forma do personagem. Devolve se mudou. */
+    default boolean mudarForma(String forma) {
+        return false;
+    }
+
     /** Começa um efeito solto no kit do jogador. */
     default void criarEfeito(Efeito efeito) {
     }

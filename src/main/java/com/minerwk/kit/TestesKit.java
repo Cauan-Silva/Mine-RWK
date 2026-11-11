@@ -41,6 +41,25 @@ public final class TestesKit {
     }
 
     @GameTest(template = "vazio")
+    public static void transformarTrocaOsGolpesEMorrerVoltaABase(GameTestHelper helper) {
+        ServerPlayer jogador = helper.makeMockServerPlayerInLevel();
+        ServicoKits.definirPersonagem(jogador, Personagens.porId(Personagens.TESTE).orElseThrow());
+        KitDoJogador kit = ServicoKits.kit(jogador).orElseThrow();
+        String forma = com.minerwk.core.kit.teste.PersonagemTeste.FORMA;
+        ServicoKits.usarTecla(jogador, Tecla.G, true);
+        for (int i = 0; i < 8; i++) ServicoKits.tickJogador(jogador);
+        helper.assertTrue(forma.equals(kit.forma()), "o G deveria transformar, forma " + kit.forma());
+        helper.assertTrue("teste_golpe_forte".equals(kit.habilidade(Tecla.Z).orElseThrow().id()), "o Z é o da transformação");
+        helper.assertTrue(kit.habilidade(Tecla.X).isEmpty(), "a transformação não tem X");
+        ServicoKits.usarTecla(jogador, Tecla.X, true);
+        helper.assertTrue(kit.execucao().isEmpty(), "tecla sem golpe na forma não faz nada");
+        jogador.setHealth(0);
+        for (int i = 0; i < 5; i++) ServicoKits.tickJogador(jogador);
+        helper.assertTrue(com.minerwk.core.kit.Forma.BASE.equals(kit.forma()), "morrer volta à forma base");
+        helper.succeed();
+    }
+
+    @GameTest(template = "vazio")
     public static void morrerNaCargaDescartaSemCobrar(GameTestHelper helper) {
         ServerPlayer jogador = helper.makeMockServerPlayerInLevel();
         ServicoKits.definirPersonagem(jogador, Personagens.porId(Personagens.TESTE).orElseThrow());
