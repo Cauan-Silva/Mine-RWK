@@ -191,6 +191,40 @@ public interface Contexto {
         return false;
     }
 
+    /** Quanto o jogador tem do recurso agora. */
+    default double recurso() {
+        return Double.MAX_VALUE;
+    }
+
+    /** Põe uma habilidade do jogador em recarga por {@code ticks}, a partir de agora. */
+    default void recarga(String habilidade, int ticks) {
+    }
+
+    /**
+     * O ataque básico do jogador neste tick. Vale enquanto for pedido: quem tem arma própria pede todo tick
+     * (a passiva), e o último pedido do tick ganha (um efeito pode trocar a arma por um tempo).
+     */
+    default void arma(Arma arma) {
+    }
+
+    /**
+     * Leva o jogador em linha reta por até {@code distancia} blocos, parando antes de parede; com
+     * {@code encarar}, ele chega olhando para esse ponto. Devolve onde os pés ficaram.
+     */
+    default Vetor deslocar(Vetor direcao, double distancia, Vetor encarar) {
+        return Vetor.ZERO;
+    }
+
+    /** Se há bloco sólido entre os dois pontos (inimigos não contam: é para o que os atravessa). */
+    default boolean colideBloco(Vetor de, Vetor ate) {
+        return false;
+    }
+
+    /** Desfaz os projéteis dos outros dentro da esfera; devolve quantos. */
+    default int desfazerProjeteis(Vetor centro, double raio) {
+        return 0;
+    }
+
     /** Começa um efeito solto no kit do jogador. */
     default void criarEfeito(Efeito efeito) {
     }

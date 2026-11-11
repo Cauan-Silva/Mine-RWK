@@ -24,6 +24,12 @@ Voltar para [[00 Início]].
 - Gojo (revisão 09/11, menores que ficaram): o Roxo pode derrubar plantas vizinhas (o `BreakEvent` para mods de proteção entrou em 09/11, no Gojo peso); o Vermelho atravessa parede fina encostada no rosto; bola de fogo e crânio de Wither voltam a acelerar no Infinito (o dano é cancelado mesmo assim); TNT sem dono passa pelo Infinito; sobram até 2 ticks de Infinito e 5 de Paralisia depois de morrer. Corrigidos na revisão: efeitos acabam ao mudar de dimensão; golpes não atingem pets, montaria nem projéteis do próprio Gojo; Paralisia não cancela Espinhos nem dano em si mesmo; ícone da Paralisia escondido (falta textura).
 
 ## Para testar no jogo
+- Ichigo, parte 2 (11/11): o kit das duas formas, ainda só com partículas (`/rwk trocar <jogador> ichigo`):
+  - **Shikai:** Z segurado e solto cedo (o segurado fere mais), atravessando dois inimigos em fila e parando na parede; X avança 8 blocos e para antes de parede (testar olhando para baixo, para cima e num degrau); C empurra, fere e apaga flechas de esqueleto; V lança a espada e, até ela voltar, o clique é um soco.
+  - **Bankai:** G leva 1,5 s e empurra quem está perto; a barra fica vermelho-escura e escorre. Z sai na hora; X com um inimigo na mira surge atrás dele já olhando para ele; C deixa o clique alcançar 5 blocos por 6 s; G volta e o Bankai fica 5 s em recarga.
+  - **Reiatsu em zero:** o Bankai acaba sozinho e o G fica 10 s em recarga.
+  - **Ataque básico:** o clique tira 7 no Shikai e 6 no Bankai (mais rápido), com qualquer item na mão. Conferir se a barra de recarga do ataque acompanha a velocidade, e se o balanceamento agrada (o Bankai dura 100 s parado; cada golpe encurta).
+  - **Shunpo:** ver se o deslocamento fica bom em primeira pessoa (é um teleporte seco, sem animação ainda) e se dá para abusar dele para subir muros.
 - Ichigo, parte 1 (11/11): as formas no núcleo. O Ichigo ainda não existe no jogo; dá para ver pelo personagem de teste (`/rwk trocar <jogador> teste`):
   - **G** entra na "forma de teste": o HUD passa a mostrar só o Z e o G, e o Z vira o "Golpe forte de teste". G de novo volta.
   - **Recarga:** usar o Z, transformar e usar o Z da forma (não deve estar em recarga); voltar e ver que a recarga do primeiro Z continuou correndo.

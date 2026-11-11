@@ -448,6 +448,87 @@ public final class ContextoServidor implements Contexto {
     }
 
     @Override
+    public double recurso() {
+        return kit().map(k -> k.recurso().atual()).orElse(0.0);
+    }
+
+    @Override
+    public void recarga(String habilidade, int ticks) {
+        kit().ifPresent(k -> k.recargas().iniciar(habilidade, nivel().getGameTime(), ticks));
+    }
+
+    @Override
+    public void arma(com.minerwk.core.kit.Arma arma) {
+        ArmaServidor.pedir(jogador, arma);
+    }
+
+    @Override
+    public boolean colideBloco(Vetor de, Vetor ate) {
+        return nivel().clip(new ClipContext(vec(de), vec(ate), ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, jogador))
+                .getType() != HitResult.Type.MISS;
+    }
+
+    @Override
+    public int desfazerProjeteis(Vetor centro, double raio) {
+        List<Projectile> projeteis = naEsfera(Projectile.class, vec(centro), raio, p -> true);
+        for (Projectile p : projeteis) p.discard();
+        return projeteis.size();
+    }
+
+    /** Tamanho de cada passo do deslocamento: menor que a largura do jogador, para não pular parede fina. */
+    private static final double PASSO_DO_DESLOCAMENTO = 0.5;
+
+    @Override
+    public Vetor deslocar(Vetor direcao, double distancia, Vetor encarar) {
+        Vec3 dir = vec(direcao);
+        Vec3 pos = jogador.position();
+        if (dir.lengthSqr() > 1e-9 && distancia > 0) {
+            dir = dir.normalize();
+            AABB caixa = jogador.getBoundingBox();
+            for (double andou = 0; andou < distancia - 1e-6; andou += PASSO_DO_DESLOCAMENTO) {
+                Vec3 passo = passoLivre(caixa, dir.scale(Math.min(PASSO_DO_DESLOCAMENTO, distancia - andou)));
+                if (passo == null) break;
+                caixa = caixa.move(passo);
+                pos = pos.add(passo);
+            }
+        }
+        float giro = jogador.getYRot();
+        float inclinacao = jogador.getXRot();
+        if (encarar != null) {
+            Vec3 ate = vec(encarar).subtract(pos.add(0, jogador.getEyeHeight(), 0));
+            if (ate.lengthSqr() > 1e-6) {
+                giro = (float) (Math.toDegrees(Math.atan2(ate.z, ate.x)) - 90);
+                inclinacao = (float) -Math.toDegrees(Math.atan2(ate.y, ate.horizontalDistance()));
+            }
+        }
+        jogador.stopRiding();
+        jogador.fallDistance = 0;
+        if (jogador.connection != null && encarar == null) {
+            // Sem ponto para encarar, a câmera do jogador fica como está (giro relativo zero), sem tranco.
+            jogador.connection.teleport(pos.x, pos.y, pos.z, 0, 0, java.util.Set.of(
+                    net.minecraft.world.entity.RelativeMovement.X_ROT, net.minecraft.world.entity.RelativeMovement.Y_ROT));
+        } else if (jogador.connection != null) {
+            jogador.connection.teleport(pos.x, pos.y, pos.z, giro, inclinacao);
+        } else {
+            jogador.moveTo(pos.x, pos.y, pos.z, giro, inclinacao);
+        }
+        return vetor(pos);
+    }
+
+    /**
+     * O passo que cabe: reto; senão rente ao chão ou ao teto (quem olha um pouco para baixo não empaca);
+     * senão subindo um degrau. Null se há parede.
+     */
+    private Vec3 passoLivre(AABB caixa, Vec3 passo) {
+        if (nivel().noCollision(jogador, caixa.move(passo))) return passo;
+        Vec3 rente = new Vec3(passo.x, 0, passo.z);
+        if (passo.y != 0 && rente.lengthSqr() > 1e-6 && nivel().noCollision(jogador, caixa.move(rente))) return rente;
+        Vec3 degrau = new Vec3(passo.x, Math.max(passo.y, 0) + 1, passo.z);
+        if (rente.lengthSqr() > 1e-6 && nivel().noCollision(jogador, caixa.move(degrau))) return degrau;
+        return null;
+    }
+
+    @Override
     public void criarEfeito(Efeito efeito) {
         kit().ifPresent(k -> k.adicionarEfeito(efeito));
     }

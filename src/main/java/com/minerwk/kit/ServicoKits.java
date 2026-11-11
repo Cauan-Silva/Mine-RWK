@@ -135,6 +135,11 @@ public final class ServicoKits {
      * Roda {@code golpe} marcando o dano como vindo do kit do {@code jogador}: só esse dano (e o abate que
      * ele causar) dá XP de maestria. Um soco ou uma espada não contam.
      */
+    /** Se o dano que está sendo causado agora vem de um golpe do kit do jogador (e não do clique). */
+    static boolean emGolpeDoKit(ServerPlayer jogador) {
+        return golpeDoKit == jogador;
+    }
+
     static void comoGolpeDoKit(ServerPlayer jogador, Runnable golpe) {
         ServerPlayer antes = golpeDoKit;
         golpeDoKit = jogador;
@@ -265,6 +270,7 @@ public final class ServicoKits {
         if (ProtecoesServidor.paralisado(jogador)) kit.get().atordoar(agora, contexto);
         boolean parado = jogador.getDeltaMovement().horizontalDistanceSqr() < LIMIAR_PARADO * LIMIAR_PARADO;
         kit.get().tick(agora, new EstadoDoJogador(parado, apanhou, causou), contexto);
+        ArmaServidor.aplicar(jogador);
         if (agora % SALVAR_A_CADA == 0) salvar(jogador, kit.get());
         Sincronizacao.aoTick(jogador, kit.get());
     }

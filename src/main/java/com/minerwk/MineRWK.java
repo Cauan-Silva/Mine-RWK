@@ -43,7 +43,9 @@ public final class MineRWK {
         Regras.registrar();
         Personagens.registrar(PersonagemTeste.criar());
         Personagens.registrar(Gojo.criar());
+        Personagens.registrar(com.minerwk.core.personagens.ichigo.Ichigo.criar());
         ServicoKits.registrarEventos();
+        com.minerwk.kit.ArmaServidor.registrarEventos();
         ProtecoesServidor.registrarEventos();
         // Depois das proteções: um golpe que o Infinito parou não chega à luta do Toji.
         com.minerwk.boss.LutasToji.registrarEventos();
