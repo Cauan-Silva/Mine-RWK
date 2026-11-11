@@ -91,6 +91,26 @@ class AnimacoesGojoTest {
     }
 
     @Test
+    void quedaDoDespertarDeitaOCorpoEEstaDePeNoCorteDaCutscene() throws IOException {
+        var queda = animacoes().getAsJsonObject(com.minerwk.core.boss.CutsceneDespertar.ANIM_QUEDA);
+        int levanta = com.minerwk.core.boss.CutsceneDespertar.LEVANTA;
+        int total = levanta + com.minerwk.core.boss.CutsceneDespertar.DEPOIS;
+        assertEquals(total, Math.round(queda.get("animation_length").getAsDouble() * 20), "cobre a queda e a cutscene");
+        var giro = queda.getAsJsonObject("bones").getAsJsonObject("body").getAsJsonObject("rotation");
+        double deitado = 0;
+        for (var q : giro.entrySet()) {
+            double tick = Double.parseDouble(q.getKey()) * 20;
+            double x = q.getValue().getAsJsonObject().getAsJsonArray("vector").get(0).getAsDouble();
+            if (tick > 10 && tick <= levanta - com.minerwk.core.boss.CutsceneDespertar.ERGUER) {
+                assertTrue(Math.abs(x) >= 80, "deitado no tick " + tick);
+                deitado++;
+            }
+            if (tick >= levanta) assertEquals(0, x, 1e-6, "de pé a partir do corte, no tick " + tick);
+        }
+        assertTrue(deitado >= 2, "a pose deitada é segurada");
+    }
+
+    @Test
     void todaAnimacaoMexeOCorpoInteiroComOssosQueExistem() throws IOException {
         for (Map.Entry<String, com.google.gson.JsonElement> e : animacoes().entrySet()) {
             Set<String> ossos = e.getValue().getAsJsonObject().getAsJsonObject("bones").keySet();

@@ -235,6 +235,31 @@ A["gojo_vazio_infinito"] = anim(2.5, {
     "left_leg": {"rotation": [(0, N), (0.35, [0, 0, -3]), (2.0, [0, 0, -3]), (2.5, N, C)]},
 })
 
+# A queda do despertar (boss Toji). Tempos de CutsceneDespertar: LEVANTA = 60 ticks (3,0 s), ERGUER = 10
+# (começa a se erguer em 2,5 s), DEPOIS = 25 (acaba em 4,25 s). Cai de costas, fica no chão e está de pé
+# no corte da câmera; depois ergue a cabeça devagar.
+CAI, ERGUE, LEVANTA_S, FIM_QUEDA = 0.40, 2.50, 3.00, 4.25
+# Quanto o corpo desce para encostar as costas no chão (pixels).
+QUEDA_Y = -10
+DEITADO = [-90, 0, 0]
+A["gojo_queda"] = anim(FIM_QUEDA, {
+    "body": {"rotation": [(0, N), (CAI, DEITADO, "easeInQuad"), (1.4, [-90, 0, 0]), (ERGUE, DEITADO),
+                          (LEVANTA_S, N, OUTC), (FIM_QUEDA, N)],
+             "position": [(0, N), (CAI, [0, QUEDA_Y, 0], "easeInQuad"), (1.4, [0, QUEDA_Y, 0]), (ERGUE, [0, QUEDA_Y, 0]),
+                          (LEVANTA_S, N, OUTC), (FIM_QUEDA, N)]},
+    "torso": {"rotation": [(0, N), (0.12, [-14, 0, 0], OUTC), (CAI, N), (ERGUE, N), (2.8, [18, 0, 0]),
+                           (LEVANTA_S, [10, 0, 0]), (3.8, N, C), (FIM_QUEDA, N)]},
+    "head": {"rotation": [(0, N), (0.12, [-25, 0, 0], OUTC), (CAI, [-8, 12, 0]), (ERGUE, [-8, 12, 0]),
+                          (LEVANTA_S, [28, 0, 0]), (3.3, [28, 0, 0]), (4.0, [-6, 0, 0], C), (FIM_QUEDA, N)]},
+    "right_arm": {"rotation": [(0, N), (0.12, [-40, 0, 30], OUTC), (CAI, [0, 0, 62]), (ERGUE, [0, 0, 60]),
+                               (LEVANTA_S, [8, 0, 8]), (FIM_QUEDA, N, C)]},
+    "left_arm": {"rotation": [(0, N), (0.12, [-30, 0, -25], OUTC), (CAI, [0, 0, -38]), (ERGUE, [0, 0, -40]),
+                              (LEVANTA_S, [8, 0, -8]), (FIM_QUEDA, N, C)]},
+    "right_leg": {"rotation": [(0, N), (CAI, [0, 0, 10]), (ERGUE, [0, 0, 10]), (2.8, [-35, 0, 4]),
+                               (LEVANTA_S, N, OUTC), (FIM_QUEDA, N)]},
+    "left_leg": {"rotation": [(0, N), (CAI, [-12, 0, -8]), (ERGUE, [-12, 0, -8]), (LEVANTA_S, N, OUTC), (FIM_QUEDA, N)]},
+})
+
 for nome in ("gojo_azul", "gojo_infinito", "gojo_roxo"):
     sem_pernas(A[nome])
 

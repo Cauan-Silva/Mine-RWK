@@ -12,6 +12,7 @@ import com.minerwk.kit.ServicoKits;
 import com.minerwk.rede.Cutscene;
 import com.minerwk.rede.Envio;
 import com.minerwk.rede.MostrarVisual;
+import com.minerwk.rede.TocarApresentacao;
 import com.minerwk.registro.Efeitos;
 import com.minerwk.registro.Sons;
 import java.util.ArrayList;
@@ -590,7 +591,8 @@ public final class TojiEntity extends Monster implements GeoEntity {
         }
         dono.setDeltaMovement(Vec3.ZERO);
         dono.hurtMarked = true;
-        dono.setForcedPose(Pose.SWIMMING);
+        // A pose forçada do servidor não chega ao próprio jogador: quem o deita é a animação.
+        Envio.paraQuemVe(dono, new TocarApresentacao(dono.getId(), CutsceneDespertar.ANIM_QUEDA, "", ""));
         triggerAnim(CONTROLE, "fase");
         particulas(ParticleTypes.DAMAGE_INDICATOR, dono.getX(), dono.getY() + 1, dono.getZ(), 14, .3, .4, .3, .1);
         tocar(SonsToji.QUEDA, 1.6f, 1f);
@@ -624,6 +626,7 @@ public final class TojiEntity extends Monster implements GeoEntity {
         if (level().getGameTime() < quedaAteDaCutscene) {
             Envio.para(dono, new Cutscene(Cutscene.FIM, dono.getId(), vetor(dono.getEyePosition()), vetor(direcao),
                     level().getGameTime()));
+            Envio.paraQuemVe(dono, new TocarApresentacao(dono.getId(), TocarApresentacao.PARAR, "", ""));
         }
         quedaAteDaCutscene = 0;
         LutasToji.CAIDOS.remove(dono.getUUID());

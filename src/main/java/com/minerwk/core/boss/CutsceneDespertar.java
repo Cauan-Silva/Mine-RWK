@@ -17,6 +17,10 @@ public final class CutsceneDespertar {
     public static final int LEVANTA = TojiBoss.QUEDA;
     /** Ticks de cutscene depois de se levantar; o Toji espera esse tempo antes de voltar a atacar. */
     public static final int DEPOIS = 25;
+    /** Animação de quem caiu: deitado até pouco antes de {@link #LEVANTA}, de pé no corte. */
+    public static final String ANIM_QUEDA = "gojo_queda";
+    /** Ticks antes de {@link #LEVANTA} em que ele começa a se erguer. */
+    public static final int ERGUER = 10;
 
     public static final Coreografia COREOGRAFIA = new Coreografia(List.of(
             // De cima, quase a pino, o corpo no chão.
