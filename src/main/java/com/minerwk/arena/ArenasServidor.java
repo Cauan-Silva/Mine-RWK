@@ -240,6 +240,11 @@ public final class ArenasServidor {
     /** Quem entra no jogo dentro da dimensão sem uma luta em andamento volta para de onde saiu. */
     static void aoEntrar(ServerPlayer jogador) {
         if (!naArena(jogador) || ARENAS.containsKey(jogador.getUUID())) return;
+        if (!jogador.isAlive()) {
+            // Morreu lá e fechou o jogo sem renascer: renascer já o tira da arena, e o ponto velho não vale mais.
+            jogador.removeData(Anexos.RETORNO_ARENA);
+            return;
+        }
         if (!trazer(jogador) && naArena(jogador)) paraORenascimento(jogador);
     }
 

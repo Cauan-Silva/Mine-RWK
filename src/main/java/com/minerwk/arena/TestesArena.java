@@ -342,6 +342,20 @@ public final class TestesArena {
         helper.succeed();
     }
 
+    @GameTest(template = "vazio", batch = "arena_22")
+    public static void entrarMortoNaArenaEsperaORenascimento(GameTestHelper helper) {
+        // Morreu na arena e fechou o jogo sem renascer: ao entrar de novo ele ainda está morto lá.
+        ServerPlayer jogador = jogador(helper);
+        ArenasServidor.levar(jogador, CaixaArena.daVaga(58));
+        jogador.hasChangedDimension();
+        jogador.kill();
+        ArenasServidor.aoEntrar(jogador);
+        helper.assertTrue(ArenasServidor.naArena(jogador), "o morto não é teleportado: renascer já o tira de lá");
+        helper.assertFalse(jogador.hasData(Anexos.RETORNO_ARENA), "e não leva um ponto de retorno velho para a vida nova");
+        jogador.remove(Entity.RemovalReason.DISCARDED);
+        helper.succeed();
+    }
+
     // --- Morrer na arena ---
 
     /** Quem renasce é um jogador novo que copia o antigo: é aí que o jogo decide o que ele mantém. */
