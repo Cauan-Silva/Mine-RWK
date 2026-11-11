@@ -24,6 +24,14 @@ Voltar para [[00 Início]].
 - Gojo (revisão 09/11, menores que ficaram): o Roxo pode derrubar plantas vizinhas (o `BreakEvent` para mods de proteção entrou em 09/11, no Gojo peso); o Vermelho atravessa parede fina encostada no rosto; bola de fogo e crânio de Wither voltam a acelerar no Infinito (o dano é cancelado mesmo assim); TNT sem dono passa pelo Infinito; sobram até 2 ticks de Infinito e 5 de Paralisia depois de morrer. Corrigidos na revisão: efeitos acabam ao mudar de dimensão; golpes não atingem pets, montaria nem projéteis do próprio Gojo; Paralisia não cancela Espinhos nem dano em si mesmo; ícone da Paralisia escondido (falta textura).
 
 ## Para testar no jogo
+- Arena da Escola Jujutsu (11/11), conferir no jogo (`/rwk toji <jogador>`); substitui os itens de **cenário** da lista "Arena, partes 2 e 3" abaixo:
+  - **Entrada:** quanto tempo fica a tela preta e a de carregamento? Ficou mais longa que antes? Se incomodar, dá para enxugar mais a floresta.
+  - **Cenário:** parece a Escola Jujutsu? Olhar a escadaria com os torii atrás de onde você entra, o salão ao norte, os dois pavilhões e a floresta. Os telhados ficaram bons? O céu está de pôr do sol?
+  - **Espaço:** o pátio de 41 × 41 é suficiente para a luta (Execução do Assassino, investidas)? O Toji fica preso em prédio, em telhado ou na escadaria?
+  - **Destruição:** o Azul, o Roxo e o R destroem os prédios e as árvores? O R cabe (subida de 25 blocos)?
+  - **Escadaria:** descer até o fim: a barreira segura no último patamar? Dá para ver o vazio por trás das árvores?
+  - **Dentro dos prédios:** dá para entrar pela porta; está claro o bastante?
+- Queda do despertar (11/11): o Gojo agora cai de costas, fica no chão os 3 s e está de pé no corte da cutscene (antes ficava em pé parado). Conferir no jogo, na luta do Toji: a queda, se o corpo encosta no chão sem afundar, e o levantar.
 - Arena, partes 2 e 3 (10/11), conferir no jogo (`/rwk toji <jogador>`):
   - **Atenção:** o jogador "Dev" do "New World" ficou desperto de vez (a prova automática venceu o Toji nele): `/rwk despertar Dev nao` devolve os cadeados.
   - **Depois da revisão final:** morrer na luta, sair para a tela de título sem renascer, entrar de novo e renascer: os itens e o XP voltam? Invocar de dentro de uma construção e, durante a luta, não há como testar sozinho o ponto obstruído (precisa de outro jogador).

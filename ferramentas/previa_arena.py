@@ -26,12 +26,18 @@ CORES = {
     "FOLHA": (58, 96, 58),
     "LANTERNA": (250, 200, 90),
     "MURO": (100, 100, 104),
+    "GRAMA": (96, 140, 70),
+    "PAREDE_BRANCA": (232, 228, 218),
+    "PILAR": (50, 34, 20),
+    "ASSOALHO": (118, 86, 50),
+    "TELHA": (58, 58, 64),
+    "LAJE_TELHA": (70, 70, 78),
 }
 CEU = (236, 190, 140)
-MEIA = 40          # a caixa vai de -40 a +40
-ESCALA = 8         # pixels por bloco
+MEIA = 50          # a caixa vai de -50 a +50
+ESCALA = 6         # pixels por bloco
 MARGEM = 24
-Y_MIN, Y_MAX = -8, 24
+Y_MIN, Y_MAX = -20, 26
 
 
 def ler():

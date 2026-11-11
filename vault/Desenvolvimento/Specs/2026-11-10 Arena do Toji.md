@@ -17,28 +17,32 @@ Voltar para [[Roadmap]]. Muda onde acontece a luta de [[2026-11-10 Toji e o desp
 - O gatilho não muda: o Contrato do Matador de Feiticeiros ou `/rwk toji <jogador>`, com as mesmas exigências de hoje.
 - O mod guarda o **ponto de retorno** do jogador (dimensão, posição e para onde olhava) e reserva uma **vaga** na dimensão da arena.
 - A arena é montada na vaga, em fatias, ao longo de até 2 segundos. Nesse tempo o jogador fica parado onde está, com a tela escurecendo. Quando a arena fica pronta, ele é levado para lá.
-- O jogador aparece no lado sul do pátio, olhando para o norte. O Toji entra 16 blocos à frente dele, com a animação de chegada, o baque e a fala que já existem, e só ataca 2 segundos depois, como hoje.
+- O jogador aparece no lado sul do pátio, no topo da escadaria, olhando para o norte. O Toji entra 16 blocos à frente dele, com a animação de chegada, o baque e a fala que já existem, e só ataca 2 segundos depois, como hoje.
 - Montaria, passageiros e animais de estimação não vão junto. Quem está montado desmonta antes.
 - Só entra quem invocou. Não é possível invocar de dentro da arena.
 
 ## A dimensão
-- Nome: `minerwk:arena`. Vazia (só ar), sem mobs, sem clima, sem ciclo de dia: a hora fica fixa no fim de tarde.
+- Nome: `minerwk:arena`. Vazia (só ar), sem mobs, sem clima, sem ciclo de dia: a hora fica fixa no pôr do sol (12400).
 - Dividida em **vagas** numa grade, a 512 blocos uma da outra. Duas lutas ao mesmo tempo ficam em vagas diferentes e não se veem.
 - Uma vaga fica ocupada do começo da montagem até o fim da limpeza. A próxima luta pega a primeira vaga livre.
 - As vagas não são salvas: quando o servidor liga, todas estão livres. A arena é limpa antes de ser montada, então sobras de uma queda do servidor não aparecem.
 
 ## O cenário: entrada da Escola Jujutsu
-Montado por código, com blocos do Minecraft. Tudo cabe numa caixa de 81 × 64 × 81 blocos por vaga.
+> **Refeito em 11/11** a pedido do autor, para ficar fiel à obra (caps. 70 a 72, ep. 27): o grupo sobe uma escadaria longa com torii em fila, chega ao topo já dentro da Escola, e a luta acontece ali, entre prédios de templo que o Azul máximo arrasa. A versão anterior (pátio de 61 × 61 com muro e doze árvores, caixa de 81) saiu. Ver [[2026-11-11 Arena da Escola Jujutsu]].
 
-- **Pátio:** 61 × 61 blocos, plano, de tijolos e lajes de pedra em faixas, com 4 blocos de pedra por baixo (para o Azul e o Roxo terem o que arrancar e furar sem abrir o vazio logo).
-- **Lado norte:** uma escadaria larga subindo 8 blocos até um patamar, com um portão torii grande no topo.
-- **Caminho central:** dois torii menores sobre a faixa do meio do pátio, altos o bastante para não atrapalhar a luta (vão livre de 7 blocos).
-- **Bordas leste, oeste e sul:** muro baixo de pedra, lanternas e árvores (troncos e folhas) numa faixa de 10 blocos em volta do pátio.
-- **Sem itens soltos, baús ou mobs.** Nada no cenário dá itens ao ser quebrado.
-- A planta (qual bloco em cada posição) fica separada do código que põe os blocos no mundo, para poder ser testada e ajustada sem abrir o jogo.
+Montado por código, com blocos do Minecraft. Tudo cabe numa caixa de 101 × 76 × 101 blocos por vaga. Norte é para onde o jogador olha ao entrar.
+
+- **Sul, a chegada:** uma escadaria de 11 blocos de largura que desce 14 blocos encosta abaixo, com cinco torii vermelhos em fila e um torii grande na cabeça dela. O jogador entra no topo, de costas para a escadaria.
+- **Pátio:** 41 × 41 blocos, plano, de tijolo de pedra com a faixa central e a moldura de andesito polido e 3 camadas de pedra por baixo. Só os dois pilares de um torii ficam dentro dele. Lanternas de pedra na borda.
+- **Salão principal (norte):** base de pedra de 2 blocos com escada de frente, paredes brancas com pilares e viga escuros, porta de 5 × 4 para o pátio e dois telhados escuros de beiral largo.
+- **Pavilhões (leste e oeste):** o mesmo estilo, menores, com um telhado e a porta para o pátio.
+- **Prédios ocos e destrutíveis:** dá para entrar e subir nos telhados, e os golpes os destroem.
+- **Floresta:** pinheiros altos em volta de tudo e pela encosta.
+- **Sem itens soltos, baús ou mobs.**
+- A planta (`core/arena/PlantaEscola`) fica separada do código que põe os blocos no mundo; `python ferramentas/previa_arena.py` desenha a planta sem abrir o jogo.
 
 ## Regras dentro da arena
-- **Barreira:** uma caixa invisível nas bordas da vaga (81 × 81, do fundo até 56 blocos acima do pátio). Nem o jogador nem o Toji passam. Usa a mesma regra de movimento do domínio do Gojo, estendida para caixa.
+- **Barreira:** uma caixa invisível nas bordas da vaga (101 × 101, de 20 blocos abaixo do pátio até 56 acima). Nem o jogador nem o Toji passam. Usa a mesma regra de movimento do domínio do Gojo, estendida para caixa.
 - **Queda no vazio:** se o chão for todo destruído e alguém cair abaixo do fundo da caixa, volta para o centro do pátio (o chão do centro é refeito num quadrado de 5 × 5) e leva 4 de dano. Vale para o jogador e para o Toji.
 - **Blocos:** o jogador não quebra nem coloca blocos à mão (em sobrevivência). Os golpes destroem normalmente.
 - **Destruição limitada à caixa:** o Roxo, o R e o Azul não apagam nem arrancam blocos fora da caixa da vaga. A explosão de raio 40 do R continua com o mesmo visual e o mesmo dano; só os blocos apagados é que param na borda.

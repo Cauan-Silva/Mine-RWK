@@ -11,14 +11,14 @@ import java.util.Map;
  * mundo para poder ser testada e ajustada sem abrir o jogo.
  */
 public final class PlantaEscola {
-    /** Meio lado do pátio: de −30 a +30 são 61 blocos. */
+    /** Meio lado da plataforma lisa: de −30 a +30 são 61 blocos. */
     public static final int MEIO_PATIO = 30;
     /** Camadas sob os pés: o piso e mais três de pedra. */
     public static final int CAMADAS = 4;
 
     public enum Material {
         PEDRA, TIJOLO_PEDRA, LAJE_PEDRA, ANDESITO_POLIDO, ESCADA_PEDRA, MADEIRA_ESCURA, MADEIRA_VERMELHA, TRONCO,
-        FOLHA, LANTERNA, MURO
+        FOLHA, LANTERNA, MURO, GRAMA, PAREDE_BRANCA, PILAR, ASSOALHO, TELHA, LAJE_TELHA
     }
 
     public record Bloco(int dx, int dy, int dz, Material material) {
@@ -40,92 +40,143 @@ public final class PlantaEscola {
     }
 
     // --- O cenário: a entrada da Escola Jujutsu ---
+    // Norte é dz negativo. Do sul vem a escadaria longa com os torii em fila; no topo dela, o pátio; em
+    // volta do pátio, o salão principal (norte) e dois pavilhões (leste e oeste); em volta de tudo, a floresta.
 
-    /** Meio lado da caixa: a faixa de fora do pátio vai de 31 a 40. */
-    private static final int BORDA = 40;
-    /** Onde ficam os muros: logo depois do pátio. */
-    private static final int MURO_EM = MEIO_PATIO + 1;
-    /** Meia largura da escadaria (21 blocos) e quantos degraus ela sobe. */
-    private static final int MEIA_ESCADA = 10;
-    private static final int DEGRAUS = 8;
-    /** Os dois torii do caminho central: onde ficam, meio vão (7 livres) e altura livre. */
-    private static final int[] TORII_DO_CAMINHO = {-12, 12};
-    private static final int PILAR_DO_CAMINHO = 4;
-    private static final int VAO_DO_CAMINHO = 7;
-    /** O torii grande do patamar: meio vão (9 livres) e altura livre. */
-    private static final int PILAR_GRANDE = 5;
-    private static final int VAO_GRANDE = 9;
-    /** De quanto em quanto há uma lanterna sobre o muro. */
-    private static final int PASSO_DAS_LANTERNAS = 6;
-    /** As doze árvores, em posições fixas: toda luta acontece no mesmo cenário. */
-    private static final int[][] ARVORES = {
-            {36, -24}, {36, -8}, {36, 8}, {36, 24},
-            {-36, -24}, {-36, -8}, {-36, 8}, {-36, 24},
-            {-24, 36}, {-8, 36}, {8, 36}, {24, 36}};
+    /** Meio lado da caixa. */
+    private static final int BORDA = CaixaArena.MEIA;
+    /** Meio lado do pátio da luta: de −20 a +20 são 41 blocos. */
+    public static final int MEIO_PATIO_ESCOLA = 20;
+    /** Até onde vai o calçamento em volta do pátio, antes da grama. */
+    private static final int CALCADA = 24;
+    /** Primeira fileira da escadaria (logo ao sul do pátio) e quantos degraus ela desce. */
+    public static final int ESCADA_EM = MEIO_PATIO_ESCOLA + 1;
+    public static final int DEGRAUS = 14;
+    /** Meia largura da escadaria (11 blocos). */
+    public static final int MEIA_ESCADA = 5;
+    /** Em quais degraus há um torii; os pilares ficam em ±6 e o vão tem 6 de altura. */
+    public static final int[] TORII_DA_ESCADA = {1, 4, 7, 10, 13};
+    public static final int PILAR_DA_ESCADA = MEIA_ESCADA + 1;
+    private static final int VAO_DA_ESCADA = 6;
+    /** O torii grande, na cabeça da escadaria: pilares em ±6, vão de 9 de altura. */
+    public static final int TORII_GRANDE_EM = MEIO_PATIO_ESCOLA;
+    public static final int PILAR_GRANDE = 6;
+    public static final int VAO_GRANDE = 9;
+    /** O torii do caminho, entre o centro e o salão: pilares em ±4, vão de 7 de altura. */
+    public static final int TORII_DO_CAMINHO = -12;
+    public static final int PILAR_DO_CAMINHO = 4;
+    public static final int VAO_DO_CAMINHO = 7;
+
+    /** Um prédio: a planta das paredes, a altura da base e das paredes, o lado da porta e se tem dois telhados. */
+    public record Predio(int x0, int x1, int z0, int z1, int podio, int parede, char porta, boolean doisNiveis) {
+        /** Quanto o beiral passa das paredes. */
+        public static final int BEIRAL = 2;
+
+        boolean perto(int x, int z, int folga) {
+            return x >= x0 - BEIRAL - folga && x <= x1 + BEIRAL + folga && z >= z0 - BEIRAL - folga && z <= z1 + BEIRAL + folga;
+        }
+    }
+
+    /** O salão principal, ao norte, de frente para o pátio. */
+    public static final Predio SALAO = new Predio(-12, 12, -39, -27, 2, 6, 'S', true);
+    /** Os pavilhões dos lados, com a porta para o pátio. */
+    public static final Predio PAVILHAO_LESTE = new Predio(27, 39, -10, 10, 1, 5, 'O', false);
+    public static final Predio PAVILHAO_OESTE = new Predio(-39, -27, -10, 10, 1, 5, 'L', false);
+    public static final List<Predio> PREDIOS = List.of(SALAO, PAVILHAO_LESTE, PAVILHAO_OESTE);
+
+    /** De quanto em quanto a floresta tenta uma árvore. */
+    private static final int PASSO_DA_FLORESTA = 7;
 
     /** Junta os blocos por posição: o que é posto depois substitui o que estava lá. */
     private static final class Obra {
         private final Map<Long, Bloco> blocos = new LinkedHashMap<>();
 
+        private static long chave(int dx, int dy, int dz) {
+            return ((long) (dx + 512) << 40) | ((long) (dy + 512) << 20) | (dz + 512);
+        }
+
+        /** Fora da caixa nada é posto (a copa de uma árvore da borda é cortada). */
         void por(int dx, int dy, int dz, Material m) {
-            long chave = ((long) (dx + 512) << 40) | ((long) (dy + 512) << 20) | (dz + 512);
+            if (Math.abs(dx) > BORDA || Math.abs(dz) > BORDA) return;
+            long chave = chave(dx, dy, dz);
             // Sai e entra de novo: assim o que depende de apoio (a lanterna) vem depois do apoio na lista.
             blocos.remove(chave);
             blocos.put(chave, new Bloco(dx, dy, dz, m));
         }
+
+        void tirar(int dx, int dy, int dz) {
+            blocos.remove(chave(dx, dy, dz));
+        }
+
+        boolean tem(int dx, int dy, int dz) {
+            return blocos.containsKey(chave(dx, dy, dz));
+        }
+    }
+
+    /** A fileira é a de um degrau da escadaria (e não a de um patamar)? */
+    private static boolean fileiraDeDegrau(int dz) {
+        return dz >= ESCADA_EM && (dz - ESCADA_EM) % 2 == 0 && (dz - ESCADA_EM) / 2 < DEGRAUS;
     }
 
     /**
-     * A entrada da Escola: pátio de pedra com a faixa central de andesito, escadaria ao norte subindo até o
-     * patamar do torii grande, dois torii sobre o caminho, e muro, lanternas e árvores nas outras bordas.
+     * Altura (dy) do bloco do chão numa fileira: −1 do pátio para o norte; ao sul a encosta desce um bloco
+     * a cada dois, junto com a escadaria (uma fileira de degrau, uma de patamar).
      */
+    public static int chao(int dz) {
+        if (dz < ESCADA_EM) return -1;
+        int k = Math.min((dz - ESCADA_EM) / 2, DEGRAUS - 1);
+        return fileiraDeDegrau(dz) ? -1 - k : -2 - k;
+    }
+
+    /** A entrada da Escola: ver o comentário do começo desta parte. */
     public static List<Bloco> cenario() {
         Obra o = new Obra();
-        // Pátio: a faixa central de 5 e a moldura são de andesito polido; o resto, tijolo de pedra.
-        for (int dx = -MEIO_PATIO; dx <= MEIO_PATIO; dx++) {
-            for (int dz = -MEIO_PATIO; dz <= MEIO_PATIO; dz++) {
-                boolean destaque = Math.abs(dx) <= 2 || Math.abs(dx) == MEIO_PATIO || Math.abs(dz) == MEIO_PATIO;
-                o.por(dx, -1, dz, destaque ? Material.ANDESITO_POLIDO : Material.TIJOLO_PEDRA);
-                for (int dy = -CAMADAS; dy <= -2; dy++) o.por(dx, dy, dz, Material.PEDRA);
-            }
+        terreno(o);
+        torii(o, TORII_GRANDE_EM, 0, PILAR_GRANDE, VAO_GRANDE);
+        torii(o, TORII_DO_CAMINHO, 0, PILAR_DO_CAMINHO, VAO_DO_CAMINHO);
+        for (int k : TORII_DA_ESCADA) torii(o, ESCADA_EM + 1 + 2 * k, -1 - k, PILAR_DA_ESCADA, VAO_DA_ESCADA);
+        for (Predio p : PREDIOS) predio(o, p);
+        // Lanternas de pedra na borda do pátio, fora da frente das portas e do caminho.
+        for (int i : new int[] {-16, -8, 8, 16}) {
+            lanterna(o, MEIO_PATIO_ESCOLA, i);
+            lanterna(o, -MEIO_PATIO_ESCOLA, i);
+            lanterna(o, i, -MEIO_PATIO_ESCOLA);
         }
-        // Faixa de fora: uma camada de pedra em volta do pátio.
+        lanterna(o, PILAR_GRANDE + 3, MEIO_PATIO_ESCOLA);
+        lanterna(o, -PILAR_GRANDE - 3, MEIO_PATIO_ESCOLA);
+        floresta(o);
+        return new ArrayList<>(o.blocos.values());
+    }
+
+    /** O chão da caixa inteira: pátio, calçamento, grama e a encosta do sul com a escadaria. */
+    private static void terreno(Obra o) {
         for (int dx = -BORDA; dx <= BORDA; dx++) {
             for (int dz = -BORDA; dz <= BORDA; dz++) {
-                if (Math.max(Math.abs(dx), Math.abs(dz)) > MEIO_PATIO) o.por(dx, -1, dz, Material.PEDRA);
+                int topo = chao(dz);
+                // Sob o pátio e a calçada são três camadas de pedra (para o Azul e o Roxo); sob a grama e a
+                // encosta, uma só: menos blocos para montar e iluminar.
+                boolean calcado = Math.abs(dx) <= CALCADA && dz >= -CALCADA && dz < ESCADA_EM;
+                int fundo = calcado ? -CAMADAS : topo - 1;
+                for (int dy = fundo; dy < topo; dy++) o.por(dx, dy, dz, Material.PEDRA);
+                o.por(dx, topo, dz, piso(dx, dz));
             }
         }
-        // Escadaria ao norte: cada degrau um bloco mais alto, maciça por baixo.
-        for (int dx = -MEIA_ESCADA; dx <= MEIA_ESCADA; dx++) {
-            for (int k = 0; k < DEGRAUS; k++) {
-                int dz = -MURO_EM - k;
-                for (int dy = 0; dy < k; dy++) o.por(dx, dy, dz, Material.PEDRA);
-                o.por(dx, k, dz, Material.ESCADA_PEDRA);
-            }
-            // Patamar: os dois últimos blocos da caixa, com o piso na altura do último degrau.
-            for (int dz = -MURO_EM - DEGRAUS; dz >= -BORDA; dz--) {
-                for (int dy = 0; dy < DEGRAUS - 1; dy++) o.por(dx, dy, dz, Material.PEDRA);
-                o.por(dx, DEGRAUS - 1, dz, Math.abs(dx) <= 2 ? Material.ANDESITO_POLIDO : Material.TIJOLO_PEDRA);
-            }
+    }
+
+    private static Material piso(int dx, int dz) {
+        int ax = Math.abs(dx);
+        if (dz >= ESCADA_EM) {
+            if (ax > MEIA_ESCADA) return Material.GRAMA;
+            return fileiraDeDegrau(dz) ? Material.ESCADA_PEDRA : Material.TIJOLO_PEDRA;
         }
-        torii(o, -BORDA, DEGRAUS, PILAR_GRANDE, VAO_GRANDE);
-        for (int dz : TORII_DO_CAMINHO) torii(o, dz, 0, PILAR_DO_CAMINHO, VAO_DO_CAMINHO);
-        // Muro de 2 de altura a leste, a oeste e ao sul, e ao norte dos dois lados da escadaria.
-        for (int i = -MURO_EM; i <= MURO_EM; i++) {
-            for (int dy = 0; dy <= 1; dy++) {
-                o.por(MURO_EM, dy, i, Material.MURO);
-                o.por(-MURO_EM, dy, i, Material.MURO);
-                o.por(i, dy, MURO_EM, Material.MURO);
-                if (Math.abs(i) > MEIA_ESCADA) o.por(i, dy, -MURO_EM, Material.MURO);
-            }
+        int longe = Math.max(ax, Math.abs(dz));
+        if (longe <= MEIO_PATIO_ESCOLA) {
+            // A faixa central de 5 e a moldura do pátio são de andesito polido.
+            return ax <= 2 || longe == MEIO_PATIO_ESCOLA ? Material.ANDESITO_POLIDO : Material.TIJOLO_PEDRA;
         }
-        for (int i = -MEIO_PATIO; i <= MEIO_PATIO; i += PASSO_DAS_LANTERNAS) {
-            o.por(MURO_EM, 2, i, Material.LANTERNA);
-            o.por(-MURO_EM, 2, i, Material.LANTERNA);
-            o.por(i, 2, MURO_EM, Material.LANTERNA);
-        }
-        for (int i = 0; i < ARVORES.length; i++) arvore(o, ARVORES[i][0], ARVORES[i][1], 5 + i % 3, 2 + i % 2);
-        return new ArrayList<>(o.blocos.values());
+        // O caminho segue até a escada do salão.
+        if (ax <= 2 && dz < 0 && dz >= SALAO.z1()) return Material.ANDESITO_POLIDO;
+        return longe <= CALCADA ? Material.TIJOLO_PEDRA : Material.GRAMA;
     }
 
     /**
@@ -141,19 +192,147 @@ public final class PlantaEscola {
         for (int dx = -pilar - 2; dx <= pilar + 2; dx++) o.por(dx, base + vao + 1, dz, Material.MADEIRA_ESCURA);
     }
 
-    /** Tronco de {@code altura} blocos e copa redonda de raio {@code raio} em volta do topo dele. */
-    private static void arvore(Obra o, int x, int z, int altura, int raio) {
-        for (int dx = -raio; dx <= raio; dx++) {
-            for (int dy = -raio; dy <= raio; dy++) {
-                for (int dz = -raio; dz <= raio; dz++) {
-                    if (dx * dx + dy * dy + dz * dz > raio * raio + 1) continue;
-                    int fx = x + dx, fz = z + dz;
-                    // A copa não passa da caixa nem entra por cima do muro e do pátio.
-                    if (Math.max(Math.abs(fx), Math.abs(fz)) > BORDA || Math.max(Math.abs(fx), Math.abs(fz)) <= MURO_EM) continue;
-                    o.por(fx, altura + dy, fz, Material.FOLHA);
+    /** Lanterna de pedra: um poste de dois blocos com a luz em cima. */
+    private static void lanterna(Obra o, int dx, int dz) {
+        o.por(dx, 0, dz, Material.MURO);
+        o.por(dx, 1, dz, Material.MURO);
+        o.por(dx, 2, dz, Material.LANTERNA);
+    }
+
+    /**
+     * Um prédio de templo: base de pedra, assoalho, paredes brancas com pilares e viga escuros, porta de
+     * 5 × 4, oco por dentro, e telhado de beiral largo (dois telhados no salão).
+     */
+    private static void predio(Obra o, Predio p) {
+        int b = Predio.BEIRAL;
+        for (int dx = p.x0() - b; dx <= p.x1() + b; dx++) {
+            for (int dz = p.z0() - b; dz <= p.z1() + b; dz++) {
+                for (int dy = 0; dy < p.podio(); dy++) {
+                    boolean dentro = dx > p.x0() && dx < p.x1() && dz > p.z0() && dz < p.z1();
+                    o.por(dx, dy, dz, dy == p.podio() - 1 && dentro ? Material.ASSOALHO : Material.TIJOLO_PEDRA);
                 }
             }
         }
-        for (int dy = 0; dy < altura; dy++) o.por(x, dy, z, Material.TRONCO);
+        int topo = p.podio() + p.parede() - 1;
+        paredes(o, p.x0(), p.x1(), p.z0(), p.z1(), p.podio(), topo);
+        // A porta, no meio do lado que dá para o pátio.
+        int mx = (p.x0() + p.x1()) / 2, mz = (p.z0() + p.z1()) / 2;
+        for (int i = -2; i <= 2; i++) {
+            for (int dy = p.podio(); dy < p.podio() + 4; dy++) {
+                if (p.porta() == 'S') o.tirar(mx + i, dy, p.z1());
+                else o.tirar(p.porta() == 'O' ? p.x0() : p.x1(), dy, mz + i);
+            }
+        }
+        if (p.porta() == 'S') {
+            // Escada de frente, subindo para o norte: um degrau por bloco da base.
+            for (int j = 0; j < p.podio(); j++) {
+                int dz = p.z1() + b + p.podio() - j;
+                for (int dx = mx - 3; dx <= mx + 3; dx++) {
+                    for (int dy = 0; dy < j; dy++) o.por(dx, dy, dz, Material.TIJOLO_PEDRA);
+                    o.por(dx, j, dz, Material.ESCADA_PEDRA);
+                }
+            }
+        } else {
+            // Base de um bloco: meia laje de degrau diante da porta.
+            int dx = p.porta() == 'O' ? p.x0() - b - 1 : p.x1() + b + 1;
+            for (int dz = mz - 2; dz <= mz + 2; dz++) o.por(dx, 0, dz, Material.LAJE_PEDRA);
+        }
+        // Luz por dentro, nos quatro cantos.
+        for (int dx : new int[] {p.x0() + 1, p.x1() - 1}) {
+            for (int dz : new int[] {p.z0() + 1, p.z1() - 1}) o.por(dx, p.podio(), dz, Material.LANTERNA);
+        }
+        int beiral = topo + 1;
+        if (!p.doisNiveis()) {
+            telhado(o, p.x0(), p.x1(), p.z0(), p.z1(), beiral, Integer.MAX_VALUE);
+            return;
+        }
+        // Telhado de baixo com quatro faixas, o corpo de cima recuado, e o telhado de cima até fechar.
+        telhado(o, p.x0(), p.x1(), p.z0(), p.z1(), beiral, 4);
+        int r = 2;
+        paredes(o, p.x0() + r, p.x1() - r, p.z0() + r, p.z1() - r, beiral + 2, beiral + 4);
+        telhado(o, p.x0() + r, p.x1() - r, p.z0() + r, p.z1() - r, beiral + 5, Integer.MAX_VALUE);
+    }
+
+    /** As quatro paredes de um retângulo: pilar escuro nos cantos e de 4 em 4, branco entre eles, viga escura em cima. */
+    private static void paredes(Obra o, int x0, int x1, int z0, int z1, int de, int ate) {
+        for (int dx = x0; dx <= x1; dx++) {
+            for (int dz = z0; dz <= z1; dz++) {
+                boolean emX = dx == x0 || dx == x1, emZ = dz == z0 || dz == z1;
+                if (!emX && !emZ) continue;
+                boolean pilar = (emX && emZ) || (emZ && (dx - x0) % 4 == 0) || (emX && (dz - z0) % 4 == 0);
+                for (int dy = de; dy <= ate; dy++) {
+                    o.por(dx, dy, dz, dy == ate ? Material.MADEIRA_ESCURA : pilar ? Material.PILAR : Material.PAREDE_BRANCA);
+                }
+            }
+        }
+    }
+
+    /**
+     * Telhado de quatro águas sobre um retângulo, com beiral: faixas de dois blocos que recuam um bloco e
+     * sobem meio bloco cada (laje, depois bloco inteiro), até {@code faixas} ou até fechar. Os cantos do
+     * beiral sobem meio bloco, como nos telhados japoneses.
+     */
+    private static void telhado(Obra o, int x0, int x1, int z0, int z1, int base, int faixas) {
+        int b = Predio.BEIRAL;
+        for (int j = 0; j < faixas; j++) {
+            int ax0 = x0 - b + j, ax1 = x1 + b - j, az0 = z0 - b + j, az1 = z1 + b - j;
+            if (ax0 > ax1 || az0 > az1) break;
+            boolean fecha = ax1 - ax0 < 4 || az1 - az0 < 4;
+            int dy = base + j / 2;
+            Material m = j % 2 == 0 ? Material.LAJE_TELHA : Material.TELHA;
+            for (int dx = ax0; dx <= ax1; dx++) {
+                for (int dz = az0; dz <= az1; dz++) {
+                    boolean faixa = dx - ax0 < 2 || ax1 - dx < 2 || dz - az0 < 2 || az1 - dz < 2;
+                    if ((faixa || fecha) && !o.tem(dx, dy, dz)) o.por(dx, dy, dz, m);
+                }
+            }
+            if (j == 0) {
+                for (int dx : new int[] {ax0, ax1}) {
+                    for (int dz : new int[] {az0, az1}) o.por(dx, dy, dz, Material.TELHA);
+                }
+            }
+            if (fecha) break;
+        }
+    }
+
+    /** A floresta: pinheiros altos numa grade com desvio fixo (toda luta acontece no mesmo cenário). */
+    private static void floresta(Obra o) {
+        for (int gx = -BORDA + 2; gx <= BORDA - 2; gx += PASSO_DA_FLORESTA) {
+            for (int gz = -BORDA + 2; gz <= BORDA - 2; gz += PASSO_DA_FLORESTA) {
+                int h = (gx * 73856093) ^ (gz * 19349663);
+                h ^= h >>> 13;
+                int x = gx + Math.floorMod(h, 3) - 1, z = gz + Math.floorMod(h >> 4, 3) - 1;
+                if (!livreParaArvore(x, z)) continue;
+                arvore(o, x, z, 8 + Math.floorMod(h >> 8, 5));
+            }
+        }
+    }
+
+    /** Longe do pátio, da calçada, dos prédios e da escadaria, e dentro da caixa. */
+    public static boolean livreParaArvore(int x, int z) {
+        int folga = 4;
+        if (Math.abs(x) > BORDA - 1 || Math.abs(z) > BORDA - 1) return false;
+        if (Math.abs(x) <= CALCADA + folga && z >= -CALCADA - folga && z < ESCADA_EM + folga) return false;
+        if (Math.abs(x) <= PILAR_DA_ESCADA + 2 + folga && z >= ESCADA_EM) return false;
+        for (Predio p : PREDIOS) {
+            if (p.perto(x, z, folga)) return false;
+        }
+        return true;
+    }
+
+    /** Pinheiro: tronco de {@code altura} blocos a partir do chão e copa em andares que afinam para cima. */
+    private static void arvore(Obra o, int x, int z, int altura) {
+        int pe = chao(z) + 1;
+        for (int dy = 3; dy <= altura + 1; dy++) {
+            int doTopo = altura + 1 - dy;
+            int raio = doTopo == 0 ? 0 : Math.min(3, (doTopo + 1) / 2 + doTopo % 2);
+            for (int dx = -raio; dx <= raio; dx++) {
+                for (int dz = -raio; dz <= raio; dz++) {
+                    if (Math.abs(dx) + Math.abs(dz) > raio + 1) continue;
+                    o.por(x + dx, pe + dy, z + dz, Material.FOLHA);
+                }
+            }
+        }
+        for (int dy = 0; dy < altura; dy++) o.por(x, pe + dy, z, Material.TRONCO);
     }
 }

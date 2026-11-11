@@ -9,13 +9,13 @@ import com.minerwk.core.kit.Vetor;
  */
 public record CaixaArena(int indiceX, int indiceZ) {
     public static final int LADO_VAGA = 512;
-    public static final int LARGURA = 81;
-    public static final int ALTURA = 64;
+    public static final int LARGURA = 101;
+    public static final int ALTURA = 76;
     /** Blocos do centro até a face (o bloco do centro não conta). */
-    public static final int MEIA = 40;
+    public static final int MEIA = 50;
     /** Y dos pés de quem está no pátio. */
     public static final int Y_PATIO = 64;
-    public static final int Y_FUNDO = 56;
+    public static final int Y_FUNDO = 44;
     public static final int Y_TETO = 120;
     public static final int VAGAS_POR_LINHA = 64;
     /** Do jogador até o Toji na entrada. */
@@ -55,7 +55,7 @@ public record CaixaArena(int indiceX, int indiceZ) {
 
     /** Lado sul do pátio; quem entra olha para o norte (yaw 180). */
     public Vetor entradaJogador() {
-        return new Vetor(centroX() + .5, Y_PATIO, centroZ() + 24.5);
+        return new Vetor(centroX() + .5, Y_PATIO, centroZ() + 16.5);
     }
 
     public Vetor entradaToji() {
