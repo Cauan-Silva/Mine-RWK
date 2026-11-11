@@ -74,7 +74,6 @@ public final class TojiEntity extends Monster implements GeoEntity {
     /** A animação "morte" dura 1,5 s. */
     private static final int TICKS_DA_MORTE = 30;
     /** Quem bate no Toji sem ser quem invocou vira alvo por este tempo. */
-    private static final int TICKS_DE_REVIDE = 100;
 
     private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
     private final ServerBossEvent barra = new ServerBossEvent(getDisplayName(), BossEvent.BossBarColor.RED,
@@ -97,8 +96,6 @@ public final class TojiEntity extends Monster implements GeoEntity {
     private Vec3 direcao = new Vec3(0, 0, 1);
     private final Set<UUID> atingidos = new HashSet<>();
     private boolean puxando;
-    private UUID revide;
-    private long revideAte;
     /** Tick de jogo até o qual ele não age: a entrada, a troca de fase e o fim da cutscene do despertar. */
     private long paradoAte;
     private boolean entrou;
@@ -119,7 +116,7 @@ public final class TojiEntity extends Monster implements GeoEntity {
         return Monster.createMonsterAttributes()
                 .add(Attributes.MAX_HEALTH, TojiBoss.VIDA)
                 .add(Attributes.MOVEMENT_SPEED, .32)
-                .add(Attributes.FOLLOW_RANGE, TojiBoss.DISTANCIA_MAXIMA)
+                .add(Attributes.FOLLOW_RANGE, TojiBoss.ALCANCE_DE_VISAO)
                 .add(Attributes.KNOCKBACK_RESISTANCE, .8)
                 .add(Attributes.ATTACK_DAMAGE, TojiBoss.DANO_SOCO);
     }
@@ -200,7 +197,7 @@ public final class TojiEntity extends Monster implements GeoEntity {
         ticksDeLuta++;
         boolean presente = dono != null && dono.isAlive() && !dono.isRemoved() && !dono.hasDisconnected()
                 && dono.level() == level();
-        if (TojiBoss.fim(presente, presente ? dono.distanceTo(this) : 0, ticksDeLuta) != TojiBoss.Fim.CONTINUA) {
+        if (TojiBoss.fim(presente, ticksDeLuta) != TojiBoss.Fim.CONTINUA) {
             sumir();
             return;
         }
@@ -247,14 +244,8 @@ public final class TojiEntity extends Monster implements GeoEntity {
         else perseguir(alvo, distancia);
     }
 
-    /** Quem invocou, ou por alguns segundos outro jogador que acabou de ferir o Toji. */
+    /** Sempre quem invocou: a luta é solo, só ele entra na arena. */
     private LivingEntity alvo(ServerPlayer dono, long agora) {
-        if (lancaDoDespertar) return dono;
-        if (revide != null && agora < revideAte) {
-            Player outro = level().getPlayerByUUID(revide);
-            if (outro != null && outro.isAlive() && !outro.isSpectator() && outro.distanceTo(this) < 32) return outro;
-        }
-        revide = null;
         return dono;
     }
 
@@ -732,15 +723,21 @@ public final class TojiEntity extends Monster implements GeoEntity {
         barra.removeAllPlayers();
         LutasToji.esquecer(this);
         ServerPlayer dono = jogadorAtual();
-        if (dono == null) return;
-        LutasToji.CAIDOS.remove(dono.getUUID());
-        // Quem saiu do jogo já foi limpo na saída; mexer no kit dele o recriaria.
-        if (dono.hasDisconnected()) return;
-        if (quedaAte >= 0) {
-            quedaAte = -1;
-            soltar(dono);
+        if (dono != null) {
+            LutasToji.CAIDOS.remove(dono.getUUID());
+            // Quem saiu do jogo já foi limpo na saída; mexer no kit dele o recriaria.
+            if (!dono.hasDisconnected()) {
+                if (quedaAte >= 0) {
+                    quedaAte = -1;
+                    soltar(dono);
+                }
+                if (!venceu) ServicoKits.definirDespertoNaLuta(dono, false);
+            }
         }
-        if (!venceu) ServicoKits.definirDespertoNaLuta(dono, false);
+        // Por último: a arena leva o jogador de volta, e ele já tem de estar solto e com o kit certo.
+        if (invocadorId != null && getServer() != null) {
+            com.minerwk.arena.ArenasServidor.lutaAcabou(getServer(), invocadorId, venceu);
+        }
     }
 
     @Override
@@ -755,10 +752,6 @@ public final class TojiEntity extends Monster implements GeoEntity {
 
     @Override
     public boolean hurt(DamageSource fonte, float dano) {
-        if (fonte.getEntity() instanceof ServerPlayer p && invocadorId != null && !p.getUUID().equals(invocadorId)) {
-            revide = p.getUUID();
-            revideAte = level().getGameTime() + TICKS_DE_REVIDE;
-        }
         return super.hurt(fonte, dano);
     }
 

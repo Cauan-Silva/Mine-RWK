@@ -24,6 +24,35 @@ Voltar para [[00 Início]].
 - Gojo (revisão 09/11, menores que ficaram): o Roxo pode derrubar plantas vizinhas (o `BreakEvent` para mods de proteção entrou em 09/11, no Gojo peso); o Vermelho atravessa parede fina encostada no rosto; bola de fogo e crânio de Wither voltam a acelerar no Infinito (o dano é cancelado mesmo assim); TNT sem dono passa pelo Infinito; sobram até 2 ticks de Infinito e 5 de Paralisia depois de morrer. Corrigidos na revisão: efeitos acabam ao mudar de dimensão; golpes não atingem pets, montaria nem projéteis do próprio Gojo; Paralisia não cancela Espinhos nem dano em si mesmo; ícone da Paralisia escondido (falta textura).
 
 ## Para testar no jogo
+- Arena, partes 2 e 3 (10/11), conferir no jogo (`/rwk toji <jogador>`):
+  - **Atenção:** o jogador "Dev" do "New World" ficou desperto de vez (a prova automática venceu o Toji nele): `/rwk despertar Dev nao` devolve os cadeados.
+  - **Depois da revisão final:** morrer na luta, sair para a tela de título sem renascer, entrar de novo e renascer: os itens e o XP voltam? Invocar de dentro de uma construção e, durante a luta, não há como testar sozinho o ponto obstruído (precisa de outro jogador).
+  - **A observar (o revisor não pôde julgar):** travada ao montar a arena, o Toji tremendo encostado na parede, aviso de "configurações experimentais" ao abrir o mundo, e se dá para ver o teleporte por baixo da tela preta.
+  - **Entrada:** a tela escurece em meio segundo, fica preta 1 a 2 s e clareia já na arena. Dá para ver o teleporte? A espera incomoda?
+  - **Cenário:** o pátio com a faixa central, a escadaria e o torii grande ao norte, os dois torii no caminho, o muro com lanternas e as árvores. Combina com a entrada da Escola do anime? O muro ficou ligado (sem postes soltos)? As lanternas iluminam bem com a hora fixa no fim de tarde?
+  - **Os torii do caminho atrapalham?** A investida, o Desaparecer e a Execução do Toji passam pelos pilares; o seu Vermelho e o Roxo destroem os torii.
+  - **Barreira:** andar e pular contra as bordas, subir a escadaria até o fundo, pérola do Ender para fora. O R sobe 25 blocos sem bater no teto (ele fica 56 acima do pátio).
+  - **Queda no vazio:** destruir o chão com o Roxo e cair: volta ao centro com 4 de dano e um 5 × 5 de chão. O Toji também.
+  - **Destruição:** o R perto da borda não apaga nada fora da caixa (não há nada lá, mas a borda do cenário deve ficar reta). Depois da luta, invocar de novo: o cenário volta inteiro.
+  - **Blocos:** em sobrevivência não dá para quebrar nem pôr; no criativo dá.
+  - **O Toji não some mais** quando você se afasta.
+  - **Volta:** a tela escurece no fim dos 5 s e clareia no lugar de onde você saiu.
+  - **FPS** na montagem e durante a luta; **Iris**; servidor dedicado (não ligado aqui: pede aceitar o EULA).
+- Arena, parte 1 (10/11): **a ida, a luta e a volta depois da vitória foram provadas no "New World" pela prova automática.** Conferir no jogo o que ela não vê:
+  - **Entrada:** `/rwk toji <jogador>` (ou o Contrato): você fica lento por 1 a 2 s e é levado a uma plataforma lisa; o Toji aparece 16 blocos à frente com a entrada dele. A espera incomoda? (a tela escurecendo só entra na parte 3)
+  - **Vitória:** 5 s na arena e volta ao lugar exato.
+  - **Morte:** renasce no lugar normal **com os itens e o XP**; os cadeados voltam.
+  - **Sair do jogo no meio da luta** e entrar de novo: aparece no lugar de onde saiu para a arena.
+  - **`/tp` para fora no meio:** o Toji some e você fica onde o comando pôs.
+  - **Invocar de novo logo depois** de uma luta: funciona (pega outra vaga enquanto a anterior é apagada).
+  - **Ainda não tem (parte 2):** barreira (dá para cair da plataforma no vazio e morrer), proteção de blocos, e o Toji ainda some se você se afastar 64 blocos.
+- Arena, parte 0 (10/11): **ida e volta provadas no "New World" pela prova automática** (dimensão carregou em mundo antigo, voltou ao lugar exato). Ainda vale olhar:
+  - **Ir:** `/rwk arena ir` leva a uma plataforma de tijolos de pedra de 61 × 61, com vazio em volta e céu de fim de tarde. Se responder "Você já está na arena" estando fora dela, a dimensão não carregou: avisar.
+  - **Voltar:** `/rwk arena voltar` devolve ao lugar exato, olhando para o mesmo lado. Testar saindo do mundo normal, do Nether e de dentro de uma construção.
+  - **Sair e entrar no jogo** estando na arena: continua lá, e o `voltar` ainda funciona.
+  - **Morrer na arena** (pular no vazio): renasce no lugar normal. Nesta parte ainda perde os itens; isso entra na parte 1.
+  - **Mundo antigo:** abrir o "New World" criado antes da arena e ver se o comando funciona nele também.
+  - **Servidor dedicado:** não foi ligado aqui (pede aceitar o EULA).
 - Gojo (09/11): **as seis teclas funcionaram no jogo sem erro** (autor). Ainda vale conferir com calma, mundo novo escolhendo o Gojo: Z puxa mobs para o ponto à frente; X segurando lança a esfera que explode e empurra; C faz flechas pararem no ar e mobs não encostarem (some depois de ~6 s ou sem energia); V abre um túnel de 40 blocos; G paralisa mobs num raio de 12 por 8 s; R (energia cheia) carrega 4 s e abre um túnel de 120 blocos, e um golpe forte na carga cancela. Técnica Reversa: vida volta sozinha depois de 5 s sem dano. Conferir `/gamerule minerwkApagarBlocos false`. Ver também a TPS com o Roxo 200%.
 - Gojo VFX (09/11), conferir no jogo: Z esfera escura com filamentos ciano puxando; X carga vermelha na mão, esfera viajando e explosão em anéis no ponto do impacto; C bolha azulada em volta do jogador; V e R duas esferas (azul e vermelha) se juntando à frente e a massa roxa com coroa e rastro seguindo o túnel; G domo escuro de raio 12 com chão estrelado, linhas coloridas e neblina escura só dentro. Ver de outro jogador também (os visuais vão para quem vê). Conferir FPS, o `VFX reduzido` na config e com Iris ligado. Se o shader não carregar, o log avisa e o desenho sai só com cor.
 - Gojo impacto (09/11), conferir no jogo: tela treme e pisca e o FOV dá um tranco no Vermelho (explosão), Roxo, Roxo 200% (o chão já treme na carga) e domínio; Azul puxa o FOV. Pedaços dos blocos voam no Roxo e na explosão do Vermelho; Azul suga pedaços do chão; poeira em anel na abertura do domínio. Brilho em volta das esferas. Longe (fora do raio) não sente nada. A opção do jogo "Efeitos de FOV" zera o tranco. Ver FPS e rede com o Roxo 200% abrindo túnel.

@@ -1,5 +1,6 @@
 package com.minerwk.kit;
 
+import com.minerwk.arena.ArenasServidor;
 import com.minerwk.core.kit.Arremessos;
 import com.minerwk.core.kit.Contexto;
 import com.minerwk.core.kit.Efeito;
@@ -229,7 +230,8 @@ public final class ContextoServidor implements Contexto {
             double dz = (nivel.random.nextDouble() * 2 - 1) * raio;
             if (dx * dx + dy * dy + dz * dz > raio * raio) continue;
             BlockPos p = BlockPos.containing(c.x + dx, c.y + dy, c.z + dz);
-            if (!nivel.isLoaded(p) || nivel.isOutsideBuildHeight(p) || !nivel.mayInteract(jogador, p)) continue;
+            if (!nivel.isLoaded(p) || nivel.isOutsideBuildHeight(p) || !nivel.mayInteract(jogador, p)
+                    || !ArenasServidor.podeMexer(nivel, p)) continue;
             BlockState estado = nivel.getBlockState(p);
             float dureza = estado.getDestroySpeed(nivel, p);
             if (estado.isAir() || dureza < 0 || dureza > durezaMax || estado.hasBlockEntity()
@@ -249,7 +251,23 @@ public final class ContextoServidor implements Contexto {
 
     /** Pergunta aos mods de proteção de terreno (claims) se o jogador pode quebrar aqui. */
     private boolean podeQuebrar(ServerLevel nivel, BlockPos p, BlockState estado) {
-        return !NeoForge.EVENT_BUS.post(new BlockEvent.BreakEvent(nivel, p, estado, jogador)).isCanceled();
+        consultandoGolpe = true;
+        try {
+            return !NeoForge.EVENT_BUS.post(new BlockEvent.BreakEvent(nivel, p, estado, jogador)).isCanceled();
+        } finally {
+            consultandoGolpe = false;
+        }
+    }
+
+    /** Só na thread do servidor: verdadeiro enquanto um golpe pergunta se pode quebrar um bloco. */
+    private static boolean consultandoGolpe;
+
+    /**
+     * Se o evento de quebra em andamento é a pergunta de um golpe, e não alguém quebrando à mão. Quem só
+     * proíbe a quebra à mão (a arena) usa isto para deixar os golpes passarem.
+     */
+    public static boolean quebraDeGolpe() {
+        return consultandoGolpe;
     }
 
     @Override
@@ -317,7 +335,8 @@ public final class ContextoServidor implements Contexto {
         ServerLevel nivel = nivel();
         if (!nivel.getGameRules().getBoolean(Regras.APAGAR_BLOCOS)) return;
         ApagadorServidor.apagarCasca(nivel, vec(centro), de, ate,
-                (p, estado) -> nivel.mayInteract(jogador, p) && podeQuebrar(nivel, p.immutable(), estado));
+                (p, estado) -> nivel.mayInteract(jogador, p) && ArenasServidor.podeMexer(nivel, p)
+                        && podeQuebrar(nivel, p.immutable(), estado));
     }
 
     @Override
@@ -352,7 +371,8 @@ public final class ContextoServidor implements Contexto {
         BlockState[] estados = new BlockState[DETRITOS];
         for (BlockPos p : BlockPos.betweenClosed(base.offset(-r, -r, -r), base.offset(r, r, r))) {
             if (p.getCenter().distanceToSqr(c) > raio * raio) continue;
-            if (!nivel.isLoaded(p) || nivel.isOutsideBuildHeight(p) || !nivel.mayInteract(jogador, p)) continue;
+            if (!nivel.isLoaded(p) || nivel.isOutsideBuildHeight(p) || !nivel.mayInteract(jogador, p)
+                    || !ArenasServidor.podeMexer(nivel, p)) continue;
             BlockState estado = nivel.getBlockState(p);
             if (estado.isAir() || estado.getDestroySpeed(nivel, p) < 0 || estado.hasBlockEntity()
                     || !estado.getFluidState().isEmpty() || !podeQuebrar(nivel, p, estado)) continue;

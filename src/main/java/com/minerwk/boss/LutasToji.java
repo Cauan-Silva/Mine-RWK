@@ -1,6 +1,9 @@
 package com.minerwk.boss;
 
+import com.minerwk.arena.ArenasServidor;
+import com.minerwk.core.arena.CaixaArena;
 import com.minerwk.core.boss.TojiBoss;
+import com.minerwk.core.kit.Vetor;
 import com.minerwk.core.personagens.gojo.ArvoreGojo;
 import com.minerwk.core.personagens.gojo.Gojo;
 import com.minerwk.kit.DadosKit;
@@ -12,12 +15,10 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
-import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.tags.DamageTypeTags;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent;
 
@@ -84,48 +85,39 @@ public final class LutasToji {
     }
 
     /**
-     * Invoca o Toji a 8 blocos de {@code jogador}, na direção do olhar. Com {@code exigir}, vale a regra do
-     * Contrato (ser Gojo e ter o nó Despertar); sem, só não pode haver outro Toji dele (comando de teste).
+     * Começa a luta: o jogador é levado para uma arena própria (ver {@link ArenasServidor}) e o Toji entra
+     * lá, 16 blocos à frente dele, assim que ela fica pronta. Com {@code exigir}, vale a regra do Contrato
+     * (ser Gojo e ter o nó Despertar); sem, só não pode haver outra luta dele (comando de teste). {@code OK}
+     * quer dizer que a entrada começou; o Toji aparece até 2 segundos depois.
      */
     public static TojiBoss.Invocacao invocar(ServerPlayer jogador, boolean exigir) {
+        if (ArenasServidor.naArena(jogador) || ArenasServidor.de(jogador.getUUID()).isPresent()) {
+            return TojiBoss.Invocacao.NA_ARENA;
+        }
         DadosKit dados = ServicoKits.dados(jogador);
         boolean temNo = dados.temPersonagem() && dados.maestriaAtual().nos.getOrDefault(ArvoreGojo.DESPERTAR, 0) > 0;
         boolean temToji = de(jogador.getUUID()).isPresent();
         TojiBoss.Invocacao resposta = exigir ? TojiBoss.podeInvocar(dados.personagem, Gojo.ID, temNo, temToji)
                 : temToji ? TojiBoss.Invocacao.JA_EXISTE : TojiBoss.Invocacao.OK;
         if (resposta != TojiBoss.Invocacao.OK) return resposta;
-        ServerLevel nivel = jogador.serverLevel();
-        TojiEntity toji = Entidades.TOJI.get().create(nivel);
-        if (toji == null) return TojiBoss.Invocacao.JA_EXISTE;
-        Vec3 olhar = jogador.getLookAngle();
-        Vec3 frente = new Vec3(olhar.x, 0, olhar.z);
-        frente = frente.lengthSqr() < 1e-6 ? Vec3.directionFromRotation(0, jogador.getYRot()) : frente.normalize();
-        Vec3 ponto = chao(nivel, toji, jogador.position().add(frente.scale(TojiBoss.DISTANCIA_DA_INVOCACAO)),
-                jogador.position());
-        // De frente para quem invocou.
-        float yaw = (float) (Math.toDegrees(Math.atan2(-frente.z, -frente.x)) - 90);
-        toji.moveTo(ponto.x, ponto.y, ponto.z, yaw, 0);
-        toji.yBodyRot = yaw;
-        toji.yHeadRot = yaw;
-        toji.comecarLuta(jogador);
-        if (!nivel.addFreshEntity(toji)) {
-            esquecer(toji);
-            return TojiBoss.Invocacao.JA_EXISTE;
-        }
-        return TojiBoss.Invocacao.OK;
+        return ArenasServidor.entrar(jogador, LutasToji::entrarNaArena) ? TojiBoss.Invocacao.OK : TojiBoss.Invocacao.NA_ARENA;
     }
 
-    /** O chão livre mais perto de {@code ponto} (3 blocos acima até 6 abaixo); sem chão, fica onde o jogador está. */
-    private static Vec3 chao(ServerLevel nivel, TojiEntity toji, Vec3 ponto, Vec3 reserva) {
-        BlockPos base = BlockPos.containing(ponto);
-        for (int dy = 3; dy >= -6; dy--) {
-            BlockPos p = base.above(dy);
-            double x = p.getX() + .5, z = p.getZ() + .5;
-            if (nivel.getBlockState(p.below()).blocksMotion()
-                    && nivel.noCollision(toji.getType().getDimensions().makeBoundingBox(x, p.getY(), z))) {
-                return new Vec3(x, p.getY(), z);
-            }
+    /** A arena ficou pronta e {@code jogador} já está nela: o Toji entra de frente para ele. */
+    private static void entrarNaArena(ServerPlayer jogador, CaixaArena caixa) {
+        ServerLevel nivel = jogador.serverLevel();
+        TojiEntity toji = Entidades.TOJI.get().create(nivel);
+        if (toji != null) {
+            Vetor ponto = caixa.entradaToji();
+            // O jogador entra ao sul dele: yaw 0 olha para o sul.
+            toji.moveTo(ponto.x(), ponto.y(), ponto.z(), 0, 0);
+            toji.yBodyRot = 0;
+            toji.yHeadRot = 0;
+            toji.comecarLuta(jogador);
+            if (nivel.addFreshEntity(toji)) return;
+            esquecer(toji);
         }
-        return reserva;
+        // Sem Toji não há luta: o jogador volta para de onde saiu.
+        ArenasServidor.lutaAcabou(nivel.getServer(), jogador.getUUID(), false);
     }
 }

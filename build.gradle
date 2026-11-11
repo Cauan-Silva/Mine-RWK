@@ -35,6 +35,9 @@ neoForge {
         client {
             client()
             systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
+            // -Pmundo="New World" abre direto nesse mundo; -Pprova_arena faz a prova automática da arena.
+            if (project.hasProperty('mundo')) programArguments.addAll '--quickPlaySingleplayer', project.property('mundo').toString()
+            if (project.hasProperty('prova_arena')) systemProperty 'minerwk.prova_arena', 'true'
         }
         clientDemo {
             // Prévia gravável: entra direto no mundo e toca a demonstração de VFX (client/vfx/DemoVfx).

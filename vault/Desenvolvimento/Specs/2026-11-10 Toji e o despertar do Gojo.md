@@ -6,6 +6,8 @@ estado: aprovado
 
 Voltar para [[Roadmap]]. Fecha o item "[[Toji]] como boss (Nêmesis do Gojo) e o despertar". Depende da maestria e da árvore, já feitas ([[2026-11-10 Maestria e árvore de habilidades]]). Aprovado pelo autor em 10/11; partes 1 e 2 feitas (a parte 0 passou: o modelo do Minezin abre no GeckoLib daqui e a Lança desliga o Infinito).
 
+> **Mudou em 10/11 (arena):** a luta acontece numa arena própria e é solo. A escolha 6 ("qualquer um ajuda"), o Toji aparecendo a 8 blocos e a regra de sumir a 64 blocos não valem mais. Ver [[2026-11-10 Arena do Toji]].
+
 ## Escolhas do autor (10/11)
 1. **O que desperta:** como na obra. O Gojo começa com Azul e Infinito; o despertar libera a Técnica Reversa, o Vermelho, o Roxo, o Vazio Infinito (G) e o Vazio Roxo máximo (R).
 2. **Requisito:** maestria 20 e o nó **Despertar** comprado na árvore.

@@ -40,6 +40,7 @@ public final class ContratoToji extends Item {
             case OUTRO_PERSONAGEM -> "mensagem.minerwk.toji.outro_personagem";
             case SEM_NO -> "mensagem.minerwk.toji.sem_no";
             case JA_EXISTE -> "mensagem.minerwk.toji.ja_existe";
+            case NA_ARENA -> "mensagem.minerwk.toji.na_arena";
             case OK -> "mensagem.minerwk.toji.invocado";
         };
     }
