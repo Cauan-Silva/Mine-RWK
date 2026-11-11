@@ -180,16 +180,31 @@ class FormasTest {
     }
 
     @Test
-    void soltarATeclaValeParaOGolpeEmUsoMesmoDepoisDaTroca() {
+    void soltarTeclaDeGolpeQueFicouNaOutraFormaNaoPrendeNada() {
         Golpe segurado = new Golpe("segurado", new Numeros(2, 20, 2, 2, true, 0, 0));
         Personagem p = new Personagem("p", "P", "Obra", () -> recurso, Map.of(Tecla.Z, segurado), List.of(),
                 Arvore.VAZIA, Trancas.NENHUMA, List.of(new Forma(BANKAI, Map.of(Tecla.X, zBankai))));
         KitDoJogador k = new KitDoJogador(p);
         assertTrue(k.apertar(Tecla.Z, 0));
         correr(k, 0, 4);
+        // A troca chega com o Z ainda segurado: a carga acaba, e soltar o Z depois não acha golpe nenhum.
+        assertTrue(k.mudarForma(BANKAI, Contexto.NULO));
         k.soltar(Tecla.Z);
-        correr(k, 4, 2);
-        assertEquals(List.of("disparou"), segurado.chamadas);
+        correr(k, 4, 30);
+        assertEquals(List.of("interrompeu"), segurado.chamadas, "não dispara nem fica carregando");
+        assertTrue(k.execucao().isEmpty());
+        assertTrue(k.apertar(Tecla.X, 40), "a forma nova responde normalmente");
+    }
+
+    @Test
+    void mudarDeDimensaoMantemAFormaMasAcabaComOGolpe() {
+        KitDoJogador k = kit();
+        k.mudarForma(BANKAI, Contexto.NULO);
+        assertTrue(k.apertar(Tecla.Z, 0));
+        k.descartarMantendoAForma(Contexto.NULO);
+        assertEquals(BANKAI, k.forma());
+        assertTrue(k.execucao().isEmpty());
+        assertEquals(List.of(BANKAI), recurso.formas, "o recurso não é avisado de troca nenhuma");
     }
 
     @Test

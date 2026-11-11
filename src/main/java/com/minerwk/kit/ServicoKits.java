@@ -298,11 +298,14 @@ public final class ServicoKits {
         DESPERTOS_NA_LUTA.remove(jogador.getUUID());
     }
 
-    /** Os efeitos guardam coordenadas da dimensão antiga: acabam na troca (o domínio não segue para o Nether). */
+    /**
+     * Os efeitos guardam coordenadas da dimensão antiga: acabam na troca (o domínio não segue para o Nether).
+     * A transformação continua: entrar na arena ou num portal não tira o jogador da forma.
+     */
     private static void aoMudarDeDimensao(PlayerEvent.PlayerChangedDimensionEvent evento) {
         if (evento.getEntity() instanceof ServerPlayer jogador) {
             KitDoJogador kit = KITS.get(jogador.getUUID());
-            if (kit != null) kit.descartar(new ContextoServidor(jogador));
+            if (kit != null) kit.descartarMantendoAForma(new ContextoServidor(jogador));
         }
     }
 

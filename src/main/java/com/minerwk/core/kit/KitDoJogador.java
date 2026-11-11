@@ -195,6 +195,18 @@ public final class KitDoJogador {
 
     /** Como {@link #descartar()}, avisando a habilidade em carga para desfazer o visual. */
     public void descartar(Contexto contexto) {
+        descartar(contexto, false);
+    }
+
+    /**
+     * Como {@link #descartar(Contexto)}, mas o jogador continua na forma em que está: é o caso de mudar de
+     * dimensão (entrar na arena, um portal), em que só o golpe e os efeitos acabam.
+     */
+    public void descartarMantendoAForma(Contexto contexto) {
+        descartar(contexto, true);
+    }
+
+    private void descartar(Contexto contexto, boolean manterForma) {
         Habilidade emCarga = execucao != null && execucao.fase() == Execucao.Fase.CARGA ? execucao.habilidade() : null;
         // A animação cobre o golpe inteiro, não só a carga: havendo golpe ou efeito no ar, ela para.
         boolean emAndamento = execucao != null || !efeitos.isEmpty();
@@ -205,7 +217,7 @@ public final class KitDoJogador {
         // Uma cutscene no meio do golpe (a parte 2 do R) acaba junto.
         if (emAndamento) contexto.encerrarCutscene();
         // Quem morre ou sai volta à forma base.
-        if (!Forma.BASE.equals(forma)) {
+        if (!manterForma && !Forma.BASE.equals(forma)) {
             forma = Forma.BASE;
             recurso.forma(forma);
         }

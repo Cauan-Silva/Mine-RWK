@@ -27,6 +27,8 @@ Tudo em `core/personagens/<nome>/`, sem classes do Minecraft.
 | Passivas | `TecnicaReversa`, que implementa `Passiva` |
 | Golpe com muitas fases e constantes de tempo | uma classe só de números e contas, como `RoxoMaximo` |
 
+**Personagem de transformação** (o [[Ichigo]]): cada transformação é uma `Forma` (id e golpes por tecla) na lista `transformacoes` do `Personagem`; a forma base são as habilidades de sempre. O golpe que transforma chama `ctx.mudarForma(id)`. Recargas e trancas valem por id de golpe, então a mesma tecla pode estar livre numa forma e trancada em outra. O recurso fica sabendo da troca por `Recurso.forma(id)`. Morrer volta à base, e a forma não é salva. O nome da transformação na tela de escolha vem da tradução `forma.minerwk.<id>`. Ver [[2026-11-11 Ichigo parte 1]].
+
 Pontos que custaram caro no Gojo:
 - **`Numeros`** guarda carga mínima e máxima, disparo, fim, se segura a tecla, custo e recarga. Golpe que dispara sozinho usa `Numeros.instantanea`.
 - **O golpe só fala com o mundo pelo `Contexto`** (`ferir`, `danoUmaVez`, `puxar`, `arremessar`, `suspender`, `apagarCasca`, `visual`, `apresentacao`, `tremor`, `cutscene`...). Se faltar uma ação, ela entra em `Contexto` com corpo vazio e é implementada em `kit/ContextoServidor`.

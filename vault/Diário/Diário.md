@@ -35,3 +35,4 @@ Voltar para [[00 Início]].
 - [[2026-11-10 Arena partes 2 e 3]]: regras da arena (barreira, queda no vazio, blocos) e o cenário da entrada da Escola Jujutsu, com a tela escurecendo
 - [[2026-11-11 Queda do despertar]]: o Gojo passa a cair de costas e se levantar no despertar (antes ficava em pé)
 - [[2026-11-11 Arena da Escola Jujutsu]]: o cenário da arena refeito como a Escola (escadaria com torii, pátio, salão, pavilhões e floresta)
+- [[2026-11-11 Ichigo parte 1]]: formas no núcleo (transformações, trancas por golpe, sincronização e tela de escolha) e o Reiatsu
