@@ -68,6 +68,17 @@ class IchigoTest {
         public void criarEfeito(Efeito e) { kit.adicionarEfeito(e); }
         public double recurso() { return kit.recurso().atual(); }
         public void recarga(String habilidade, int ticks) { kit.recargas().iniciar(habilidade, agora, ticks); }
+        final List<String> animacoes = new ArrayList<>(), visuais = new ArrayList<>(), fins = new ArrayList<>();
+        int paradas;
+        Vetor rumoDoVisual;
+        public void apresentacao(String animacao, String efeito, String som) { if (!animacao.isEmpty()) animacoes.add(animacao); }
+        public void pararAnimacao() { paradas++; }
+        public void visual(String tipo, Vetor origem, Vetor direcao, float forca, int duracao) {
+            visuais.add(tipo);
+            rumoDoVisual = direcao;
+            assertTrue(duracao > 0, tipo);
+        }
+        public void visualFim(String tipo, Vetor ponto) { fins.add(tipo); }
     }
 
     private final Personagem ichigo = Ichigo.criar();
@@ -300,5 +311,78 @@ class IchigoTest {
         assertEquals(Forma.BASE, kit.forma());
         assertEquals(Ichigo.ZANGETSU, ctx.arma);
         assertTrue(kit.efeitos().isEmpty());
+    }
+
+    @Test
+    void getsugaMostraACargaOCorteEAMeiaLua() {
+        usar(Tecla.Z);
+        ticks(30);
+        assertEquals(List.of("ichigo_getsuga", "ichigo_getsuga_disparo"), ctx.animacoes);
+        assertEquals(List.of("ichigo_carga", "ichigo_getsuga"), ctx.visuais);
+        assertEquals(List.of("ichigo_carga"), ctx.fins, "a carga some no disparo; a meia-lua foi até o fim");
+    }
+
+    @Test
+    void getsugaQueBateEmBlocoEncerraOVisualDaMeiaLua() {
+        ctx.paredeEm = v -> v.x() > 6;
+        usar(Tecla.Z);
+        ticks(30);
+        assertTrue(ctx.fins.contains("ichigo_getsuga"));
+    }
+
+    @Test
+    void cargaInterrompidaApagaOReiatsuEParaAAnimacao() {
+        usar(Tecla.Z);
+        ticks(3);
+        kit.atordoar(agora, ctx);
+        assertEquals(List.of("ichigo_carga"), ctx.visuais);
+        assertEquals(List.of("ichigo_carga"), ctx.fins);
+        assertEquals(1, ctx.paradas);
+        assertEquals(List.of("ichigo_getsuga"), ctx.animacoes, "o corte não saiu");
+    }
+
+    @Test
+    void shunpoMostraOCaminhoPercorrido() {
+        usar(Tecla.X);
+        ticks(6);
+        assertEquals(List.of("ichigo_shunpo"), ctx.visuais);
+        // O contexto falso não anda: o caminho é o que o jogador andou de verdade, aqui nada.
+        assertEquals(Vetor.ZERO, ctx.rumoDoVisual);
+    }
+
+    @Test
+    void bankaiMostraACargaOPilarEASaida() {
+        entrarNoBankai();
+        assertEquals(List.of("ichigo_bankai_carga", "ichigo_bankai"), ctx.visuais);
+        assertEquals(List.of("ichigo_bankai_carga"), ctx.fins);
+        assertEquals(0, ctx.paradas, "trocar de forma no disparo não corta a animação da liberação");
+        usar(Tecla.C);
+        ticks(12);
+        usar(Tecla.G);
+        ticks(10);
+        assertTrue(ctx.visuais.containsAll(List.of("ichigo_lamina", "ichigo_sair")));
+        assertTrue(ctx.fins.contains("ichigo_lamina"), "a lâmina carregada apaga ao sair do Bankai");
+    }
+
+    @Test
+    void todaAnimacaoPedidaExisteNoArquivo() throws Exception {
+        Tecla[] shikai = {Tecla.Z, Tecla.X, Tecla.C, Tecla.V}, bankai = {Tecla.Z, Tecla.X, Tecla.C, Tecla.G};
+        for (Tecla tecla : shikai) {
+            kit.recurso().carregar(Reiatsu.MAXIMO);
+            usar(tecla);
+            ticks(40);
+        }
+        entrarNoBankai();
+        for (Tecla tecla : bankai) {
+            kit.recurso().carregar(Reiatsu.MAXIMO);
+            usar(tecla);
+            ticks(20);
+        }
+        String arquivo = java.nio.file.Files.readString(
+                java.nio.file.Path.of("src/main/resources/assets/minerwk/player_animations/ichigo.json"));
+        assertEquals(10, ctx.animacoes.size(), ctx.animacoes.toString());
+        for (String animacao : ctx.animacoes) {
+            assertTrue(arquivo.contains("\"" + animacao + "\": {"), "falta a animação " + animacao);
+        }
     }
 }

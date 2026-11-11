@@ -91,8 +91,11 @@ public final class RenderVisuaisGojo {
                 case "gojo_azul_marca" -> marcaAzul(q, v, (float) (PerfilVfxGojo.suave(t / 4)
                         * Math.min(1, Math.max(0, (v.duracao - t) / PerfilVfxGojo.MARCA_AZUL))));
                 case "gojo_vazio_infinito" -> dominio(q, v, t, op);
-                // O que não é do Gojo: as marcas dos golpes do Toji.
-                default -> RenderVisuaisToji.desenhar(q.camera(), q.parcial(), v, t);
+                // O que não é do Gojo: os visuais do Ichigo e as marcas dos golpes do Toji.
+                default -> {
+                    if (RenderVisuaisIchigo.eDoIchigo(v.tipo)) RenderVisuaisIchigo.desenhar(q.camera(), q.parcial(), v, t);
+                    else RenderVisuaisToji.desenhar(q.camera(), q.parcial(), v, t);
+                }
             }
         }
     }

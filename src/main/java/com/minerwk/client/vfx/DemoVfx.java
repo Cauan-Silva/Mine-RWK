@@ -38,6 +38,8 @@ public final class DemoVfx {
     private static boolean vestiuPeitoral;
     /** {@code ichigo_traje}: o Ichigo no Shikai e no Bankai, de frente, correndo de costas e em 1ª pessoa. */
     private static final boolean TRAJE_ICHIGO = MODO.equals("ichigo_traje");
+    /** {@code ichigo}: os golpes do Shikai (Z, X, C, V), a entrada do Bankai e os golpes dele, num alvo parado. */
+    private static final boolean ICHIGO = MODO.equals("ichigo");
     /** {@code arvore}: a tela da árvore do Gojo em três momentos (sem pontos, com compras e desperto). */
     private static final boolean ARVORE = MODO.equals("arvore");
     /** {@code toji}: a luta contra o Toji: a entrada, a Nuvem, a investida, a queda com a cutscene, o Desaparecer e a fase 3. */
@@ -46,7 +48,7 @@ public final class DemoVfx {
     private static final Path PASTA = Path.of("demo");
     private static final int ESFERAS = RoxoMaximo.TICKS_ESFERAS;
     private static final int ESTOURO = ESFERAS + RoxoMaximo.TICKS_FUSAO;
-    private static final int FIM_PREVIA = TOJI ? 520 : ARVORE ? 100 : TRAJE ? 260 : TRAJE_ICHIGO ? 300 : R_COMPLETO ? 360
+    private static final int FIM_PREVIA = TOJI ? 520 : ARVORE ? 100 : TRAJE ? 260 : TRAJE_ICHIGO ? 300 : ICHIGO ? 350 : R_COMPLETO ? 360
             : ENCANTAMENTO ? CARGA + 90 : ESTOURO + RoxoMaximo.TICKS_EXPLOSAO + 110;
     private static int ticks;
     private static int quadro;
@@ -72,14 +74,14 @@ public final class DemoVfx {
             mc.setScreen(null);
         }
         if (DEMO && ticks == 40) {
-            jogador.connection.sendCommand(ENCANTAMENTO || R_COMPLETO || TRAJE || TRAJE_ICHIGO || TOJI ? "time set noon" : "time set midnight");
+            jogador.connection.sendCommand(ENCANTAMENTO || R_COMPLETO || TRAJE || TRAJE_ICHIGO || ICHIGO || TOJI ? "time set noon" : "time set midnight");
             if (ARVORE) jogador.connection.sendCommand("rwk trocar @s gojo");
             if (TOJI) {
                 jogador.connection.sendCommand("rwk trocar @s gojo");
                 jogador.connection.sendCommand("rwk despertar @s nao");
                 jogador.connection.sendCommand("tp @s ~150 ~12 ~");
             }
-            if (TRAJE_ICHIGO) {
+            if (TRAJE_ICHIGO || ICHIGO) {
                 jogador.connection.sendCommand("rwk trocar @s ichigo");
                 jogador.connection.sendCommand("tp @s ~150 ~12 ~");
             }
@@ -175,6 +177,51 @@ public final class DemoVfx {
                 jogador.connection.sendCommand("tp @s ~-150 ~ ~-10");
             }
             if (t >= FIM_PREVIA) {
+                mc.options.setCameraType(net.minecraft.client.CameraType.FIRST_PERSON);
+                previa = -1;
+            }
+            return;
+        }
+        if (ICHIGO) {
+            mc.gui.getChat().clearMessages(false);
+            // De lado, por uma câmera fixa (de costas o golpe some atrás do corpo): Getsuga carregado, Shunpo,
+            // a onda no chão e o arremesso. De frente: a entrada do Bankai. De lado de novo: dois Getsugas
+            // negros e o Shunpo; de frente: o Getsuga na lâmina; e a saída.
+            boolean frente = t >= 136 && t < 212 || t >= 278 && t < 312;
+            net.minecraft.world.entity.Entity camera = jogador;
+            if (!frente) {
+                for (net.minecraft.world.entity.Entity e : mc.level.entitiesForRendering()) {
+                    if (e instanceof net.minecraft.world.entity.decoration.ArmorStand && e.distanceToSqr(jogador) < 60 * 60) camera = e;
+                }
+            }
+            if (mc.getCameraEntity() != camera) mc.setCameraEntity(camera);
+            mc.options.setCameraType(frente ? net.minecraft.client.CameraType.THIRD_PERSON_FRONT
+                    : net.minecraft.client.CameraType.THIRD_PERSON_BACK);
+            jogador.setXRot(frente ? 6 : 2);
+            if (t == 0) {
+                jogador.setYRot(0);
+                jogador.connection.sendCommand("kill @e[type=minecraft:armor_stand,distance=..60]");
+                jogador.connection.sendCommand("execute at @s run summon minecraft:armor_stand ~-3.5 ~0.6 ~7 "
+                        + "{Invisible:1b,NoGravity:1b,Marker:0b,Rotation:[-90f,6f]}");
+                jogador.connection.sendCommand("kill @e[type=minecraft:husk,distance=..60]");
+                jogador.connection.sendCommand("execute at @s run summon minecraft:husk ~ ~ ~15 {NoAI:1b}");
+            }
+            if (t == 2 || t == 100 || t == 136 || t == 213 || t == 270 || t == 312) jogador.connection.sendCommand("rwk recarregar");
+            int[][] teclas = {{10, 22, 0}, {52, 54, 1}, {76, 78, 2}, {104, 106, 3}, {140, 142, 4},
+                    {220, 222, 0}, {238, 240, 0}, {256, 258, 1}, {276, 278, 2}, {318, 320, 4}};
+            com.minerwk.core.kit.Tecla[] qual = {com.minerwk.core.kit.Tecla.Z, com.minerwk.core.kit.Tecla.X,
+                    com.minerwk.core.kit.Tecla.C, com.minerwk.core.kit.Tecla.V, com.minerwk.core.kit.Tecla.G};
+            for (int[] k : teclas) {
+                if (t == k[0]) tecla(qual[k[2]], true);
+                if (t == k[1]) tecla(qual[k[2]], false);
+            }
+            if (t == FIM_PREVIA - 3) {
+                jogador.connection.sendCommand("kill @e[type=minecraft:husk,distance=..60]");
+                jogador.connection.sendCommand("kill @e[type=minecraft:armor_stand,distance=..60]");
+                jogador.connection.sendCommand("tp @s ~-150 ~ ~-30");
+            }
+            if (t >= FIM_PREVIA) {
+                mc.setCameraEntity(jogador);
                 mc.options.setCameraType(net.minecraft.client.CameraType.FIRST_PERSON);
                 previa = -1;
             }

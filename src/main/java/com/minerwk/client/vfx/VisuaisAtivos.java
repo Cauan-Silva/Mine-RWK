@@ -30,6 +30,8 @@ public final class VisuaisAtivos {
         final int duracao;
         final long inicio;
         long fimEm = -1;
+        /** Onde o servidor disse que o golpe parou (null se não foi encerrado antes da hora). */
+        Vetor pontoFim;
         /** Se já deixou o rastro (túnel do Roxo, marca do Azul). */
         boolean deixouRastro;
         /** Se o som de fim (o domínio rachando) já tocou. */
@@ -142,7 +144,10 @@ public final class VisuaisAtivos {
         ClientLevel nivel = Minecraft.getInstance().level;
         if (nivel == null) return;
         long agora = nivel.getGameTime();
-        for (int i = ATIVOS.size() - 1; i >= 0; i--) {
+        // Dois Getsugas do mesmo dono no ar: quem bate primeiro é o que saiu primeiro.
+        boolean maisAntigo = p.tipo().startsWith("ichigo_getsuga");
+        for (int k = 0; k < ATIVOS.size(); k++) {
+            int i = maisAntigo ? k : ATIVOS.size() - 1 - k;
             Visual v = ATIVOS.get(i);
             if (v.dono != p.dono() || !v.tipo.equals(p.tipo()) || v.fimEm >= 0) continue;
             if (p.tipo().equals("gojo_vermelho")) {
@@ -162,6 +167,7 @@ public final class VisuaisAtivos {
                         PerfilVfxGojo.RASTRO_ROXO, agora));
             } else {
                 v.fimEm = agora;
+                v.pontoFim = p.ponto();
             }
             return;
         }

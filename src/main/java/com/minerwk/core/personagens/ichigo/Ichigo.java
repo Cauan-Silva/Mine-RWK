@@ -12,6 +12,8 @@ import com.minerwk.core.kit.Personagem;
 import com.minerwk.core.kit.Tecla;
 import com.minerwk.core.kit.Trancas;
 import com.minerwk.core.kit.Vetor;
+import com.minerwk.core.vfx.FormasIchigo;
+import com.minerwk.core.vfx.GetsugaIchigo;
 import com.minerwk.core.maestria.Arvore;
 import java.util.HashSet;
 import java.util.List;
@@ -20,7 +22,8 @@ import java.util.Set;
 
 /**
  * Ichigo Kurosaki (Bleach). A forma base é o Shikai; o G leva ao Bankai, que troca os golpes e gasta o
- * reiatsu até acabar. A apresentação aqui é provisória (partículas): modelos, animações e VFX entram depois.
+ * reiatsu até acabar. Cada golpe toca a animação de mesmo id e manda os visuais {@code ichigo_*}, que o
+ * cliente desenha a partir de {@code core/vfx}. O som entra depois.
  */
 public final class Ichigo {
     public static final String ID = "ichigo";
@@ -38,9 +41,8 @@ public final class Ichigo {
     public static final Arma TENSA_ZANGETSU = new Arma(6, 2.2f, 0);
     public static final Arma TENSA_CARREGADA = new Arma(12, 2.2f, 5);
 
-    /** Partículas provisórias: azul-claro no Shikai, preto e vermelho no Bankai. */
-    private static final String AZUL = "soul_fire_flame", PRETO = "squid_ink", VERMELHO = "flame", PASSO = "cloud",
-            CORTE = "sweep_attack";
+    /** Dos olhos aos pés: os visuais de chão nascem nos pés do Ichigo. */
+    private static final Vetor ATE_OS_PES = new Vetor(0, -1.62, 0);
 
     private Ichigo() {
     }
@@ -64,7 +66,16 @@ public final class Ichigo {
         return ctx.colideBloco(ctx.olhos(), frente) ? ctx.olhos() : frente;
     }
 
-    /** Base das habilidades: id e números fixos. */
+    private static Vetor pes(Contexto ctx) {
+        return ctx.olhos().mais(ATE_OS_PES);
+    }
+
+    /** O Bankai se desfazendo em volta do corpo (ao sair por vontade ou sem reiatsu). */
+    private static void desfazer(Contexto ctx) {
+        ctx.visual("ichigo_sair", ctx.olhos(), ctx.olhar(), 0f, FormasIchigo.SAIR);
+    }
+
+    /** Base das habilidades: id e números fixos; a animação do golpe tem o mesmo id e começa com a carga. */
     private abstract static class Golpe implements Habilidade {
         private final String id;
         private final Numeros numeros;
@@ -83,6 +94,20 @@ public final class Ichigo {
         public Numeros numeros() {
             return numeros;
         }
+
+        protected String animacao() {
+            return id;
+        }
+
+        @Override
+        public void aoIniciarCarga(Contexto ctx) {
+            ctx.apresentacao(animacao(), "", "");
+        }
+
+        @Override
+        public void aoInterromper(Contexto ctx) {
+            ctx.pararAnimacao();
+        }
     }
 
     /**
@@ -94,7 +119,7 @@ public final class Ichigo {
             if (noBankai(ctx) && ctx.recurso() <= 1e-6) {
                 ctx.mudarForma(Forma.BASE);
                 ctx.recarga(ENTRAR_NO_BANKAI, RECARGA_ESGOTADO);
-                ctx.particulas(PRETO, ctx.olhos(), 30);
+                desfazer(ctx);
             }
             ctx.arma(noBankai(ctx) ? TENSA_ZANGETSU : ZANGETSU);
         }
@@ -102,25 +127,49 @@ public final class Ichigo {
 
     /** Z do Shikai: segura para o corte sair mais forte; a meia-lua atravessa os inimigos. */
     static final class GetsugaTensho extends Golpe {
+        static final String VISUAL = "ichigo_getsuga";
+
         GetsugaTensho() {
-            super("ichigo_getsuga", new Numeros(2, 10, 2, 6, true, 20, 80));
+            super(VISUAL, new Numeros(2, 10, 2, 6, true, 20, 80));
+        }
+
+        /** O reiatsu sobe pelo corpo enquanto a tecla está segurada. */
+        @Override
+        public void aoIniciarCarga(Contexto ctx) {
+            super.aoIniciarCarga(ctx);
+            ctx.visual("ichigo_carga", ctx.olhos(), ctx.olhar(), 0f, numeros().cargaMax() + 6);
+        }
+
+        @Override
+        public void aoInterromper(Contexto ctx) {
+            super.aoInterromper(ctx);
+            ctx.visualFim("ichigo_carga", ctx.olhos());
         }
 
         @Override
         public void aoDisparar(Contexto ctx, float forca) {
-            ctx.criarEfeito(new MeiaLua(saida(ctx), ctx.olhar(), 1.6, 24, 8 + 4 * forca, AZUL));
+            Vetor de = saida(ctx);
+            ctx.visualFim("ichigo_carga", ctx.olhos());
+            ctx.apresentacao("ichigo_getsuga_disparo", "", "");
+            ctx.visual(VISUAL, de, ctx.olhar(), forca, GetsugaIchigo.duracao(false));
+            ctx.criarEfeito(new MeiaLua(de, ctx.olhar(), GetsugaIchigo.PASSO_SHIKAI, GetsugaIchigo.ALCANCE_SHIKAI,
+                    8 + 4 * forca, VISUAL));
         }
     }
 
     /** Z do Bankai: sai na hora, mais rápido e mais longe. */
     static final class GetsugaNegro extends Golpe {
+        static final String VISUAL = "ichigo_getsuga_negro";
+
         GetsugaNegro() {
-            super("ichigo_getsuga_negro", Numeros.instantanea(2, 2, 4, 15, 30));
+            super(VISUAL, Numeros.instantanea(2, 2, 4, 15, 30));
         }
 
         @Override
         public void aoDisparar(Contexto ctx, float forca) {
-            ctx.criarEfeito(new MeiaLua(saida(ctx), ctx.olhar(), 2.4, 28, 10, PRETO));
+            Vetor de = saida(ctx);
+            ctx.visual(VISUAL, de, ctx.olhar(), 1f, GetsugaIchigo.duracao(true));
+            ctx.criarEfeito(new MeiaLua(de, ctx.olhar(), GetsugaIchigo.PASSO_BANKAI, GetsugaIchigo.ALCANCE_BANKAI, 10, VISUAL));
         }
     }
 
@@ -131,19 +180,20 @@ public final class Ichigo {
         private final Vetor direcao;
         private final double passo, alcance;
         private final float dano;
-        private final String particula;
+        /** O visual que acompanha esta meia-lua: é encerrado se ela bater num bloco. */
+        private final String visual;
         private final Set<Object> atingidos = new HashSet<>();
         private Vetor ponto;
         private double andou;
         private boolean parou;
 
-        MeiaLua(Vetor origem, Vetor direcao, double passo, double alcance, float dano, String particula) {
+        MeiaLua(Vetor origem, Vetor direcao, double passo, double alcance, float dano, String visual) {
             this.ponto = origem;
             this.direcao = direcao.normalizado();
             this.passo = passo;
             this.alcance = alcance;
             this.dano = dano;
-            this.particula = particula;
+            this.visual = visual;
         }
 
         @Override
@@ -157,7 +207,7 @@ public final class Ichigo {
             Vetor proximo = ponto.mais(direcao.vezes(p));
             if (ctx.colideBloco(ponto, proximo)) {
                 parou = true;
-                ctx.particulas(particula, ponto, 20);
+                ctx.visualFim(visual, ponto);
                 return;
             }
             // Dois pontos por tick: o passo é maior que o corte, e ninguém pode ficar no vão.
@@ -166,8 +216,6 @@ public final class Ichigo {
             if (feridos > 0) ctx.acertou(.5f);
             ponto = proximo;
             andou += p;
-            ctx.particulas(particula, ponto, 8);
-            ctx.particulas(PRETO.equals(particula) ? VERMELHO : CORTE, ponto, 2);
         }
 
         @Override
@@ -184,9 +232,9 @@ public final class Ichigo {
 
         @Override
         public void aoDisparar(Contexto ctx, float forca) {
-            ctx.particulas(PASSO, ctx.olhos(), 10);
+            Vetor de = ctx.olhos();
             ctx.deslocar(ctx.olhar(), 8, null);
-            ctx.particulas(PASSO, ctx.olhos(), 10);
+            ctx.visual("ichigo_shunpo", de, ctx.olhos().menos(de), 0f, FormasIchigo.SHUNPO);
         }
     }
 
@@ -199,9 +247,13 @@ public final class Ichigo {
         }
 
         @Override
+        protected String animacao() {
+            return "ichigo_shunpo";
+        }
+
+        @Override
         public void aoDisparar(Contexto ctx, float forca) {
             Vetor olhos = ctx.olhos();
-            ctx.particulas(PRETO, olhos, 10);
             Object alvo = ctx.marcarAlvo(ALCANCE, LARGURA_DA_MIRA);
             Vetor onde = alvo == null ? null : ctx.posicaoDe(alvo);
             if (onde == null) {
@@ -213,13 +265,13 @@ public final class Ichigo {
                 Vetor caminho = new Vetor(ate.x(), ate.y() + OLHOS_SOBRE_O_MEIO, ate.z()).mais(reto.vezes(ATRAS_DO_ALVO));
                 ctx.deslocar(caminho.normalizado(), caminho.comprimento(), onde);
             }
-            ctx.particulas(PRETO, ctx.olhos(), 10);
+            ctx.visual("ichigo_shunpo_bankai", olhos, ctx.olhos().menos(olhos), 1f, FormasIchigo.SHUNPO);
         }
     }
 
     /** C do Shikai: crava o Getsuga no chão; a onda fere, afasta e desfaz projéteis em volta. */
     static final class GetsugaNoChao extends Golpe {
-        static final double RAIO = 5;
+        static final double RAIO = FormasIchigo.ONDA_RAIO;
 
         GetsugaNoChao() {
             super("ichigo_getsuga_chao", Numeros.instantanea(8, 2, 6, 30, 240));
@@ -232,8 +284,7 @@ public final class Ichigo {
             ctx.empurrar(centro, RAIO, 1.2);
             ctx.desfazerProjeteis(centro, RAIO);
             ctx.tremor(.4f, 8, 10);
-            ctx.particulas(AZUL, centro, 60);
-            ctx.particulas("explosion", centro, 3);
+            ctx.visual("ichigo_onda", pes(ctx), ctx.olhar(), 1f, FormasIchigo.ONDA);
         }
     }
 
@@ -246,14 +297,15 @@ public final class Ichigo {
         @Override
         public void aoDisparar(Contexto ctx, float forca) {
             ctx.arma(Arma.MAO);
+            ctx.visual("ichigo_arremesso", ctx.olhos(), ctx.olhar(), 1f, FormasIchigo.ARREMESSO);
             ctx.criarEfeito(new Lancada(ctx.olhos(), ctx.olhar()));
         }
     }
 
     /** A Zangetsu fora da mão: vai até 10 blocos ferindo quem estiver no caminho e volta pelo pano. */
     static final class Lancada implements Efeito {
-        static final int IDA = 8;
-        static final double PASSO = 10.0 / IDA, RAIO = 1.2;
+        static final int IDA = FormasIchigo.ARREMESSO_IDA;
+        static final double PASSO = FormasIchigo.ARREMESSO_PASSO, RAIO = 1.2;
         private final Vetor origem, direcao;
         private final Set<Object> atingidos = new HashSet<>();
         private double andou;
@@ -285,8 +337,6 @@ public final class Ichigo {
                 // A volta: a espada vem de onde parou até a mão, sem ferir.
                 andou = Math.max(0, andou - andou / (duracao() - t));
             }
-            ctx.particulas(CORTE, origem.mais(direcao.vezes(andou)), 1);
-            ctx.particulas("crit", origem.mais(direcao.vezes(andou / 2)), 3);
         }
     }
 
@@ -296,9 +346,17 @@ public final class Ichigo {
             super(ENTRAR_NO_BANKAI, Numeros.instantanea(30, 4, 6, 50, 0));
         }
 
+        /** O reiatsu é puxado para o corpo durante a carga; some se a liberação for cortada. */
         @Override
         public void aoIniciarCarga(Contexto ctx) {
-            ctx.particulas(AZUL, ctx.olhos(), 40);
+            super.aoIniciarCarga(ctx);
+            ctx.visual("ichigo_bankai_carga", ctx.olhos(), ctx.olhar(), 0f, numeros().cargaMax() + 6);
+        }
+
+        @Override
+        public void aoInterromper(Contexto ctx) {
+            super.aoInterromper(ctx);
+            ctx.visualFim("ichigo_bankai_carga", ctx.olhos());
         }
 
         @Override
@@ -306,8 +364,8 @@ public final class Ichigo {
             Vetor centro = ctx.olhos();
             ctx.empurrar(centro, 6, 1.5);
             ctx.tremor(.6f, 12, 14);
-            ctx.particulas(PRETO, centro, 80);
-            ctx.particulas(VERMELHO, centro, 30);
+            ctx.visualFim("ichigo_bankai_carga", centro);
+            ctx.visual("ichigo_bankai", pes(ctx), ctx.olhar(), 1f, FormasIchigo.BANKAI);
             ctx.mudarForma(Reiatsu.BANKAI);
         }
     }
@@ -322,7 +380,7 @@ public final class Ichigo {
         public void aoDisparar(Contexto ctx, float forca) {
             if (!ctx.mudarForma(Forma.BASE)) return;
             ctx.recarga(ENTRAR_NO_BANKAI, RECARGA_AO_SAIR);
-            ctx.particulas(PRETO, ctx.olhos(), 30);
+            desfazer(ctx);
         }
     }
 
@@ -335,6 +393,7 @@ public final class Ichigo {
         @Override
         public void aoDisparar(Contexto ctx, float forca) {
             ctx.arma(TENSA_CARREGADA);
+            ctx.visual(LaminaCarregada.VISUAL, ctx.olhos(), ctx.olhar(), 1f, LaminaCarregada.DURACAO);
             ctx.criarEfeito(new LaminaCarregada());
         }
     }
@@ -342,6 +401,7 @@ public final class Ichigo {
     /** O Getsuga na lâmina; acaba antes se o Ichigo sair do Bankai. */
     static final class LaminaCarregada implements Efeito {
         static final int DURACAO = 120;
+        static final String VISUAL = "ichigo_lamina";
         private boolean acabou;
 
         @Override
@@ -353,13 +413,10 @@ public final class Ichigo {
         public void tick(Contexto ctx, int t) {
             if (!noBankai(ctx)) {
                 acabou = true;
+                ctx.visualFim(VISUAL, ctx.olhos());
                 return;
             }
             ctx.arma(TENSA_CARREGADA);
-            if (t % 4 == 0) {
-                ctx.particulas(PRETO, ctx.olhos().mais(ctx.olhar()), 2);
-                ctx.particulas(VERMELHO, ctx.olhos().mais(ctx.olhar()), 1);
-            }
         }
 
         @Override

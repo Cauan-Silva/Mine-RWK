@@ -10,6 +10,7 @@
 | Arquivo | Origem |
 | --- | --- |
 | `assets/minerwk/player_animations/gojo.json` | Minezin (mesmo autor) |
+| `assets/minerwk/player_animations/ichigo.json` | Gerado por `ferramentas/gerar_animacoes_ichigo.py`; as poses do Getsuga, da onda e da entrada do Bankai partem das do Minezin (mesmo autor), `player_animation/ichigo.json` |
 | `assets/minerwk/animations/boss/toji.animation.json` | Minezin (mesmo autor): as 14 animações do Toji (`animations/nemesis/1.animation.json`), sem mudança |
 
 ## Shaders
@@ -32,3 +33,4 @@
 | Arquivo | Origem |
 | --- | --- |
 | `core/traje/tecido/MolaManto.java`, `MalhaTecido.java`, `TecidoIchigo.java`, `TecidoEspada.java` e os testes deles | Minezin (mesmo autor): o tecido dos trajes (`MolaMantoCid`, `MalhaTecido`, `TecidoIchigo`, `TecidoEspadaIchigo`), com os nomes trocados e as mangas do Shikai acrescentadas |
+| `core/vfx/GetsugaIchigo.java` | Minezin (mesmo autor): a forma da meia-lua do Getsuga (`core/vfx/GetsugaIchigo`), com os números do Mine-RWK |

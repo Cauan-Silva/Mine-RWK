@@ -24,6 +24,15 @@ Voltar para [[00 Início]].
 - Gojo (revisão 09/11, menores que ficaram): o Roxo pode derrubar plantas vizinhas (o `BreakEvent` para mods de proteção entrou em 09/11, no Gojo peso); o Vermelho atravessa parede fina encostada no rosto; bola de fogo e crânio de Wither voltam a acelerar no Infinito (o dano é cancelado mesmo assim); TNT sem dono passa pelo Infinito; sobram até 2 ticks de Infinito e 5 de Paralisia depois de morrer. Corrigidos na revisão: efeitos acabam ao mudar de dimensão; golpes não atingem pets, montaria nem projéteis do próprio Gojo; Paralisia não cancela Espinhos nem dano em si mesmo; ícone da Paralisia escondido (falta textura).
 
 ## Para testar no jogo
+- Ichigo, parte 4 (11/11): VFX e animações (prévia em `previas/ichigo.mp4`); os golpes ainda não têm som:
+  - **Getsuga (Z):** o reiatsu azul sobe enquanto segura; a meia-lua sai do corte, acompanha o dano e se parte em lascas na parede (atirar de perto numa parede e ver se as lascas aparecem do lado de cá). No Bankai é preta com borda vermelha. Ver de frente, de lado e em primeira pessoa se o tamanho e o brilho agradam.
+  - **Shunpo (X):** riscos, vultos e poeira no caminho; conferir em primeira pessoa se não atrapalha a visão.
+  - **C do Shikai:** a parede da onda abre até onde o golpe alcança (5 blocos).
+  - **Arremesso (V):** a espada gira no ar presa pelo pano e volta à mão; atirar contra uma parede próxima e ver se ela para antes do bloco.
+  - **Bankai (G):** a carga puxa o reiatsu e escurece; o pilar esconde a troca do traje. Levar dano durante a carga: o visual e a animação param.
+  - **C do Bankai:** chamas na lâmina por 6 s, e somem ao sair do Bankai ou morrer.
+  - **Animações:** olhar as nove em terceira pessoa (F5), andando e parado; a espada acompanha o braço em todas? Ajustes de pose dá para fazer no Blockbench.
+  - **Outro jogador** vê os mesmos visuais (precisa de dois clientes).
 - Ichigo, parte 3 (11/11): arma e traje (prévia em `previas/ichigo_traje.mp4`):
   - **Shikai:** shihakushō e a Zangetsu na mão direita, sem item no inventário. As mangas e a faixa da espada balançam ao andar e ao virar a câmera.
   - **Bankai (G):** o traje vira o casaco longo e a espada vira a Tensa Zangetsu; o casaco abre na entrada e balança ao correr, pular e girar. Olhar de perto se os painéis do casaco mostram fresta ou se a perna atravessa (se incomodar, dá para trazer a folha lisa do Minezin).
