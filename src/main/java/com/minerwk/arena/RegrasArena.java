@@ -34,11 +34,12 @@ import net.neoforged.neoforge.event.tick.ServerTickEvent;
 
 /** As regras que só valem dentro da dimensão da arena. */
 public final class RegrasArena {
-    /** O que o jogador tinha ao morrer na arena, até ele renascer. */
-    private record Guardado(ListTag inventario, int nivel, float progresso, int total) {
-    }
-
-    private static final Map<UUID, Guardado> GUARDADOS = new HashMap<>();
+    /**
+     * O inventário de quem está morrendo na arena, do evento da morte até o dos itens caídos (no mesmo
+     * tick). Depois disso os itens voltam para o próprio morto: é ele que vai para o disco se o jogo fechar
+     * antes de o jogador renascer.
+     */
+    private static final Map<UUID, ListTag> MORRENDO = new HashMap<>();
 
     private RegrasArena() {
     }
@@ -49,7 +50,7 @@ public final class RegrasArena {
         NeoForge.EVENT_BUS.addListener(RegrasArena::aoDerrubar);
         NeoForge.EVENT_BUS.addListener(RegrasArena::aoDerrubarXp);
         NeoForge.EVENT_BUS.addListener(RegrasArena::aoRenascer);
-        NeoForge.EVENT_BUS.addListener((ServerStoppedEvent e) -> GUARDADOS.clear());
+        NeoForge.EVENT_BUS.addListener((ServerStoppedEvent e) -> MORRENDO.clear());
         NeoForge.EVENT_BUS.addListener((ServerTickEvent.Post e) -> tick(e.getServer()));
         NeoForge.EVENT_BUS.addListener(RegrasArena::aoQuebrar);
         NeoForge.EVENT_BUS.addListener(RegrasArena::aoColocar);
@@ -105,6 +106,8 @@ public final class RegrasArena {
         Vec3 v = e.getDeltaMovement();
         Barreira.Correcao c = caixa.corrigir(pes, new Vetor(v.x, v.y, v.z), e.getBbWidth() / 2, e.getBbHeight());
         if (c.posicao().distancia(pes) <= tolerancia) return;
+        // Montado, quem manda na posição é a montaria: ele desce para a barreira valer.
+        e.stopRiding();
         e.teleportTo(c.posicao().x(), c.posicao().y(), c.posicao().z());
         e.setDeltaMovement(c.velocidade().x(), c.velocidade().y(), c.velocidade().z());
         e.hurtMarked = true;
@@ -112,6 +115,8 @@ public final class RegrasArena {
 
     /** Os golpes destruíram o chão e alguém caiu: o meio do pátio é refeito e a entidade volta para lá, ferida. */
     private static void cairNoVazio(ServerLevel arena, LivingEntity e, CaixaArena caixa) {
+        // Senão a montaria o levaria de volta para o vazio no tick seguinte, e o dano se repetiria.
+        e.stopRiding();
         Vetor centro = caixa.centro();
         BlockPos piso = BlockPos.containing(centro.x(), CaixaArena.Y_PATIO - 1, centro.z());
         for (BlockPos p : BlockPos.betweenClosed(piso.offset(-2, 0, -2), piso.offset(2, 0, 2))) {
@@ -131,25 +136,29 @@ public final class RegrasArena {
     /** Por último e só se a morte valeu: o inventário é copiado antes de o jogo esvaziá-lo. */
     private static void aoMorrer(LivingDeathEvent evento) {
         if (evento.isCanceled() || !(evento.getEntity() instanceof ServerPlayer j) || !ArenasServidor.naArena(j)) return;
-        GUARDADOS.put(j.getUUID(), new Guardado(j.getInventory().save(new ListTag()), j.experienceLevel,
-                j.experienceProgress, j.totalExperience));
+        MORRENDO.put(j.getUUID(), j.getInventory().save(new ListTag()));
     }
 
+    /** Nada cai na arena: os itens voltam para o inventário do morto. */
     private static void aoDerrubar(LivingDropsEvent evento) {
-        if (evento.getEntity() instanceof ServerPlayer j && GUARDADOS.containsKey(j.getUUID())) evento.setCanceled(true);
+        if (!(evento.getEntity() instanceof ServerPlayer j)) return;
+        ListTag inventario = MORRENDO.remove(j.getUUID());
+        if (inventario == null) return;
+        evento.setCanceled(true);
+        j.getInventory().load(inventario);
     }
 
     private static void aoDerrubarXp(LivingExperienceDropEvent evento) {
-        if (evento.getEntity() instanceof ServerPlayer j && GUARDADOS.containsKey(j.getUUID())) evento.setCanceled(true);
+        if (evento.getEntity() instanceof ServerPlayer j && ArenasServidor.naArena(j)) evento.setCanceled(true);
     }
 
+    /** Quem renasce depois de morrer na arena recebe o que o morto tinha (itens e XP). */
     private static void aoRenascer(PlayerEvent.Clone evento) {
-        if (!evento.isWasDeath() || !(evento.getEntity() instanceof ServerPlayer novo)) return;
-        Guardado g = GUARDADOS.remove(novo.getUUID());
-        if (g == null) return;
-        novo.getInventory().load(g.inventario());
-        novo.experienceLevel = g.nivel();
-        novo.experienceProgress = g.progresso();
-        novo.totalExperience = g.total();
+        if (!evento.isWasDeath() || !(evento.getEntity() instanceof ServerPlayer novo)
+                || !(evento.getOriginal() instanceof ServerPlayer morto) || !ArenasServidor.naArena(morto)) return;
+        novo.getInventory().replaceWith(morto.getInventory());
+        novo.experienceLevel = morto.experienceLevel;
+        novo.experienceProgress = morto.experienceProgress;
+        novo.totalExperience = morto.totalExperience;
     }
 }

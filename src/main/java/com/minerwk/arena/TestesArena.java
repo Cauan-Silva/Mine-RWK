@@ -36,6 +36,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.ExperienceOrb;
 import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.entity.vehicle.Boat;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.context.UseOnContext;
@@ -107,6 +108,11 @@ public final class TestesArena {
     public static ServerPlayer jogador(GameTestHelper helper) {
         garantirDimensao(helper.getLevel().getServer());
         ServerPlayer jogador = TestesGojo.gojo(helper);
+        // O jogador dos testes do Gojo nasce dentro de um bloco do molde; aqui ele precisa de um lugar livre,
+        // porque voltar para um lugar obstruído é recusado.
+        while (!helper.getLevel().noCollision(jogador.getBoundingBox().deflate(1e-3))) {
+            jogador.setPos(jogador.getX(), jogador.getY() + 1, jogador.getZ());
+        }
         Connection conexao = new Connection(PacketFlow.SERVERBOUND);
         new EmbeddedChannel(conexao);
         jogador.connection = new ServerGamePacketListenerImpl(helper.getLevel().getServer(), conexao, jogador,
@@ -384,6 +390,8 @@ public final class TestesArena {
         jogador.hasChangedDimension();
         jogador.kill();
         helper.assertTrue(jogador.isDeadOrDying(), "o jogador deveria ter morrido");
+        // Morreu e fechou o jogo sem renascer: o que vai para o disco é o morto, então os itens ficam nele.
+        helper.assertTrue(diamantes(jogador) == 3, "os itens continuam no inventário do morto, tem " + diamantes(jogador));
         ServerPlayer novo = renascer(helper, jogador);
         helper.assertTrue(diamantes(novo) == 3, "os 3 diamantes voltam, voltaram " + diamantes(novo));
         helper.assertTrue(novo.getItemBySlot(EquipmentSlot.HEAD).is(Items.IRON_HELMET), "a armadura volta no lugar");
@@ -391,7 +399,6 @@ public final class TestesArena {
         ServerLevel arena = ArenasServidor.nivel(helper.getLevel().getServer());
         helper.assertTrue(arena.getEntitiesOfClass(ItemEntity.class, ObrasArena.volume(caixa)).isEmpty(), "nada cai na arena");
         helper.assertTrue(arena.getEntitiesOfClass(ExperienceOrb.class, ObrasArena.volume(caixa)).isEmpty(), "nem XP");
-        helper.assertTrue(diamantes(renascer(helper, jogador)) == 0, "o que foi guardado só é devolvido uma vez");
         jogador.remove(Entity.RemovalReason.DISCARDED);
         helper.succeed();
     }
@@ -593,5 +600,60 @@ public final class TestesArena {
         jogador.remove(Entity.RemovalReason.DISCARDED);
         ObrasArena.apagar(arena, caixa, () -> { });
         helper.succeed();
+    }
+
+    // --- Achados da revisão final ---
+
+    @GameTest(template = "vazio", batch = "arena_23")
+    public static void retornoObstruidoVaiParaORenascimento(GameTestHelper helper) {
+        ServerPlayer jogador = jogador(helper);
+        Vec3 antes = jogador.position();
+        ArenasServidor.levar(jogador, CaixaArena.daVaga(59));
+        // Enquanto ele lutava, alguém construiu no lugar de onde ele saiu.
+        BlockPos pes = BlockPos.containing(antes);
+        helper.getLevel().setBlockAndUpdate(pes, Blocks.STONE.defaultBlockState());
+        helper.getLevel().setBlockAndUpdate(pes.above(), Blocks.STONE.defaultBlockState());
+        helper.assertFalse(ArenasServidor.trazer(jogador), "ponto obstruído devolve false");
+        helper.assertFalse(ArenasServidor.naArena(jogador), "mas ele sai da arena");
+        helper.assertFalse(perto(jogador, antes), "e não é posto dentro dos blocos");
+        helper.assertFalse(jogador.hasData(Anexos.RETORNO_ARENA), "o ponto de retorno é apagado");
+        helper.getLevel().setBlockAndUpdate(pes, Blocks.AIR.defaultBlockState());
+        helper.getLevel().setBlockAndUpdate(pes.above(), Blocks.AIR.defaultBlockState());
+        jogador.remove(Entity.RemovalReason.DISCARDED);
+        helper.succeed();
+    }
+
+    @GameTest(template = "vazio", batch = "arena_24")
+    public static void aoLigarOServidorNenhumChunkDaArenaFicaForcado(GameTestHelper helper) {
+        // O servidor parou com uma luta em andamento: os chunks forçados ficaram salvos no disco.
+        ServerLevel arena = garantirDimensao(helper.getLevel().getServer());
+        CaixaArena caixa = CaixaArena.daVaga(60);
+        int cx = caixa.centroX() >> 4, cz = caixa.centroZ() >> 4;
+        arena.setChunkForced(cx, cz, true);
+        helper.assertTrue(arena.getForcedChunks().contains(ChunkPos.asLong(cx, cz)), "o chunk deveria estar forçado");
+        ObrasArena.soltarChunksEsquecidos(arena);
+        helper.assertFalse(arena.getForcedChunks().contains(ChunkPos.asLong(cx, cz)), "ao ligar, o chunk é solto");
+        helper.succeed();
+    }
+
+    @GameTest(template = "vazio", batch = "arena_25")
+    public static void quemCaiNoVazioMontadoDesmonta(GameTestHelper helper) {
+        ServerPlayer jogador = jogador(helper);
+        CaixaArena caixa = CaixaArena.daVaga(61);
+        ServerLevel arena = ArenasServidor.nivel(helper.getLevel().getServer());
+        ArenasServidor.levar(jogador, caixa);
+        jogador.hasChangedDimension();
+        Boat barco = new Boat(arena, caixa.centroX() + 10.5, CaixaArena.Y_FUNDO - 6, caixa.centroZ() + 10.5);
+        arena.addFreshEntity(barco);
+        jogador.teleportTo(barco.getX(), barco.getY(), barco.getZ());
+        helper.assertTrue(jogador.startRiding(barco, true), "o jogador deveria montar no barco");
+        helper.runAfterDelay(3, () -> {
+            helper.assertFalse(jogador.isPassenger(), "quem cai montado é tirado da montaria");
+            helper.assertTrue(perto(jogador, vec(caixa.centro())), "e volta ao centro, está em " + jogador.position());
+            helper.assertTrue(jogador.getHealth() == 16, "com um só dano de 4, sobrou " + jogador.getHealth());
+            jogador.remove(Entity.RemovalReason.DISCARDED);
+            ObrasArena.apagar(arena, caixa, () -> { });
+            helper.succeed();
+        });
     }
 }

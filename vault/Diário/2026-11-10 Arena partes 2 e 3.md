@@ -35,7 +35,33 @@ O autor pediu, no meio da parte 2, que eu fizesse tudo até o fim e trouxesse o 
 - GameTest: 7 novos (fora da caixa volta para dentro; o Toji não sai da caixa; queda no vazio; espectador passa; não quebra nem põe à mão; apagar e arrancar não passam da caixa). Os 58 passam, em duas rodadas seguidas.
 - **Prova num mundo real** (`runClient -Pmundo="New World" -Pprova_arena`): três rodadas. Na primeira, o Toji matou o jogador parado em 9 s (ele tinha ficado desperto de vez na prova da parte 1, e desperto não tem a queda que o protege): a arena fechou e liberou a vaga como devia, mas a prova não pôde conferir a volta. Na segunda, a prova renasceu o jogador à força e a volta caiu no lugar exato, mas o cliente ficou dessincronizado (tela de morte) e o jogador apareceu fora da caixa; isso é efeito do renascimento forçado da ferramenta, não do jogo. Na terceira, com o jogador vivo e imune a dano: chegou à entrada (256.5, 64, 280.5); posto 20 blocos para fora da parede leste, a barreira o trouxe para x = 296,1 (a parede fica em 297); lutou com o Toji a 2,4 blocos; 3 s depois da vitória ainda estava na arena; 7 s depois, de volta ao lugar exato. Sem erros no log. A primeira rodada revelou um caso sem tratamento, já corrigido e com teste: quem entra no jogo morto dentro da arena não é teleportado (renascer já o tira de lá) e não leva um ponto de retorno velho.
 
+## Revisão final (revisor separado, 10/11 à noite)
+Um crítico e quatro importantes. O crítico e três importantes foram corrigidos, cada um com um teste que falhou antes e passa agora; os 62 GameTests passam em duas rodadas e a prova num mundo real passou de novo depois das correções.
+
+**Corrigidos**
+- **Crítico: morrer na arena e fechar o jogo antes de renascer perdia todos os itens e o XP.** A cópia do inventário ficava só na memória do servidor. Agora os itens voltam para o inventário do próprio morto (é ele que vai para o disco) e quem renasce copia do morto. Teste: `morrerNaArenaMantemItensEXp`.
+- **Ponto de retorno obstruído:** se construíram (ou escorreu lava) no lugar de onde o jogador saiu, ele vai para o renascimento normal em vez de voltar dentro do bloco. Água não conta. Teste: `retornoObstruidoVaiParaORenascimento`.
+- **Chunks forçados para sempre:** se o servidor parava com uma luta em andamento, os chunks da vaga ficavam carregados em toda sessão seguinte. Ao ligar, todos são soltos. Teste: `aoLigarOServidorNenhumChunkDaArenaFicaForcado`.
+- **Montado:** quem está numa montaria desmonta ao ser segurado pela barreira ou ao voltar do vazio (antes a montaria o levava de volta e o dano se repetia). Teste: `quemCaiNoVazioMontadoDesmonta`.
+
+**Não corrigido (decisão)**
+- **Mods que mexem nos itens da morte** (Curios, mochilas, túmulos): a arena cancela os itens caídos inteiros, então o que outro mod acrescenta ali seria destruído, e um mod de túmulo poderia duplicar. Só dá para saber com esses mods instalados; fica anotado para quando o mod entrar num modpack.
+
+**Menores, deixados para depois**
+- A volta acontece 6,5 s depois do golpe final, não 5: os 5 s contam de quando o corpo do Toji some (1,5 s depois).
+- Uma fila só para montar e apagar: com três obras na frente (vários jogadores invocando juntos) a espera passa de 4 s e a tela clareia antes do teleporte.
+- Ao chegar, a arena tira Lentidão e Resistência de qualquer origem (poção do jogador).
+- Se outro mod cancelar a troca de dimensão, o Toji nasceria no mundo normal nas coordenadas da vaga.
+- A montagem não tira itens que ficaram numa vaga depois de uma queda do servidor.
+- A proteção de blocos não cobre baldes nem isqueiro.
+- Sem a dimensão, a mensagem é "você já está na arena" (o log avisa o motivo certo ao abrir o mundo).
+- A planta do cenário é recalculada a cada luta.
+- A dimensão herda a chuva do mundo normal: o céu pode escurecer (o spec diz "sem clima").
+- A ferramenta `ProvaArena` continua no código (só liga com `-Pprova_arena`).
+
+**O revisor não pôde julgar (só rodando):** travada na montagem (carga dos chunks e luz de 20 mil blocos), tremor do Toji encostado na parede, aviso de "configurações experimentais" ao abrir o mundo, e se a tela preta cobre de fato o carregamento.
+
 ## Falta
 - **O teste do autor no jogo** (roteiro em [[Pendências]]). Nada do que é visual foi visto por alguém: o cenário, a tela preta, a barreira.
-- A revisão final por um revisor separado e a junção do `arena-toji` na `main`.
+- Juntar o `arena-toji` na `main` e enviar ao GitHub (o branch está só neste PC).
 - Depois: o spec do balanceamento de todos os golpes, que era o motivo da arena.

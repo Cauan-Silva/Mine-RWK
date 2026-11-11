@@ -25,6 +25,9 @@ Voltar para [[00 Início]].
 
 ## Para testar no jogo
 - Arena, partes 2 e 3 (10/11), conferir no jogo (`/rwk toji <jogador>`):
+  - **Atenção:** o jogador "Dev" do "New World" ficou desperto de vez (a prova automática venceu o Toji nele): `/rwk despertar Dev nao` devolve os cadeados.
+  - **Depois da revisão final:** morrer na luta, sair para a tela de título sem renascer, entrar de novo e renascer: os itens e o XP voltam? Invocar de dentro de uma construção e, durante a luta, não há como testar sozinho o ponto obstruído (precisa de outro jogador).
+  - **A observar (o revisor não pôde julgar):** travada ao montar a arena, o Toji tremendo encostado na parede, aviso de "configurações experimentais" ao abrir o mundo, e se dá para ver o teleporte por baixo da tela preta.
   - **Entrada:** a tela escurece em meio segundo, fica preta 1 a 2 s e clareia já na arena. Dá para ver o teleporte? A espera incomoda?
   - **Cenário:** o pátio com a faixa central, a escadaria e o torii grande ao norte, os dois torii no caminho, o muro com lanternas e as árvores. Combina com a entrada da Escola do anime? O muro ficou ligado (sem postes soltos)? As lanternas iluminam bem com a hora fixa no fim de tarde?
   - **Os torii do caminho atrapalham?** A investida, o Desaparecer e a Execução do Toji passam pelos pilares; o seu Vermelho e o Roxo destroem os torii.

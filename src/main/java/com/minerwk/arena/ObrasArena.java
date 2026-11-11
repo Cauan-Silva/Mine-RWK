@@ -11,6 +11,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.LeavesBlock;
@@ -75,6 +76,17 @@ public final class ObrasArena {
         forcarChunks(nivel, caixa, true);
         tirarEntidades(nivel, caixa);
         FILA.addLast(new Obra(nivel, caixa, List.of(), true, aoTerminar));
+    }
+
+    /**
+     * Solta todo chunk da dimensão que ficou forçado. Ao ligar o servidor nenhuma vaga está em uso, mas o
+     * jogo salva os chunks forçados no disco: se ele parou com uma luta em andamento, eles voltariam
+     * carregados para sempre.
+     */
+    static void soltarChunksEsquecidos(ServerLevel arena) {
+        for (long chunk : arena.getForcedChunks().toLongArray()) {
+            arena.setChunkForced(ChunkPos.getX(chunk), ChunkPos.getZ(chunk), false);
+        }
     }
 
     static boolean ocioso() {

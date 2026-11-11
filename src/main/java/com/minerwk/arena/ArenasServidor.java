@@ -20,11 +20,14 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.tags.FluidTags;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.Pose;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.portal.DimensionTransition;
+import net.minecraft.world.phys.AABB;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.server.ServerStartedEvent;
@@ -88,6 +91,8 @@ public final class ArenasServidor {
             } else {
                 MineRWK.LOGGER.info("Arena: dimensão {} carregada (hora fixa {})", DIMENSAO.location(),
                         arena.dimensionType().fixedTime().orElse(-1));
+                // Nenhuma vaga está em uso ao ligar: o que ficou forçado de uma luta interrompida é solto.
+                ObrasArena.soltarChunksEsquecidos(arena);
             }
         });
         NeoForge.EVENT_BUS.addListener((ServerTickEvent.Post e) -> tick(e.getServer()));
@@ -291,13 +296,20 @@ public final class ArenasServidor {
         jogador.removeData(Anexos.RETORNO_ARENA);
         ServerLevel destino = jogador.server.getLevel(ResourceKey.create(Registries.DIMENSION, ponto.dimensao()));
         jogador.stopRiding();
-        if (destino == null || destino.dimension() == DIMENSAO) {
+        // A dimensão não existe mais, ou construíram (ou escorreu lava) no lugar enquanto ele lutava.
+        if (destino == null || destino.dimension() == DIMENSAO || !livre(destino, jogador, ponto)) {
             paraORenascimento(jogador);
             return false;
         }
         jogador.teleportTo(destino, ponto.x(), ponto.y(), ponto.z(), ponto.yaw(), ponto.pitch());
         jogador.resetFallDistance();
         return true;
+    }
+
+    /** Se o jogador cabe no ponto de retorno: sem bloco nem lava no lugar do corpo dele (água não impede). */
+    private static boolean livre(ServerLevel destino, ServerPlayer jogador, PontoRetorno ponto) {
+        AABB corpo = jogador.getDimensions(Pose.STANDING).makeBoundingBox(ponto.x(), ponto.y(), ponto.z()).deflate(1e-3);
+        return destino.noCollision(corpo) && destino.getBlockStates(corpo).noneMatch(e -> e.getFluidState().is(FluidTags.LAVA));
     }
 
     /** O lugar onde o jogador renasceria (cama, âncora ou o início do mundo), sem gastar a âncora. */
