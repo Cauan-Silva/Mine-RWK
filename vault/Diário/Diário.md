@@ -32,4 +32,5 @@ Voltar para [[00 Início]].
 - [[2026-11-10 Arena parte 0]]: prova da arena do Toji (dimensão `minerwk:arena`, ponto de retorno e `/rwk arena ir` e `voltar`)
 - [[2026-11-10 Arena parte 1]]: a luta do Toji acontece na arena (vagas, montagem em fatias, todos os fins de luta, morte sem perder itens)
 - [[2026-11-10 Arena partes 2 e 3]]: regras da arena (barreira, queda no vazio, blocos) e o cenário da entrada da Escola Jujutsu, com a tela escurecendo
-- [[2026-11-11 Queda do despertar]]
+- [[2026-11-11 Queda do despertar]]: o Gojo passa a cair de costas e se levantar no despertar (antes ficava em pé)
+- [[2026-11-11 Arena da Escola Jujutsu]]: o cenário da arena refeito como a Escola (escadaria com torii, pátio, salão, pavilhões e floresta)

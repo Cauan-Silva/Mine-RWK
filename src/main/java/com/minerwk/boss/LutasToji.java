@@ -42,7 +42,7 @@ public final class LutasToji {
             ServicoKits.esquecerDespertosNaLuta();
         });
         NeoForge.EVENT_BUS.addListener((net.neoforged.neoforge.event.entity.player.PlayerEvent.PlayerLoggedOutEvent e) -> {
-            if (CAIDOS.remove(e.getEntity().getUUID())) e.getEntity().setForcedPose(null);
+            CAIDOS.remove(e.getEntity().getUUID());
         });
     }
 

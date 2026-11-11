@@ -221,7 +221,8 @@ class PlantaEscolaTest {
         int lanternas = 0;
         for (Bloco b : blocos) {
             if (b.material() != Material.LANTERNA) continue;
-            assertNotNull(m.get(chave(b.dx(), b.dy() - 1, b.dz())), "lanterna sem apoio: " + b);
+            Material apoio = m.get(chave(b.dx(), b.dy() - 1, b.dz()));
+            assertTrue(apoio == Material.MURO || apoio == Material.ASSOALHO, "lanterna sem apoio firme: " + b);
             lanternas++;
         }
         assertTrue(lanternas >= 14 + 12, "lanternas do pátio e de dentro dos prédios: " + lanternas);

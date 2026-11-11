@@ -37,7 +37,6 @@ import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.MoverType;
-import net.minecraft.world.entity.Pose;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.goal.FloatGoal;
@@ -630,7 +629,6 @@ public final class TojiEntity extends Monster implements GeoEntity {
         }
         quedaAteDaCutscene = 0;
         LutasToji.CAIDOS.remove(dono.getUUID());
-        dono.setForcedPose(null);
         dono.removeEffect(Efeitos.PARALISIA);
     }
 
