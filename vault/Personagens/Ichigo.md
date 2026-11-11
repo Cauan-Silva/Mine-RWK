@@ -1,6 +1,6 @@
 ---
 tags: [personagem]
-estado: pesquisa feita, kit proposto (não aprovado)
+estado: pesquisa feita, kit em aprovação (decisões do autor em 11/11)
 ---
 # Ichigo Kurosaki
 
@@ -32,14 +32,20 @@ Zanpakutō: **Zangetsu** (斬月, "Lua Cortante"). Fica sempre liberada (Shikai)
 - Fonte: Fandom, "Zangetsu (Zanpakutō spirit)".
 
 ## Aparência e som
-- **Cor do Getsuga do Shikai:** dourado no mangá e no anime da Guerra Sangrenta; **azul-claro no anime original**. O Minezin usa o azul. Decisão do autor.
-- **Getsuga negro:** preto com contorno vermelho.
+- **Cor do Getsuga do Shikai:** dourado no mangá e no anime da Guerra Sangrenta; **azul-claro no anime original**. O Minezin usa o azul. **Decidido pelo autor (11/11): azul-claro.**
+- **Getsuga negro:** preto com bordas vermelhas (confirmado pelo autor em 11/11).
 - **Bankai:** casaco preto longo de pontas rasgadas (forro vermelho, de memória), lâmina preta fina com manji e corrente.
 - **Máscara:** branca, listras vermelhas do lado esquerdo.
 - **Mugetsu:** tudo preto; o céu escurece; silêncio antes do corte.
 - **Som:** o Getsuga é um corte de ar que cresce e estoura; o Bankai entra com um estouro de pressão; a máscara distorce a voz com eco. Sintetizado aqui, como o do Gojo.
 
-## No jogo (proposta, não aprovada)
+## No jogo (proposta, em aprovação)
+**Decisões do autor (11/11):**
+- O Ichigo é um personagem de **transformação**: o kit do Shikai na base e o kit do Bankai na transformação.
+- Getsuga **azul-claro** no Shikai e **preto com bordas vermelhas** no Bankai.
+- A vitória contra o boss libera o **Mugetsu** e a **máscara Hollow**. O Bankai já vem liberado.
+- A **forma Hollow completa entra no kit**: ativa sozinha ao levar um golpe fatal no Bankai, sem controle do jogador sobre os ataques, e também depende de vencer o boss.
+
 Recurso: **Reiatsu**, máximo 200. Dois conjuntos de golpes, como no Minezin: o do Shikai e o do Bankai, e o G alterna. Números são ponto de partida.
 
 | Tecla | Shikai | Bankai (Tensa Zangetsu) |
@@ -53,8 +59,8 @@ Recurso: **Reiatsu**, máximo 200. Dois conjuntos de golpes, como no Minezin: o 
 
 - **Passiva, pressão espiritual:** o reiatsu regenera rápido, e no Bankai mais devagar (é o que limita a forma).
 - **Arma:** a Zangetsu aparece na mão ao escolher o Ichigo (como o traje do Gojo, sem item), e troca para a Tensa Zangetsu no Bankai.
-- **Despertar e Nêmesis:** o Ichigo começa só com o Shikai. O boss é o **Zangetsu interior**, o Hollow branco em Bankai branco; vencê-lo libera o Bankai, a máscara e o R. Mesmo sistema do [[Toji]] (item que invoca, golpes trancados, árvore).
-- **Forma Hollow completa (opcional):** uma vez por luta longa, um golpe que mataria no Bankai o transforma por 10 s no Hollow de chifres, sem controle do jogador sobre a mira, disparando o Cero violeta. É a cena do Ulquiorra, mas é uma forma inteira a mais (modelo, animações, VFX).
+- **Despertar e Nêmesis:** o boss é o **Zangetsu interior**, o Hollow branco em Bankai branco; vencê-lo libera a máscara (V do Bankai) e o Mugetsu (R); o Shikai e o Bankai já vêm liberados. Mesmo sistema do [[Toji]] (item que invoca, golpes trancados, árvore).
+- **Forma Hollow completa (passiva, depois do boss):** no Bankai, um golpe que mataria o transforma por 10 s no Hollow de chifres, em vez de morrer. Ele ataca sozinho o inimigo mais próximo (garras, Sonído e o Cero violeta entre os chifres); o jogador só anda. Ao acabar, volta ao Shikai com pouca vida. Recarga longa (ponto de partida: 5 minutos). É a cena do Ulquiorra, e pede modelo, animações e VFX próprios.
 
 ## Diferenças em relação ao Minezin
 - **C do Shikai:** "Pressão Espiritual" (empurrão) vira o Getsuga no chão, que é um uso do golpe descrito na obra.
