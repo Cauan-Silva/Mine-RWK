@@ -24,6 +24,14 @@ O autor testou o jogo neste PC em 10/11 e pediu que a luta do [[Toji]] fosse num
 - JUnit: 13 novos (`CaixaArenaTest`, `VagasArenaTest`).
 - GameTest: 4 novos (`TestesArena`): a dimensão existe com a hora fixa, levar e trazer volta ao lugar exato, trazer sem retorno não faz nada, retorno inválido vai para o renascimento. Os 41 passam.
 
+## Prova no mundo real (10/11, à noite)
+O autor pediu que eu testasse. Como não dá para digitar comandos no jogo daqui, entrou uma prova automática: `./gradlew runClient -Pmundo="New World" -Pprova_arena` abre direto no mundo e, 5 s depois de entrar, leva o jogador à arena e o traz de volta 5 s depois, escrevendo o resultado no log. Resultado no "New World" (mundo criado **antes** da arena existir):
+- `Arena: dimensão minerwk:arena carregada (hora fixa 11500)`: o `dimension/arena.json` carrega num mundo de verdade, inclusive num mundo antigo.
+- `ir = true, na arena = true, posição (256.5, 64.0, 280.5)`: a entrada do jogador na vaga 0.
+- `voltar = true, lugar exato = true`: mesma dimensão, posição, yaw e pitch de antes.
+
+Também ficou no código um aviso permanente: ao abrir o mundo, o log diz se a dimensão carregou (erro se não). A prova automática e o `-Pprova_arena` saem na parte 1, junto com o comando de prova; o `-Pmundo` fica, para abrir direto num mundo.
+
 ## Falta
-- O teste do autor (roteiro em [[Pendências]]). O servidor dedicado não foi ligado aqui (pede aceitar o EULA do Minecraft).
+- O autor olhar a arena com os próprios olhos, se quiser (roteiro em [[Pendências]]); a ida e a volta já estão provadas. O servidor dedicado não foi ligado aqui (pede aceitar o EULA do Minecraft).
 - Depois: parte 1 (a luta do Toji na plataforma e todos os fins de luta).

@@ -51,6 +51,7 @@ public final class MineRWK {
         BarreirasServidor.registrarEventos();
         SuspensosServidor.registrarEventos();
         ApagadorServidor.registrarEventos();
+        com.minerwk.arena.ArenasServidor.registrarEventos();
         NeoForge.EVENT_BUS.addListener((RegisterCommandsEvent e) -> ComandoTrocar.registrar(e.getDispatcher()));
         NeoForge.EVENT_BUS.addListener((RegisterCommandsEvent e) -> ComandoTrocar.registrarRecarregar(e.getDispatcher()));
         NeoForge.EVENT_BUS.addListener((RegisterCommandsEvent e) -> ComandoTrocar.registrarMaestria(e.getDispatcher()));

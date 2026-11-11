@@ -15,12 +15,61 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.portal.DimensionTransition;
+import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.event.server.ServerStartedEvent;
 
 /** A dimensão da arena: quem vai, de onde saiu e como volta. */
 public final class ArenasServidor {
     public static final ResourceKey<Level> DIMENSAO = ResourceKey.create(Registries.DIMENSION, MineRWK.id("arena"));
 
     private ArenasServidor() {
+    }
+
+    public static void registrarEventos() {
+        // Sem a dimensão nada da arena funciona: melhor saber ao abrir o mundo do que no meio da luta.
+        NeoForge.EVENT_BUS.addListener((ServerStartedEvent e) -> {
+            ServerLevel arena = nivel(e.getServer());
+            if (arena == null) {
+                MineRWK.LOGGER.error("Arena: a dimensão {} não carregou; a luta do Toji não vai ter arena", DIMENSAO.location());
+            } else {
+                MineRWK.LOGGER.info("Arena: dimensão {} carregada (hora fixa {})", DIMENSAO.location(),
+                        arena.dimensionType().fixedTime().orElse(-1));
+            }
+        });
+        if (Boolean.getBoolean("minerwk.prova_arena")) provaAutomatica();
+    }
+
+    /**
+     * Prova sem ninguém no teclado (parte 0; sai junto com o comando de prova): com
+     * {@code -Dminerwk.prova_arena=true}, quem entra no mundo é levado à arena depois de 5 s e trazido de
+     * volta 5 s depois, e o log diz se voltou ao lugar exato.
+     */
+    private static void provaAutomatica() {
+        record Passo(ServerPlayer jogador, long tick, PontoRetorno origem) {
+        }
+        java.util.List<Passo> fila = new java.util.ArrayList<>();
+        NeoForge.EVENT_BUS.addListener((net.neoforged.neoforge.event.entity.player.PlayerEvent.PlayerLoggedInEvent e) -> {
+            if (e.getEntity() instanceof ServerPlayer j) fila.add(new Passo(j, j.server.getTickCount() + 100, null));
+        });
+        NeoForge.EVENT_BUS.addListener((net.neoforged.neoforge.event.tick.ServerTickEvent.Post e) -> {
+            for (Passo p : java.util.List.copyOf(fila)) {
+                if (e.getServer().getTickCount() < p.tick()) continue;
+                fila.remove(p);
+                ServerPlayer j = p.jogador();
+                if (p.origem() == null) {
+                    PontoRetorno origem = PontoRetorno.de(j);
+                    boolean foi = provaIr(j);
+                    MineRWK.LOGGER.info("Prova da arena: ir = {}, na arena = {}, posição {} em {}", foi, naArena(j),
+                            j.position(), j.level().dimension().location());
+                    fila.add(new Passo(j, e.getServer().getTickCount() + 100, origem));
+                } else {
+                    boolean voltou = provaVoltar(j);
+                    PontoRetorno agora = PontoRetorno.de(j);
+                    MineRWK.LOGGER.info("Prova da arena: voltar = {}, lugar exato = {}, antes {} depois {}", voltou,
+                            agora.equals(p.origem()), p.origem(), agora);
+                }
+            }
+        });
     }
 
     /** A dimensão da arena, ou null se os dados do mod não a carregaram. */

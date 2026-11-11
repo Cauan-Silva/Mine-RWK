@@ -24,7 +24,7 @@ Voltar para [[00 Início]].
 - Gojo (revisão 09/11, menores que ficaram): o Roxo pode derrubar plantas vizinhas (o `BreakEvent` para mods de proteção entrou em 09/11, no Gojo peso); o Vermelho atravessa parede fina encostada no rosto; bola de fogo e crânio de Wither voltam a acelerar no Infinito (o dano é cancelado mesmo assim); TNT sem dono passa pelo Infinito; sobram até 2 ticks de Infinito e 5 de Paralisia depois de morrer. Corrigidos na revisão: efeitos acabam ao mudar de dimensão; golpes não atingem pets, montaria nem projéteis do próprio Gojo; Paralisia não cancela Espinhos nem dano em si mesmo; ícone da Paralisia escondido (falta textura).
 
 ## Para testar no jogo
-- Arena, parte 0 (10/11), conferir no jogo:
+- Arena, parte 0 (10/11): **ida e volta provadas no "New World" pela prova automática** (dimensão carregou em mundo antigo, voltou ao lugar exato). Ainda vale olhar:
   - **Ir:** `/rwk arena ir` leva a uma plataforma de tijolos de pedra de 61 × 61, com vazio em volta e céu de fim de tarde. Se responder "Você já está na arena" estando fora dela, a dimensão não carregou: avisar.
   - **Voltar:** `/rwk arena voltar` devolve ao lugar exato, olhando para o mesmo lado. Testar saindo do mundo normal, do Nether e de dentro de uma construção.
   - **Sair e entrar no jogo** estando na arena: continua lá, e o `voltar` ainda funciona.
