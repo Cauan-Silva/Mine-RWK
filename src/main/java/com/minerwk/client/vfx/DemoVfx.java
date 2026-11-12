@@ -46,11 +46,16 @@ public final class DemoVfx {
     private static final boolean ARVORE = MODO.equals("arvore");
     /** {@code toji}: a luta contra o Toji: a entrada, a Nuvem, a investida, a queda com a cutscene, o Desaparecer e a fase 3. */
     private static final boolean TOJI = MODO.equals("toji");
+    /** {@code zangetsu}: a luta contra o Zangetsu interior, do mundo interior à vitória, com a queda e a máscara. */
+    private static final boolean ZANGETSU = MODO.equals("zangetsu");
+    /** O tick da prévia em que o Zangetsu apareceu (a arena leva um tempo para ficar pronta). */
+    private static int zangetsuEm = -1;
+    private static boolean fimDaDemo;
     private static final int CARGA = 100;
     private static final Path PASTA = Path.of("demo");
     private static final int ESFERAS = RoxoMaximo.TICKS_ESFERAS;
     private static final int ESTOURO = ESFERAS + RoxoMaximo.TICKS_FUSAO;
-    private static final int FIM_PREVIA = TOJI ? 520 : ARVORE ? 100 : TRAJE ? 260 : TRAJE_ICHIGO ? 300 : ICHIGO ? 350 : MUGETSU ? 360 : R_COMPLETO ? 360
+    private static final int FIM_PREVIA = ZANGETSU ? 2400 : TOJI ? 520 : ARVORE ? 100 : TRAJE ? 260 : TRAJE_ICHIGO ? 300 : ICHIGO ? 350 : MUGETSU ? 360 : R_COMPLETO ? 360
             : ENCANTAMENTO ? CARGA + 90 : ESTOURO + RoxoMaximo.TICKS_EXPLOSAO + 110;
     private static int ticks;
     private static int quadro;
@@ -76,14 +81,15 @@ public final class DemoVfx {
             mc.setScreen(null);
         }
         if (DEMO && ticks == 40) {
-            jogador.connection.sendCommand(ENCANTAMENTO || R_COMPLETO || TRAJE || TRAJE_ICHIGO || ICHIGO || MUGETSU || TOJI ? "time set noon" : "time set midnight");
+            jogador.connection.sendCommand(ENCANTAMENTO || R_COMPLETO || TRAJE || TRAJE_ICHIGO || ICHIGO || MUGETSU || TOJI || ZANGETSU ? "time set noon" : "time set midnight");
             if (ARVORE) jogador.connection.sendCommand("rwk trocar @s gojo");
             if (TOJI) {
                 jogador.connection.sendCommand("rwk trocar @s gojo");
                 jogador.connection.sendCommand("rwk despertar @s nao");
                 jogador.connection.sendCommand("tp @s ~150 ~12 ~");
             }
-            if (TRAJE_ICHIGO || ICHIGO || MUGETSU) {
+            if (ZANGETSU) jogador.connection.sendCommand("rwk despertar @s nao");
+            if (TRAJE_ICHIGO || ICHIGO || MUGETSU || ZANGETSU) {
                 jogador.connection.sendCommand("rwk trocar @s ichigo");
                 jogador.connection.sendCommand("tp @s ~150 ~12 ~");
             }
@@ -118,7 +124,7 @@ public final class DemoVfx {
         if (DEMO) {
             gravarQuadro(mc);
             // A prévia zera a si mesma no último tick: a parada usa o t guardado antes.
-            if (t >= FIM_PREVIA) mc.stop();
+            if (t >= FIM_PREVIA || fimDaDemo) mc.stop();
         }
     }
 
@@ -141,6 +147,10 @@ public final class DemoVfx {
             if (t == FIM_PREVIA - 4) jogador.connection.sendCommand("rwk maestria @s zerar");
             if (t == FIM_PREVIA - 3) jogador.connection.sendCommand("rwk despertar @s nao");
             if (t >= FIM_PREVIA) previa = -1;
+            return;
+        }
+        if (ZANGETSU) {
+            previaDoZangetsu(mc, jogador, t);
             return;
         }
         if (TOJI) {
@@ -402,6 +412,84 @@ public final class DemoVfx {
                     (float) RoxoMaximo.RAIO_EXPLOSAO, RoxoMaximo.TICKS_EXPLOSAO + RoxoMaximo.TICKS_RESTO, agora));
         }
         if (t >= FIM_PREVIA) previa = -1;
+    }
+
+    /**
+     * A luta inteira contra o Zangetsu interior. Os tempos contam de quando ele aparece, porque a arena do
+     * mundo interior leva um tempo para ficar pronta.
+     */
+    private static void previaDoZangetsu(Minecraft mc, LocalPlayer jogador, int t) {
+        if (t == 0) {
+            jogador.connection.sendCommand("gamerule sendCommandFeedback false");
+            jogador.connection.sendCommand("gamemode survival");
+        }
+        if (t <= 2) mc.gui.getChat().clearMessages(false);
+        if (t == 2) jogador.connection.sendCommand("rwk zangetsu @s");
+        net.minecraft.world.entity.Entity zangetsu = null;
+        for (net.minecraft.world.entity.Entity e : mc.level.entitiesForRendering()) {
+            if (e instanceof com.minerwk.boss.ZangetsuEntity) zangetsu = e;
+        }
+        if (zangetsuEm < 0) {
+            if (zangetsu == null) return;
+            zangetsuEm = t;
+        }
+        int z = t - zangetsuEm;
+        // Até a queda, o jogador não pode cair por um golpe fora do roteiro.
+        if (z < 250 && z % 10 == 0) vidaDoJogador(20);
+        if (z == 60) golpeDoZangetsu(com.minerwk.core.boss.ZangetsuBoss.GETSUGA);
+        if (z == 110) golpeDoZangetsu(com.minerwk.core.boss.ZangetsuBoss.ARREMESSO);
+        if (z == 160) golpeDoZangetsu(com.minerwk.core.boss.ZangetsuBoss.CERO);
+        if (z == 215) golpeDoZangetsu(com.minerwk.core.boss.ZangetsuBoss.SHUNPO);
+        // O golpe que mataria: o jogador cai e se levanta de máscara.
+        if (z == 262) golpeDoZangetsu(com.minerwk.core.boss.ZangetsuBoss.GETSUGA);
+        if (z >= 270 && z < 300 && z % 2 == 0 && !com.minerwk.client.camera.CutsceneCliente.ativa()) vidaDoJogador(1);
+        if (z >= 380 && z % 10 == 0) vidaDoJogador(20);
+        // Abaixo de 40% da vida ele veste a máscara e o Getsuga vem em três.
+        if (z == 400) jogador.connection.sendCommand("damage @e[type=minerwk:zangetsu,limit=1,sort=nearest] 170");
+        if (z == 460) golpeDoZangetsu(com.minerwk.core.boss.ZangetsuBoss.GETSUGA_3);
+        if (z == 540) jogador.connection.sendCommand("kill @e[type=minerwk:zangetsu]");
+        boolean deFora = (z >= 55 && z < 262) || z >= 440;
+        if (!com.minerwk.client.camera.CutsceneCliente.ativa()) {
+            mc.options.setCameraType(deFora ? net.minecraft.client.CameraType.THIRD_PERSON_BACK
+                    : net.minecraft.client.CameraType.FIRST_PERSON);
+            if (zangetsu != null && !zangetsu.isInvisible()) {
+                jogador.lookAt(net.minecraft.commands.arguments.EntityAnchorArgument.Anchor.EYES, zangetsu.position().add(0, 1.2, 0));
+                // De fora, um pouco de lado: senão o jogador tapa o Zangetsu.
+                if (deFora) jogador.setYRot(jogador.getYRot() + 28);
+            }
+        }
+        // A vitória devolve o jogador ao mundo; depois o mundo de testes volta a ficar sem o despertar da demonstração.
+        int volta = 540 + com.minerwk.arena.ArenasServidor.TICKS_DEPOIS_DA_VITORIA + 30;
+        if (z == volta) {
+            jogador.connection.sendCommand("rwk despertar @s nao");
+            jogador.connection.sendCommand("rwk maestria @s zerar");
+            jogador.connection.sendCommand("gamerule sendCommandFeedback true");
+            jogador.connection.sendCommand("gamemode creative");
+        }
+        if (z >= volta + 10) {
+            mc.options.setCameraType(net.minecraft.client.CameraType.FIRST_PERSON);
+            fimDaDemo = true;
+        }
+    }
+
+    private static void golpeDoZangetsu(com.minerwk.core.boss.Golpe golpe) {
+        net.minecraft.server.MinecraftServer servidor = Minecraft.getInstance().getSingleplayerServer();
+        if (servidor == null) return;
+        servidor.execute(() -> {
+            for (net.minecraft.server.level.ServerLevel nivel : servidor.getAllLevels()) {
+                for (net.minecraft.world.entity.Entity e : nivel.getAllEntities()) {
+                    if (e instanceof com.minerwk.boss.ZangetsuEntity zangetsu) zangetsu.forcar(golpe);
+                }
+            }
+        });
+    }
+
+    private static void vidaDoJogador(float vida) {
+        net.minecraft.server.MinecraftServer servidor = Minecraft.getInstance().getSingleplayerServer();
+        if (servidor == null) return;
+        servidor.execute(() -> servidor.getPlayerList().getPlayers().forEach(p -> {
+            if (p.isAlive()) p.setHealth(Math.min(vida, p.getMaxHealth()));
+        }));
     }
 
     /** Manda o Toji da demonstração começar um golpe (o servidor é o do próprio jogo). */

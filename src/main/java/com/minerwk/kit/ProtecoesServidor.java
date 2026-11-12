@@ -82,9 +82,10 @@ public final class ProtecoesServidor {
     }
 
     public static boolean paralisado(LivingEntity entidade) {
-        // Quem o Toji derrubou também não age, até se levantar.
+        // Quem o Toji ou o Zangetsu interior derrubou também não age, até se levantar.
         return entidade.hasEffect(Efeitos.PARALISIA)
-                || entidade instanceof Player jogador && com.minerwk.boss.LutasToji.caido(jogador);
+                || entidade instanceof Player jogador && (com.minerwk.boss.LutasToji.caido(jogador)
+                || com.minerwk.boss.LutasZangetsu.caido(jogador));
     }
 
     private static void aoReceberDano(LivingIncomingDamageEvent evento) {

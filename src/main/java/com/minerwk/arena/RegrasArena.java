@@ -89,6 +89,9 @@ public final class RegrasArena {
         for (TojiEntity toji : arena.getEntities(Entidades.TOJI.get(), LivingEntity::isAlive)) {
             segurar(arena, toji, caixaDe(toji.invocadorId(), toji), 0);
         }
+        for (com.minerwk.boss.ZangetsuEntity z : arena.getEntities(Entidades.ZANGETSU.get(), LivingEntity::isAlive)) {
+            segurar(arena, z, caixaDe(z.invocadorId(), z), 0);
+        }
     }
 
     /** A caixa da luta desse jogador; sem luta (alguém levado por comando), a da vaga onde a entidade está. */
@@ -120,7 +123,10 @@ public final class RegrasArena {
         Vetor centro = caixa.centro();
         BlockPos piso = BlockPos.containing(centro.x(), CaixaArena.Y_PATIO - 1, centro.z());
         for (BlockPos p : BlockPos.betweenClosed(piso.offset(-2, 0, -2), piso.offset(2, 0, 2))) {
-            arena.setBlockAndUpdate(p, ObrasArena.estado(PlantaEscola.Material.TIJOLO_PEDRA));
+            // Só o que foi destruído: o chão que sobrou é do cenário (cada boss tem o seu).
+            if (arena.getBlockState(p).getCollisionShape(arena, p).isEmpty()) {
+                arena.setBlockAndUpdate(p, ObrasArena.estado(PlantaEscola.Material.TIJOLO_PEDRA));
+            }
         }
         // E espaço para ficar de pé, caso o centro esteja entulhado.
         for (BlockPos p : BlockPos.betweenClosed(piso.offset(-1, 1, -1), piso.offset(1, 3, 1))) {

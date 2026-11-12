@@ -55,6 +55,16 @@ final class RenderVisuaisIchigo {
             switch (v.tipo) {
                 case "ichigo_getsuga" -> getsuga(camera, v, o, t, false);
                 case "ichigo_getsuga_negro" -> getsuga(camera, v, o, t, true);
+                case "ichigo_getsuga_branco" -> {
+                    branco = true;
+                    getsuga(camera, v, o, t, true);
+                }
+                case "ichigo_arremesso_branco" -> {
+                    branco = true;
+                    arremesso(camera, parcial, v, o, t);
+                }
+                case "ichigo_cero_carga" -> ceroCarga(v, o, t, sai);
+                case "ichigo_cero" -> cero(v, o, t);
                 case "ichigo_corte" -> corte(v, o, t);
                 case "ichigo_carga" -> carga(camera, parcial, v, t, sai, false);
                 case "ichigo_bankai_carga" -> carga(camera, parcial, v, t, sai, true);
@@ -74,6 +84,7 @@ final class RenderVisuaisIchigo {
                 }
             }
         } finally {
+            branco = false;
             if (buffer != null) {
                 // Um desenho falhou no meio do lote: joga fora o que estava pela metade.
                 MeshData resto = buffer.build();
@@ -238,6 +249,17 @@ final class RenderVisuaisIchigo {
 
     // ---------------------------------------------------------------- Getsuga Tenshō
 
+    /** Ligado enquanto se desenha um golpe do Zangetsu interior: o preto do Bankai vira branco. */
+    private static boolean branco;
+
+    private static int negro() {
+        return branco ? 0xF4F4F8 : NEGRO;
+    }
+
+    private static int tinta() {
+        return branco ? 0xC9CAD6 : TINTA;
+    }
+
     private static void getsuga(Vec3 camera, VisuaisAtivos.Visual v, Vec3 o, double t, boolean bankai) {
         Base b = Base.de(vec(v.direcao));
         // Parou onde o servidor avisou (bloco) ou no alcance máximo; depois se parte em lascas.
@@ -274,12 +296,12 @@ final class RenderVisuaisIchigo {
                 double tk = t - k * 1.5;
                 if (tk <= 0) continue;
                 Vec3 recuo = b.frente.scale(GetsugaIchigo.distancia(Math.min(tk, fim), bankai) - andou);
-                malha(vol, null, null, recuo, bankai ? TINTA : AZUL, (bankai ? (k == 1 ? .6f : .32f) : (k == 1 ? .34f : .15f)) * ac);
+                malha(vol, null, null, recuo, bankai ? tinta() : AZUL, (bankai ? (k == 1 ? .6f : .32f) : (k == 1 ? .34f : .15f)) * ac);
             }
             fechar();
             // O corpo: opaco e com luz no Bankai, quase branco no Shikai.
             abrir(false, ac > .9f);
-            malha(vol, lum, null, Vec3.ZERO, bankai ? NEGRO : BRANCO, bankai ? ac : ac * .92f);
+            malha(vol, lum, null, Vec3.ZERO, bankai ? negro() : BRANCO, bankai ? ac : ac * .92f);
             fechar();
             abrir(true, false);
             // A borda de raspão dá o contorno de qualquer ângulo.
@@ -298,7 +320,7 @@ final class RenderVisuaisIchigo {
             fechar();
             // Chamas saindo do dorso: azuis somando luz, ou de tinta com um fio vermelho.
             abrir(!bankai, false);
-            chamas(c, b, e, t, bankai, bankai ? .15 : .11, bankai ? TINTA : AZUL, ac);
+            chamas(c, b, e, t, bankai, bankai ? .15 : .11, bankai ? tinta() : AZUL, ac);
             fechar();
             if (bankai) {
                 abrir(true, false);
@@ -310,7 +332,7 @@ final class RenderVisuaisIchigo {
             double tam = .14 * (1 - dis * .6);
             abrir(false, false);
             for (int k = 0; k < GetsugaIchigo.LASCAS; k++) {
-                caixa(c.add(b.em(GetsugaIchigo.lasca(k, t, fim, bankai), e)), tam, tam * .6, tam, bankai ? NEGRO : BRANCO, a);
+                caixa(c.add(b.em(GetsugaIchigo.lasca(k, t, fim, bankai), e)), tam, tam * .6, tam, bankai ? negro() : BRANCO, a);
             }
             fechar();
             abrir(true, false);
@@ -622,13 +644,14 @@ final class RenderVisuaisIchigo {
     /** A Zangetsu em cor chapada: cabo claro, lâmina escura de dorso reto e o fio branco. */
     private static void espada(Vec3 p, Vec3 eixo, Vec3 fio, Vec3 fora) {
         tira(p, eixo, fio, -.45, -.05, -.05, .05, MARFIM);
-        tira(p, eixo, fio, -.05, 1.2, -.17, .05, 0x1A1529);
-        tira(p, eixo, fio, -.05, 1.2, .05, .17, FIO);
+        int lamina = branco ? 0xECECF2 : 0x1A1529, gume = branco ? 0x1A1529 : FIO;
+        tira(p, eixo, fio, -.05, 1.2, -.17, .05, lamina);
+        tira(p, eixo, fio, -.05, 1.2, .05, .17, gume);
         // A ponta: o dorso segue reto e o fio sobe até ele.
         quad(em(p, eixo, fio, 1.2, -.17), em(p, eixo, fio, 1.45, -.17), em(p, eixo, fio, 1.45, -.15), em(p, eixo, fio, 1.2, .05),
-                0x1A1529, 1);
+                lamina, 1);
         quad(em(p, eixo, fio, 1.2, .05), em(p, eixo, fio, 1.45, -.15), em(p, eixo, fio, 1.45, -.13), em(p, eixo, fio, 1.2, .17),
-                FIO, 1);
+                gume, 1);
         // A espessura, para a lâmina não sumir vista de perfil.
         tira(p, eixo, fora, -.45, 1.4, -.03, .03, 0x2A2438);
     }
@@ -639,6 +662,41 @@ final class RenderVisuaisIchigo {
 
     private static void tira(Vec3 p, Vec3 eixo, Vec3 fio, double de, double ate, double f0, double f1, int cor) {
         quad(em(p, eixo, fio, de, f0), em(p, eixo, fio, ate, f0), em(p, eixo, fio, ate, f1), em(p, eixo, fio, de, f1), cor, 1);
+    }
+
+    // ---------------------------------------------------------------- Cero (Zangetsu interior)
+
+    /** O Cero se juntando na mão: uma esfera carmesim que cresce, com o miolo branco e fios de reiatsu puxados para ela. */
+    private static void ceroCarga(VisuaisAtivos.Visual v, Vec3 o, double t, float sai) {
+        double p = v.duracao <= 0 ? 1 : Mth.clamp(t / v.duracao, 0, 1);
+        Base b = Base.de(vec(v.direcao));
+        Vec3 c = o.add(b.frente.scale(.8));
+        abrir(true, false);
+        halo(c, .35 + 1.1 * p, RUBRO, .55f * sai);
+        halo(c, .15 + .45 * p, BRANCO, .9f * sai);
+        for (int k = 0; k < 8; k++) {
+            double ang = k * Math.PI / 4 + t * .35, fase = (t * .12 + acaso(k)) % 1, r = 1.7 * (1 - fase);
+            Vec3 q = c.add(b.lado.scale(Math.cos(ang) * r)).add(b.cima.scale(Math.sin(ang) * r));
+            fita(q, c, .05, RUBRO, 0f, (float) (.75 * fase) * sai);
+        }
+        fechar();
+    }
+
+    /** O raio: carmesim com o miolo branco, da mão até onde o servidor disse; afina e some. */
+    private static void cero(VisuaisAtivos.Visual v, Vec3 o, double t) {
+        Base b = Base.de(vec(v.direcao));
+        double p = Mth.clamp(t / Math.max(1, v.duracao), 0, 1);
+        float a = (float) (1 - p * p);
+        double grossura = 1.1 * (1 - .7 * p);
+        Vec3 fim = o.add(b.frente.scale(v.forca));
+        abrir(true, false);
+        fita(o, fim, grossura * 2.2, RUBRO, a * .35f, a * .35f);
+        fita(o, fim, grossura, RUBRO, a, a);
+        fita(o, fim, grossura * .45, BRANCO, a, a);
+        halo(o, 1.6 * (1 - .5 * p), RUBRO, a * .8f);
+        halo(fim, 2.2 * (1 - .4 * p), RUBRO, a * .7f);
+        halo(fim, 1.0, BRANCO, a * .8f);
+        fechar();
     }
 
     // ---------------------------------------------------------------- Bankai

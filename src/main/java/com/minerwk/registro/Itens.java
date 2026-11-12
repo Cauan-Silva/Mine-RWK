@@ -27,8 +27,15 @@ public final class Itens {
     public static final DeferredItem<com.minerwk.boss.ContratoToji> CONTRATO_TOJI =
             REGISTRO.register("contrato_toji", com.minerwk.boss.ContratoToji::new);
 
+    /** Leva ao Zangetsu interior; feita na bancada com osso, pérola do Ender e espada de ferro. */
+    public static final DeferredItem<com.minerwk.boss.MascaraRachada> MASCARA_RACHADA =
+            REGISTRO.register("mascara_rachada", com.minerwk.boss.MascaraRachada::new);
+
     public static void naAbaCriativa(net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent evento) {
-        if (evento.getTabKey() == net.minecraft.world.item.CreativeModeTabs.COMBAT) evento.accept(CONTRATO_TOJI.get());
+        if (evento.getTabKey() == net.minecraft.world.item.CreativeModeTabs.COMBAT) {
+            evento.accept(CONTRATO_TOJI.get());
+            evento.accept(MASCARA_RACHADA.get());
+        }
     }
 
     private Itens() {

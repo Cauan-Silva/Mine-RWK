@@ -24,6 +24,18 @@ Voltar para [[00 Início]].
 - Gojo (revisão 09/11, menores que ficaram): o Roxo pode derrubar plantas vizinhas (o `BreakEvent` para mods de proteção entrou em 09/11, no Gojo peso); o Vermelho atravessa parede fina encostada no rosto; bola de fogo e crânio de Wither voltam a acelerar no Infinito (o dano é cancelado mesmo assim); TNT sem dono passa pelo Infinito; sobram até 2 ticks de Infinito e 5 de Paralisia depois de morrer. Corrigidos na revisão: efeitos acabam ao mudar de dimensão; golpes não atingem pets, montaria nem projéteis do próprio Gojo; Paralisia não cancela Espinhos nem dano em si mesmo; ícone da Paralisia escondido (falta textura).
 
 ## Para testar no jogo
+- Ichigo, parte 7 (12/11): **ver primeiro a prévia** `previas/ichigo_parte7_zangetsu.mp4` (a luta inteira, gravada por `./gradlew runClientDemo -Pdemo=zangetsu`). No jogo:
+  - **Árvore (H):** os 13 nós do Ichigo. Os seis primeiros e o Despertar (5 pontos, maestria 20) abrem logo; os outros seis só depois de vencer o Zangetsu. Os números de cada nó foram escolha minha: conferir se algum pesa demais ou de menos.
+  - **Máscara Rachada:** a receita sem forma (osso, pérola do Ender, espada de ferro) e as recusas (outro personagem, sem o nó, já na arena). Ela é gasta só quando a luta começa? Para pular os requisitos: `/rwk zangetsu <jogador>`.
+  - **Mundo interior:** o chão é a fachada de um prédio deitado, com janelas de vidro azul, e há três prédios em volta. Lê como "prédios de lado"? O céu é o entardecer da dimensão das arenas, não o azul do spec: trocar pede uma dimensão própria; vale a pena?
+  - **A chegada:** ele espera 2 s parado e depois faz a entrada (2 s) com a fala. Na prévia a tela de carregamento comeu a entrada inteira; ver se no jogo normal dá tempo de vê-la. Se não der, a saída é o cliente avisar o servidor quando terminou de carregar.
+  - **Os golpes:** corte de perto (setor no chão), Getsuga branco (linha de aviso), Shunpo (some e surge atrás, com a sombra), espada arremessada (linha curta; ele fica sem espada até ela voltar) e Cero (carga na cara e o raio vermelho). Dá para ler e desviar de cada um? Ele fica colado demais no jogador?
+  - **A queda:** o golpe que mataria derruba; a cutscene curta, a máscara no rosto, e o jogador se levanta de vida cheia, em Bankai, de máscara e com os golpes trancados liberados. Só vale uma vez por luta: da segunda vez o jogador morre.
+  - **A máscara dele:** abaixo de 40% da vida ele veste a máscara, anda e ataca mais rápido, e o Getsuga vem em três, cada um mirado de novo.
+  - **Fim:** vencer dá 500 de XP de maestria, o despertar de vez e nenhum item, e devolve o jogador para onde estava. Morrer, sair ou deixar o tempo acabar tranca tudo de novo.
+  - **Perder de máscara:** quem perde a luta depois da queda volta ao mundo ainda em Bankai e com a máscara no rosto até ela acabar (uns segundos), embora os golpes voltem a trancar. Incomoda? Dá para tirar a máscara na hora.
+  - **Máscara Rachada devolvida:** ela volta ao inventário se o Zangetsu não conseguir entrar; mas quem morre ou sai do jogo nos poucos segundos em que a arena é montada ainda a perde.
+  - **Som:** o Cero usa por enquanto a carga do Bankai e a onda; o boss usa os sons do Ichigo. Sons próprios ficam para a parte 8, se o autor quiser.
 - Mugetsu fino e longo (12/11), prévia em `previas/ichigo_mugetsu.mp4`:
   - O véu agora tem 3 de largura, 40 de altura e 150 de alcance. A largura está fina o bastante? O topo aparece como pontas (uma cortina a cada 3 blocos); agrada ou prefere liso?
   - Com 3 de largura é preciso mirar: testar se dá para acertar um alvo andando. Ele também pega quem está voando até 40 blocos acima.

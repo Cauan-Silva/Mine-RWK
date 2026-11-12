@@ -40,11 +40,13 @@ public final class SonsIchigo {
         return Optional.ofNullable(switch (tipo) {
             case "ichigo_carga" -> GETSUGA_CARGA;
             case "ichigo_getsuga" -> GETSUGA;
-            case "ichigo_getsuga_negro" -> GETSUGA_NEGRO;
+            // Os golpes do Zangetsu interior são os do Ichigo, em branco: soam igual.
+            case "ichigo_getsuga_negro", "ichigo_getsuga_branco" -> GETSUGA_NEGRO;
             case "ichigo_shunpo", "ichigo_shunpo_bankai" -> SHUNPO;
-            case "ichigo_onda" -> ONDA;
-            case "ichigo_arremesso" -> ARREMESSO;
-            case "ichigo_bankai_carga" -> BANKAI_CARGA;
+            // O Cero do boss usa, por enquanto, o reiatsu se juntando e o estouro da onda (o som próprio vem na parte 8).
+            case "ichigo_onda", "ichigo_cero" -> ONDA;
+            case "ichigo_arremesso", "ichigo_arremesso_branco" -> ARREMESSO;
+            case "ichigo_bankai_carga", "ichigo_cero_carga" -> BANKAI_CARGA;
             case "ichigo_bankai" -> BANKAI;
             case "ichigo_lamina" -> LAMINA;
             case "ichigo_sair" -> SAIR;
@@ -64,7 +66,7 @@ public final class SonsIchigo {
      */
     public static boolean cortaComOVisual(String tipo) {
         return tipo.equals("ichigo_carga") || tipo.equals("ichigo_bankai_carga") || tipo.equals("ichigo_lamina")
-                || tipo.equals("ichigo_mugetsu_carga");
+                || tipo.equals("ichigo_mugetsu_carga") || tipo.equals("ichigo_cero_carga");
     }
 
     /** A máscara começa a quebrar esses ticks antes de sumir: o último estalo cai quando ela some. */

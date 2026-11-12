@@ -466,6 +466,16 @@ class IchigoTest {
         assertEquals(840, sem.duracao(), "60 s menos 30%");
     }
 
+    @Test
+    void noMeioDaLutaContraOZangetsuAMascaraSeFormaSemCustoEJaNoBankai() {
+        double antes = kit.recurso().atual();
+        Ichigo.vestirAMascara(ctx);
+        assertEquals(Reiatsu.BANKAI, kit.forma(), "do Shikai ele vai direto ao Bankai");
+        assertTrue(kit.efeitos().stream().anyMatch(e -> e instanceof Ichigo.MascaraAtiva));
+        assertTrue(ctx.visuais.contains("ichigo_mascara"));
+        assertEquals(antes, kit.recurso().atual(), 1e-9, "sem custo");
+    }
+
     private void bankaiDesperto() {
         kit.definirDesperto(true);
         entrarNoBankai();

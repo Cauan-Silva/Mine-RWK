@@ -74,6 +74,15 @@ public final class Ichigo {
         return Reiatsu.BANKAI.equals(ctx.forma());
     }
 
+    /**
+     * O meio da luta contra o Zangetsu interior: o Ichigo entra no Bankai, se não estava, e a máscara Hollow
+     * se forma nele sem gesto nem custo.
+     */
+    public static void vestirAMascara(Contexto ctx) {
+        if (!noBankai(ctx)) ctx.mudarForma(Reiatsu.BANKAI);
+        new MascaraHollow().aoDisparar(ctx, 1f);
+    }
+
     private static boolean mascarado(Contexto ctx) {
         return ctx.efeitoAtivo(MascaraAtiva.class);
     }

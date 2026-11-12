@@ -53,6 +53,9 @@ public final class CutsceneCliente {
             // O despertar no meio da luta contra o Toji: só quem caiu assiste; nenhum visual a corta.
             CutsceneDespertar.ID, new Roteiro(CutsceneDespertar.COREOGRAFIA, CutsceneDespertar.PALAVRAS,
                     "", false, false, -1),
+            // A queda no meio da luta contra o Zangetsu interior: só quem caiu assiste.
+            com.minerwk.core.boss.CutsceneMascara.ID, new Roteiro(com.minerwk.core.boss.CutsceneMascara.COREOGRAFIA,
+                    com.minerwk.core.boss.CutsceneMascara.PALAVRAS, "", false, false, -1),
             // O Mugetsu do Ichigo: uma parte só, da carga ao véu. Quem a corta é o próprio golpe, se for
             // interrompido (ele manda o fim da cutscene); o visual da carga acabar no corte não a encerra.
             com.minerwk.core.personagens.ichigo.CutsceneMugetsu.ID, new Roteiro(
