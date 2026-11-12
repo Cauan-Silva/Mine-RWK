@@ -36,6 +36,13 @@ class IchigoTest {
         /** Um inimigo parado aqui (ou null = ninguém). */
         Vetor inimigoEm;
         Object alvoMarcado;
+        /** O inimigo mais próximo que a forma Hollow acha (ou null). */
+        Object proximo;
+        final List<Float> feridos = new ArrayList<>(), vidas = new ArrayList<>(), curas = new ArrayList<>();
+        public Object inimigoProximo(double raio) { return proximo; }
+        public void ferir(Object alvo, float dano) { feridos.add(dano); }
+        public void vida(float v) { vidas.add(v); }
+        public void curar(float v) { curas.add(v); }
         Vetor posAlvo;
         Arma arma;
         Vetor direcaoDoPasso;
@@ -775,5 +782,153 @@ class IchigoTest {
         // A do Mugetsu cobre a carga inteira e o corte: 6 s e mais o gesto final.
         var anim = com.google.gson.JsonParser.parseString(arquivo).getAsJsonObject().getAsJsonObject("animations");
         assertTrue(anim.getAsJsonObject("ichigo_mugetsu").get("animation_length").getAsDouble() >= Ichigo.Mugetsu.CARGA / 20.0 + .5);
+    }
+
+    // --- A forma Hollow completa ---
+
+    private void virarHollow() {
+        bankaiDesperto();
+        Ichigo.virarHollow(ctx);
+    }
+
+    @Test
+    void hollowSoTomaOCorpoNoBankaiDespertoComAPassivaProntaEForaDaArena() {
+        assertTrue(Ichigo.podeVirarHollow(Reiatsu.BANKAI, true, true, false));
+        assertFalse(Ichigo.podeVirarHollow(Forma.BASE, true, true, false), "no Shikai o golpe mata");
+        assertFalse(Ichigo.podeVirarHollow(Reiatsu.BANKAI, false, true, false), "antes de vencer o Zangetsu");
+        assertFalse(Ichigo.podeVirarHollow(Reiatsu.BANKAI, true, false, false), "em recarga");
+        assertFalse(Ichigo.podeVirarHollow(Reiatsu.BANKAI, true, true, true), "na arena do boss");
+        assertFalse(Ichigo.podeVirarHollow(Reiatsu.HOLLOW, true, true, false), "já está na forma");
+    }
+
+    @Test
+    void golpeFatalNoBankaiViraHollowComOnzeDeVidaERecargaDeCincoMinutos() {
+        virarHollow();
+        assertEquals(Reiatsu.HOLLOW, kit.forma());
+        assertEquals(List.of(1f), ctx.vidas, "fica com 1 de vida");
+        assertEquals(List.of(10f), ctx.curas, "e cura 10");
+        assertEquals(6000, kit.recargas().restante(Ichigo.PASSIVA_HOLLOW, agora));
+        ticks(1);
+        assertTrue(ctx.visuais.contains("ichigo_hollow"));
+        assertTrue(kit.efeitos().stream().anyMatch(e -> e instanceof Ichigo.FormaHollow));
+    }
+
+    @Test
+    void naFormaHollowAsTeclasEOAtaqueBasicoNaoRespondemEOReiatsuNaoMuda() {
+        virarHollow();
+        double reiatsu = kit.recurso().atual();
+        ticks(60);
+        for (Tecla tecla : Tecla.values()) assertFalse(kit.apertar(tecla, agora), "tecla " + tecla);
+        assertEquals(0f, ctx.arma.dano(), "o clique não fere");
+        assertEquals(reiatsu, kit.recurso().atual(), 1e-9);
+        assertEquals(Reiatsu.HOLLOW, kit.forma(), "sem reiatsu drenando, a forma não cai antes da hora");
+    }
+
+    @Test
+    void hollowDaGarraEmQuemEstaAteQuatroBlocos() {
+        ctx.proximo = "alvo";
+        ctx.posAlvo = new Vetor(3, 0, 0);
+        virarHollow();
+        ticks(Ichigo.FormaHollow.PRIMEIRO_ATO + 1);
+        assertEquals(List.of(8f), ctx.feridos);
+        assertTrue(ctx.visuais.contains("ichigo_hollow_garra"));
+        assertEquals(new Vetor(3, 0, 0), ctx.encarado, "vira para o alvo");
+        ticks(Ichigo.FormaHollow.INTERVALO);
+        assertEquals(List.of(8f, 8f), ctx.feridos, "uma a cada 30 ticks");
+    }
+
+    @Test
+    void hollowUsaOSonidoParaChegarEmQuemEstaLonge() {
+        ctx.proximo = "alvo";
+        ctx.posAlvo = new Vetor(15, 0, 0);
+        virarHollow();
+        ticks(Ichigo.FormaHollow.PRIMEIRO_ATO + 1);
+        assertTrue(ctx.feridos.isEmpty(), "longe demais para a garra");
+        assertEquals(15 - Ichigo.FormaHollow.JUNTO_DO_ALVO, ctx.distanciaDoPasso, 1e-9);
+        assertEquals(1, ctx.direcaoDoPasso.x(), 1e-9);
+        assertTrue(ctx.visuais.contains("ichigo_hollow_sonido"));
+    }
+
+    @Test
+    void hollowSemInimigoPorPertoSoEspera() {
+        virarHollow();
+        ticks(100);
+        assertTrue(ctx.feridos.isEmpty());
+        assertFalse(ctx.chamadas.contains("deslocar"));
+    }
+
+    @Test
+    void aosSeisSegundosOHollowDisparaOCeroDeDezoitoDeDano() {
+        ctx.proximo = "alvo";
+        ctx.posAlvo = new Vetor(12, .55, 0);
+        ctx.inimigoEm = new Vetor(12, .55, 0);
+        virarHollow();
+        ticks(Ichigo.FormaHollow.CERO_EM + 1);
+        assertTrue(ctx.visuais.contains("ichigo_hollow_cero_carga"));
+        assertFalse(ctx.danos.contains(18f), "a carga leva 20 ticks");
+        ticks(Ichigo.FormaHollow.CERO_CARGA);
+        assertTrue(ctx.visuais.contains("ichigo_hollow_cero"));
+        assertEquals(List.of(18f), ctx.danos);
+        double maisLonge = ctx.pontosDeDano.stream().mapToDouble(Vetor::x).max().orElse(0);
+        assertEquals(24, maisLonge, 1, "o feixe tem 24 blocos");
+    }
+
+    @Test
+    void oCeroParaNaParede() {
+        ctx.proximo = "alvo";
+        ctx.posAlvo = new Vetor(12, .55, 0);
+        ctx.inimigoEm = new Vetor(12, .55, 0);
+        ctx.paredeEm = v -> v.x() > 8;
+        virarHollow();
+        ticks(Ichigo.FormaHollow.CERO_EM + Ichigo.FormaHollow.CERO_CARGA + 1);
+        assertTrue(ctx.danos.isEmpty(), "o alvo está atrás da parede");
+    }
+
+    @Test
+    void aoAcabarOHollowVoltaAoShikaiComSeisDeVidaEOBankaiEmRecarga() {
+        virarHollow();
+        ticks(Ichigo.FormaHollow.DURACAO + 1);
+        assertEquals(Forma.BASE, kit.forma());
+        assertEquals(6f, ctx.vidas.get(ctx.vidas.size() - 1));
+        assertTrue(ctx.fins.contains("ichigo_hollow"));
+        long falta = kit.recargas().restante(Ichigo.ENTRAR_NO_BANKAI, agora);
+        assertTrue(falta > 390 && falta <= 400, "G em recarga de 20 s: " + falta);
+        assertFalse(kit.efeitos().stream().anyMatch(e -> e instanceof Ichigo.FormaHollow));
+    }
+
+    @Test
+    void formaHollowSemOEfeitoAcabaComOMesmoCusto() {
+        // Quem saiu do jogo ou trocou de dimensão no meio da forma volta sem o efeito, que não é salvo.
+        kit.mudarForma(Reiatsu.HOLLOW, ctx);
+        ticks(1);
+        assertEquals(Forma.BASE, kit.forma());
+        assertEquals(List.of(6f), ctx.vidas, "6 de vida, como no fim normal");
+        assertFalse(kit.recargas().pronta(Ichigo.ENTRAR_NO_BANKAI, agora), "e o G em recarga");
+        assertTrue(ctx.fins.contains("ichigo_hollow"), "o visual da forma é encerrado");
+    }
+
+    @Test
+    void aFormaDuraDuzentosTicksComSeisGarrasEUmCeroSo() {
+        ctx.proximo = "alvo";
+        ctx.posAlvo = new Vetor(3, 0, 0);
+        virarHollow();
+        ticks(Ichigo.FormaHollow.DURACAO - 1);
+        assertEquals(Reiatsu.HOLLOW, kit.forma(), "no tick 199 ainda é o Hollow");
+        // Garras aos 15, 45, 75, 105, 165 e 195: a de 135 cairia em cima do Cero.
+        assertEquals(6, ctx.feridos.size());
+        assertEquals(1, ctx.visuais.stream().filter("ichigo_hollow_cero"::equals).count());
+        assertEquals(1, ctx.visuais.stream().filter("ichigo_hollow_cero_carga"::equals).count());
+        ticks(1);
+        assertEquals(Forma.BASE, kit.forma(), "e acaba no 200");
+    }
+
+    @Test
+    void oCeroPegaQuemEstaColado() {
+        ctx.proximo = "alvo";
+        ctx.posAlvo = new Vetor(.5, .55, 0);
+        ctx.inimigoEm = new Vetor(.5, .55, 0);
+        virarHollow();
+        ticks(Ichigo.FormaHollow.CERO_EM + Ichigo.FormaHollow.CERO_CARGA + 1);
+        assertEquals(List.of(18f), ctx.danos);
     }
 }

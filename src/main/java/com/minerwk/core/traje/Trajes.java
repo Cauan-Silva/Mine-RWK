@@ -12,6 +12,7 @@ public final class Trajes {
     public static Optional<String> de(String personagem, String forma) {
         if ("gojo".equals(personagem)) return Optional.of("gojo");
         if ("ichigo".equals(personagem)) {
+            if (Reiatsu.HOLLOW.equals(forma)) return Optional.of(TrajeIchigo.HOLLOW);
             return Optional.of(Reiatsu.BANKAI.equals(forma) ? TrajeIchigo.BANKAI : TrajeIchigo.SHIKAI);
         }
         return Optional.empty();

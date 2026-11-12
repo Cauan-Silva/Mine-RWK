@@ -11,6 +11,8 @@ import com.minerwk.core.kit.Recurso;
 public final class Reiatsu implements Recurso {
     /** Id da forma do Bankai (as habilidades dela entram com o kit). */
     public static final String BANKAI = "bankai";
+    /** Id da forma Hollow completa: nela o reiatsu não sobe nem desce. */
+    public static final String HOLLOW = "hollow";
     public static final double MAXIMO = 200;
     /** Por tick no Shikai: 1,5 por segundo. */
     public static final double GANHO = 1.5 / 20;
@@ -38,6 +40,7 @@ public final class Reiatsu implements Recurso {
     private int semDreno;
     /** Ticks que faltam do selo. */
     private int selado;
+    private boolean hollow;
     /** O que o Bankai drenou no último tick: uma pausa pedida nesse tick devolve isso. */
     private double ultimoDreno;
     /** Ticks desde o último golpe recebido; começa calmo. */
@@ -54,6 +57,7 @@ public final class Reiatsu implements Recurso {
     @Override
     public void forma(String forma) {
         bankai = BANKAI.equals(forma);
+        hollow = HOLLOW.equals(forma);
         // A pausa é de quem está no Bankai: sair dele a desfaz.
         if (!bankai) semDreno = 0;
         ultimoDreno = 0;
@@ -113,6 +117,7 @@ public final class Reiatsu implements Recurso {
     public void tick(EstadoDoJogador estado) {
         semApanhar = estado.apanhou() ? 0 : Math.min(CALMA, semApanhar + 1);
         ultimoDreno = 0;
+        if (hollow) return;
         if (selado > 0) {
             selado--;
             atual = 0;

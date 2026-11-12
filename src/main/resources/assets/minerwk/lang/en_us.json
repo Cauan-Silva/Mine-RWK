@@ -47,6 +47,7 @@
   "habilidade.minerwk.ichigo_sair_bankai": "Seal Bankai",
   "habilidade.minerwk.ichigo_sair_bankai.desc": "Back to Shikai. Bankai cannot return for 5 s.",
   "forma.minerwk.bankai": "Bankai",
+  "forma.minerwk.hollow": "Hollow Form",
   "habilidade.minerwk.gojo_azul": "Blue",
   "habilidade.minerwk.gojo_azul.desc": "Creates a point of attraction that pulls in and crushes everything.",
   "habilidade.minerwk.gojo_vermelho": "Red",
@@ -231,8 +232,13 @@
   "subtitles.minerwk.ichigo_poderes_perdidos": "Ichigo's reiatsu fades away",
   "subtitles.minerwk.ichigo_poderes_voltam": "Ichigo's reiatsu returns",
   "item.minerwk.traje_ichigo_mugetsu": "Ichigo's final form",
+  "item.minerwk.traje_ichigo_hollow": "Ichigo's Hollow form",
   "cutscene.minerwk.ichigo_mugetsu.1": "The Final Getsuga Tenshō",
   "cutscene.minerwk.ichigo_mugetsu.1.jp": "最後の月牙天衝",
   "cutscene.minerwk.ichigo_mugetsu.2": "Mugetsu",
-  "cutscene.minerwk.ichigo_mugetsu.2.jp": "無月"
+  "cutscene.minerwk.ichigo_mugetsu.2.jp": "無月",
+  "subtitles.minerwk.ichigo_hollow": "The Hollow takes over and roars",
+  "subtitles.minerwk.ichigo_hollow_garra": "Claws tear the air",
+  "subtitles.minerwk.ichigo_cero_carga": "A Cero gathers",
+  "subtitles.minerwk.ichigo_cero": "The Cero fires"
 }

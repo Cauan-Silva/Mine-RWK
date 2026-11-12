@@ -51,7 +51,8 @@ public record PersonagemEscolha(String id, String nome, String obra, List<GolpeE
         for (com.minerwk.core.kit.Forma f : p.transformacoes()) {
             List<GolpeEscolha> daForma = new ArrayList<>();
             for (Tecla t : Tecla.values()) f.naTecla(t).ifPresent(h -> daForma.add(new GolpeEscolha(t, h.id())));
-            formas.add(new FormaEscolha(f.id(), daForma));
+            // Forma sem golpe em tecla (a Hollow do Ichigo, que ataca sozinha) não entra na tela de escolha.
+            if (!daForma.isEmpty()) formas.add(new FormaEscolha(f.id(), daForma));
         }
         return new PersonagemEscolha(p.id(), p.nome(), p.obra(), golpes, formas);
     }

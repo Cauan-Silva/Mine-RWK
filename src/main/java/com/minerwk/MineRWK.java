@@ -47,6 +47,7 @@ public final class MineRWK {
         ServicoKits.registrarEventos();
         com.minerwk.kit.ArmaServidor.registrarEventos();
         ProtecoesServidor.registrarEventos();
+        com.minerwk.kit.HollowServidor.registrarEventos();
         // Depois das proteções: um golpe que o Infinito parou não chega à luta do Toji.
         com.minerwk.boss.LutasToji.registrarEventos();
         com.minerwk.boss.LutasZangetsu.registrarEventos();

@@ -268,4 +268,99 @@ public final class TestesIchigo {
         helper.assertTrue(outro.atual() == 0 && !outro.pode(1), "ao voltar ele continua sem reiatsu");
         helper.succeed();
     }
+
+    // --- A forma Hollow completa ---
+
+    private static boolean hollow(KitDoJogador kit) {
+        return Reiatsu.HOLLOW.equals(kit.forma());
+    }
+
+    @GameTest(template = "vazio")
+    public static void golpeFatalNoBankaiViraAFormaHollow(GameTestHelper helper) {
+        ServerPlayer jogador = ichigo(helper);
+        KitDoJogador kit = bankaiDesperto(jogador);
+        jogador.setHealth(5);
+        jogador.hurt(jogador.damageSources().generic(), 50);
+        helper.assertTrue(jogador.isAlive() && hollow(kit), "em vez de morrer, vira o Hollow");
+        helper.assertTrue(perto(jogador.getHealth(), 11), "1 de vida mais 10 de cura: " + jogador.getHealth());
+        helper.assertFalse(kit.recargas().pronta(Ichigo.PASSIVA_HOLLOW, jogador.level().getGameTime()), "a passiva entra em recarga");
+        // Na forma: metade do dano, e nada o mata.
+        jogador.invulnerableTime = 0;
+        jogador.hurt(jogador.damageSources().generic(), 4);
+        helper.assertTrue(perto(jogador.getHealth(), 9), "4 de dano viram 2: " + jogador.getHealth());
+        jogador.invulnerableTime = 0;
+        jogador.hurt(jogador.damageSources().generic(), 500);
+        helper.assertTrue(jogador.isAlive() && perto(jogador.getHealth(), 1), "o que mataria o deixa com 1");
+        // Um golpe que a armadura segura não gasta a forma: conta o dano que chegaria à vida.
+        ServerPlayer blindadoDeBankai = ichigo(helper);
+        KitDoJogador outro = bankaiDesperto(blindadoDeBankai);
+        blindadoDeBankai.getAttribute(Attributes.ARMOR).setBaseValue(20);
+        blindadoDeBankai.setHealth(10);
+        blindadoDeBankai.hurt(blindadoDeBankai.damageSources().cactus(), 12);
+        helper.assertTrue(!hollow(outro) && blindadoDeBankai.getHealth() < 10 && blindadoDeBankai.getHealth() > 1,
+                "12 de dano com armadura não mata quem tem 10: " + blindadoDeBankai.getHealth());
+        ServicoKits.usarTecla(jogador, Tecla.Z, true);
+        ticks(jogador, 3);
+        helper.assertTrue(kit.execucao().isEmpty(), "as teclas não respondem");
+        helper.succeed();
+    }
+
+    @GameTest(template = "vazio")
+    public static void formaHollowSoValeNoBankaiDespertoEUmaVezPorRecarga(GameTestHelper helper) {
+        ServerPlayer jogador = ichigo(helper);
+        ServicoKits.definirDespertou(jogador, false);
+        KitDoJogador kit = ServicoKits.kit(jogador).orElseThrow();
+        kit.mudarForma(Reiatsu.BANKAI, new ContextoServidor(jogador));
+        jogador.setHealth(5);
+        helper.assertFalse(Ichigo.podeVirarHollow(kit.forma(), ServicoKits.dados(jogador).maestriaAtual().despertou, true, false),
+                "sem vencer o Zangetsu não há forma Hollow");
+        ServicoKits.definirDespertou(jogador, true);
+        kit.recargas().iniciar(Ichigo.PASSIVA_HOLLOW, jogador.level().getGameTime(), 100);
+        // O jogador de teste não pode morrer de verdade (não tem conexão): confere-se a regra com o estado real.
+        boolean pronta = kit.recargas().pronta(Ichigo.PASSIVA_HOLLOW, jogador.level().getGameTime());
+        helper.assertFalse(Ichigo.podeVirarHollow(kit.forma(), true, pronta, false), "com a passiva em recarga o golpe mata");
+        // Fora do Bankai também: um golpe que não mata passa inteiro e não vira nada.
+        kit.recargas().limpar();
+        kit.mudarForma(Forma.BASE, new ContextoServidor(jogador));
+        jogador.hurt(jogador.damageSources().generic(), 2);
+        helper.assertTrue(!hollow(kit) && perto(jogador.getHealth(), 3), "no Shikai o dano é o normal: " + jogador.getHealth());
+        helper.succeed();
+    }
+
+    @GameTest(template = "vazio", timeoutTicks = 100)
+    public static void formaHollowAtacaSozinhaEVoltaAoShikaiComSeisDeVida(GameTestHelper helper) {
+        ServerPlayer jogador = ichigo(helper);
+        KitDoJogador kit = bankaiDesperto(jogador);
+        var alvo = blindado(helper, 3, 1);
+        alvo.getAttribute(Attributes.ARMOR).setBaseValue(0);
+        alvo.getAttribute(Attributes.ARMOR_TOUGHNESS).setBaseValue(0);
+        // A forma só vai atrás de inimigo: monstro, ou quem está atrás do Ichigo.
+        var vaca = net.minecraft.world.entity.EntityType.COW.create(helper.getLevel());
+        // Atrás dele, do lado oposto ao alvo: fora do caminho do Cero, que pega quem estiver na linha.
+        var paraTras = jogador.position().subtract(alvo.position()).multiply(1, 0, 1).normalize().scale(1.5);
+        vaca.moveTo(jogador.getX() + paraTras.x, jogador.getY(), jogador.getZ() + paraTras.z, 0, 0);
+        vaca.setNoAi(true);
+        helper.getLevel().addFreshEntity(vaca);
+        // (Pode haver um monstro de outro teste à vista: o que importa é não ser nenhum destes dois.)
+        Object manso = new ContextoServidor(jogador).inimigoProximo(24);
+        helper.assertTrue(!alvo.getUUID().equals(manso) && !vaca.getUUID().equals(manso), "golem manso e vaca não são alvo");
+        alvo.setTarget(jogador);
+        jogador.setHealth(5);
+        jogador.hurt(jogador.damageSources().generic(), 50);
+        helper.assertTrue(hollow(kit), "virou o Hollow");
+        ticks(jogador, 20);
+        helper.assertTrue(perto(alvo.getHealth(), 100 - 8), "a garra fere 8 sem tecla nenhuma: sobrou " + alvo.getHealth());
+        // Até o fim: mais garras e o Cero de 18.
+        for (int i = 0; i < 190; i++) {
+            alvo.invulnerableTime = 0;
+            ticks(jogador, 1);
+        }
+        helper.assertTrue(alvo.getHealth() <= 100 - 8 - 18, "as garras e o Cero continuam: sobrou " + alvo.getHealth());
+        helper.assertTrue(vaca.getHealth() == vaca.getMaxHealth(), "a vaca ao lado sai inteira");
+        vaca.discard();
+        helper.assertTrue(Forma.BASE.equals(kit.forma()), "ao acabar volta ao Shikai");
+        helper.assertTrue(perto(jogador.getHealth(), 6), "com 6 de vida: " + jogador.getHealth());
+        helper.assertFalse(kit.recargas().pronta(Ichigo.ENTRAR_NO_BANKAI, jogador.level().getGameTime()), "e o G em recarga");
+        helper.succeed();
+    }
 }

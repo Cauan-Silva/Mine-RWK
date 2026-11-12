@@ -23,6 +23,9 @@ public final class Itens {
     /** A forma final do Mugetsu, vestida só durante a cutscene e o corte. */
     public static final DeferredItem<Traje> TRAJE_ICHIGO_MUGETSU =
             REGISTRO.register("traje_ichigo_mugetsu", () -> new Traje("ichigo_mugetsu"));
+    /** A forma Hollow completa, vestida nos 10 s em que o Hollow toma o corpo. */
+    public static final DeferredItem<Traje> TRAJE_ICHIGO_HOLLOW =
+            REGISTRO.register("traje_ichigo_hollow", () -> new Traje("ichigo_hollow"));
     /** Invoca o Toji; feito na bancada com papel, lingote de ouro e espada de ferro. */
     public static final DeferredItem<com.minerwk.boss.ContratoToji> CONTRATO_TOJI =
             REGISTRO.register("contrato_toji", com.minerwk.boss.ContratoToji::new);

@@ -34,6 +34,13 @@ public final class Ichigo {
     public static final String MASCARA = "ichigo_mascara", MUGETSU = "ichigo_mugetsu";
     /** Depois do Mugetsu: 60 s sem golpes e sem reiatsu. */
     public static final int SEM_PODERES = 1200;
+    /** A recarga da forma Hollow completa (a passiva não tem tecla: a recarga tem id próprio). */
+    public static final String PASSIVA_HOLLOW = "ichigo_hollow";
+    public static final int RECARGA_DO_HOLLOW = 6000;
+    /** Na forma Hollow ele fica com isso de vida e cura mais {@link #CURA_DO_HOLLOW}. */
+    static final float VIDA_DO_HOLLOW = 1, CURA_DO_HOLLOW = 10;
+    /** Na forma Hollow o clique não fere: quem ataca é a forma. */
+    static final Arma SEM_ATAQUE = new Arma(0, 4, 0);
     /** Com a máscara, todo dano causado é 30% maior. */
     static final float BONUS_DA_MASCARA = 1.3f;
     /** Recarga do Bankai para quem saiu por vontade (5 s) e para quem ficou sem reiatsu (10 s). */
@@ -66,8 +73,10 @@ public final class Ichigo {
         Forma bankai = new Forma(Reiatsu.BANKAI, Map.of(Tecla.Z, new GetsugaNegro(), Tecla.X, new ShunpoDoBankai(),
                 Tecla.C, new GetsugaNaLamina(), Tecla.V, new MascaraHollow(), Tecla.G, new SairDoBankai(),
                 Tecla.R, new Mugetsu()));
+        // A forma Hollow não tem golpe em tecla nenhuma: o jogador só anda.
+        Forma hollow = new Forma(Reiatsu.HOLLOW, Map.of());
         return new Personagem(ID, "Ichigo Kurosaki", "Bleach", Reiatsu::new, shikai, List.of(Zangetsu::new),
-                ArvoreIchigo.ARVORE, new Trancas(Set.of(MASCARA, MUGETSU), false), List.of(bankai));
+                ArvoreIchigo.ARVORE, new Trancas(Set.of(MASCARA, MUGETSU), false), List.of(bankai, hollow));
     }
 
     private static boolean noBankai(Contexto ctx) {
@@ -81,6 +90,30 @@ public final class Ichigo {
     public static void vestirAMascara(Contexto ctx) {
         if (!noBankai(ctx)) ctx.mudarForma(Reiatsu.BANKAI);
         new MascaraHollow().aoDisparar(ctx, 1f);
+    }
+
+    private static boolean hollow(Contexto ctx) {
+        return Reiatsu.HOLLOW.equals(ctx.forma());
+    }
+
+    /**
+     * Se um golpe que mataria vira a forma Hollow completa: só no Bankai, depois de vencer o Zangetsu
+     * interior, com a passiva fora da recarga e fora da arena de um boss.
+     */
+    public static boolean podeVirarHollow(String forma, boolean desperto, boolean pronta, boolean naArena) {
+        return Reiatsu.BANKAI.equals(forma) && desperto && pronta && !naArena;
+    }
+
+    /**
+     * O golpe mataria: o Hollow toma o corpo. Ele fica com 1 de vida, cura 10 e passa
+     * {@link FormaHollow#DURACAO} ticks atacando sozinho; a passiva entra em recarga de 5 minutos.
+     */
+    public static void virarHollow(Contexto ctx) {
+        ctx.mudarForma(Reiatsu.HOLLOW);
+        ctx.vida(VIDA_DO_HOLLOW);
+        ctx.curar(CURA_DO_HOLLOW);
+        ctx.recarga(PASSIVA_HOLLOW, RECARGA_DO_HOLLOW);
+        ctx.criarEfeito(new FormaHollow());
     }
 
     private static boolean mascarado(Contexto ctx) {
@@ -153,6 +186,15 @@ public final class Ichigo {
                 ctx.mudarForma(Forma.BASE);
                 ctx.recarga(ENTRAR_NO_BANKAI, RECARGA_ESGOTADO);
                 desfazer(ctx);
+            }
+            if (hollow(ctx)) {
+                // O efeito da forma não sobrevive a sair do jogo nem a trocar de dimensão: a forma acaba ali,
+                // com o mesmo custo de quando acaba sozinha.
+                if (!ctx.efeitoAtivo(FormaHollow.class)) FormaHollow.sair(ctx);
+                else {
+                    ctx.arma(SEM_ATAQUE);
+                    return;
+                }
             }
             ctx.arma(!noBankai(ctx) ? ZANGETSU : mascarado(ctx) ? TENSA_MASCARADA : TENSA_ZANGETSU);
         }
@@ -585,6 +627,131 @@ public final class Ichigo {
             ctx.sinalAoRecurso(Reiatsu.SELAR, ticks);
             for (String golpe : DO_SHIKAI) ctx.recarga(golpe, ticks);
             ctx.criarEfeito(new SemPoderes(ticks));
+        }
+    }
+
+    /**
+     * A forma Hollow completa: 10 s em que o corpo ataca sozinho o inimigo mais próximo. A cada
+     * {@link #INTERVALO} ticks, uma garra em quem está a até {@link #GARRA_ALCANCE} blocos ou o Sonído para
+     * junto de quem está mais longe; aos 6 s, uma vez, o Cero violeta entre os chifres. Ao acabar ele volta
+     * ao Shikai com pouca vida. Metade do dano e não morrer são regras do servidor, pela forma.
+     */
+    static final class FormaHollow implements Efeito {
+        static final int DURACAO = 200, INTERVALO = 30, PRIMEIRO_ATO = 15;
+        static final double ALCANCE = 24, GARRA_ALCANCE = 4, JUNTO_DO_ALVO = 1.5;
+        static final float GARRA_DANO = 8, CERO_DANO = 18;
+        static final int CERO_EM = 120, CERO_CARGA = 20;
+        static final double CERO_ALCANCE = 24, CERO_RAIO = 1.2;
+        /** Em volta do Cero ele não dá garra nem Sonído. */
+        static final int ANTES_DO_CERO = 10, DEPOIS_DO_CERO = 12;
+        static final float VIDA_AO_ACABAR = 6;
+        static final int RECARGA_DO_BANKAI = 400;
+        /** O Cero nasce entre as pontas dos chifres, acima e à frente dos olhos. */
+        static final double CHIFRES_ACIMA = .55, CHIFRES_A_FRENTE = .9;
+        /** Ticks do rugido da transformação, do risco da garra, do Sonído e do feixe do Cero (o som acompanha). */
+        static final int RUGIDO = 12, GARRA_TICKS = 8, SONIDO_TICKS = 10, CERO_TICKS = 14;
+        static final String VISUAL = "ichigo_hollow", GARRA = "ichigo_hollow_garra", SONIDO = "ichigo_hollow_sonido",
+                CERO_CARGA_VISUAL = "ichigo_hollow_cero_carga", CERO = "ichigo_hollow_cero";
+        private boolean fora;
+        private Vetor rumoDoCero;
+
+        @Override
+        public int duracao() {
+            return DURACAO;
+        }
+
+        @Override
+        public boolean encerrado() {
+            return fora;
+        }
+
+        @Override
+        public void tick(Contexto ctx, int t) {
+            // Outra coisa tirou a forma (um comando, a troca de personagem): o efeito só some.
+            if (!hollow(ctx)) {
+                fora = true;
+                return;
+            }
+            if (t == 0) {
+                ctx.visual(VISUAL, ctx.olhos(), ctx.olhar(), 1f, DURACAO);
+                ctx.apresentacao(VISUAL, "", "");
+                ctx.tremor(.6f, RUGIDO, 16);
+            }
+            if (t == CERO_EM) carregarCero(ctx);
+            else if (t == CERO_EM + CERO_CARGA) dispararCero(ctx);
+            else if (t >= PRIMEIRO_ATO && (t - PRIMEIRO_ATO) % INTERVALO == 0
+                    && (t < CERO_EM - ANTES_DO_CERO || t > CERO_EM + CERO_CARGA + DEPOIS_DO_CERO)) agir(ctx);
+        }
+
+        /** A garra em quem está perto; o Sonído para junto de quem está longe. */
+        private void agir(Contexto ctx) {
+            Object alvo = ctx.inimigoProximo(ALCANCE);
+            Vetor onde = alvo == null ? null : ctx.posicaoDe(alvo);
+            if (onde == null) return;
+            Vetor ate = onde.menos(ctx.olhos());
+            double distancia = ate.comprimento();
+            if (distancia <= GARRA_ALCANCE) {
+                ctx.deslocar(Vetor.ZERO, 0, onde);
+                ctx.apresentacao(GARRA, "", "");
+                ctx.visual(GARRA, onde, distancia < 1e-6 ? ctx.olhar() : ate.vezes(1 / distancia), 1f, GARRA_TICKS);
+                ctx.ferir(alvo, GARRA_DANO);
+                ctx.acertou(.5f);
+                return;
+            }
+            // O mesmo desenho do Shunpo: dos olhos de antes até os de depois.
+            Vetor de = ctx.olhos();
+            ctx.deslocar(ate.vezes(1 / distancia), distancia - JUNTO_DO_ALVO, onde);
+            ctx.visual(SONIDO, de, ctx.olhos().menos(de), 0f, SONIDO_TICKS);
+        }
+
+        private Vetor chifres(Contexto ctx, Vetor rumo) {
+            return ctx.olhos().mais(new Vetor(0, CHIFRES_ACIMA, 0)).mais(rumo.vezes(CHIFRES_A_FRENTE));
+        }
+
+        /** Vira para o alvo e junta o Cero entre os chifres; a direção fica travada aqui. */
+        private void carregarCero(Contexto ctx) {
+            Object alvo = ctx.inimigoProximo(ALCANCE);
+            Vetor onde = alvo == null ? null : ctx.posicaoDe(alvo);
+            rumoDoCero = ctx.olhar();
+            if (onde != null) {
+                Vetor ate = onde.menos(ctx.olhos().mais(new Vetor(0, CHIFRES_ACIMA, 0)));
+                if (ate.comprimento() > 1e-6) rumoDoCero = ate.vezes(1 / ate.comprimento());
+                ctx.deslocar(Vetor.ZERO, 0, onde);
+            }
+            ctx.apresentacao(CERO, "", "");
+            ctx.visual(CERO_CARGA_VISUAL, chifres(ctx, rumoDoCero), rumoDoCero, 1f, CERO_CARGA);
+        }
+
+        /** O feixe: 24 blocos em linha reta, até a primeira parede; fere cada inimigo uma vez. */
+        private void dispararCero(Contexto ctx) {
+            if (rumoDoCero == null) return;
+            Vetor de = chifres(ctx, rumoDoCero);
+            Set<Object> atingidos = new java.util.HashSet<>();
+            double andou = 0;
+            // Desde a boca do feixe: quem está colado nele também é pego.
+            for (double d = 0; d <= CERO_ALCANCE - CHIFRES_A_FRENTE + 1e-9; d += 1) {
+                Vetor ponto = de.mais(rumoDoCero.vezes(d));
+                if (d > 0 && ctx.colideBloco(de.mais(rumoDoCero.vezes(d - 1)), ponto)) break;
+                andou = d;
+                ctx.danoUmaVez(ponto, CERO_RAIO, CERO_DANO, atingidos);
+            }
+            ctx.visual(CERO, de, rumoDoCero, (float) Math.max(1, andou), CERO_TICKS);
+            ctx.tremor(.8f, 10, 24);
+        }
+
+        @Override
+        public void aoAcabar(Contexto ctx) {
+            sair(ctx);
+        }
+
+        /** O fim da forma: de volta ao Shikai, com pouca vida e o Bankai em recarga. */
+        static void sair(Contexto ctx) {
+            ctx.visualFim(VISUAL, ctx.olhos());
+            if (!hollow(ctx)) return;
+            ctx.mudarForma(Forma.BASE);
+            ctx.vida(VIDA_AO_ACABAR);
+            ctx.recarga(ENTRAR_NO_BANKAI, RECARGA_DO_BANKAI);
+            desfazer(ctx);
         }
     }
 

@@ -176,6 +176,19 @@ public interface Contexto {
     default void curar(float vida) {
     }
 
+    /** Põe a vida do jogador em {@code vida} (até o máximo dele). */
+    default void vida(float vida) {
+    }
+
+    /**
+     * O inimigo vivo mais perto do jogador, a até {@code raio} blocos e à vista: monstros, quem o ataca e
+     * outros jogadores, nunca animais nem aldeões (é para golpes que escolhem o alvo sozinhos). Devolve a mesma chave opaca
+     * de {@link #marcarAlvo}, ou null.
+     */
+    default Object inimigoProximo(double raio) {
+        return null;
+    }
+
     /** Gasta do recurso do jogador; devolve falso (e não gasta) se não houver o bastante. */
     default boolean gastarRecurso(double quantidade) {
         return true;

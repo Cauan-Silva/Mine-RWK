@@ -33,6 +33,8 @@ import net.minecraft.world.phys.shapes.CollisionContext;
 final class RenderVisuaisIchigo {
     private static final int AZUL = 0x5FC4FF, BRANCO = 0xEAF8FF, TINTA = 0x0E0A12, RUBRO = 0xD32A50;
     private static final int NEGRO = 0x241A2A, MARFIM = 0xEDE8DE, POEIRA = 0xB9B0A0, PEDRA = 0x6A6258, FIO = 0xF6F4EB;
+    /** O Cero da forma Hollow. */
+    private static final int VIOLETA = 0x9B3DF2;
     private static final Vec3 CIMA = new Vec3(0, 1, 0);
     private static final double ALCANCE = 160;
 
@@ -63,8 +65,13 @@ final class RenderVisuaisIchigo {
                     branco = true;
                     arremesso(camera, parcial, v, o, t);
                 }
-                case "ichigo_cero_carga" -> ceroCarga(v, o, t, sai);
-                case "ichigo_cero" -> cero(v, o, t);
+                case "ichigo_cero_carga" -> ceroCarga(v, o, t, sai, RUBRO);
+                case "ichigo_cero" -> cero(v, o, t, RUBRO);
+                case "ichigo_hollow" -> hollow(camera, parcial, v, t, sai);
+                case "ichigo_hollow_garra" -> garra(v, o, t);
+                case "ichigo_hollow_sonido" -> shunpo(v, o, t, true);
+                case "ichigo_hollow_cero_carga" -> ceroCarga(v, o, t, sai, VIOLETA);
+                case "ichigo_hollow_cero" -> cero(v, o, t, VIOLETA);
                 case "ichigo_corte" -> corte(v, o, t);
                 case "ichigo_carga" -> carga(camera, parcial, v, t, sai, false);
                 case "ichigo_bankai_carga" -> carga(camera, parcial, v, t, sai, true);
@@ -667,35 +674,78 @@ final class RenderVisuaisIchigo {
     // ---------------------------------------------------------------- Cero (Zangetsu interior)
 
     /** O Cero se juntando na mão: uma esfera carmesim que cresce, com o miolo branco e fios de reiatsu puxados para ela. */
-    private static void ceroCarga(VisuaisAtivos.Visual v, Vec3 o, double t, float sai) {
+    private static void ceroCarga(VisuaisAtivos.Visual v, Vec3 o, double t, float sai, int cor) {
         double p = v.duracao <= 0 ? 1 : Mth.clamp(t / v.duracao, 0, 1);
         Base b = Base.de(vec(v.direcao));
         Vec3 c = o.add(b.frente.scale(.8));
         abrir(true, false);
-        halo(c, .35 + 1.1 * p, RUBRO, .55f * sai);
+        halo(c, .35 + 1.1 * p, cor, .55f * sai);
         halo(c, .15 + .45 * p, BRANCO, .9f * sai);
         for (int k = 0; k < 8; k++) {
             double ang = k * Math.PI / 4 + t * .35, fase = (t * .12 + acaso(k)) % 1, r = 1.7 * (1 - fase);
             Vec3 q = c.add(b.lado.scale(Math.cos(ang) * r)).add(b.cima.scale(Math.sin(ang) * r));
-            fita(q, c, .05, RUBRO, 0f, (float) (.75 * fase) * sai);
+            fita(q, c, .05, cor, 0f, (float) (.75 * fase) * sai);
         }
         fechar();
     }
 
     /** O raio: carmesim com o miolo branco, da mão até onde o servidor disse; afina e some. */
-    private static void cero(VisuaisAtivos.Visual v, Vec3 o, double t) {
+    private static void cero(VisuaisAtivos.Visual v, Vec3 o, double t, int cor) {
         Base b = Base.de(vec(v.direcao));
         double p = Mth.clamp(t / Math.max(1, v.duracao), 0, 1);
         float a = (float) (1 - p * p);
         double grossura = 1.1 * (1 - .7 * p);
         Vec3 fim = o.add(b.frente.scale(v.forca));
         abrir(true, false);
-        fita(o, fim, grossura * 2.2, RUBRO, a * .35f, a * .35f);
-        fita(o, fim, grossura, RUBRO, a, a);
+        fita(o, fim, grossura * 2.2, cor, a * .35f, a * .35f);
+        fita(o, fim, grossura, cor, a, a);
         fita(o, fim, grossura * .45, BRANCO, a, a);
-        halo(o, 1.6 * (1 - .5 * p), RUBRO, a * .8f);
-        halo(fim, 2.2 * (1 - .4 * p), RUBRO, a * .7f);
+        halo(o, 1.6 * (1 - .5 * p), cor, a * .8f);
+        halo(fim, 2.2 * (1 - .4 * p), cor, a * .7f);
         halo(fim, 1.0, BRANCO, a * .8f);
+        fechar();
+    }
+
+    // ---------------------------------------------------------------- Forma Hollow completa
+
+    /**
+     * O Hollow tomando o corpo: um estouro de pressão no começo e, enquanto a forma dura, o reiatsu preto e
+     * vermelho subindo em volta dele. Segue o dono.
+     */
+    private static void hollow(Vec3 camera, float parcial, VisuaisAtivos.Visual v, double t, float sai) {
+        Entity e = dono(v);
+        if (e == null) return;
+        Vec3 pes = e.getPosition(parcial).subtract(camera);
+        float a = sai * (float) Math.min(1, t / 4);
+        abrir(false, false);
+        linguas(pes, t, 2.7, .16, TINTA, a * .85f);
+        fechar();
+        abrir(true, false);
+        linguas(pes, t * 1.3 + 7, 2.2, .06, RUBRO, a * .7f);
+        halo(pes.add(0, 1.1, 0), 1.5 + .2 * Math.sin(t * .4), RUBRO, a * .16f);
+        if (t < 12) {
+            double f = t / 12;
+            anel(pes.add(0, .08, 0), .5 + 6 * f, .5, RUBRO, (float) (1 - f) * .8f);
+            anel(pes.add(0, .1, 0), .4 + 5.4 * f, .14, BRANCO, (float) (1 - f) * .6f);
+            halo(pes.add(0, 1.2, 0), 1 + 5 * f, BRANCO, (float) ((1 - f) * (1 - f)) * .7f);
+        }
+        fechar();
+    }
+
+    /** A garra: três riscos paralelos que descem na diagonal sobre o alvo. */
+    private static void garra(VisuaisAtivos.Visual v, Vec3 o, double t) {
+        Base b = Base.de(vec(v.direcao));
+        double p = Mth.clamp(t / Math.max(1, v.duracao), 0, 1), abre = Math.min(1, p * 3);
+        float a = (float) (1 - p * p);
+        abrir(true, false);
+        for (int k = -1; k <= 1; k++) {
+            Vec3 de = o.add(b.lado.scale(-.9 + k * .42)).add(b.cima.scale(1.05)).add(b.frente.scale(-.35));
+            Vec3 ate = o.add(b.lado.scale(.5 + k * .42)).add(b.cima.scale(-1.05)).add(b.frente.scale(-.35));
+            Vec3 fim = de.add(ate.subtract(de).scale(abre));
+            fita(de, fim, .24, RUBRO, a * .45f, a * .9f);
+            fita(de, fim, .08, BRANCO, a * .6f, a);
+        }
+        halo(o, .9 + p, RUBRO, a * .3f);
         fechar();
     }
 

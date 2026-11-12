@@ -27,10 +27,14 @@ public final class SonsIchigo {
     public static final String MUGETSU = "ichigo_mugetsu";
     public static final String PODERES_PERDIDOS = "ichigo_poderes_perdidos";
     public static final String PODERES_VOLTAM = "ichigo_poderes_voltam";
+    public static final String HOLLOW = "ichigo_hollow";
+    public static final String HOLLOW_GARRA = "ichigo_hollow_garra";
+    public static final String CERO_CARGA = "ichigo_cero_carga";
+    public static final String CERO = "ichigo_cero";
 
     public static final List<String> TODOS = List.of(GETSUGA_CARGA, GETSUGA, GETSUGA_NEGRO, SHUNPO, ONDA, ARREMESSO,
             BANKAI_CARGA, BANKAI, LAMINA, SAIR, CORTE, MASCARA_VESTE, MASCARA_QUEBRA, MUGETSU_CARGA, MUGETSU,
-            PODERES_PERDIDOS, PODERES_VOLTAM);
+            PODERES_PERDIDOS, PODERES_VOLTAM, HOLLOW, HOLLOW_GARRA, CERO_CARGA, CERO);
 
     private SonsIchigo() {
     }
@@ -42,11 +46,16 @@ public final class SonsIchigo {
             case "ichigo_getsuga" -> GETSUGA;
             // Os golpes do Zangetsu interior são os do Ichigo, em branco: soam igual.
             case "ichigo_getsuga_negro", "ichigo_getsuga_branco" -> GETSUGA_NEGRO;
-            case "ichigo_shunpo", "ichigo_shunpo_bankai" -> SHUNPO;
-            // O Cero do boss usa, por enquanto, o reiatsu se juntando e o estouro da onda (o som próprio vem na parte 8).
-            case "ichigo_onda", "ichigo_cero" -> ONDA;
+            // O Sonído da forma Hollow é o mesmo passo.
+            case "ichigo_shunpo", "ichigo_shunpo_bankai", "ichigo_hollow_sonido" -> SHUNPO;
+            case "ichigo_onda" -> ONDA;
             case "ichigo_arremesso", "ichigo_arremesso_branco" -> ARREMESSO;
-            case "ichigo_bankai_carga", "ichigo_cero_carga" -> BANKAI_CARGA;
+            case "ichigo_bankai_carga" -> BANKAI_CARGA;
+            // O Cero é o mesmo no Zangetsu interior (carmesim) e na forma Hollow (violeta).
+            case "ichigo_cero_carga", "ichigo_hollow_cero_carga" -> CERO_CARGA;
+            case "ichigo_cero", "ichigo_hollow_cero" -> CERO;
+            case "ichigo_hollow" -> HOLLOW;
+            case "ichigo_hollow_garra" -> HOLLOW_GARRA;
             case "ichigo_bankai" -> BANKAI;
             case "ichigo_lamina" -> LAMINA;
             case "ichigo_sair" -> SAIR;
@@ -66,7 +75,8 @@ public final class SonsIchigo {
      */
     public static boolean cortaComOVisual(String tipo) {
         return tipo.equals("ichigo_carga") || tipo.equals("ichigo_bankai_carga") || tipo.equals("ichigo_lamina")
-                || tipo.equals("ichigo_mugetsu_carga") || tipo.equals("ichigo_cero_carga");
+                || tipo.equals("ichigo_mugetsu_carga") || tipo.equals("ichigo_cero_carga")
+                || tipo.equals("ichigo_hollow_cero_carga");
     }
 
     /** A máscara começa a quebrar esses ticks antes de sumir: o último estalo cai quando ela some. */

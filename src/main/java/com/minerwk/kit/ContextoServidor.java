@@ -319,6 +319,40 @@ public final class ContextoServidor implements Contexto {
         return melhor == null ? null : melhor.getUUID();
     }
 
+    @Override
+    public Object inimigoProximo(double raio) {
+        Vec3 olhos = jogador.getEyePosition();
+        LivingEntity melhor = null;
+        double melhorLonge = raio * raio;
+        for (LivingEntity e : nivel().getEntitiesOfClass(LivingEntity.class, jogador.getBoundingBox().inflate(raio),
+                e -> afetavel(e) && inimigo(e))) {
+            double longe = e.getBoundingBox().getCenter().distanceToSqr(olhos);
+            if (longe > melhorLonge || !jogador.hasLineOfSight(e)) continue;
+            melhor = e;
+            melhorLonge = longe;
+        }
+        return melhor == null ? null : melhor.getUUID();
+    }
+
+    /**
+     * Quem um golpe sem mira pode escolher: monstros, quem está atrás do jogador, quem o feriu por último e
+     * outros jogadores (o PvP já foi conferido). Animais, aldeões e bichos dos outros ficam de fora.
+     */
+    private boolean inimigo(LivingEntity e) {
+        if (e instanceof ArmorStand) return false;
+        if (e instanceof Player) return !e.isAlliedTo(jogador);
+        if (e instanceof OwnableEntity dono && dono.getOwnerUUID() != null) {
+            return e instanceof net.minecraft.world.entity.Mob m && m.getTarget() == jogador;
+        }
+        return e instanceof net.minecraft.world.entity.monster.Enemy || e == jogador.getLastHurtByMob()
+                || e instanceof net.minecraft.world.entity.Mob m && m.getTarget() == jogador;
+    }
+
+    @Override
+    public void vida(float vida) {
+        jogador.setHealth(Math.max(1, Math.min(vida, jogador.getMaxHealth())));
+    }
+
     /** O alvo marcado, se ainda está vivo neste mundo. */
     private LivingEntity marcado(Object alvo) {
         if (!(alvo instanceof java.util.UUID id)) return null;

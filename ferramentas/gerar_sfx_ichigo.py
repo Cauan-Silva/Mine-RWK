@@ -13,7 +13,8 @@ seco e rápido (preto e vermelho). Os sons do Ichigo no Minezin não são usados
 A máscara é osso e uma voz oca por baixo; o Mugetsu é o contrário de um estouro: tudo se cala e vem um
 corte só, seco e enorme, com a escuridão rolando atrás.
 
-Ficam para a parte 8 do spec (a forma Hollow completa): Cero e garra.
+A forma Hollow completa (parte 8) é o oposto do Ichigo: nada de aço, só a voz oca virando rugido, garra
+e o Cero, um tom que sobe apertado e estoura num feixe grave. O Cero é o mesmo do Zangetsu interior.
 """
 import argparse
 import numpy as np
@@ -35,6 +36,8 @@ QUEBRA = 8 * T            # SonsIchigo.QUEBRA_DA_MASCARA: a máscara some neste 
 TRANSFORMA, SILENCIO, MUGETSU_CARGA = 30 * T, 84 * T, 120 * T  # Ichigo.Mugetsu: TRANSFORMA, SILENCIO e CARGA
 PASSOU, MUGETSU_FIM = 20 * T, 50 * T   # Ichigo.Veu.TICKS, e mais Veu.RESTO
 AVISO = 30 * T            # Ichigo.SemPoderes.TICKS_DO_AVISO
+RUGIDO, GARRA = 12 * T, 8 * T          # Ichigo.FormaHollow.RUGIDO e GARRA_TICKS
+CERO_CARGA, CERO = 20 * T, 14 * T      # Ichigo.FormaHollow.CERO_CARGA e CERO_TICKS
 
 # nome -> (duração em s, alcance em blocos, legenda pt, legenda en)
 SONS = {
@@ -55,6 +58,10 @@ SONS = {
     'ichigo_mugetsu': (MUGETSU_FIM + 2.2, 128, 'Mugetsu', 'Mugetsu'),
     'ichigo_poderes_perdidos': (AVISO + .6, 32, 'O reiatsu do Ichigo se vai', "Ichigo's reiatsu fades away"),
     'ichigo_poderes_voltam': (AVISO + .4, 32, 'O reiatsu do Ichigo volta', "Ichigo's reiatsu returns"),
+    'ichigo_hollow': (RUGIDO + 1.6, 96, 'O Hollow toma o corpo e ruge', 'The Hollow takes over and roars'),
+    'ichigo_hollow_garra': (GARRA + .3, 32, 'Garras rasgam o ar', 'Claws tear the air'),
+    'ichigo_cero_carga': (CERO_CARGA + .05, 64, 'Um Cero se junta', 'A Cero gathers'),
+    'ichigo_cero': (CERO + 1.6, 96, 'O Cero dispara', 'The Cero fires'),
 }
 
 # Marcos em ticks, conferidos contra o Java pelo SonsIchigoTest.
@@ -76,6 +83,10 @@ MARCOS = {
     'ichigo_mugetsu': {'passou': 20, 'fim': 50},
     'ichigo_poderes_perdidos': {'fim': 30},
     'ichigo_poderes_voltam': {'fim': 30},
+    'ichigo_hollow': {'rugido': 12},
+    'ichigo_hollow_garra': {'fim': 8},
+    'ichigo_cero_carga': {'dispara': 20},
+    'ichigo_cero': {'fim': 14},
 }
 
 
@@ -219,6 +230,40 @@ def sintese(nome, s):
         ar = s.girar(s.ruido(300, 6000, .4), hz=8, prof=.35) * s.crescer(0, AVISO * .8, 2.) * s.janela(0, AVISO, .12)
         acende = .9 * s.sub(AVISO * .8, 110, 52, 5, 2.5) + .55 * aco(s, AVISO * .8, 2100, 1.) + .4 * s.transiente(AVISO * .8, 5000, .008)
         return s.reverb(.45 * sobe * s.janela(0, AVISO, .08) + .35 * ar + acende, 1.4, .28, 4500)
+    if nome == 'ichigo_hollow':
+        # O estouro de pressão e o rugido: a voz oca da máscara, mais grave e rasgada, que incha até o fim do
+        # tremor e morre com eco. Um ruído áspero por cima faz a garganta.
+        estouro = 1.2 * s.transiente(0, 5000, .014) + 1.3 * s.sub(0, 85, 22, 1.4, 5)
+        voz = np.tanh(4.5 * (s.tom(96, 58, .8, 0, RUGIDO + .9, (1, 2, 3, 5, 7), vibrato=.06, vib_hz=11)
+                             + .8 * s.tom(101, 61, .8, 0, RUGIDO + .9, (1, 2, 3, 5), vibrato=.05, vib_hz=8.3)))
+        garganta = s.girar(s.passa_baixa(s.ruido(120, 5200, .6), 2400), hz=23, prof=.8)
+        forma = s.crescer(0, RUGIDO, .6) * s.janela(0, RUGIDO + 1.0, .04) * (1 - .75 * s.crescer(RUGIDO, RUGIDO + 1.0, 1.))
+        rugido = (.6 * s.passa_baixa(voz, 1800) + .45 * garganta) * forma
+        eco = sum(g * np.roll(rugido, int(m.RATE * d)) for d, g in ((.19, .4), (.38, .22)))
+        return estouro + s.reverb(rugido + .6 * eco, 2.8, .4, 2600)
+    if nome == 'ichigo_hollow_garra':
+        # Três riscos quase juntos (um por garra) e o baque seco de quando pegam.
+        riscos = sum((.75 - .12 * i) * golpe_de_ar(s, .02 * i, .14, 900, 11000, 1.3) for i in range(3))
+        pega = .9 * s.transiente(GARRA * .35, 3800, .01) + .7 * s.sub(GARRA * .35, 130, 60, 10, 2.5)
+        rosna = .25 * np.tanh(3 * s.tom(110, 70, 1., 0, GARRA, (1, 2, 3))) * s.janela(0, GARRA, .03)
+        return pega + s.reverb(riscos + rosna, .6, .15, 7000)
+    if nome == 'ichigo_cero_carga':
+        # O Cero se juntando: um tom fino que sobe e aperta, um grave que pulsa cada vez mais rápido e o ar
+        # sendo puxado para um ponto só.
+        g = s.crescer(0, CERO_CARGA, 1.6)
+        fino = s.tom(520, 1650, 1.7, 0, CERO_CARGA, (1, 2.02, 3.01), vibrato=.015, vib_hz=19)
+        grave = np.tanh(3 * s.tom(48, 96, 1.5, 0, CERO_CARGA, (1, 2, 3), vibrato=.04, vib_hz=9))
+        puxa = s.girar(s.ruido(400, 9000, .35), hz=17, prof=.6) * s.crescer(0, CERO_CARGA, 2.6)
+        return s.reverb((.3 * fino + .5 * grave + .3 * puxa) * (.08 + .92 * g), 1.2, .22, 6000)
+    if nome == 'ichigo_cero':
+        # O disparo: estalo, um sub enorme e o feixe (um rugido grave com um fio agudo por cima) enquanto ele
+        # dura; depois só a cauda.
+        estalo = 1.4 * s.transiente(0, 7000, .012) + .6 * s.ruido(1200, 12000) * s.env(0, .001, 20)
+        sub = 1.4 * s.sub(0, 95, 22, 1.3, 5)
+        feixe = np.tanh(3 * s.passa_baixa(s.ruido(30, 4200, .8), 900)) * s.janela(.01, CERO + .12, .1)
+        fio = .16 * s.tom(1650, 900, 1., 0, CERO, (1, 2.02)) * s.janela(.01, CERO, .08)
+        zumbe = .35 * s.girar(np.tanh(2 * s.tom(74, 52, 1., 0, CERO + .3, (1, 2, 3))), hz=31, prof=.5) * s.janela(.01, CERO + .3, .15)
+        return estalo + s.reverb(sub + .8 * feixe + fio + zumbe, 3.4, .42, 3200)
     raise ValueError(nome)
 
 

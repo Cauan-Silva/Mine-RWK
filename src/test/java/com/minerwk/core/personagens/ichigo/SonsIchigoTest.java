@@ -84,13 +84,18 @@ class SonsIchigoTest {
         assertEquals(SonsIchigo.MUGETSU, SonsIchigo.doVisual("ichigo_mugetsu").orElseThrow());
         assertEquals(SonsIchigo.PODERES_PERDIDOS, SonsIchigo.doVisual("ichigo_poderes_perdidos").orElseThrow());
         assertEquals(SonsIchigo.PODERES_VOLTAM, SonsIchigo.doVisual("ichigo_poderes_voltam").orElseThrow());
+        assertEquals(SonsIchigo.SHUNPO, SonsIchigo.doVisual("ichigo_hollow_sonido").orElseThrow(), "o Sonído soa como o passo");
+        assertEquals(SonsIchigo.CERO, SonsIchigo.doVisual("ichigo_cero").orElseThrow(), "o Cero do Zangetsu interior é o mesmo som");
+        assertEquals(SonsIchigo.CERO_CARGA, SonsIchigo.doVisual("ichigo_cero_carga").orElseThrow());
+        assertTrue(SonsIchigo.cortaComOVisual("ichigo_hollow_cero_carga"), "forma cortada no meio da carga: o som para");
         assertTrue(SonsIchigo.doVisual("ichigo_traje").isEmpty(), "visual sem som");
         assertTrue(SonsIchigo.doVisual("gojo_azul").isEmpty(), "visual de outro personagem");
         // Todo som é usado por algum visual: nenhum fica gerado à toa.
         Set<String> usados = new HashSet<>();
         for (String tipo : List.of("ichigo_carga", "ichigo_getsuga", "ichigo_getsuga_negro", "ichigo_shunpo", "ichigo_onda",
                 "ichigo_arremesso", "ichigo_bankai_carga", "ichigo_bankai", "ichigo_lamina", "ichigo_sair", "ichigo_corte",
-                "ichigo_mascara", "ichigo_mugetsu_carga", "ichigo_mugetsu", "ichigo_poderes_perdidos", "ichigo_poderes_voltam")) {
+                "ichigo_mascara", "ichigo_mugetsu_carga", "ichigo_mugetsu", "ichigo_poderes_perdidos", "ichigo_poderes_voltam",
+                "ichigo_hollow", "ichigo_hollow_garra", "ichigo_hollow_sonido", "ichigo_hollow_cero_carga", "ichigo_hollow_cero")) {
             usados.add(SonsIchigo.doVisual(tipo).orElseThrow());
         }
         // A máscara quebrando é o único que não começa com um visual: toca no fim do da máscara.
@@ -146,6 +151,10 @@ class SonsIchigoTest {
         assertEquals(Ichigo.Veu.TICKS + Ichigo.Veu.RESTO, marco(m, SonsIchigo.MUGETSU, "fim"));
         assertEquals(SonsIchigo.antesDoFim("ichigo_mascara").orElseThrow().antes(), marco(m, SonsIchigo.MASCARA_QUEBRA, "quebra"),
                 "a máscara termina de quebrar quando some do rosto");
+        assertEquals(Ichigo.FormaHollow.RUGIDO, marco(m, SonsIchigo.HOLLOW, "rugido"), "o rugido incha enquanto a tela treme");
+        assertEquals(Ichigo.FormaHollow.GARRA_TICKS, marco(m, SonsIchigo.HOLLOW_GARRA, "fim"));
+        assertEquals(Ichigo.FormaHollow.CERO_CARGA, marco(m, SonsIchigo.CERO_CARGA, "dispara"), "a carga acaba no disparo");
+        assertEquals(Ichigo.FormaHollow.CERO_TICKS, marco(m, SonsIchigo.CERO, "fim"), "o feixe dura esse tempo");
         for (String som : SonsIchigo.TODOS) {
             JsonObject s = m.getAsJsonObject(som);
             assertFalse(s.getAsJsonObject("marcos").isEmpty(), som + " tem ao menos um marco conferido");

@@ -14,6 +14,8 @@ public final class TrajeIchigo {
     public static final String BANKAI = "ichigo_bankai";
     /** A forma final do Mugetsu: cabelo longo, faixas e o corpo coberto de reiatsu preto. Sem espada. */
     public static final String MUGETSU = "ichigo_mugetsu";
+    /** A forma Hollow completa: pele branca, cabelo longo, a máscara de chifres. Sem espada. */
+    public static final String HOLLOW = "ichigo_hollow";
     /** A máscara Hollow leva esses ticks para se fechar sobre o rosto (o gesto do golpe). */
     public static final int MASCARA_SE_FORMA = 6;
     /** A espada inteira: some enquanto ela está fora da mão (o arremesso). */
@@ -25,7 +27,7 @@ public final class TrajeIchigo {
     }
 
     public static boolean eDoIchigo(String traje) {
-        return SHIKAI.equals(traje) || BANKAI.equals(traje) || MUGETSU.equals(traje);
+        return SHIKAI.equals(traje) || BANKAI.equals(traje) || MUGETSU.equals(traje) || HOLLOW.equals(traje);
     }
 
     /**

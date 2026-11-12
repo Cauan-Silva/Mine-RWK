@@ -155,6 +155,29 @@ A["ichigo_mugetsu"] = anim(7.3, {
              (5.6, [-6, 8, 0], C), (6.06, [0, -10, 0], OUTC), (6.9, [0, -10, 0]), (7.3, N, C)],
 })
 
+# A forma Hollow completa (ninguém aperta tecla: quem toca é a própria forma).
+# A transformação: o corpo se abre para trás num rugido e depois se curva para a frente, de garras soltas.
+A["ichigo_hollow"] = anim(1.2, {
+    "right_arm": [(0, N), (0.15, [20, 0, 55], OUTC), (0.6, [25, 0, 60]), (0.9, [-22, 0, 26], C), (1.2, N, C)],
+    "left_arm": [(0, N), (0.15, [20, 0, -55], OUTC), (0.6, [25, 0, -60]), (0.9, [-22, 0, -26], C), (1.2, N, C)],
+    "torso": [(0, N), (0.15, [-14, 0, 0], OUTC), (0.6, [-16, 0, 0]), (0.9, [18, 0, 0], C), (1.2, N, C)],
+    "head": [(0, N), (0.15, [-30, 0, 0], OUTC), (0.6, [-32, 0, 0]), (0.9, [12, 0, 0], C), (1.2, N, C)],
+})
+# A garra: o braço direito sobe e desce rasgando na diagonal (o risco aparece aos 0,1 s).
+A["ichigo_hollow_garra"] = anim(0.5, {
+    "right_arm": [(0, N), (0.08, [-155, -20, 20], OUTC), (0.16, [-30, 40, -10], EXPO), (0.3, [-22, 36, -8]), (0.5, N, C)],
+    "left_arm": [(0, N), (0.08, [25, 0, -30], OUTC), (0.3, [20, 0, -26]), (0.5, N, C)],
+    "torso": [(0, N), (0.08, [-6, -22, 0], OUTC), (0.16, [14, 26, 0], EXPO), (0.3, [12, 22, 0]), (0.5, N, C)],
+    "head": [(0, N), (0.16, [6, -10, 0], OUTC), (0.3, [6, -10, 0]), (0.5, N, C)],
+})
+# O Cero: a cabeça baixa para os chifres apontarem (1 s de carga), o tranco do disparo, e volta.
+A["ichigo_hollow_cero"] = anim(1.9, {
+    "right_arm": [(0, N), (0.3, [30, 0, 36], OUTC), (1.0, [34, 0, 40]), (1.08, [44, 0, 50], EXPO), (1.5, [36, 0, 40]), (1.9, N, C)],
+    "left_arm": [(0, N), (0.3, [30, 0, -36], OUTC), (1.0, [34, 0, -40]), (1.08, [44, 0, -50], EXPO), (1.5, [36, 0, -40]), (1.9, N, C)],
+    "torso": [(0, N), (0.3, [14, 0, 0], OUTC), (1.0, [16, 0, 0]), (1.08, [6, 0, 0], EXPO), (1.5, [10, 0, 0]), (1.9, N, C)],
+    "head": [(0, N), (0.3, [22, 0, 0], OUTC), (1.0, [24, 0, 0]), (1.08, [10, 0, 0], EXPO), (1.5, [16, 0, 0]), (1.9, N, C)],
+})
+
 saida = {"format_version": "1.8.0", "geckolib_format_version": 2, "animations": A}
 p = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "src/main/resources/assets/minerwk/player_animations/ichigo.json")
 with open(p, "w", encoding="utf-8") as f:

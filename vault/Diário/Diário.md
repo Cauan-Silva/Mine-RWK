@@ -44,3 +44,4 @@ Voltar para [[00 Início]].
 - [[2026-11-11 Ichigo parte 6 apresentação]]: máscara no rosto, forma final, cutscene, véu, sons, animações e o aviso de "sem poderes" (a parte 6 fica completa)
 - [[2026-11-12 Mugetsu fino e longo]]: o véu do Mugetsu passa a ter 3 de largura, 40 de altura e 150 de alcance, a pedido do autor
 - [[2026-11-12 Ichigo parte 7]]: árvore do Ichigo com o nó Despertar, boss Zangetsu interior, Máscara Rachada e a arena do mundo interior
+- [[2026-11-12 Ichigo parte 8]]: a forma Hollow completa (modelo de chifres, garra, Sonído e Cero sozinhos, sons e animações); o Ichigo fecha as 8 partes
