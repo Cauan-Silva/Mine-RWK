@@ -83,7 +83,8 @@ Um por vez, sempre: pesquisa canônica → kit aprovado → código → VFX → 
 | # | Personagem | Por que nessa posição |
 | --- | --- | --- |
 | 1 | [[Ichigo]] | Espada + forma (Bankai/Mugetsu). Kit e spec ([[2026-11-11 Ichigo]]) aprovados em 11/11. As 8 partes feitas (falta o teste do autor no jogo): formas no núcleo e Reiatsu ([[2026-11-11 Ichigo parte 1]]); kit do Shikai e do Bankai ([[2026-11-11 Ichigo parte 2]]); arma e traje com pano ([[2026-11-11 Ichigo parte 3]]); VFX e animações ([[2026-11-11 Ichigo parte 4]]); som (parte 5); máscara e Mugetsu (parte 6); árvore, boss Zangetsu interior e mundo interior ([[2026-11-12 Ichigo parte 7]]); forma Hollow completa ([[2026-11-12 Ichigo parte 8]]) |
-| 2 | Tanjiro | Espada + respirações, efeitos de água/fogo |
+| 2 | [[Cid]] | Espada + ultimate de área. Passou à frente a pedido do autor (12/11). Pesquisa feita e kit proposto em 12/11, aguardando aprovação |
+| 3 | Tanjiro | Espada + respirações, efeitos de água/fogo |
 | 3 | Asta | Espadas + forma demônio |
 | 4 | Killua | Rápido, elétrico, sem invocações |
 | 5 | Douma | Gelo, área |
@@ -91,7 +92,6 @@ Um por vez, sempre: pesquisa canônica → kit aprovado → código → VFX → 
 | 7 | Rudeus | Magias elementais |
 | 8 | Homura | Tempo parado (sistema de tempo) |
 | 9 | Dio | Stand + tempo parado (reaproveita a Homura) |
-| 10 | Cid | Espada + ultimate de área |
 | 11 | Guts | Arma enorme + armadura berserker (forma) |
 | 12 | Jin-Woo | Invocações (Igris, Beru) com GeckoLib |
 | 13 | Subaru e Beatrice | Contrato, forma e magias da Beatrice |
