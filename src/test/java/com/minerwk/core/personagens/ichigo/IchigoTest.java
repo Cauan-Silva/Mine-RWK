@@ -523,15 +523,15 @@ class IchigoTest {
     }
 
     @Test
-    void mugetsuFereQuarentaSemArmaduraNumVeuDeNoveBlocosQueAndaQuarenta() {
+    void mugetsuFereQuarentaSemArmaduraNumVeuFinoQueAndaCentoECinquenta() {
         bankaiDesperto();
-        ctx.inimigoEm = new Vetor(39, 0, 4);
+        ctx.inimigoEm = new Vetor(140, 0, 1);
         mugetsuInteiro();
         assertEquals(List.of(40f), ctx.danosDiretos, "40 de dano, uma vez, ignorando armadura");
         assertTrue(ctx.danos.isEmpty(), "nada pelo dano comum");
         double maisLonge = ctx.pontosDiretos.stream().mapToDouble(Vetor::x).max().orElse(0);
-        assertEquals(40, maisLonge, 1e-6, "o véu avança 40 blocos");
-        assertEquals(4.5, Ichigo.Veu.MEIA_LARGURA, "9 blocos de largura");
+        assertEquals(150, maisLonge, 1e-6, "o véu avança 150 blocos");
+        assertEquals(1.5, Ichigo.Veu.MEIA_LARGURA, "3 blocos de largura");
         assertTrue(ctx.visuais.contains("ichigo_mugetsu_carga") && ctx.visuais.contains("ichigo_mugetsu"));
         assertTrue(ctx.cutscenes.contains("ichigo_mugetsu"), "a carga é a cutscene");
     }
@@ -539,15 +539,31 @@ class IchigoTest {
     @Test
     void mugetsuNaoAlcancaQuemEstaForaDoVeu() {
         bankaiDesperto();
-        ctx.inimigoEm = new Vetor(20, 0, 6);
+        ctx.inimigoEm = new Vetor(20, 0, 3);
         mugetsuInteiro();
-        assertTrue(ctx.danosDiretos.isEmpty(), "6 blocos para o lado: fora dos 9 de largura");
+        assertTrue(ctx.danosDiretos.isEmpty(), "3 blocos para o lado: fora dos 3 de largura");
     }
 
     @Test
-    void mugetsuNaoPassaDosQuarentaBlocos() {
+    void mugetsuAlcancaQuemEstaNoAltoMasNaoAcimaDoVeu() {
         bankaiDesperto();
-        ctx.inimigoEm = new Vetor(46, 0, 0);
+        ctx.inimigoEm = new Vetor(60, 31, 0);
+        mugetsuInteiro();
+        assertEquals(List.of(40f), ctx.danosDiretos, "o véu tem 40 de altura");
+    }
+
+    @Test
+    void mugetsuNaoFereAcimaDosQuarentaDeAltura() {
+        bankaiDesperto();
+        ctx.inimigoEm = new Vetor(60, 44, 0);
+        mugetsuInteiro();
+        assertTrue(ctx.danosDiretos.isEmpty());
+    }
+
+    @Test
+    void mugetsuNaoPassaDosCentoECinquentaBlocos() {
+        bankaiDesperto();
+        ctx.inimigoEm = new Vetor(156, 0, 0);
         mugetsuInteiro();
         assertTrue(ctx.danosDiretos.isEmpty());
     }

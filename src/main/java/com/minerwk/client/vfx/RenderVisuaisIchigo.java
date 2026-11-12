@@ -794,9 +794,9 @@ final class RenderVisuaisIchigo {
     }
 
     /**
-     * O véu: uma parede de escuridão de 9 blocos que sobe do chão e avança em linha reta. É desenhado como
-     * cortinas atravessadas no caminho, uma a cada 2 blocos, com as laterais e a frente fechadas: de fora
-     * parece um volume preto; de dentro, não se vê nada. Depois de passar, se desfaz devagar.
+     * O véu: uma lâmina de escuridão fina, muito alta e muito comprida, que sobe do chão e avança em linha
+     * reta. É desenhado como cortinas atravessadas no caminho, uma a cada 3 blocos, com as laterais e a frente
+     * fechadas: de fora parece uma parede preta; de dentro, não se vê nada. Depois de passar, se desfaz devagar.
      */
     private static void veu(VisuaisAtivos.Visual v, Vec3 o, double t) {
         float op = (float) MugetsuIchigo.opacidade(t);
@@ -804,13 +804,13 @@ final class RenderVisuaisIchigo {
         Base b = Base.de(new Vec3(v.direcao.x(), 0, v.direcao.z()));
         double frente = MugetsuIchigo.frente(t), meia = MugetsuIchigo.MEIA_LARGURA;
         if (frente <= .05) return;
-        int colunas = 8;
+        int colunas = 3;
         abrir(false, false);
         // O chão coberto de tinta por onde o véu já passou.
         Vec3 e0 = o.add(b.lado().scale(-meia)).add(0, .06, 0), d0 = o.add(b.lado().scale(meia)).add(0, .06, 0);
         quad(e0, d0, d0.add(b.frente().scale(frente)), e0.add(b.frente().scale(frente)), TINTA, .93f * op);
         // As cortinas atravessadas e as duas laterais, trecho a trecho.
-        double passo = 1.5;
+        double passo = 3;
         for (double z = 0; z < frente; z += passo) {
             double z1 = Math.min(frente, z + passo);
             Vec3 c0 = o.add(b.frente().scale(z)), c1 = o.add(b.frente().scale(z1));
@@ -828,7 +828,7 @@ final class RenderVisuaisIchigo {
         Vec3 cf = o.add(b.frente().scale(frente));
         for (int i = 0; i < colunas; i++) {
             double u0 = -1 + 2.0 * i / colunas, u1 = -1 + 2.0 * (i + 1) / colunas;
-            double h0 = Math.max(2.5, MugetsuIchigo.altura(u0, frente - 1.2, t)), h1 = Math.max(2.5, MugetsuIchigo.altura(u1, frente - 1.2, t));
+            double h0 = Math.max(6, MugetsuIchigo.altura(u0, frente - 3, t)), h1 = Math.max(6, MugetsuIchigo.altura(u1, frente - 3, t));
             pano(cf.add(b.lado().scale(u0 * meia)), cf.add(b.lado().scale(u1 * meia)), h0, h1, .98f * op);
         }
         fechar();

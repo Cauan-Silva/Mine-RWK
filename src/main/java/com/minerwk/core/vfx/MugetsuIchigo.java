@@ -8,12 +8,12 @@ package com.minerwk.core.vfx;
 public final class MugetsuIchigo {
     /** A carga (a cutscene) em ticks: a forma final aparece, tudo se cala, o corte. */
     public static final int TRANSFORMA = 30, SILENCIO = 84, CARGA = 120;
-    /** O véu: 9 blocos de largura, avança 40 a 2 por tick. */
-    public static final double ALCANCE = 40, MEIA_LARGURA = 4.5, PASSO = 2;
+    /** O véu: uma lâmina de escuridão de 3 blocos de largura que avança 150 em 1 s (7,5 por tick). */
+    public static final double ALCANCE = 150, MEIA_LARGURA = 1.5, PASSO = 7.5;
     /** Ticks do avanço, e os do véu se desfazendo e do céu voltando ao normal. */
     public static final int TICKS = (int) (ALCANCE / PASSO), RESTO = 30;
     /** A altura do véu no meio, e em quantos blocos atrás da frente ele termina de subir. */
-    public static final double ALTURA = 13, SUBIDA = 4;
+    public static final double ALTURA = 40, SUBIDA = 12;
     /** O céu fica todo escuro nesses ticks depois do corte. */
     public static final int CEU_ESCURECE = 4;
     /** Quanto o céu já escurece durante a carga, da transformação em diante. */

@@ -8,24 +8,26 @@ import org.junit.jupiter.api.Test;
 class MugetsuIchigoTest {
 
     @Test
-    void oVeuAvancaDoisBlocosPorTickAteQuarenta() {
+    void oVeuAvancaCentoECinquentaBlocosEmUmSegundo() {
         assertEquals(0, MugetsuIchigo.frente(0), 1e-9);
-        assertEquals(20, MugetsuIchigo.frente(10), 1e-9);
-        assertEquals(1, MugetsuIchigo.frente(.5), 1e-9, "anda liso entre os ticks");
-        assertEquals(40, MugetsuIchigo.frente(20), 1e-9);
-        assertEquals(40, MugetsuIchigo.frente(35), 1e-9, "para no alcance");
+        assertEquals(75, MugetsuIchigo.frente(10), 1e-9);
+        assertEquals(3.75, MugetsuIchigo.frente(.5), 1e-9, "anda liso entre os ticks");
+        assertEquals(150, MugetsuIchigo.frente(20), 1e-9);
+        assertEquals(150, MugetsuIchigo.frente(35), 1e-9, "para no alcance");
+        assertEquals(20, MugetsuIchigo.TICKS, "o som do Mugetsu foi feito para esse tempo");
         assertEquals(0, MugetsuIchigo.frente(-3), 1e-9);
         assertEquals(MugetsuIchigo.ALCANCE / MugetsuIchigo.PASSO, MugetsuIchigo.TICKS);
-        assertEquals(9, 2 * MugetsuIchigo.MEIA_LARGURA, "9 blocos de largura");
+        assertEquals(3, 2 * MugetsuIchigo.MEIA_LARGURA, "fino: 3 blocos de largura");
+        assertEquals(40, MugetsuIchigo.ALTURA, "e 40 de altura");
     }
 
     @Test
     void oVeuSobeDoChaoAtrasDaFrenteENaoExisteAdianteDela() {
-        double t = 10; // a frente está a 20 blocos
-        assertEquals(0, MugetsuIchigo.altura(0, 20.5, t), 1e-9, "adiante da frente não há véu");
-        assertEquals(0, MugetsuIchigo.altura(0, 30, t), 1e-9);
-        assertTrue(MugetsuIchigo.altura(0, 19.5, t) < MugetsuIchigo.altura(0, 15, t), "logo atrás da frente ele ainda está subindo");
-        assertTrue(MugetsuIchigo.altura(0, 10, t) > 8, "no meio, já alto: " + MugetsuIchigo.altura(0, 10, t));
+        double t = 10; // a frente está a 75 blocos
+        assertEquals(0, MugetsuIchigo.altura(0, 75.5, t), 1e-9, "adiante da frente não há véu");
+        assertEquals(0, MugetsuIchigo.altura(0, 100, t), 1e-9);
+        assertTrue(MugetsuIchigo.altura(0, 73, t) < MugetsuIchigo.altura(0, 50, t), "logo atrás da frente ele ainda está subindo");
+        assertTrue(MugetsuIchigo.altura(0, 20, t) > 25, "no meio, já alto: " + MugetsuIchigo.altura(0, 20, t));
         assertTrue(MugetsuIchigo.altura(0, 10, t) <= MugetsuIchigo.ALTURA * 1.01);
     }
 

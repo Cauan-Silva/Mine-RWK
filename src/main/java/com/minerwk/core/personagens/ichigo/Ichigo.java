@@ -599,6 +599,10 @@ public final class Ichigo {
         static final float DANO = 40;
         /** As medidas são as do visual ({@link MugetsuIchigo}): o dano pega onde o véu é desenhado. */
         static final double ALCANCE = MugetsuIchigo.ALCANCE, MEIA_LARGURA = MugetsuIchigo.MEIA_LARGURA, PASSO = MugetsuIchigo.PASSO;
+        static final double ALTURA = MugetsuIchigo.ALTURA;
+        /** Pontos de dano por tick ao longo do avanço, e de quantos em quantos blocos para cima. */
+        private static final int FATIAS = 5;
+        private static final double DEGRAU = 2.5;
         /** Ticks do avanço, e os do céu voltando ao normal depois (só no visual). */
         static final int TICKS = MugetsuIchigo.TICKS, RESTO = MugetsuIchigo.RESTO;
         private final Vetor origem, rumo;
@@ -618,10 +622,14 @@ public final class Ichigo {
 
         @Override
         public void tick(Contexto ctx, int t) {
-            // Dois pontos por tick: o passo é de 2 blocos e a faixa tem de ficar sem vãos.
-            double ate = (t + 1) * PASSO;
-            int feridos = ctx.danoDiretoUmaVez(origem.mais(rumo.vezes(ate - PASSO / 2)), MEIA_LARGURA, dano, atingidos)
-                    + ctx.danoDiretoUmaVez(origem.mais(rumo.vezes(ate)), MEIA_LARGURA, dano, atingidos);
+            // O véu é fino, alto e rápido: cada tick cobre o trecho andado em fatias, dos pés ao topo, sem vãos.
+            int feridos = 0;
+            for (int k = 1; k <= FATIAS; k++) {
+                Vetor base = origem.mais(rumo.vezes((t + k / (double) FATIAS) * PASSO));
+                for (double h = 0; h <= ALTURA + 1e-9; h += DEGRAU) {
+                    feridos += ctx.danoDiretoUmaVez(base.mais(new Vetor(0, h, 0)), MEIA_LARGURA, dano, atingidos);
+                }
+            }
             if (feridos > 0) ctx.acertou(1f);
         }
     }

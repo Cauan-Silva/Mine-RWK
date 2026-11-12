@@ -42,3 +42,4 @@ Voltar para [[00 Início]].
 - [[2026-11-11 Ichigo parte 5]]: som dos golpes do Ichigo (11 sons sintetizados, presos aos visuais) e o `SonsDosVisuais` para todos os personagens
 - [[2026-11-11 Ichigo parte 6 mecânica]]: máscara Hollow, Mugetsu e a perda dos poderes funcionando no servidor (falta a apresentação)
 - [[2026-11-11 Ichigo parte 6 apresentação]]: máscara no rosto, forma final, cutscene, véu, sons, animações e o aviso de "sem poderes" (a parte 6 fica completa)
+- [[2026-11-12 Mugetsu fino e longo]]: o véu do Mugetsu passa a ter 3 de largura, 40 de altura e 150 de alcance, a pedido do autor

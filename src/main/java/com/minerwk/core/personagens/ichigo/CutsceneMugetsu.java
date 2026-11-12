@@ -32,8 +32,9 @@ public final class CutsceneMugetsu {
             new Quadro(S + 3, new Vetor(-.95, .35, -2.3), new Vetor(0, 0, 6), 1, 0, true),
             new Quadro(C, new Vetor(-.75, .3, -1.9), new Vetor(0, .1, 8), .95, 0),
             // O corte: plano aberto, de lado e do alto, fora da faixa do véu (de dentro dele não se vê nada).
-            new Quadro(PLANO_DO_VEU, new Vetor(10, 5, -5), new Vetor(0, 1, 16), 1.15, 0, true),
-            new Quadro(C + MugetsuIchigo.TICKS + 6, new Vetor(12, 6.5, -3), new Vetor(0, 1, 26), 1.15, 0),
+            // O véu tem 40 de altura e 150 de comprimento: a câmera abre bem para ele caber.
+            new Quadro(PLANO_DO_VEU, new Vetor(26, 9, -16), new Vetor(0, 14, 30), 1.15, 0, true),
+            new Quadro(C + MugetsuIchigo.TICKS + 6, new Vetor(34, 12, -12), new Vetor(0, 16, 60), 1.15, 0),
             // De volta ao Ichigo, já sem poderes.
             new Quadro(C + MugetsuIchigo.TICKS + 22, new Vetor(0, .3, -3.4), new Vetor(0, 0, 4), 1, 0)));
 
