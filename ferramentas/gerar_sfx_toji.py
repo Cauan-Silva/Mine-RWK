@@ -1,4 +1,4 @@
-"""Sons do Toji, sintetizados pelo motor em camadas (ferramentas/sfx_motor.py). Sem áudio de terceiros.
+"""Sons do Toji: síntese do motor em camadas (ferramentas/sfx_motor.py) com gravações CC0 por cima (gravacoes.py).
 
 Rodar: python ferramentas/gerar_sfx_toji.py [--preview caminho.wav]
 Escreve os .ogg em assets/minerwk/sounds/toji/, as entradas do sounds.json, as legendas e o manifesto
@@ -10,6 +10,8 @@ sem os zumbidos e tons vítreos dos sons do Gojo. Só o despertar, que é do Goj
 import argparse
 import numpy as np
 import sfx_motor as m
+from gravacoes import *  # noqa: F401,F403 (as listas de gravações)
+from gravacoes import _k
 
 T = m.TICK
 QUEDA = 60 * T   # TojiBoss.QUEDA: o tempo no chão antes de se levantar
@@ -49,7 +51,7 @@ def sopro(s, ini, ataque, queda, lo=300, hi=6000, cor=.3):
     return s.ruido(lo, hi, cor) * s.env(ini, ataque, queda)
 
 
-def sintese(nome, s):
+def sintetico(nome, s):
     if nome == 'toji_entrada':
         # Ar descendo e o baque dos pés no chão.
         ar = .45 * sopro(s, 0, .28, 9, 200, 3000, .5)
@@ -128,6 +130,44 @@ def sintese(nome, s):
             + .3 * s.passa_baixa(s.ruido(80, 2000, .7), 700) * s.env(.76, .02, 5)
         return s.reverb(lanca + corpo, 1.3, .25, 4000)
     raise KeyError(nome)
+
+
+def gravado(nome, s):
+    """O Toji é todo físico: as camadas gravadas (CC0) fazem o grosso, e a síntese fica por baixo."""
+    if nome == 'toji_entrada':
+        return s.amostra(WHOOSH, 0, .5, .7) + s.amostra(BAQUES, .3, 1., .8) + s.amostra(PEDRAS, .32, .35, 1.2)
+    if nome == 'toji_aviso':
+        return s.amostra(SACAR, 0, .8, 1.)
+    if nome == 'toji_investida':
+        return s.amostra(BAQUES, 0, .7, 1.) + s.amostra(WHOOSH, .02, 1., 1.)
+    if nome == 'toji_lanca':
+        return s.amostra([ESPADA_AR, LAMINA_FACA], 0, .8, 1.1) + s.amostra(METAL, .07, .7, 1.1)
+    if nome == 'toji_anula':
+        return s.amostra(VIDRO, 0, .8, 1.) + s.amostra(BAQUES, .02, .4, .8)
+    if nome == 'toji_corrente':
+        return s.amostra(CORRENTE_MEDIA, 0, .8, 1.) + s.amostra(CORRENTE_PESADA, .35, 1., 1.)
+    if nome == 'toji_soco':
+        return s.amostra(MURROS, 0, 1., 1.)
+    if nome == 'toji_nuvem':
+        return s.amostra(WHOOSH, 0, .6, 1.2) + s.amostra(MADEIRA + [PICAR], .05, .9, .9) + s.amostra(CORRENTE_LEVE, .07, .35, 1.2)
+    if nome == 'toji_sumir':
+        return s.amostra(WHOOSH, 0, .7, 1.1) + s.amostra(PANO, 0, .4, 1.)
+    if nome == 'toji_surgir':
+        return s.amostra(WHOOSH, 0, .7, 1.2, inverter=True) + s.amostra(BAQUES, .09, .6, 1.)
+    if nome == 'toji_marca':
+        return s.amostra(SACAR, 0, .6, .7) + s.amostra(METAL, .58, .7, 1.2)
+    if nome == 'toji_fase':
+        return s.amostra(BAQUES, 0, .9, .7) + s.amostra(PANO, .15, .6, .8) + s.amostra(METAL, .7, .6, .9) + s.amostra(METAL, .95, .5, 1.)
+    if nome == 'toji_queda':
+        return s.amostra(MURROS, 0, 1., .8) + s.amostra(METAL, 0, .4, 1.)
+    if nome == 'toji_morte':
+        return (s.amostra(METAL, .15, .8, .9) + s.amostra(METAL, .3, .5, 1.) + s.amostra(BAQUES, .75, 1., .7)
+                + s.amostra(PANO, .76, .4, .8))
+    return None  # o despertar é do Gojo: só o acorde sintetizado
+
+
+def sintese(nome, s):
+    return hibrido(s, sintetico(nome, s), gravado(nome, s))
 
 
 def gerar(preview=None):

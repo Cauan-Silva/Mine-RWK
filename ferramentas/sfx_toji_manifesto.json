@@ -3,9 +3,9 @@
     "duration": 1.6,
     "sample_rate": 48000,
     "channels": 1,
-    "peak": 0.57841,
-    "rms": 0.1262,
-    "sha256": "e7da3c32e40fd1d6188170fd3aad107a046c6e0af8a1a4f705952cf6d447880b",
+    "peak": 0.59337,
+    "rms": 0.10418,
+    "sha256": "38cfc51f12ebc9704075bc2899486fdc5ada8e9b5a35aae14da5a481445006bc",
     "ticks": 32,
     "marcos": {}
   },
@@ -13,25 +13,25 @@
     "duration": 1.5385,
     "sample_rate": 48000,
     "channels": 1,
-    "peak": 0.6056,
-    "rms": 0.15136,
-    "sha256": "d5ede05b118e88ecfd8bdad702d276336102b367f0fd8a80e0a58042011992dc"
+    "peak": 0.60129,
+    "rms": 0.1022,
+    "sha256": "1b365b78939d461919a49f21f8cd76b4a6c45e41b8e9882f72b79da2ba273767"
   },
   "toji_entrada_3": {
     "duration": 1.6666,
     "sample_rate": 48000,
     "channels": 1,
-    "peak": 0.61985,
-    "rms": 0.15928,
-    "sha256": "afa2dcef3ee5e33bbb2dbf8dac28e3045276b6dd9466b00a006a746754e433c1"
+    "peak": 0.60601,
+    "rms": 0.13012,
+    "sha256": "c658294363047fbc26219775df36f64b9ccc3f4e187e2862bab18371cbdd6d2d"
   },
   "toji_aviso": {
     "duration": 0.35,
     "sample_rate": 48000,
     "channels": 1,
-    "peak": 0.64083,
-    "rms": 0.07442,
-    "sha256": "7807822ff6becf6ebabd79984b740b7b344118fbdf7abd86732b77dcfe74d15b",
+    "peak": 0.68469,
+    "rms": 0.12373,
+    "sha256": "62b1855283170984ad6608a82eb470202d8debff53cc3c599a28c8de459931b5",
     "ticks": 7,
     "marcos": {}
   },
@@ -39,25 +39,25 @@
     "duration": 0.3365,
     "sample_rate": 48000,
     "channels": 1,
-    "peak": 0.62774,
-    "rms": 0.07718,
-    "sha256": "588d66dfe69f4f05ddc2bbab3079c497d7bb075f322707739cd0bfe2dbb770a5"
+    "peak": 0.65127,
+    "rms": 0.14514,
+    "sha256": "06ed6bec9e241cb45aa0184fbfaaf87718b0640f9348ed15e8d4e0710bf7cf65"
   },
   "toji_aviso_3": {
     "duration": 0.3646,
     "sample_rate": 48000,
     "channels": 1,
-    "peak": 0.60498,
-    "rms": 0.07673,
-    "sha256": "cdaff882f7c456b3c82b2b95c9dd60bd47194cb23c4291b27e547b3661b73e0f"
+    "peak": 0.6468,
+    "rms": 0.14575,
+    "sha256": "b396488d1f288003b9f489d98db13835a98aad77e6750425ed17f13031596a62"
   },
   "toji_investida": {
     "duration": 0.7,
     "sample_rate": 48000,
     "channels": 1,
-    "peak": 0.61983,
-    "rms": 0.12543,
-    "sha256": "3b102177394a459d839d7e21df1c21868c2f0b538db125477a9503e1ca531620",
+    "peak": 0.62614,
+    "rms": 0.13456,
+    "sha256": "729c00d0e95b4da1afc347c7f3423affe94b06f02c0d45d2c30e1c0c43695f2d",
     "ticks": 14,
     "marcos": {}
   },
@@ -65,25 +65,25 @@
     "duration": 0.6731,
     "sample_rate": 48000,
     "channels": 1,
-    "peak": 0.60638,
-    "rms": 0.12475,
-    "sha256": "588439d59d97b10d8d2207d6b232e5e3f93471473e8b70e205ff77725e8bc7a0"
+    "peak": 0.64233,
+    "rms": 0.15012,
+    "sha256": "8a44702d4ef6cee9eaf315b2baa95812c5f365beb47ea28cb7f068d3fa1c7c38"
   },
   "toji_investida_3": {
     "duration": 0.7291,
     "sample_rate": 48000,
     "channels": 1,
-    "peak": 0.68487,
-    "rms": 0.13378,
-    "sha256": "41cf98adc782b933ddab36411848a32517d1a2367bbbe30fccae0345326f3023"
+    "peak": 0.61809,
+    "rms": 0.13841,
+    "sha256": "082c4d64fd0e1c0eb2a6b81b47559feaab49ab216dd9a82395f0e7869de25a3b"
   },
   "toji_lanca": {
     "duration": 0.6,
     "sample_rate": 48000,
     "channels": 1,
     "peak": 0.64776,
-    "rms": 0.07517,
-    "sha256": "1bf49d989670ccf692eea01b47c6ed30f9450fb5c96b26f92e6d9e5e6d3d317a",
+    "rms": 0.08955,
+    "sha256": "296f9f55da2de7424c100e79b0715af52427eb915b881e09a52445799d6f932b",
     "ticks": 12,
     "marcos": {}
   },
@@ -92,24 +92,24 @@
     "sample_rate": 48000,
     "channels": 1,
     "peak": 0.63492,
-    "rms": 0.08219,
-    "sha256": "be2c7672b95d3bed84cd7e5dca87c71852bcad9be76bf81cd848adb7910bdc22"
+    "rms": 0.09941,
+    "sha256": "711e997adcf8f3fe00427c3de064fed130650b0db4f151656bae3f3ed3b5c4a9"
   },
   "toji_lanca_3": {
     "duration": 0.625,
     "sample_rate": 48000,
     "channels": 1,
-    "peak": 0.70015,
-    "rms": 0.08967,
-    "sha256": "405591ff7a46a0cc86e225298cc4e910f98d1db6a5dfe391ae0d76c18bbfdd86"
+    "peak": 0.70327,
+    "rms": 0.11393,
+    "sha256": "c7e76669e51c5ec53a5aef313e55b0d60bc4c51a65b7d1242fabbf445f773f91"
   },
   "toji_anula": {
     "duration": 1.1,
     "sample_rate": 48000,
     "channels": 1,
-    "peak": 0.61595,
-    "rms": 0.15124,
-    "sha256": "52d5c7fe06ec77b7ab0fc731d72562059042733ef74d0d6465954cc9dc106a06",
+    "peak": 0.60115,
+    "rms": 0.12524,
+    "sha256": "8cec101719b62b4356c9933fa4dd432fcc28d923aeb89f0b701afaf14e673876",
     "ticks": 22,
     "marcos": {}
   },
@@ -117,25 +117,25 @@
     "duration": 1.0577,
     "sample_rate": 48000,
     "channels": 1,
-    "peak": 0.60734,
-    "rms": 0.17662,
-    "sha256": "155b92e88607640ccf340a7f283a8bc1920eebbe705c9313a6c756c3872f1494"
+    "peak": 0.59429,
+    "rms": 0.14588,
+    "sha256": "8656d30385f5d8f5416f89e75c474b403f229b379a1f3eaff3581a4afc12f59e"
   },
   "toji_anula_3": {
     "duration": 1.1458,
     "sample_rate": 48000,
     "channels": 1,
-    "peak": 0.59881,
-    "rms": 0.14284,
-    "sha256": "485c17ec5eb8020cd835d0eb08a4710beae39914c84191fcf5ab60cc879d59e9"
+    "peak": 0.6234,
+    "rms": 0.1384,
+    "sha256": "4f611a2fb0774c9927c23cbb2708b86a730b7a49b403c1fe99fc2879f70d6280"
   },
   "toji_corrente": {
     "duration": 0.9,
     "sample_rate": 48000,
     "channels": 1,
-    "peak": 0.65072,
-    "rms": 0.11324,
-    "sha256": "867137c8b18febdfbb19fe333c1188caa703252f4360a81e9a2a67667f623b6f",
+    "peak": 0.62496,
+    "rms": 0.09415,
+    "sha256": "d74ed68912ddae6edeb41e11e3cea1856b0ca567e82580fe2860701f302177ca",
     "ticks": 18,
     "marcos": {}
   },
@@ -143,25 +143,25 @@
     "duration": 0.8654,
     "sample_rate": 48000,
     "channels": 1,
-    "peak": 0.6051,
-    "rms": 0.11935,
-    "sha256": "e577b7875e9b16ffc373912af7acd488a7317b2e5369ea8557b8f18c627f9142"
+    "peak": 0.63044,
+    "rms": 0.09688,
+    "sha256": "3897ba594b716443b282f34be141d654aa109003ccfc8645fcec5755df9f3270"
   },
   "toji_corrente_3": {
     "duration": 0.9375,
     "sample_rate": 48000,
     "channels": 1,
-    "peak": 0.63037,
-    "rms": 0.11724,
-    "sha256": "ac538e336a195557482256ed0483b01cb2072b7053b57984b5333c7434501f9e"
+    "peak": 0.62563,
+    "rms": 0.09779,
+    "sha256": "23c708c259c0f1cc8f2d7c50ccc66d93c6e0dc2d0aedfaf9a2e46a1ae5879987"
   },
   "toji_soco": {
     "duration": 0.5,
     "sample_rate": 48000,
     "channels": 1,
-    "peak": 0.60686,
-    "rms": 0.15361,
-    "sha256": "b214d5ddbf7b85988c913d20b47f2e0d51cb7345120616b9b268fb62befa911e",
+    "peak": 0.58525,
+    "rms": 0.1371,
+    "sha256": "97e51daf53f1c55fa33a049f610799feed80fe4f71f8e7d6ab1979f86730a963",
     "ticks": 10,
     "marcos": {}
   },
@@ -169,25 +169,25 @@
     "duration": 0.4808,
     "sample_rate": 48000,
     "channels": 1,
-    "peak": 0.6074,
-    "rms": 0.16118,
-    "sha256": "89dc0bcc7b63100da844ea3f1b70b2cd08472063cc4e42aa1dd7286e5b5beeb5"
+    "peak": 0.62908,
+    "rms": 0.15104,
+    "sha256": "f746d27c832696a90662b7c43a69ae8d045b4a462152220871e8129840f84ea2"
   },
   "toji_soco_3": {
     "duration": 0.5208,
     "sample_rate": 48000,
     "channels": 1,
-    "peak": 0.59588,
-    "rms": 0.13932,
-    "sha256": "4a09a79794b3f349fd9627c010c4a2d9e65da1cceb918e0802e11bfe4603e9f5"
+    "peak": 0.63557,
+    "rms": 0.13376,
+    "sha256": "25f475294d409eb700db6023b1984c1b9d2adb6f9167f62b96ab208aa81a514f"
   },
   "toji_nuvem": {
     "duration": 0.45,
     "sample_rate": 48000,
     "channels": 1,
-    "peak": 0.60575,
-    "rms": 0.10521,
-    "sha256": "8a19cf2a827d0d2d98f7f67f227cb0589021ccf62cb7f1547dfb5eea053189af",
+    "peak": 0.58178,
+    "rms": 0.09858,
+    "sha256": "e71630336a9524fc54e8a13a01c231645a040f8159b61f1d86a35b4620dd5d0e",
     "ticks": 9,
     "marcos": {}
   },
@@ -195,25 +195,25 @@
     "duration": 0.4327,
     "sample_rate": 48000,
     "channels": 1,
-    "peak": 0.61937,
-    "rms": 0.10396,
-    "sha256": "67a895025cfaf4af70ae3a1f661c00dd1bfb321ce8414364aba4b6b504788908"
+    "peak": 0.61742,
+    "rms": 0.11927,
+    "sha256": "1dfa519d0b1f21884872cec6e34ab84d614237fa7bcca50f49275c9c540da5e1"
   },
   "toji_nuvem_3": {
     "duration": 0.4687,
     "sample_rate": 48000,
     "channels": 1,
-    "peak": 0.61788,
-    "rms": 0.10464,
-    "sha256": "856450a62df85dc3025e8665834f7c8a477c288a415bb243a702554879395761"
+    "peak": 0.64117,
+    "rms": 0.11688,
+    "sha256": "a34998e692d8aa77b4624dbcc0e8b44cb4a7e4a476d896d587071c17581cc4af"
   },
   "toji_sumir": {
     "duration": 0.6,
     "sample_rate": 48000,
     "channels": 1,
-    "peak": 0.62401,
-    "rms": 0.13583,
-    "sha256": "48f5d4fbe35e5ae0a671531a4c0b8f3a8c90335c0d7916a4704af0fac3d79264",
+    "peak": 0.64965,
+    "rms": 0.15245,
+    "sha256": "ed73c5b1ef39f3176d3beffab0d6da45bb3505320afcba26f518e951d688de79",
     "ticks": 12,
     "marcos": {}
   },
@@ -221,25 +221,25 @@
     "duration": 0.5769,
     "sample_rate": 48000,
     "channels": 1,
-    "peak": 0.66064,
-    "rms": 0.13678,
-    "sha256": "a80abb8305711913b017cb4487ecbce917e641fcc6d851148e74ae719a769fcd"
+    "peak": 0.63411,
+    "rms": 0.16659,
+    "sha256": "3b42f89f9716b4562272f8f7327258b8da59a65d5cb6900b6129976a15c0a73f"
   },
   "toji_sumir_3": {
     "duration": 0.625,
     "sample_rate": 48000,
     "channels": 1,
-    "peak": 0.61935,
-    "rms": 0.13177,
-    "sha256": "069893b522b0065daaeb547d62ebe9cb28a1708f81ad4925392bb05703ef98b6"
+    "peak": 0.59436,
+    "rms": 0.16057,
+    "sha256": "b4cf6f56af5217aacb177124e06cc6fc8e82bd8009203ab9174db4161903e641"
   },
   "toji_surgir": {
     "duration": 0.5,
     "sample_rate": 48000,
     "channels": 1,
-    "peak": 0.66122,
-    "rms": 0.09572,
-    "sha256": "8a4eac5ef73b4e19818720ccade9e6a0d3a7cc7f111a06ae7ada944621dda7ba",
+    "peak": 0.72055,
+    "rms": 0.09408,
+    "sha256": "54566825901b79c5fecbc6a129cb2678a5c4559b83abb50a6c1554635bf93fac",
     "ticks": 10,
     "marcos": {}
   },
@@ -247,25 +247,25 @@
     "duration": 0.4808,
     "sample_rate": 48000,
     "channels": 1,
-    "peak": 0.58399,
-    "rms": 0.08753,
-    "sha256": "53983b1f6ed1cd4562c40316e5bfaf21488110f37a65b9fcf583c4a02a62a37b"
+    "peak": 0.60593,
+    "rms": 0.08455,
+    "sha256": "c740a9552eb428803c979ad80acdbd0e8f97a4dac80d90f70a46673e97a8009f"
   },
   "toji_surgir_3": {
     "duration": 0.5208,
     "sample_rate": 48000,
     "channels": 1,
-    "peak": 0.58542,
-    "rms": 0.09817,
-    "sha256": "78680f5dff1a23f43a0374b1659928443be1a201df1cff5b1cce13098155cb93"
+    "peak": 0.61103,
+    "rms": 0.10634,
+    "sha256": "9bfef1ef440e4562ffa2b9b65f3c0f05a38355010b034b3971354d451cdf7278"
   },
   "toji_marca": {
     "duration": 1.0,
     "sample_rate": 48000,
     "channels": 1,
-    "peak": 0.65793,
-    "rms": 0.12206,
-    "sha256": "3bf16e06202d4521bfbcdd89047a7b513b80b5b5e22c9a02c5ffbd9d7faebe48",
+    "peak": 0.62478,
+    "rms": 0.13341,
+    "sha256": "98915c40ff6c871ac04ed56dce9fdb7f19cd695f525ff8d434a2759dcfc68211",
     "ticks": 20,
     "marcos": {}
   },
@@ -273,25 +273,25 @@
     "duration": 0.9615,
     "sample_rate": 48000,
     "channels": 1,
-    "peak": 0.69987,
-    "rms": 0.13436,
-    "sha256": "6ef914a77b5c88a7360eec77ecfc5ebbb503d0e79b365db5598db829b5105349"
+    "peak": 0.75547,
+    "rms": 0.13993,
+    "sha256": "2cbcafbdcd21747b366a78f6d7cab4e6257c4a474f02843668e4283d112e32b2"
   },
   "toji_marca_3": {
     "duration": 1.0416,
     "sample_rate": 48000,
     "channels": 1,
-    "peak": 0.5513,
-    "rms": 0.10249,
-    "sha256": "c496aab38415ce13ddf2a21db2f73ec47ddb4875f69c8441112c02f489888c6c"
+    "peak": 0.54578,
+    "rms": 0.10919,
+    "sha256": "0ce67860366e8ec32af23cde2c24ef1302f8b56f6acc04a0c6067af7bb802515"
   },
   "toji_fase": {
     "duration": 1.8,
     "sample_rate": 48000,
     "channels": 1,
-    "peak": 0.61351,
-    "rms": 0.14513,
-    "sha256": "116c8536dc3d6065ed8b4146ee2b5be94587a034dcb81cc6c124c00266521c26",
+    "peak": 0.60492,
+    "rms": 0.15204,
+    "sha256": "762c409c47fc74a296814f819ea27a28560a14509a919fed1928ffc2b8fdd0b2",
     "ticks": 36,
     "marcos": {}
   },
@@ -299,25 +299,25 @@
     "duration": 1.7308,
     "sample_rate": 48000,
     "channels": 1,
-    "peak": 0.72521,
-    "rms": 0.15763,
-    "sha256": "96c5e0f197634e0a1cd5d15ea1124df8232536278b03a2f3e7315663ea99a0e7"
+    "peak": 0.63586,
+    "rms": 0.1588,
+    "sha256": "d9bb2e315d99958da69d19acbd049ee37ca23615031bad0470da58a918193086"
   },
   "toji_fase_3": {
     "duration": 1.875,
     "sample_rate": 48000,
     "channels": 1,
-    "peak": 0.57756,
-    "rms": 0.14497,
-    "sha256": "6a3cbeb04c83ee6386198afa1d0c56bfb703d7add973b7b07fdb1561404f3b39"
+    "peak": 0.58183,
+    "rms": 0.14966,
+    "sha256": "7c37532d7e8fff95aa4126c715254faad929e6724c7477df4e89bf32e1e2c2af"
   },
   "toji_queda": {
     "duration": 3.3,
     "sample_rate": 48000,
     "channels": 1,
-    "peak": 0.58268,
-    "rms": 0.13794,
-    "sha256": "e535266db8a7bf320bfac09b19a4dd2c745037a1fd135305dd85cbe1cf5b5c05",
+    "peak": 0.62146,
+    "rms": 0.11988,
+    "sha256": "f6a55b43af1add6fb6cc6d1899d84434a422ed69b41f5bc5eb1d32f4b6fc5015",
     "ticks": 66,
     "marcos": {
       "levanta": 60
@@ -327,17 +327,17 @@
     "duration": 3.1731,
     "sample_rate": 48000,
     "channels": 1,
-    "peak": 0.6181,
-    "rms": 0.14698,
-    "sha256": "636c0f835b8e98b9e3ddf6b4179daff32aa9a3795d98f360ecff1c1395e35312"
+    "peak": 0.60032,
+    "rms": 0.11114,
+    "sha256": "d45486ddf94e98b399870fb9097ee7bd5a43cd379d141695ee623e698ab34c72"
   },
   "toji_queda_3": {
     "duration": 3.4375,
     "sample_rate": 48000,
     "channels": 1,
-    "peak": 0.60361,
-    "rms": 0.13553,
-    "sha256": "94d4222559249b398cef1c60a4aae2a736efcd9e7582a6205711abcc86e0209b"
+    "peak": 0.58728,
+    "rms": 0.10091,
+    "sha256": "22a915724b552520c773a3a6c065ad8b18e7e41a35ed2c5395438a2c5cd87333"
   },
   "toji_despertar": {
     "duration": 2.2,
@@ -345,7 +345,7 @@
     "channels": 1,
     "peak": 0.62701,
     "rms": 0.15845,
-    "sha256": "4e521530a1f05f255d7ac4abacbd94140e5b2812467cad886dcb56293b1808e5",
+    "sha256": "8a53f609d9af6f9f9cb23ab06f286d949cae0dad63975c4f6b512f1770f70f1c",
     "ticks": 44,
     "marcos": {}
   },
@@ -355,7 +355,7 @@
     "channels": 1,
     "peak": 0.59344,
     "rms": 0.15786,
-    "sha256": "55e943e8da7cb968e533ecf22eab5118e292af2fdfbfbaef900baf8d99f5ac3b"
+    "sha256": "474b4ce293c52c734d72aac65b597744d256be49ffb5e7c640cd18fdd1641445"
   },
   "toji_despertar_3": {
     "duration": 2.2916,
@@ -363,15 +363,15 @@
     "channels": 1,
     "peak": 0.62567,
     "rms": 0.15965,
-    "sha256": "64d6dd14799318325b95c982faad29d2a8e0a013f3a7540ea79f23dba65d7a19"
+    "sha256": "1c1676dedf7bd62d15a7f1d5cda8efd141f14af72014151877aefc28bfd1fe9b"
   },
   "toji_morte": {
     "duration": 1.8,
     "sample_rate": 48000,
     "channels": 1,
-    "peak": 0.62083,
-    "rms": 0.17095,
-    "sha256": "b4e64163e6edfd3d6e14e07d5e2db87357903db06bae2f9ef05c64ea9b3af1b9",
+    "peak": 0.60159,
+    "rms": 0.13229,
+    "sha256": "30c1ca8af2c31917bd29acd4e3b3d3343426f697311d8ddabe9fa27141319b3f",
     "ticks": 36,
     "marcos": {}
   },
@@ -379,16 +379,16 @@
     "duration": 1.7308,
     "sample_rate": 48000,
     "channels": 1,
-    "peak": 0.59624,
-    "rms": 0.1751,
-    "sha256": "3b73db83321d7cb15425462268464d41073841241b19a9b140f30fa69f3e267a"
+    "peak": 0.62734,
+    "rms": 0.1371,
+    "sha256": "9b6b8e5b6b74786c2994264e05b6158f9d83e7b336d0e82d31b12f98efda3d3b"
   },
   "toji_morte_3": {
     "duration": 1.875,
     "sample_rate": 48000,
     "channels": 1,
-    "peak": 0.61075,
-    "rms": 0.1806,
-    "sha256": "2171d7967c4fd6109c5b4c5abc2a0306150aad84990637f1299364cefa63f3b1"
+    "peak": 0.611,
+    "rms": 0.12772,
+    "sha256": "ffb1955ef2c6ed5e07adf964a6c89b15b6beb933393571638b6fab7ca86c94f2"
   }
 }

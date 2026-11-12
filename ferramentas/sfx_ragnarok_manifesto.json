@@ -5,7 +5,7 @@
     "channels": 1,
     "peak": 0.63797,
     "rms": 0.21763,
-    "sha256": "b0ab65dd7bed9bb27b585f879fc2e73fe51c587f6a20fc2b72bfcd15f78df5e5",
+    "sha256": "1b123e772b2c242203c50e97200d806e0db4c4475a729d2e3080aa1f000618f2",
     "ticks": 60,
     "marcos": {}
   },
@@ -15,7 +15,7 @@
     "channels": 1,
     "peak": 0.61168,
     "rms": 0.18578,
-    "sha256": "8ccc16b475b5857052f38956804299a650591efb65715e601c718aec472d2182"
+    "sha256": "7ed54caa15d41cf5e87e190fbbfbf554c2ddf4a67b40e2d653ec76476f683b8e"
   },
   "ragnarok_entrada_3": {
     "duration": 3.125,
@@ -23,7 +23,7 @@
     "channels": 1,
     "peak": 0.59962,
     "rms": 0.17737,
-    "sha256": "864107790b3c23a3b8bdb634c20a2006f700f82fa17a515cd8e1767b7d9ef72d"
+    "sha256": "7c85e0ae37091fabb57c241e08821c0175df8fea28813394c768e45d91e693fd"
   },
   "ragnarok_soco": {
     "duration": 1.4,
@@ -31,7 +31,7 @@
     "channels": 1,
     "peak": 0.60948,
     "rms": 0.1648,
-    "sha256": "54137a5cc85f2b616b7e65699337fa7c59ef98de13d3e8ec4f5cd05d7c79122a",
+    "sha256": "ea35ab3f7cdaa6e674e61661da547d4b1273b83d3438c66971031a422c97a403",
     "ticks": 28,
     "marcos": {}
   },
@@ -41,15 +41,15 @@
     "channels": 1,
     "peak": 0.61181,
     "rms": 0.15216,
-    "sha256": "18abcf8228a851822fb9d2ee0f2336dfa9e89a83ce5299c01b4c8b2ffbbffadf"
+    "sha256": "3e41e491be09d2cc76e951adaffb7e5868653b13871aab75a29bc0def7634711"
   },
   "ragnarok_soco_3": {
     "duration": 1.4583,
     "sample_rate": 48000,
     "channels": 1,
-    "peak": 0.60671,
-    "rms": 0.15554,
-    "sha256": "deaaed62d23f3a0f908b30d9ec7c1cf67a693515f5a234ea2168ca4815799f97"
+    "peak": 0.61545,
+    "rms": 0.15469,
+    "sha256": "bd6d6eaca167740db054b394afc0dcbec6f09b93412f99ce23e3275a94ef4cc8"
   },
   "ragnarok_rajada": {
     "duration": 1.2,
@@ -57,7 +57,7 @@
     "channels": 1,
     "peak": 0.60372,
     "rms": 0.14,
-    "sha256": "081c4d310c35e9497b1dbb45c8d5da57b108ec432b8f0a51df70599c552a02f3",
+    "sha256": "d0dd2a1065ab3dd7b920460ca76c4db2d1d79cb1366d22c9aaa2e8836ef8bbb1",
     "ticks": 24,
     "marcos": {}
   },
@@ -67,7 +67,7 @@
     "channels": 1,
     "peak": 0.60124,
     "rms": 0.13047,
-    "sha256": "4dad4e2aa033d8cb7a13b3ac532534d0f7faf7bb192f7341bd99979623a3532e"
+    "sha256": "c9ae31951f51790e3a7e6498c64199d03ae508c37efacc4d9b0ed87b9264c492"
   },
   "ragnarok_rajada_3": {
     "duration": 1.25,
@@ -75,7 +75,7 @@
     "channels": 1,
     "peak": 0.61667,
     "rms": 0.13477,
-    "sha256": "4606582b6471a291e627301be1ce396d807d5785aaa76da79264e425ac81e82c"
+    "sha256": "16ecfb387472c8db4e2b7550d2e1e4629d6f61264eaff1dbd2970ed201e3cac9"
   },
   "ragnarok_asas": {
     "duration": 1.6,
@@ -83,7 +83,7 @@
     "channels": 1,
     "peak": 0.61431,
     "rms": 0.10035,
-    "sha256": "3b31e5052260a5ca02bd9187fc2b9e07e673de724698ac3f07086791143bc288",
+    "sha256": "be737724b0010df82e8d6981f8cc442fbfad188b71918da68ca3006a0cae4609",
     "ticks": 32,
     "marcos": {}
   },
@@ -93,7 +93,7 @@
     "channels": 1,
     "peak": 0.58289,
     "rms": 0.13476,
-    "sha256": "94a6bf68fbb71880500a796d696a354e2997d1a96bfad2cad2a83ed0174b505f"
+    "sha256": "605db854ea38063dae240e5689dfce3a14df4e2860ce249e374f55ae115781cd"
   },
   "ragnarok_asas_3": {
     "duration": 1.6666,
@@ -101,15 +101,15 @@
     "channels": 1,
     "peak": 0.60522,
     "rms": 0.10293,
-    "sha256": "8e0a60ce82beb0e882b7daf694cca2e31a3912a520bcadb0b78f67ef0ca904c7"
+    "sha256": "afe3a621a97814dec254aed17ef054f48ccbb226ffca8f889f9ebaf5ce3dfc98"
   },
   "ragnarok_investida": {
     "duration": 1.4,
     "sample_rate": 48000,
     "channels": 1,
-    "peak": 0.60271,
-    "rms": 0.15121,
-    "sha256": "8194b33ba5a4898fb9171e1cb4b3b080575fa35e011148331677b8e2cbcb26a5",
+    "peak": 0.62326,
+    "rms": 0.1491,
+    "sha256": "8be2c98e1894807edfb103c07ad723511363c37a807dc30a589044fd76847460",
     "ticks": 28,
     "marcos": {}
   },
@@ -117,25 +117,25 @@
     "duration": 1.3461,
     "sample_rate": 48000,
     "channels": 1,
-    "peak": 0.59047,
-    "rms": 0.12972,
-    "sha256": "aef8b83be38e2601bda321a7e7a88523b7108c51987677c01f23ba59c2c1a4e7"
+    "peak": 0.58535,
+    "rms": 0.11442,
+    "sha256": "2e281804f484295753f831ad736e96679013eef7724511333ff896c3dc9e07c2"
   },
   "ragnarok_investida_3": {
     "duration": 1.4583,
     "sample_rate": 48000,
     "channels": 1,
-    "peak": 0.60282,
-    "rms": 0.13321,
-    "sha256": "3fd2b538073b4b989ebb8cd01bfd9f00a0a348dcdc644170a23aabbb656616a0"
+    "peak": 0.61385,
+    "rms": 0.15461,
+    "sha256": "ee74a35a99e2db425742eda72dec0cc7d262f8426d073d7d077dcc3b8737e44d"
   },
   "ragnarok_sopro_carga": {
     "duration": 2.1,
     "sample_rate": 48000,
     "channels": 1,
-    "peak": 0.60877,
-    "rms": 0.18169,
-    "sha256": "ca045bb89d68ceb61a04348ae280605d79220d3c4871baa528387af8824ef229",
+    "peak": 0.62799,
+    "rms": 0.14485,
+    "sha256": "d7444ab595da3a73d6082f159e45363973589c3416ae54d6b93b922eb054a5b5",
     "ticks": 42,
     "marcos": {
       "feixe": 40
@@ -147,7 +147,7 @@
     "channels": 1,
     "peak": 0.60864,
     "rms": 0.182,
-    "sha256": "88f199e32ad890e759e0ee8ef62d164c68e065579b458e759050c3c15a70ffe6"
+    "sha256": "d812d5c7f9e7d301edd81d87f6cb7db0a017b166b2af4e998ba96379633e118a"
   },
   "ragnarok_sopro_carga_3": {
     "duration": 2.1875,
@@ -155,7 +155,7 @@
     "channels": 1,
     "peak": 0.60892,
     "rms": 0.18129,
-    "sha256": "d0bf93e0d5d558948ddde046c771ad9c29a3c628287674ad61d22e62061efada"
+    "sha256": "986b457712f93b3ce488bed49e6ea2309a5052649a830b830a550d0107b8b343"
   },
   "ragnarok_sopro": {
     "duration": 2.6,
@@ -163,7 +163,7 @@
     "channels": 1,
     "peak": 0.60955,
     "rms": 0.14398,
-    "sha256": "c808a6bb5307c31e9b4430f60b2ab935197e3df2b83447dc40067273bbe4c9e0",
+    "sha256": "2f6191dde635006b9960a87d5aec8407c34d7dfabe6eb216ed51c0a2b23d000b",
     "ticks": 52,
     "marcos": {}
   },
@@ -173,7 +173,7 @@
     "channels": 1,
     "peak": 0.59598,
     "rms": 0.14668,
-    "sha256": "23cf33139195036cf45ec01f02755f5b844915d942ef6c05fe2d4835ee8861da"
+    "sha256": "711b79f74cbd08b87b7b7313dd8c196d865a35d7b0ebeffdccb90fee8cf66a14"
   },
   "ragnarok_sopro_3": {
     "duration": 2.7083,
@@ -181,7 +181,7 @@
     "channels": 1,
     "peak": 0.60085,
     "rms": 0.13863,
-    "sha256": "abcd8dba41a1e8cf3bf99aa336fa53cf4c9ddb17931ca086957571a7394d0d61"
+    "sha256": "72d24dc34d6c4a56a16a1daac894d8fc9fc717fbe575028101f1b562907ed945"
   },
   "ragnarok_pisao": {
     "duration": 1.6,
@@ -189,7 +189,7 @@
     "channels": 1,
     "peak": 0.60191,
     "rms": 0.15421,
-    "sha256": "ea54ce3086505f7d8703bae8e4f8d2702dbdc3382fc12aef6e8b7e17f471a688",
+    "sha256": "f6b035904b18978d7014c2bec6d34a305b86ee7ac3bf16b1b9f7be8467f1e98f",
     "ticks": 32,
     "marcos": {}
   },
@@ -197,17 +197,17 @@
     "duration": 1.5385,
     "sample_rate": 48000,
     "channels": 1,
-    "peak": 0.59817,
-    "rms": 0.1715,
-    "sha256": "73f6e153e42306a7fd66985d9f2df4e243b85159ad7fb73107df76e5e8855591"
+    "peak": 0.61878,
+    "rms": 0.171,
+    "sha256": "1364b60587cdb74f6cc69f3a38763c0d85824b4d698b79fe11e0bf95b32fc8a8"
   },
   "ragnarok_pisao_3": {
     "duration": 1.6666,
     "sample_rate": 48000,
     "channels": 1,
-    "peak": 0.59678,
-    "rms": 0.16698,
-    "sha256": "6cd820af1a89d1b36c8d013c798ce51ac18bd3937be74eb13d868f2f77945a26"
+    "peak": 0.60923,
+    "rms": 0.17927,
+    "sha256": "c1050e00c76532c635ae8cc09e12597eabfa1404960eb808eea0842b53b100d2"
   },
   "ragnarok_corte": {
     "duration": 0.9,
@@ -215,7 +215,7 @@
     "channels": 1,
     "peak": 0.60546,
     "rms": 0.13037,
-    "sha256": "b2e3f2a1f37322556db4db877da00d6bcc6733b4955925aee04aded9943c5f0b",
+    "sha256": "feaeb623e62ca177750a2fccac344e7b63345770848f93570069091a40b72c61",
     "ticks": 18,
     "marcos": {}
   },
@@ -225,7 +225,7 @@
     "channels": 1,
     "peak": 0.58635,
     "rms": 0.12588,
-    "sha256": "f24c1c37060646d434c7ca3faf1c06e4545d3215535a5e427c0139bca6510e77"
+    "sha256": "88a653616a8788a253050243355222ef09993a2cdf6b28bc15a23a9cba27b9b8"
   },
   "ragnarok_corte_3": {
     "duration": 0.9375,
@@ -233,7 +233,7 @@
     "channels": 1,
     "peak": 0.59812,
     "rms": 0.11841,
-    "sha256": "e5ecf0af7dbdb474974614971fa745b1ba043bbd2753762ad4bfdad2e6f17402"
+    "sha256": "2bcfd3bf17dd9b670ff20c71369164c368c55eed0cebc53aa275b79a582026a2"
   },
   "ragnarok_rugido": {
     "duration": 2.4,
@@ -241,7 +241,7 @@
     "channels": 1,
     "peak": 0.62651,
     "rms": 0.17965,
-    "sha256": "e27a3d6abf192cd56e2f90d902035dfcd089edd97227118491d86cbcee92fecd",
+    "sha256": "95b4a0c8d05b50685c53c00145925e093af9c020a25abfcddcdaac8e449bf5b7",
     "ticks": 48,
     "marcos": {}
   },
@@ -251,7 +251,7 @@
     "channels": 1,
     "peak": 0.62499,
     "rms": 0.18417,
-    "sha256": "1cf22b3f03f32b27ffadc2502b36d21dadab763c8682b47674a822b28e605124"
+    "sha256": "adb37691bc8473ca9e867ac47695c61213c3e3b7eac67891a7fa979d7826e10e"
   },
   "ragnarok_rugido_3": {
     "duration": 2.5,
@@ -259,15 +259,15 @@
     "channels": 1,
     "peak": 0.60989,
     "rms": 0.19499,
-    "sha256": "25e73b9bc5d898a2976d0155ae57c68ef9543e4076998204391ff65065891ba1"
+    "sha256": "3382b35fef7f7c4100da28c59f60039a7c5ec939a4b79ebd278ef53e2663e5ad"
   },
   "ragnarok_morte": {
     "duration": 3.2,
     "sample_rate": 48000,
     "channels": 1,
-    "peak": 0.61084,
-    "rms": 0.15812,
-    "sha256": "7117f0f346d8cf617f6707c5043b8c664020950de9817f09ddc73af5e8aa3143",
+    "peak": 0.58626,
+    "rms": 0.14256,
+    "sha256": "c362748c6306e2f30698fa1284c1114741ae16e032175c15cfdf557c72aace0b",
     "ticks": 64,
     "marcos": {}
   },
@@ -275,16 +275,16 @@
     "duration": 3.0769,
     "sample_rate": 48000,
     "channels": 1,
-    "peak": 0.63256,
-    "rms": 0.15352,
-    "sha256": "f059dc39dba31a157fdb5bcec7a9c27998a82ec87fffea55062f8ceaec9e4f2c"
+    "peak": 0.61741,
+    "rms": 0.14781,
+    "sha256": "5dd6d79263a8585d1f297936138817919f705560039173d8e468b3dbcf790952"
   },
   "ragnarok_morte_3": {
     "duration": 3.3333,
     "sample_rate": 48000,
     "channels": 1,
-    "peak": 0.60328,
-    "rms": 0.14549,
-    "sha256": "6ee8b3b25977f7d5be60bd524ed8c402e6fd0a96532d8263da8b551b0e3aff8d"
+    "peak": 0.61588,
+    "rms": 0.16156,
+    "sha256": "01d905227ab8f787b8806ba386964bea458d5eb960ddc913308665045b445bb4"
   }
 }

@@ -1,4 +1,4 @@
-"""Sons do Cid, sintetizados pelo motor em camadas (ferramentas/sfx_motor.py). Sem áudio de terceiros.
+"""Sons do Cid: síntese do motor em camadas (ferramentas/sfx_motor.py) com gravações CC0 por cima (gravacoes.py).
 
 Rodar: python ferramentas/gerar_sfx_cid.py [--preview caminho.wav]
 Escreve os .ogg em assets/minerwk/sounds/cid/, as entradas do sounds.json, as legendas e o manifesto
@@ -15,6 +15,7 @@ tom que sobe nas três palavras, o instante de silêncio do espaço e o estouro)
 import argparse
 import numpy as np
 import sfx_motor as m
+from gravacoes import *  # noqa: F401,F403 (as listas de gravações)
 
 T = m.TICK
 ENTRE_CORTES, VIDA_DO_CORTE, REDEMOINHO = 5 * T, 7 * T, 17 * T   # FormasCid: ENTRE_CORTES, VIDA_DO_CORTE, REDEMOINHO
@@ -107,7 +108,7 @@ def elos(s, ini, fim, densidade, f=2100):
     return x
 
 
-def sintese(nome, s):
+def sintetico(nome, s):
     if nome == 'cid_redemoinho':
         # Três cortes, um a cada 5 ticks: o silvo fino da lâmina esticada, um fio de magia na ponta e o slime
         # chicoteando por baixo. O terceiro é o mais forte e deixa a cauda.
@@ -239,6 +240,52 @@ def sintese(nome, s):
         rola = .4 * s.girar(s.passa_baixa(s.ruido(40, 600, .8), 260), hz=4, prof=.5) * s.janela(.05, CHOQUE + 1., .7)
         return s.reverb(baque + varre + rola, 1.6, .3, 3800)
     raise ValueError(nome)
+
+
+def gravado(nome, s):
+    """As camadas gravadas (CC0) por cima da síntese: a lâmina, o slime, as correntes e os golpes de verdade.
+    A magia continua sintetizada; o atômico ganha explosão e trovão."""
+    if nome == 'cid_redemoinho':
+        return sum((.55 + .15 * i) * s.amostra(WHOOSH, i * ENTRE_CORTES, 1., 1.15) + .25 * s.amostra(SLIME, i * ENTRE_CORTES, 1., 1.3)
+                   for i in range(3))
+    if nome == 'cid_pos_imagem':
+        return s.amostra(WHOOSH, 0, .7, .85) + s.amostra(PANO, 0, .3, .8)
+    if nome == 'cid_slime':
+        return s.amostra(SLIME, 0, .9, .9) + s.amostra(LAMA, .02, .4, 1.) + s.amostra(RESPINGO, .03, .3, 1.3)
+    if nome == 'cid_correntes':
+        return (s.amostra(CORRENTE_MEDIA, 0, .7, 1.15) + s.amostra(CORRENTE_PESADA, FECHAR, 1., .9)
+                + s.amostra(CORRENTE_LEVE, PRESO - SOLTAR, .55, 1.))
+    if nome == 'cid_overdrive':
+        return s.amostra(EXPLOSOES, 0, .6, .7) + s.amostra(CAMPO, 0, .45, .6) * s.janela(0, 1.6, .3)
+    if nome == 'cid_traje':
+        return s.amostra(SLIME, 0, 1., .7) + s.amostra(BAQUES, 0, .6, .9) + s.amostra(LAMA, .03, .4, 1.1)
+    if nome == 'cid_espada_carga':
+        return (s.amostra(SOLDA, 0, .3, 1.2) * s.crescer(0, CARGA_DA_ESPADA, 1.5) * s.janela(0, CARGA_DA_ESPADA + .05, .03)
+                + s.amostra(SACAR, 0, .35, .9))
+    if nome == 'cid_espada_atomica':
+        return s.amostra(ESPADA_CORTA, 0, .9, .9) + s.amostra(WHOOSH, 0, .6, .7) + s.amostra(EXPLOSOES, .02, .4, .8)
+    if nome == 'cid_recovery_carga':
+        return s.amostra(PICARETA, 0, .8, .7) + s.amostra(METAL, 0, .6, .8) + s.amostra(PEDRAS, .03, .3, 1.1)
+    if nome == 'cid_recovery':
+        return s.amostra(GONGOS, 0, .45, 1.) + s.amostra(TROVOES, 0, .3, 1.2)
+    if nome == 'cid_atomic_soco':
+        return (s.amostra(MURROS, 0, 1., .8) + s.amostra(MURROS, PARADA, .8, .6)
+                + s.amostra(WHOOSH, PARADA, .5, .8))
+    if nome == 'cid_atomic_risco':
+        return s.amostra(WHOOSH, 0, .8, .6) + s.amostra(VENTO, 0, .4, 1.) * s.janela(0, RISCO + .3, .1)
+    if nome == 'cid_atomic':
+        return (s.amostra(SUBGRAVE, SILENCIO, 1., .7) + s.amostra(EXPLOSOES, SILENCIO, .8, .5)
+                + s.amostra(TROVOES, SILENCIO + .1, .6, .8))
+    if nome == 'cid_atomic_luz':
+        return s.amostra(TROVOES, .12, 1., .8) + .7 * s.amostra(TROVOES, .3, 1., .7)
+    if nome == 'cid_atomic_onda':
+        return (s.amostra(EXPLOSOES, 0, .9, .55) + s.amostra(PEDRAS, .05, .5, 1.)
+                + s.amostra(VENTO, 0, .5, 1.2) * s.janela(0, CHOQUE + .3, .1))
+    return None  # cid_atomic_aura: só tons, o silêncio é dela
+
+
+def sintese(nome, s):
+    return hibrido(s, sintetico(nome, s), gravado(nome, s))
 
 
 def gerar(preview=None):

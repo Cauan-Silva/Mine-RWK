@@ -1,4 +1,4 @@
-"""Sons do Ichigo, sintetizados pelo motor em camadas (ferramentas/sfx_motor.py). Sem áudio de terceiros.
+"""Sons do Ichigo: síntese do motor em camadas (ferramentas/sfx_motor.py) com gravações CC0 por cima (gravacoes.py).
 
 Rodar: python ferramentas/gerar_sfx_ichigo.py [--preview caminho.wav]
 Escreve os .ogg em assets/minerwk/sounds/ichigo/, as entradas do sounds.json, as legendas e o manifesto
@@ -19,6 +19,7 @@ e o Cero, um tom que sobe apertado e estoura num feixe grave. O Cero é o mesmo 
 import argparse
 import numpy as np
 import sfx_motor as m
+from gravacoes import *  # noqa: F401,F403 (as listas de gravações)
 
 T = m.TICK
 GETSUGA_CARGA = 10 * T    # cargaMax do Getsuga Tensho (Z do Shikai)
@@ -116,7 +117,7 @@ def getsuga(s, voo, fim, grave):
     return saida + s.reverb(.75 * rugido + fio + estouro + rastro, 1.9 if grave else 2.3, .3, 5000 * f)
 
 
-def sintese(nome, s):
+def sintetico(nome, s):
     if nome == 'ichigo_getsuga_carga':
         # O reiatsu subindo pela lâmina: ar e um grave que crescem até a carga cheia, com o aço vibrando.
         g = s.crescer(0, GETSUGA_CARGA, 1.7)
@@ -265,6 +266,70 @@ def sintese(nome, s):
         zumbe = .35 * s.girar(np.tanh(2 * s.tom(74, 52, 1., 0, CERO + .3, (1, 2, 3))), hz=31, prof=.5) * s.janela(.01, CERO + .3, .15)
         return estalo + s.reverb(sub + .8 * feixe + fio + zumbe, 3.4, .42, 3200)
     raise ValueError(nome)
+
+
+def getsuga_gravado(s, voo, grave):
+    """O Getsuga gravado: a lâmina saindo, o ar rasgado do voo e a explosão onde ele se desfaz."""
+    tom = .75 if grave else 1.
+    return (s.amostra(ESPADA_CORTA, 0, .9, tom) + s.amostra(WHOOSH, .02, .6, .6 * tom)
+            + s.amostra(VENTO, .05, .35, 1.3) * s.janela(.05, voo, .08)
+            + s.amostra(EXPLOSOES, voo, .9, .7 * tom) + s.amostra(PEDRAS, voo + .05, .45, 1.))
+
+
+def gravado(nome, s):
+    """As camadas gravadas (CC0) por cima da síntese: o aço, o ar, a terra, o osso da máscara, o vidro que
+    quebra e a garganta do Hollow. O reiatsu continua sintetizado."""
+    if nome == 'ichigo_getsuga_carga':
+        return s.amostra(SOLDA, 0, .25, .8) * s.crescer(0, GETSUGA_CARGA, 1.7) + s.amostra(SACAR, 0, .3, .8)
+    if nome == 'ichigo_getsuga':
+        return getsuga_gravado(s, VOO, False)
+    if nome == 'ichigo_getsuga_negro':
+        return getsuga_gravado(s, VOO_NEGRO, True)
+    if nome == 'ichigo_shunpo':
+        return s.amostra(WHOOSH, 0, .8, 1.2) + s.amostra(PANO, 0, .35, 1.) + s.amostra(WHOOSH, SHUNPO * .5, .4, 1.4)
+    if nome == 'ichigo_onda':
+        return (s.amostra(METAL, 0, .8, .7) + s.amostra(EXPLOSOES, .01, 1., .6) + s.amostra(PEDRAS, .04, .6, .9)
+                + s.amostra(TROVOES, .05, .4, 1.))
+    if nome == 'ichigo_arremesso':
+        return (s.amostra(SACAR, 0, .4, .9) + s.amostra(WHOOSH, 0, .5, .7) + s.amostra(WHOOSH, VOLTA, .5, .8)
+                + s.amostra(METAL, ARREMESSO, .9, 1.))
+    if nome == 'ichigo_bankai_carga':
+        return s.amostra(MOTOR_GRAVE, 0, .5, .6) * s.crescer(0, BANKAI_CARGA, 1.8) + s.amostra(VENTO, 0, .3, .8) * s.crescer(0, BANKAI_CARGA, 2.)
+    if nome == 'ichigo_bankai':
+        return (s.amostra(SUBGRAVE, 0, 1., .7) + s.amostra(EXPLOSOES, 0, .7, .5) + s.amostra(VENTO, .05, .6, .9) * s.janela(.05, BANKAI, .3)
+                + s.amostra(SACAR, .12, .4, .7))
+    if nome == 'ichigo_lamina':
+        return s.amostra(IGNICAO, 0, .5, .8) + s.amostra(CHAMAS, .1, .25, .8) * s.janela(.1, LAMINA, .3)
+    if nome == 'ichigo_sair':
+        return s.amostra(VENTO, 0, .5, .8) * s.janela(0, SAIR + .3, .2) + s.amostra(SACAR, .02, .3, .7)
+    if nome == 'ichigo_corte':
+        return s.amostra(WHOOSH, 0, .8, 1.25) + s.amostra([ESPADA_AR, LAMINA_FACA], 0, .5, 1.)
+    if nome == 'ichigo_mascara_veste':
+        return s.amostra(OSSOS, 0, .9, .8) + s.amostra(GELO, .05, .4, .7) + s.amostra(ROSNADOS, .38, .6, .7) * s.janela(.38, 1.5, .2)
+    if nome == 'ichigo_mascara_quebra':
+        return s.amostra(GELO, 0, .5, .9) + s.amostra(VIDRO, QUEBRA, 1., .75) + s.amostra(OSSOS, QUEBRA, .5, .9)
+    if nome == 'ichigo_mugetsu_carga':
+        return s.amostra(MOTOR_GRAVE, 0, .5, .45) * s.crescer(0, TRANSFORMA, 1.6) * s.janela(0, TRANSFORMA + .3, .2) \
+            + s.amostra(SUBGRAVE, TRANSFORMA, .8, .6)
+    if nome == 'ichigo_mugetsu':
+        return (s.amostra(ESPADA_CORTA, 0, 1., .7) + s.amostra(SUBGRAVE, 0, 1., .5) + s.amostra(TROVOES, .05, .8, .6)
+                + s.amostra(VENTO, .05, .6, .6) * s.janela(.05, PASSOU + .3, .25))
+    if nome == 'ichigo_hollow':
+        return (s.amostra(EXPLOSOES, 0, .7, .6) + s.amostra(ROSNADOS, 0, 1., .65) * s.janela(0, RUGIDO + 1.2, .1)
+                + s.amostra(RUGIDO_GATO, .1, .5, .55))
+    if nome == 'ichigo_hollow_garra':
+        return (sum((.7 - .1 * i) * s.amostra(FACAS, .02 * i, 1., .9) for i in range(3))
+                + s.amostra(MURROS, GARRA * .35, .7, .9) + s.amostra(ROSNADOS, 0, .3, .9) * s.janela(0, GARRA, .03))
+    if nome == 'ichigo_cero_carga':
+        return s.amostra(CAMPO, 0, .4, .6) * s.crescer(0, CERO_CARGA, 1.6) + s.amostra(CHOQUE_ELETRICO, 0, .25, .8) * s.crescer(0, CERO_CARGA, 2.)
+    if nome == 'ichigo_cero':
+        return (s.amostra(SUBGRAVE, 0, 1., .7) + s.amostra(LASER_GRANDE, 0, .6, .5) + s.amostra(JATO, 0, .6, .8) * s.janela(0, CERO + .1, .08)
+                + s.amostra(EXPLOSOES, .02, .5, .6))
+    return None  # poderes perdidos e voltam: só o reiatsu, sintetizado
+
+
+def sintese(nome, s):
+    return hibrido(s, sintetico(nome, s), gravado(nome, s))
 
 
 def gerar(preview=None):

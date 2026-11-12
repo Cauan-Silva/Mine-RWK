@@ -3,9 +3,9 @@
     "duration": 1.2,
     "sample_rate": 48000,
     "channels": 1,
-    "peak": 0.66727,
-    "rms": 0.11069,
-    "sha256": "ef5d8632bd41970450a69a05adf63ed079e0f32fd5f3e99096d18917edfd384d",
+    "peak": 0.64479,
+    "rms": 0.1171,
+    "sha256": "95ea02842ae929cc654dd7b9aa33a680833825996cd32f2efb7199509d36c5e3",
     "ticks": 24,
     "marcos": {
       "entre_cortes": 5,
@@ -17,25 +17,25 @@
     "duration": 1.1538,
     "sample_rate": 48000,
     "channels": 1,
-    "peak": 0.69725,
-    "rms": 0.11645,
-    "sha256": "82699c999e9071fcb0cbe36bd94bc1c4caba836f72906307d2d56af7ceaaf875"
+    "peak": 0.74171,
+    "rms": 0.1237,
+    "sha256": "8a549bf7680a008b0965220913403b98f9f9b6078f3c653031ca7032a24cf3fd"
   },
   "cid_redemoinho_3": {
     "duration": 1.25,
     "sample_rate": 48000,
     "channels": 1,
-    "peak": 0.71166,
-    "rms": 0.11874,
-    "sha256": "10e6a4b96812be49a419a0e453211eee16abe24a8cb36931d62971c34708b8a9"
+    "peak": 0.68455,
+    "rms": 0.12636,
+    "sha256": "1bc1ae9441497a46522f51409cbaf7436c5d53b0e96f8e131a8c50900d278e40"
   },
   "cid_pos_imagem": {
     "duration": 0.9,
     "sample_rate": 48000,
     "channels": 1,
-    "peak": 0.59951,
-    "rms": 0.07306,
-    "sha256": "335e0be5704cd970bb87d16fe34a9a9f7d5fb30b82c09bad5fccae7f5f937df2",
+    "peak": 0.616,
+    "rms": 0.08062,
+    "sha256": "2b57b4377e707a28edd9c9901d5febc7965fba383e6a1a5e295307a708f8d935",
     "ticks": 18,
     "marcos": {
       "fim": 9
@@ -45,25 +45,25 @@
     "duration": 0.8654,
     "sample_rate": 48000,
     "channels": 1,
-    "peak": 0.58793,
-    "rms": 0.07457,
-    "sha256": "84bc6f0f16951aee4044762552d65fc491d167ceb9723119f849a9139d2ce62d"
+    "peak": 0.60954,
+    "rms": 0.08162,
+    "sha256": "058602247ea414b12f180c859ffa13c85799f5ed0c1bb8e7888b76de25f65717"
   },
   "cid_pos_imagem_3": {
     "duration": 0.9375,
     "sample_rate": 48000,
     "channels": 1,
-    "peak": 0.65182,
-    "rms": 0.07735,
-    "sha256": "7a6a5b3b280afe557f93f6555c9ae785e61ab632101f5a715749e610c2e6c874"
+    "peak": 0.64951,
+    "rms": 0.09165,
+    "sha256": "b1b1d05273ea23b2d5692829d22d6aaf26ab5d2059e8aaa7599fb0eee05f330d"
   },
   "cid_slime": {
     "duration": 0.7,
     "sample_rate": 48000,
     "channels": 1,
-    "peak": 0.61015,
-    "rms": 0.11247,
-    "sha256": "030e26c6836d9c1612768579c6a558f80b0fb643b3409fd8f5eede0b0e6007ac",
+    "peak": 0.62734,
+    "rms": 0.11782,
+    "sha256": "9fcadfd4f2d9b132962cc111c0756c8d90e886b27538a8120f579e5f3c02ff6f",
     "ticks": 14,
     "marcos": {
       "fim": 10
@@ -73,25 +73,25 @@
     "duration": 0.6731,
     "sample_rate": 48000,
     "channels": 1,
-    "peak": 0.60628,
-    "rms": 0.11161,
-    "sha256": "fa82c1fb87a0ec7664976148d0148eb9b3bf5c58571c480f825062bf629f3085"
+    "peak": 0.58803,
+    "rms": 0.11386,
+    "sha256": "319abac498d6055c070fc1eb2471dc991d202a8d65891c0460aaed5d90484e29"
   },
   "cid_slime_3": {
     "duration": 0.7291,
     "sample_rate": 48000,
     "channels": 1,
-    "peak": 0.59691,
-    "rms": 0.09055,
-    "sha256": "482dfc88fb58023336888374292a591f4d0993f734bfc330af2c0d46f70888c1"
+    "peak": 0.592,
+    "rms": 0.09233,
+    "sha256": "13f172a8db290bd8cfe8c099a07136812b4dc6e83574dc92f4557b46f09cd5e2"
   },
   "cid_correntes": {
     "duration": 2.9,
     "sample_rate": 48000,
     "channels": 1,
-    "peak": 0.62985,
-    "rms": 0.06497,
-    "sha256": "adb002a9171e0805e34d016d03ddfbc873aa626f60ecc6ebad6947f224de42dd",
+    "peak": 0.61081,
+    "rms": 0.07767,
+    "sha256": "259a6844839f5df594ef72e099f9d4bb1b17866507cc4aa583d6739e180192f6",
     "ticks": 58,
     "marcos": {
       "fecha": 4,
@@ -103,25 +103,25 @@
     "duration": 2.7885,
     "sample_rate": 48000,
     "channels": 1,
-    "peak": 0.59929,
-    "rms": 0.06565,
-    "sha256": "51f0a5855632c953268ac54be01b1c1bff7a09b527f2bef23c60b9c72119f4e7"
+    "peak": 0.60172,
+    "rms": 0.07699,
+    "sha256": "c7a8d2f9136026aeda7d64ce20f129d52dae7215992433961d91c1c9743874b3"
   },
   "cid_correntes_3": {
     "duration": 3.0208,
     "sample_rate": 48000,
     "channels": 1,
-    "peak": 0.62509,
-    "rms": 0.07062,
-    "sha256": "242a0436607e08e2c7a82846bab94420282afd298167d16acd27d21b9cfd3337"
+    "peak": 0.62607,
+    "rms": 0.081,
+    "sha256": "6b4323440d0bef1c3c0a8c6f514794660013c88e84883e135254cd6876c550f6"
   },
   "cid_overdrive": {
     "duration": 8.3,
     "sample_rate": 48000,
     "channels": 1,
-    "peak": 0.71141,
-    "rms": 0.09498,
-    "sha256": "02004c6f296e2eee141c33b96678d7110868756414ac91300a5a60201f2d9453",
+    "peak": 0.68397,
+    "rms": 0.08763,
+    "sha256": "154dd00d7cdb274bc98446300ecc687ad3ec56cd05e43b9cb2797aecd0119212",
     "ticks": 166,
     "marcos": {
       "estouro": 8,
@@ -132,25 +132,25 @@
     "duration": 7.9807,
     "sample_rate": 48000,
     "channels": 1,
-    "peak": 0.5942,
-    "rms": 0.077,
-    "sha256": "b551215fce50b099d78152fa19f898c48d860818a2febdb7ce0eb0aebe70b159"
+    "peak": 0.57518,
+    "rms": 0.06952,
+    "sha256": "8226336d489b3493d219416956f63b540e4ea6ff83ee4d7764bc56a62e7fdaa9"
   },
   "cid_overdrive_3": {
     "duration": 8.6458,
     "sample_rate": 48000,
     "channels": 1,
-    "peak": 0.58093,
-    "rms": 0.08834,
-    "sha256": "d35c612242b29fdc37067fea9dcaf7f23276164d73df1606242d0723a38e92d6"
+    "peak": 0.60848,
+    "rms": 0.08372,
+    "sha256": "dcb54593a3e7632eb9e8d91430b9581b64d0f8dd609e51d84ed213b2ad3c1319"
   },
   "cid_traje": {
     "duration": 0.9,
     "sample_rate": 48000,
     "channels": 1,
-    "peak": 0.54251,
-    "rms": 0.07398,
-    "sha256": "94221be329cedd00552463aee442ca94608be95db37c569b91ecd641a8b5f6db",
+    "peak": 0.61311,
+    "rms": 0.072,
+    "sha256": "20f62c9a2758e38e5f57834496b2649708fa12a80d7e949467fb530c3d9f42ea",
     "ticks": 18,
     "marcos": {
       "fim": 12
@@ -160,25 +160,25 @@
     "duration": 0.8654,
     "sample_rate": 48000,
     "channels": 1,
-    "peak": 0.5812,
-    "rms": 0.08224,
-    "sha256": "dd72ac13e546314b81cf15b330d2cf8e04453d951ca24cad585edee3e7a3721f"
+    "peak": 0.61437,
+    "rms": 0.09173,
+    "sha256": "2b4754a155c3450a14f0f15fea7a9af550f2dbbfa0d9e09463adf57274737595"
   },
   "cid_traje_3": {
     "duration": 0.9375,
     "sample_rate": 48000,
     "channels": 1,
-    "peak": 0.59979,
-    "rms": 0.08144,
-    "sha256": "45ab0ddc732f39771bfbae6f22367c7a20aead6fa58da3a224ce5014f8630958"
+    "peak": 0.63208,
+    "rms": 0.08413,
+    "sha256": "c8c05f27dbab9f561a4add82be69a2d1ba4ddb88bf4e42d3bd16e3a8142ad470"
   },
   "cid_espada_carga": {
     "duration": 0.7,
     "sample_rate": 48000,
     "channels": 1,
-    "peak": 0.58475,
-    "rms": 0.14228,
-    "sha256": "3f154eb4afccbc87fae0f0ba5cdbdb77089126a0b876b9d39855a9cfba1a45d1",
+    "peak": 0.59651,
+    "rms": 0.14679,
+    "sha256": "54a1bbd94c16fa6c9a36ee14c0e6405525e0a5246e8e3d3346b2a2d6e2482c6b",
     "ticks": 14,
     "marcos": {
       "fim": 12
@@ -188,25 +188,25 @@
     "duration": 0.6731,
     "sample_rate": 48000,
     "channels": 1,
-    "peak": 0.6015,
-    "rms": 0.14365,
-    "sha256": "cbbb9e53a376b6dd96d8d0b375dff5308b0ab550974c4121ddc435da79a17c60"
+    "peak": 0.62884,
+    "rms": 0.14608,
+    "sha256": "e174f33db490863df13582818054e71f76a7c02a8d12f6abd01a634fe7d32aad"
   },
   "cid_espada_carga_3": {
     "duration": 0.7291,
     "sample_rate": 48000,
     "channels": 1,
-    "peak": 0.63619,
-    "rms": 0.15467,
-    "sha256": "2ad52937c2cf0587c1882fea40171a0be1c9bc53d4c48da83229f158c97fa6e3"
+    "peak": 0.64957,
+    "rms": 0.15555,
+    "sha256": "095574341d82faadfd3f24f6f78edee578bd1adc87277c2ea3ed8433070f2abc"
   },
   "cid_espada_atomica": {
     "duration": 1.4,
     "sample_rate": 48000,
     "channels": 1,
-    "peak": 0.67617,
-    "rms": 0.09815,
-    "sha256": "5658bc7c31f48e469c9c11f4c4c735c62effbad66578b63c4869273a7bdc08d9",
+    "peak": 0.636,
+    "rms": 0.10064,
+    "sha256": "74bc7584976f17a44d4bcdcbb84dc8b91c2a13c5c792365a370c5c7d6169709e",
     "ticks": 28,
     "marcos": {
       "voo": 4,
@@ -217,25 +217,25 @@
     "duration": 1.3461,
     "sample_rate": 48000,
     "channels": 1,
-    "peak": 0.65641,
-    "rms": 0.09479,
-    "sha256": "9765df4a7b1135e216bf7c49eb6fdb8c0618bea3f323029ca7b3e6abe1d55f58"
+    "peak": 0.69896,
+    "rms": 0.11106,
+    "sha256": "10470b676af09948d37d6d995cdfffabf0814b1ec64b5a21ab6c3b6aeff24b9f"
   },
   "cid_espada_atomica_3": {
     "duration": 1.4583,
     "sample_rate": 48000,
     "channels": 1,
-    "peak": 0.58353,
-    "rms": 0.09082,
-    "sha256": "8a97337914c51b530b6a8ffd0c282e01fe74902a5ff1e604e86856e83c9564dc"
+    "peak": 0.64158,
+    "rms": 0.09627,
+    "sha256": "cd25cd7eceac808fb9110a1545e961ad8ce7e9bfbea182e830e960bf9a3b0daf"
   },
   "cid_recovery_carga": {
     "duration": 3.1,
     "sample_rate": 48000,
     "channels": 1,
-    "peak": 0.60758,
-    "rms": 0.09935,
-    "sha256": "1c13b449718b468393f1d39cbd0e5199c96be49234ec2f8e006d40b54510afb8",
+    "peak": 0.60448,
+    "rms": 0.06092,
+    "sha256": "f3cfe84a67d57e49bfee71018187931d73e1aab97c9d93228192221ec2be8659",
     "ticks": 62,
     "marcos": {
       "fim": 60
@@ -245,25 +245,25 @@
     "duration": 2.9808,
     "sample_rate": 48000,
     "channels": 1,
-    "peak": 0.6113,
-    "rms": 0.09782,
-    "sha256": "fddfff109926395ffedd8aff8d97893324fb7616314ea7f1226d982171e61a66"
+    "peak": 0.59403,
+    "rms": 0.06195,
+    "sha256": "0261204fbb2b7aa9bdbe0fe8c0dec34c2000f3aff1ab5928bd6fe7176c26d54a"
   },
   "cid_recovery_carga_3": {
     "duration": 3.2291,
     "sample_rate": 48000,
     "channels": 1,
-    "peak": 0.59712,
-    "rms": 0.09744,
-    "sha256": "ff0b00c3ab31c6ca563811ad46a877cc3b56de980d7823107d3d800cf36e7c09"
+    "peak": 0.60924,
+    "rms": 0.06222,
+    "sha256": "87591816a76c5ba7100169c2da53bc51a3922aa60bef6aa62ae877b9397db559"
   },
   "cid_recovery": {
     "duration": 3.2,
     "sample_rate": 48000,
     "channels": 1,
-    "peak": 0.61896,
-    "rms": 0.08226,
-    "sha256": "5b58ec14cb07cb0924d8b02dcb1f5132f985a6e616ebcddba838d35bf3fb8c41",
+    "peak": 0.63834,
+    "rms": 0.08839,
+    "sha256": "f7a2eb2ca0eda0bbc475561b0abbaa7d4be2268cf860063420193c9a5a0598bb",
     "ticks": 64,
     "marcos": {
       "onda": 10,
@@ -274,25 +274,25 @@
     "duration": 3.0769,
     "sample_rate": 48000,
     "channels": 1,
-    "peak": 0.69235,
-    "rms": 0.0972,
-    "sha256": "01e7e9b8c1d6368bf11764206dbb2114312adbfb4b314f2b06c8a5bfb096dc64"
+    "peak": 0.62886,
+    "rms": 0.09272,
+    "sha256": "8c052eba396e568bade92504473b226f58ae8717a1ff2cbfb3d3de2bd8696c54"
   },
   "cid_recovery_3": {
     "duration": 3.3333,
     "sample_rate": 48000,
     "channels": 1,
-    "peak": 0.64987,
-    "rms": 0.09586,
-    "sha256": "c4003e9a41f895ce34ef7a23328c947f6f37be93880697a55009c7809df101bb"
+    "peak": 0.64931,
+    "rms": 0.09978,
+    "sha256": "2cbf7aaab85c5456bf7d1f4aa9fe389a6a119ad317f4a1b564dbcd56ce706118"
   },
   "cid_atomic_soco": {
     "duration": 0.75,
     "sample_rate": 48000,
     "channels": 1,
-    "peak": 0.60431,
-    "rms": 0.1889,
-    "sha256": "23bf86ea6cb65dd17072288b012c6cf61ce98d585e92495393815daff203ac09",
+    "peak": 0.64255,
+    "rms": 0.20185,
+    "sha256": "3645a0c5e5bea9992e2a4faad22e61301575fdd07bbabeac86da953b296e3e24",
     "ticks": 15,
     "marcos": {
       "parada": 3,
@@ -303,25 +303,25 @@
     "duration": 0.7211,
     "sample_rate": 48000,
     "channels": 1,
-    "peak": 0.64236,
-    "rms": 0.19376,
-    "sha256": "c2d169d08f3131e14a85358dd9e1d518976d296daeeea209a13dba68cd232399"
+    "peak": 0.63641,
+    "rms": 0.20091,
+    "sha256": "12926f51f4e5c0362e36b0c9ef5a939ef6d875c9b5faf0caa811821fe2b9f0df"
   },
   "cid_atomic_soco_3": {
     "duration": 0.7812,
     "sample_rate": 48000,
     "channels": 1,
-    "peak": 0.61453,
-    "rms": 0.19971,
-    "sha256": "bb5ce0eaca4b87ab5eaab4b62169b26879af0a42ef96e8c1dcd369a6f0e7535d"
+    "peak": 0.60023,
+    "rms": 0.20199,
+    "sha256": "364ea7a625ee789a61948724534c6624fa02051c95f522cf68e72adeae04c308"
   },
   "cid_atomic_risco": {
     "duration": 1.2,
     "sample_rate": 48000,
     "channels": 1,
-    "peak": 0.76324,
-    "rms": 0.14122,
-    "sha256": "f4417371382cb39703abd23cc16faba6a5969a4748364729bc7b5783dfcdee00",
+    "peak": 0.74764,
+    "rms": 0.15011,
+    "sha256": "beb6cffafd586783bcdbd2ee4be5442ddcf9fa6f1485d330b389008dfd905389",
     "ticks": 24,
     "marcos": {
       "fim": 14
@@ -331,17 +331,17 @@
     "duration": 1.1538,
     "sample_rate": 48000,
     "channels": 1,
-    "peak": 0.6147,
-    "rms": 0.11263,
-    "sha256": "b3ccdff8f4ef30391244dd4de1346a19a46276b26818a9ff037f9b44299b464a"
+    "peak": 0.59686,
+    "rms": 0.12107,
+    "sha256": "35721ea15f28ecc187dd8f64a0a9ba4858bdbadb2c2b823c9275efb089816323"
   },
   "cid_atomic_risco_3": {
     "duration": 1.25,
     "sample_rate": 48000,
     "channels": 1,
-    "peak": 0.68412,
-    "rms": 0.12532,
-    "sha256": "31c11aec47298fb4e99eb9745ae7921a804dd11162bb2b2f4d9ea19b5d110a7f"
+    "peak": 0.64643,
+    "rms": 0.13737,
+    "sha256": "7cb7f7eaaed514a945e368e4a1143f3df7853f34d476ce4bbcbf52a71b6fc548"
   },
   "cid_atomic_aura": {
     "duration": 5.6,
@@ -349,7 +349,7 @@
     "channels": 1,
     "peak": 0.56459,
     "rms": 0.10356,
-    "sha256": "cfa979769ea7b7da070bd39baec0fa86e6fd64bad0459cb554202dc90365b121",
+    "sha256": "80f6134315db2214059316e5c118ee3a556d06a2a4212aab193d7143dd0a6d5f",
     "ticks": 112,
     "marcos": {
       "carga": 56,
@@ -363,7 +363,7 @@
     "channels": 1,
     "peak": 0.66917,
     "rms": 0.14405,
-    "sha256": "e93beff4188d7f026777b35a673d12dc655e0b320dcc92583c0119ff62991918"
+    "sha256": "7eda6c9ef88974d6314826afc5a68effcf9c51a42e135c54f7e3e9ff3e2950f8"
   },
   "cid_atomic_aura_3": {
     "duration": 5.8333,
@@ -371,15 +371,15 @@
     "channels": 1,
     "peak": 0.65917,
     "rms": 0.16786,
-    "sha256": "e790664235b0d31be7862b3dc025ad64bc20c99a648a09a53f5c9baed46b4ea0"
+    "sha256": "9cda8fb5de5757a66b42216f01f0dcb327f61344ffe513e36bd09011a9744a09"
   },
   "cid_atomic": {
     "duration": 5.1,
     "sample_rate": 48000,
     "channels": 1,
-    "peak": 0.57786,
-    "rms": 0.18374,
-    "sha256": "4cc986d5d384fb215a403d9a10ea0282a3bd2f9239f6875add21c3d68eeea201",
+    "peak": 0.60975,
+    "rms": 0.16931,
+    "sha256": "34192ee6227388ac11c380b868b9573f6314bac9a60eaa87223f8aab9e8bff98",
     "ticks": 102,
     "marcos": {
       "clarao": 70
@@ -389,25 +389,25 @@
     "duration": 4.9038,
     "sample_rate": 48000,
     "channels": 1,
-    "peak": 0.59875,
-    "rms": 0.18848,
-    "sha256": "1431badd61a97cb11a509b0ceabf84c6bd3278f44789fb61c8df3f5b45e3709d"
+    "peak": 0.60578,
+    "rms": 0.18608,
+    "sha256": "d0202992f634a6751cf1ba914c3999c7d730835070445310e698f28461fb84d4"
   },
   "cid_atomic_3": {
     "duration": 5.3125,
     "sample_rate": 48000,
     "channels": 1,
     "peak": 0.62436,
-    "rms": 0.18919,
-    "sha256": "32903eae9c4edd04157c0f979956b3c31b47e8d7bdffdb187efa85027991ddb8"
+    "rms": 0.1903,
+    "sha256": "d155e2ec8ae2de4e697e13aff352781c904e5229d2ae794c51fbbf56bd64acf2"
   },
   "cid_atomic_luz": {
     "duration": 7.5,
     "sample_rate": 48000,
     "channels": 1,
-    "peak": 0.60412,
-    "rms": 0.16635,
-    "sha256": "20d17199d7bb07ca2277254a273cb759255c8618212937e1f8909123223a0c50",
+    "peak": 0.59932,
+    "rms": 0.1502,
+    "sha256": "d180bc2572a6900493e4fb220d3dec385539aff01612ec70ff457a0a06f0940e",
     "ticks": 150,
     "marcos": {
       "fim": 120
@@ -417,25 +417,25 @@
     "duration": 7.2115,
     "sample_rate": 48000,
     "channels": 1,
-    "peak": 0.58529,
-    "rms": 0.16313,
-    "sha256": "bad83f7bbc75f81fe2e5181b790ee8ff4a06a50671166d9203c2a7b35746b220"
+    "peak": 0.58138,
+    "rms": 0.14098,
+    "sha256": "cc9aa1fc35894e96509b710e8eef17124afb39f7fb27403c5ab3b7921ebfb094"
   },
   "cid_atomic_luz_3": {
     "duration": 7.8125,
     "sample_rate": 48000,
     "channels": 1,
-    "peak": 0.60153,
-    "rms": 0.13151,
-    "sha256": "35aa5d278998db5e80ef21d10488dbb134ff803b374d47334fe21c6b3b8622b2"
+    "peak": 0.60522,
+    "rms": 0.15523,
+    "sha256": "1abe78ce17bb94f6f0a033eb228cbd59c7bdc80b1bd0166427d66ac03e79d27c"
   },
   "cid_atomic_onda": {
     "duration": 2.5,
     "sample_rate": 48000,
     "channels": 1,
-    "peak": 0.59989,
-    "rms": 0.15068,
-    "sha256": "2e79f6c2be02eb3d4169c1ed357d77210ddaca0476c9ee41be86242d793d1935",
+    "peak": 0.60191,
+    "rms": 0.15873,
+    "sha256": "afd48f8cc38094a8820aa3d6d43d604ae8751cd74fbd249325b1e8cc4efd717e",
     "ticks": 50,
     "marcos": {
       "fim": 24
@@ -445,16 +445,16 @@
     "duration": 2.4038,
     "sample_rate": 48000,
     "channels": 1,
-    "peak": 0.62691,
-    "rms": 0.14136,
-    "sha256": "e900113131f45b76b540ddf541a417f64911a83e43ca132794d73a6cfa27f87f"
+    "peak": 0.60272,
+    "rms": 0.14387,
+    "sha256": "fe22d8c950daa923cf1db3d1fe08603aa7c7b5fdccdd0de68e4529c23a055c2d"
   },
   "cid_atomic_onda_3": {
     "duration": 2.6041,
     "sample_rate": 48000,
     "channels": 1,
-    "peak": 0.60088,
-    "rms": 0.13148,
-    "sha256": "57bb31768877c4a0c82c8e8e6dd280f1e0577735d4b3832487df186e3b43f8c9"
+    "peak": 0.61451,
+    "rms": 0.14001,
+    "sha256": "a123682bf859405ad883c7715611c3c367c5adbbc6a5af889403101b3765ac1d"
   }
 }

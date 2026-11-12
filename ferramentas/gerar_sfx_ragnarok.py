@@ -64,22 +64,10 @@ def batida_de_asa(s, ini, forca=1.):
     return forca * (1.1 * ar + .5 * s.sub(ini + .12, 55, 35, 6, 2))
 
 
-G = 'bigsoundbank/'
-K = 'kenney/'
-ROSNADOS = [G + 'rosnado_zumbi_%s.ogg' % c for c in 'abcd']
-EXPLOSOES = [G + 'explosao_a.ogg', G + 'explosao_b.ogg'] + [K + 'explosionCrunch_00%d.ogg' % i for i in range(3)]
-PEDRAS = [G + 'pedras_%s.ogg' % c for c in 'abc']
-MURROS = [K + 'impactPunch_heavy_00%d.ogg' % i for i in range(3)] + [G + 'soco_a.ogg', G + 'soco_b.ogg']
-BAQUES = [K + 'impactSoft_heavy_00%d.ogg' % i for i in range(3)]
-SUBGRAVE = [K + 'lowFrequency_explosion_000.ogg', K + 'lowFrequency_explosion_001.ogg']
-WHOOSH = [G + 'whoosh_a.ogg', G + 'whoosh_b.ogg', G + 'whoosh_c.ogg']
-BANDEIRAS = [G + 'bandeira_a.ogg', G + 'bandeira_b.ogg']
-CHAMAS = [G + 'fogo_chama.ogg', G + 'fogo_chama_b.ogg', G + 'fogo_galhos.ogg']
-JATO = [K + 'thrusterFire_000.ogg', K + 'thrusterFire_001.ogg']
-TROVOES = [G + 'trovao_a.ogg', G + 'trovao_b.ogg']
-MAGIA = [K + 'forceField_000.ogg', K + 'forceField_001.ogg']
-LASERS = [K + 'laserLarge_00%d.ogg' % i for i in range(3)]
-FACAS = [K + 'knifeSlice.ogg', K + 'knifeSlice2.ogg']
+from gravacoes import *  # noqa: F401,F403 (as listas de gravações)
+
+MAGIA = CAMPO[:2]
+LASERS = LASER_GRANDE
 
 
 def garganta(s, ini, dur, tom=.5, forca=1.):

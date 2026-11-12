@@ -52,6 +52,7 @@ Voltar para [[00 Início]].
 - [[2026-11-12 Cid parte 5]]: a Espada Atômica (V) e o Recovery Atomic (agachado + R) do Cid: mecânica, visuais, animações e sons
 - [[2026-11-12 Cid parte 6]]: o I Am Atomic final (R) do Cid: a dimensão do espaço e o céu dela, a subida a socos, a ida e a volta, a cutscene, os visuais e os sons
 - [[2026-11-12 Cid parte 7]]: a árvore do Cid, o Anel da Sucessão, o boss Ragnarok (cinco golpes, a asa cortada, o pisão) e a arena de Oriana; sons e efeitos do boss ainda provisórios
+- [[2026-11-12 Sons híbridos nos personagens]]: Cid, Ichigo, Gojo e Toji com gravações CC0 por cima da síntese; módulo comum `gravacoes.py`
 - [[2026-11-12 Sons híbridos]]: gravações CC0 (Kenney e BigSoundBank) misturadas à síntese; piloto nos onze sons do Ragnarok
 - [[2026-11-12 Buraco do Hollow]]: o buraco no peito da forma Hollow atravessa o corpo; a camada de brilho do GeckoLib não pinta mais de preto os trajes sem máscara
 - [[2026-11-12 Cid parte 7b]]: os onze sons próprios do Ragnarok, os efeitos dos golpes (cratera, projéteis, feixe, onda) e a cena da asa com o corte do Shadow

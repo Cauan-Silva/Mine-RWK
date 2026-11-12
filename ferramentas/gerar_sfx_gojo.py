@@ -1,4 +1,4 @@
-"""Sons do Gojo, sintetizados pelo motor em camadas (ferramentas/sfx_motor.py). Sem áudio de terceiros.
+"""Sons do Gojo: síntese do motor em camadas (ferramentas/sfx_motor.py) com gravações CC0 por cima (gravacoes.py).
 
 Rodar: python ferramentas/gerar_sfx_gojo.py [--preview caminho.wav]
 Escreve os .ogg em assets/minerwk/sounds/gojo/, as entradas do sounds.json, as legendas e o manifesto
@@ -11,6 +11,7 @@ com os tempos do Mine-RWK. A explosão do Vermelho e o domínio rachando são no
 import argparse
 import numpy as np
 import sfx_motor as m
+from gravacoes import *  # noqa: F401,F403 (as listas de gravações)
 
 T = m.TICK
 AZUL = 60 * T             # Gojo.CampoAzul.DURACAO
@@ -64,7 +65,7 @@ MARCOS = {
 }
 
 
-def sintese(nome, s):
+def sintetico(nome, s):
     if nome == 'gojo_azul':
         # Sucção grave (ruído filtrado baixo) + vento girando + núcleo sub pulsante.
         suga = s.passa_baixa(s.ruido(60, 3000, .8), 900) * s.crescer(0, .5, 2.5) * s.janela(0, .55, .06)
@@ -189,6 +190,45 @@ def sintese(nome, s):
         rolar = .4 * s.girar(s.passa_baixa(s.ruido(20, 900, 1.), 220), hz=.7, prof=.5) * s.env(CRESCEU * .6, 1.2, .5)
         return s.reverb(estalo + sub + .9 * corpo + rasga + crocante + rolar, 6.5, .55, 2500)
     raise ValueError(nome)
+
+
+def gravado(nome, s):
+    """As camadas gravadas (CC0) só onde há corpo físico: o ar, os golpes, as explosões e o vidro do domínio.
+    As técnicas (Azul, Vermelho, Roxo, Infinito) continuam com os tons sintetizados, que são a cara delas."""
+    if nome == 'gojo_azul':
+        return s.amostra(VENTO, .3, .5, .7) * s.janela(.3, AZUL, .4) + s.amostra(WHOOSH, 0, .4, .5, inverter=True)
+    if nome == 'gojo_vermelho_carga':
+        return s.amostra(CHOQUE_ELETRICO, 0, .4, 1.1) * s.crescer(0, VERMELHO_CARGA, 1.8)
+    if nome == 'gojo_vermelho_disparo':
+        return s.amostra(LASER_PEQUENO, 0, .5, .8) + s.amostra(WHOOSH, 0, .6, 1.2)
+    if nome == 'gojo_vermelho_explosao':
+        return s.amostra(EXPLOSOES, 0, 1., .8) + s.amostra(SUBGRAVE, .01, .7, .9) + s.amostra(PEDRAS, .05, .3, 1.1)
+    if nome == 'gojo_roxo_carga':
+        return s.amostra(CAMPO, 0, .4, .7) * s.crescer(0, ROXO_CARGA, 1.5)
+    if nome == 'gojo_roxo_disparo':
+        return s.amostra(SUBGRAVE, 0, 1., .6) + s.amostra(TROVOES, .05, .7, .7) + s.amostra(VENTO, .1, .4, .7) * s.janela(.1, 2.5, .5)
+    if nome == 'gojo_dominio':
+        return s.amostra(GONGOS, DOMINIO_ABERTURA, .5, .5) + s.amostra(SUBGRAVE, DOMINIO_ABERTURA, .6, .6)
+    if nome == 'gojo_dominio_fim':
+        return s.amostra(GELO, 0, .6, 1.) + s.amostra(VIDRO, 8 * T, 1., .8) + s.amostra(VIDRO, 8 * T + .06, .6, .65)
+    if nome == 'gojo_r_encantamento':
+        return sum((.25 + .06 * i) * s.amostra(GONGOS, p, 1., .45) for i, p in enumerate(PALAVRAS))
+    if nome == 'gojo_r_avanco':
+        return s.amostra(BAQUES, 0, .7, .9) + s.amostra(WHOOSH, .05, .8, .8)
+    if nome == 'gojo_r_uppercut':
+        return s.amostra(MURROS, IMPACTO, 1., .7) + s.amostra(EXPLOSOES, IMPACTO, .7, .7) + s.amostra(WHOOSH, IMPACTO + .03, .4, .7)
+    if nome == 'gojo_r_subida':
+        return s.amostra(VENTO, 0, .7, .9) * s.crescer(0, SUBIDA * .6, 1.5) * s.janela(0, SUBIDA + .2, .15)
+    if nome == 'gojo_r_fusao':
+        return s.amostra(MOTOR_GRAVE, 0, .5, .5) * s.crescer(0, SILENCIO, 1.6) * (1 - s.janela(SILENCIO, ESTOURO + .3, .02))
+    if nome == 'gojo_r_explosao':
+        return (s.amostra(SUBGRAVE, 0, 1., .5) + s.amostra(EXPLOSOES, 0, .9, .45) + s.amostra(TROVOES, .1, .8, .6)
+                + s.amostra(PEDRAS, .3, .4, .8) + s.amostra(VENTO, .1, .5, .6) * s.janela(.1, CRESCEU, .5))
+    return None  # Infinito e as esferas: só os tons de vidro sintetizados
+
+
+def sintese(nome, s):
+    return hibrido(s, sintetico(nome, s), gravado(nome, s))
 
 
 def gerar(preview=None):
