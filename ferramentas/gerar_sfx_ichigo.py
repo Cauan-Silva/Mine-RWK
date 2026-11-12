@@ -10,8 +10,10 @@ O som do Ichigo é de lâmina e de pressão: ar cortado, aço, e o reiatsu como 
 dos tons de vidro e dos zumbidos do Gojo. O Shikai é mais aberto e claro (azul); o Bankai é mais grave,
 seco e rápido (preto e vermelho). Os sons do Ichigo no Minezin não são usados.
 
-Ficam para as partes que criam esses golpes (6 e 8 do spec): máscara, Mugetsu, Cero, garra e a perda e a
-volta dos poderes.
+A máscara é osso e uma voz oca por baixo; o Mugetsu é o contrário de um estouro: tudo se cala e vem um
+corte só, seco e enorme, com a escuridão rolando atrás.
+
+Ficam para a parte 8 do spec (a forma Hollow completa): Cero e garra.
 """
 import argparse
 import numpy as np
@@ -29,6 +31,10 @@ BANKAI = 34 * T           # FormasIchigo.BANKAI
 LAMINA = 120 * T          # Ichigo.LaminaCarregada.DURACAO
 SAIR = 14 * T             # FormasIchigo.SAIR
 CORTE = 7 * T             # FormasIchigo.CORTE
+QUEBRA = 8 * T            # SonsIchigo.QUEBRA_DA_MASCARA: a máscara some neste tick do som
+TRANSFORMA, SILENCIO, MUGETSU_CARGA = 30 * T, 84 * T, 120 * T  # Ichigo.Mugetsu: TRANSFORMA, SILENCIO e CARGA
+PASSOU, MUGETSU_FIM = 20 * T, 50 * T   # Ichigo.Veu.TICKS, e mais Veu.RESTO
+AVISO = 30 * T            # Ichigo.SemPoderes.TICKS_DO_AVISO
 
 # nome -> (duração em s, alcance em blocos, legenda pt, legenda en)
 SONS = {
@@ -43,6 +49,12 @@ SONS = {
     'ichigo_lamina': (LAMINA + .3, 32, 'O Getsuga arde na lâmina', 'Getsuga burns on the blade'),
     'ichigo_sair': (SAIR + .5, 32, 'O Bankai se desfaz', 'Bankai fades'),
     'ichigo_corte': (CORTE + .1, 24, 'A lâmina corta o ar', 'The blade cuts the air'),
+    'ichigo_mascara_veste': (1.7, 48, 'A máscara Hollow se forma', 'The Hollow mask forms'),
+    'ichigo_mascara_quebra': (QUEBRA + .7, 32, 'A máscara Hollow se quebra', 'The Hollow mask shatters'),
+    'ichigo_mugetsu_carga': (MUGETSU_CARGA + .05, 64, 'O reiatsu se cala', 'The reiatsu falls silent'),
+    'ichigo_mugetsu': (MUGETSU_FIM + 2.2, 128, 'Mugetsu', 'Mugetsu'),
+    'ichigo_poderes_perdidos': (AVISO + .6, 32, 'O reiatsu do Ichigo se vai', "Ichigo's reiatsu fades away"),
+    'ichigo_poderes_voltam': (AVISO + .4, 32, 'O reiatsu do Ichigo volta', "Ichigo's reiatsu returns"),
 }
 
 # Marcos em ticks, conferidos contra o Java pelo SonsIchigoTest.
@@ -58,6 +70,12 @@ MARCOS = {
     'ichigo_lamina': {'fim': 120},
     'ichigo_sair': {'fim': 14},
     'ichigo_corte': {'fim': 7},
+    'ichigo_mascara_veste': {'fecha': 8},
+    'ichigo_mascara_quebra': {'quebra': 8},
+    'ichigo_mugetsu_carga': {'transforma': 30, 'silencio': 84, 'corte': 120},
+    'ichigo_mugetsu': {'passou': 20, 'fim': 50},
+    'ichigo_poderes_perdidos': {'fim': 30},
+    'ichigo_poderes_voltam': {'fim': 30},
 }
 
 
@@ -151,6 +169,56 @@ def sintese(nome, s):
     if nome == 'ichigo_corte':
         # O ataque básico: só a lâmina passando pelo ar, curto, para não cansar de tanto ouvir.
         return .55 * s.transiente(.01, 6000, .004) + s.reverb(.75 * golpe_de_ar(s, 0, CORTE * .8, 700, 9500, 1.4), .5, .12, 8000)
+    if nome == 'ichigo_mascara_veste':
+        # O osso se fechando sobre o rosto (estalos secos, sem brilho de vidro) e a voz oca por baixo: dois
+        # tons graves quase iguais, distorcidos, com um eco que repete e some.
+        osso = sum(.55 * s.transiente(d, 3200, .006) for d in (0, .06, .13, .19, .27, .34)) + .4 * s.estalos(0, .4, 60, 2400)
+        fecha = .9 * s.sub(.4, 110, 48, 6, 3) + .5 * s.transiente(.4, 4000, .01)
+        voz = np.tanh(3.2 * (s.tom(78, 64, 1., .35, 1.5, (1, 2, 3, 5), vibrato=.04, vib_hz=7)
+                             + .8 * s.tom(81.5, 66, 1., .35, 1.5, (1, 2, 3, 5), vibrato=.03, vib_hz=5.3)))
+        voz = s.passa_baixa(voz, 1400) * s.env(.38, .05, 2.6)
+        eco = sum(g * np.roll(voz, int(m.RATE * d)) for d, g in ((.16, .5), (.32, .3), (.48, .16)))
+        return osso + fecha + s.reverb(.55 * voz + .5 * eco, 1.6, .35, 2600)
+    if nome == 'ichigo_mascara_quebra':
+        # Rachaduras subindo e o último estalo quando ela some; os cacos caem secos, a voz oca se desfaz.
+        racha = sum((.35 + .08 * i) * s.transiente(d, 3600, .005) for i, d in enumerate(np.linspace(0, QUEBRA - .05, 6)))
+        parte = 1.0 * s.transiente(QUEBRA, 4200, .012) + .6 * s.sub(QUEBRA, 120, 60, 9, 2)
+        cacos = .4 * s.estalos(QUEBRA, QUEBRA + .5, 70, 2800) * s.env(QUEBRA, .01, 5)
+        some = .3 * np.tanh(2 * s.tom(74, 40, 1., 0, QUEBRA + .4, (1, 2, 3))) * s.janela(0, QUEBRA + .4, .1) * (1 - s.crescer(0, QUEBRA + .4, 1.))
+        return racha + parte + s.reverb(cacos + some, 1.0, .25, 3500)
+    if nome == 'ichigo_mugetsu_carga':
+        # A transformação: o reiatsu preto sobe como fumaça (um grave que incha e um vento escuro) e fecha na
+        # forma final; depois tudo vai murchando até o silêncio completo antes do corte.
+        sobe = s.crescer(0, TRANSFORMA, 1.6) * s.janela(0, TRANSFORMA + .25, .2)
+        fumaca = s.girar(s.passa_baixa(s.ruido(40, 2600, .8), 700), hz=2.3, prof=.5)
+        grave = np.tanh(2.4 * s.tom(34, 58, 1.3, 0, TRANSFORMA, (1, 2, 3), vibrato=.02, vib_hz=1.7))
+        forma = 1.0 * s.sub(TRANSFORMA, 70, 24, 1.6, 4) + .35 * s.transiente(TRANSFORMA, 2200, .03)
+        # Do baque da forma final até o silêncio: um fio grave que só diminui.
+        resto = (.5 * fumaca + .4 * np.tanh(2 * s.tom(46, 30, 1., TRANSFORMA, SILENCIO, (1, 2)))) \
+            * s.janela(TRANSFORMA, SILENCIO, .15) * (1 - s.crescer(TRANSFORMA, SILENCIO, .8))
+        x = (.55 * fumaca + .6 * grave) * sobe + forma + .7 * resto
+        # Depois do SILENCIO não toca mais nada: o que sobra é só a cauda do reverb morrendo.
+        return s.reverb(x, 1.6, .3, 2400) * (1 - s.crescer(SILENCIO + .2, SILENCIO + .9, 1.))
+    if nome == 'ichigo_mugetsu':
+        # O corte único: um estalo de lâmina, um sub enorme e a escuridão rolando para longe enquanto o véu
+        # avança; quando ele passa, sobra um grave que demora a morrer.
+        corte = 1.4 * s.transiente(0, 7500, .008) + .9 * golpe_de_ar(s, 0, .22, 300, 11000, 1.2) + .7 * aco(s, .004, 1300, 1.)
+        sub = 1.4 * s.sub(0, 65, 16, .55, 5)
+        parede = np.tanh(3 * s.passa_baixa(s.ruido(20, 2600, 1.), 520)) * s.janela(.02, PASSOU + .3, .25) * (1 - .5 * s.crescer(0, PASSOU, 1.))
+        rasga = .4 * s.girar(s.ruido(120, 4200, .6), hz=1.9, prof=.5) * s.janela(.03, PASSOU, .2) * (1 - .7 * s.crescer(0, PASSOU, 1.))
+        cauda = .55 * s.girar(s.passa_baixa(s.ruido(20, 700, 1.), 180), hz=.6, prof=.5) * s.env(PASSOU * .7, .8, .55)
+        return corte + s.reverb(sub + .85 * parede + rasga + cauda, 6.0, .55, 1800)
+    if nome == 'ichigo_poderes_perdidos':
+        # O reiatsu indo embora: um tom que desce e se esvazia, com um sopro que some junto.
+        desce = np.tanh(2 * s.tom(180, 46, .7, 0, AVISO + .3, (1, 2, 3), vibrato=.03, vib_hz=4)) * (1 - s.crescer(0, AVISO + .3, .8))
+        sopro = s.ruido(300, 5000, .5) * s.janela(0, AVISO + .4, .15) * (1 - s.crescer(0, AVISO + .4, .7))
+        return s.reverb(.5 * desce * s.janela(0, AVISO + .4, .05) + .35 * sopro + .15 * aco(s, .02, 900, .8), 1.8, .35, 3000)
+    if nome == 'ichigo_poderes_voltam':
+        # O contrário: o tom sobe, o ar volta e a lâmina dá um toque quando o reiatsu acende de novo.
+        sobe = np.tanh(2 * s.tom(60, 170, 1.4, 0, AVISO * .8, (1, 2, 3), vibrato=.02, vib_hz=5)) * s.crescer(0, AVISO * .8, 1.6)
+        ar = s.girar(s.ruido(300, 6000, .4), hz=8, prof=.35) * s.crescer(0, AVISO * .8, 2.) * s.janela(0, AVISO, .12)
+        acende = .9 * s.sub(AVISO * .8, 110, 52, 5, 2.5) + .55 * aco(s, AVISO * .8, 2100, 1.) + .4 * s.transiente(AVISO * .8, 5000, .008)
+        return s.reverb(.45 * sobe * s.janela(0, AVISO, .08) + .35 * ar + acende, 1.4, .28, 4500)
     raise ValueError(nome)
 
 

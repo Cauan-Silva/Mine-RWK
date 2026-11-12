@@ -514,6 +514,8 @@ public final class Ichigo {
     static final class Mugetsu extends Golpe {
         /** A cutscene: 6 segundos da transformação ao corte. */
         static final int CARGA = 120;
+        /** Dentro da carga: quando a forma final aparece e quando tudo se cala antes do corte. */
+        static final int TRANSFORMA = 30, SILENCIO = 84;
         static final String VISUAL_DA_CARGA = "ichigo_mugetsu_carga", VISUAL = "ichigo_mugetsu";
         /** Os golpes do Shikai, que ficam em recarga enquanto ele está sem poderes. */
         private static final List<String> DO_SHIKAI = List.of("ichigo_getsuga", "ichigo_shunpo", "ichigo_getsuga_chao",
@@ -571,6 +573,32 @@ public final class Ichigo {
             ctx.mudarForma(Forma.BASE);
             ctx.sinalAoRecurso(Reiatsu.SELAR, SEM_PODERES);
             for (String golpe : DO_SHIKAI) ctx.recarga(golpe, SEM_PODERES);
+            ctx.criarEfeito(new SemPoderes());
+        }
+    }
+
+    /**
+     * Os 60 s sem poderes, só para avisar: mostra o reiatsu indo embora logo depois do corte e voltando no
+     * fim, onde o Ichigo estiver. Quem tira e devolve os poderes de fato são as recargas e o selo do reiatsu,
+     * que são salvos; este efeito não é, então quem sai e entra no jogo perde só o aviso.
+     */
+    static final class SemPoderes implements Efeito {
+        /** Ticks depois do corte em que o reiatsu vai embora (o véu já passou), e quanto cada aviso dura. */
+        static final int AVISO = 30, TICKS_DO_AVISO = 30;
+
+        @Override
+        public int duracao() {
+            return SEM_PODERES;
+        }
+
+        @Override
+        public void tick(Contexto ctx, int t) {
+            if (t == AVISO) ctx.visual("ichigo_poderes_perdidos", ctx.olhos(), ctx.olhar(), 1f, TICKS_DO_AVISO);
+        }
+
+        @Override
+        public void aoAcabar(Contexto ctx) {
+            ctx.visual("ichigo_poderes_voltam", ctx.olhos(), ctx.olhar(), 1f, TICKS_DO_AVISO);
         }
     }
 

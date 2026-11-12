@@ -653,4 +653,25 @@ class IchigoTest {
         assertEquals(List.of(52f), ctx.danosDiretos, "40 com os 30% da máscara");
         assertFalse(ctx.efeitoAtivo(Ichigo.MascaraAtiva.class), "fora do Bankai a máscara se desfaz");
     }
+
+    @Test
+    void aPerdaEAVoltaDosPoderesAparecemOndeOIchigoEstiver() {
+        bankaiDesperto();
+        mugetsuInteiro();
+        assertTrue(ctx.efeitoAtivo(Ichigo.SemPoderes.class));
+        ticks(Ichigo.SemPoderes.AVISO);
+        assertTrue(ctx.visuais.contains("ichigo_poderes_perdidos"), "depois do corte, o reiatsu vai embora");
+        assertFalse(ctx.visuais.contains("ichigo_poderes_voltam"));
+        ticks(Ichigo.SEM_PODERES);
+        assertTrue(ctx.visuais.contains("ichigo_poderes_voltam"), "aos 60 s os poderes voltam");
+        assertFalse(ctx.efeitoAtivo(Ichigo.SemPoderes.class));
+        assertEquals(1, ctx.visuais.stream().filter("ichigo_poderes_voltam"::equals).count());
+    }
+
+    @Test
+    void aCutsceneDoMugetsuTemATransformacaoEOSilencioAntesDoCorte() {
+        assertTrue(0 < Ichigo.Mugetsu.TRANSFORMA && Ichigo.Mugetsu.TRANSFORMA < Ichigo.Mugetsu.SILENCIO);
+        assertTrue(Ichigo.Mugetsu.SILENCIO < Ichigo.Mugetsu.CARGA);
+        assertTrue(Ichigo.Mugetsu.CARGA - Ichigo.Mugetsu.SILENCIO >= 20, "ao menos 1 s de silêncio");
+    }
 }

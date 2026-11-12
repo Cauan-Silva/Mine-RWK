@@ -755,5 +755,107 @@
         "attenuation_distance": 24
       }
     ]
+  },
+  "ichigo_mascara_veste": {
+    "subtitle": "subtitles.minerwk.ichigo_mascara_veste",
+    "sounds": [
+      {
+        "name": "minerwk:ichigo/ichigo_mascara_veste",
+        "attenuation_distance": 48
+      },
+      {
+        "name": "minerwk:ichigo/ichigo_mascara_veste_2",
+        "attenuation_distance": 48
+      },
+      {
+        "name": "minerwk:ichigo/ichigo_mascara_veste_3",
+        "attenuation_distance": 48
+      }
+    ]
+  },
+  "ichigo_mascara_quebra": {
+    "subtitle": "subtitles.minerwk.ichigo_mascara_quebra",
+    "sounds": [
+      {
+        "name": "minerwk:ichigo/ichigo_mascara_quebra",
+        "attenuation_distance": 32
+      },
+      {
+        "name": "minerwk:ichigo/ichigo_mascara_quebra_2",
+        "attenuation_distance": 32
+      },
+      {
+        "name": "minerwk:ichigo/ichigo_mascara_quebra_3",
+        "attenuation_distance": 32
+      }
+    ]
+  },
+  "ichigo_mugetsu_carga": {
+    "subtitle": "subtitles.minerwk.ichigo_mugetsu_carga",
+    "sounds": [
+      {
+        "name": "minerwk:ichigo/ichigo_mugetsu_carga",
+        "attenuation_distance": 64
+      },
+      {
+        "name": "minerwk:ichigo/ichigo_mugetsu_carga_2",
+        "attenuation_distance": 64
+      },
+      {
+        "name": "minerwk:ichigo/ichigo_mugetsu_carga_3",
+        "attenuation_distance": 64
+      }
+    ]
+  },
+  "ichigo_mugetsu": {
+    "subtitle": "subtitles.minerwk.ichigo_mugetsu",
+    "sounds": [
+      {
+        "name": "minerwk:ichigo/ichigo_mugetsu",
+        "attenuation_distance": 128
+      },
+      {
+        "name": "minerwk:ichigo/ichigo_mugetsu_2",
+        "attenuation_distance": 128
+      },
+      {
+        "name": "minerwk:ichigo/ichigo_mugetsu_3",
+        "attenuation_distance": 128
+      }
+    ]
+  },
+  "ichigo_poderes_perdidos": {
+    "subtitle": "subtitles.minerwk.ichigo_poderes_perdidos",
+    "sounds": [
+      {
+        "name": "minerwk:ichigo/ichigo_poderes_perdidos",
+        "attenuation_distance": 32
+      },
+      {
+        "name": "minerwk:ichigo/ichigo_poderes_perdidos_2",
+        "attenuation_distance": 32
+      },
+      {
+        "name": "minerwk:ichigo/ichigo_poderes_perdidos_3",
+        "attenuation_distance": 32
+      }
+    ]
+  },
+  "ichigo_poderes_voltam": {
+    "subtitle": "subtitles.minerwk.ichigo_poderes_voltam",
+    "sounds": [
+      {
+        "name": "minerwk:ichigo/ichigo_poderes_voltam",
+        "attenuation_distance": 32
+      },
+      {
+        "name": "minerwk:ichigo/ichigo_poderes_voltam_2",
+        "attenuation_distance": 32
+      },
+      {
+        "name": "minerwk:ichigo/ichigo_poderes_voltam_3",
+        "attenuation_distance": 32
+      }
+    ]
   }
 }

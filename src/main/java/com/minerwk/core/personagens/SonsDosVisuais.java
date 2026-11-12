@@ -21,4 +21,9 @@ public final class SonsDosVisuais {
     public static boolean cortaComOVisual(String tipo) {
         return SonsGojo.cortaComOVisual(tipo) || SonsIchigo.cortaComOVisual(tipo);
     }
+
+    /** O som que toca um pouco antes de o visual {@code tipo} acabar. */
+    public static Optional<SonsGojo.NoFim> antesDoFim(String tipo) {
+        return SonsGojo.antesDoFim(tipo).or(() -> SonsIchigo.antesDoFim(tipo));
+    }
 }

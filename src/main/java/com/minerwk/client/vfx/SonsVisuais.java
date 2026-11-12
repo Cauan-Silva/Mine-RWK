@@ -79,7 +79,7 @@ public final class SonsVisuais {
         }
         for (VisuaisAtivos.Visual v : VisuaisAtivos.ativos()) {
             if (v.fimEm >= 0 || v.somDeFimTocado) continue;
-            SonsGojo.antesDoFim(v.tipo).ifPresent(fim -> {
+            SonsDosVisuais.antesDoFim(v.tipo).ifPresent(fim -> {
                 if (!fim.naJanela(agora - v.inicio, v.duracao)) return;
                 v.somDeFimTocado = true;
                 tocar(fim.som(), v.origem);

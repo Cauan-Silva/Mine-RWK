@@ -1,11 +1,12 @@
 package com.minerwk.core.personagens.ichigo;
 
+import com.minerwk.core.personagens.gojo.SonsGojo;
 import java.util.List;
 import java.util.Optional;
 
 /**
  * Ids dos sons do Ichigo (gerados por {@code ferramentas/gerar_sfx_ichigo.py}) e qual som acompanha cada
- * visual. Todo som do Ichigo sai de um visual: assim ele soa junto com o que se vê, do lugar certo, e para
+ * visual. Todo som do Ichigo sai de um visual (do começo dele ou, na máscara quebrando, do fim): assim ele soa junto com o que se vê, do lugar certo, e para
  * com o visual quando é o caso. Sem classes do Minecraft; o registro fica em {@code registro/Sons}.
  */
 public final class SonsIchigo {
@@ -20,9 +21,16 @@ public final class SonsIchigo {
     public static final String LAMINA = "ichigo_lamina";
     public static final String SAIR = "ichigo_sair";
     public static final String CORTE = "ichigo_corte";
+    public static final String MASCARA_VESTE = "ichigo_mascara_veste";
+    public static final String MASCARA_QUEBRA = "ichigo_mascara_quebra";
+    public static final String MUGETSU_CARGA = "ichigo_mugetsu_carga";
+    public static final String MUGETSU = "ichigo_mugetsu";
+    public static final String PODERES_PERDIDOS = "ichigo_poderes_perdidos";
+    public static final String PODERES_VOLTAM = "ichigo_poderes_voltam";
 
     public static final List<String> TODOS = List.of(GETSUGA_CARGA, GETSUGA, GETSUGA_NEGRO, SHUNPO, ONDA, ARREMESSO,
-            BANKAI_CARGA, BANKAI, LAMINA, SAIR, CORTE);
+            BANKAI_CARGA, BANKAI, LAMINA, SAIR, CORTE, MASCARA_VESTE, MASCARA_QUEBRA, MUGETSU_CARGA, MUGETSU,
+            PODERES_PERDIDOS, PODERES_VOLTAM);
 
     private SonsIchigo() {
     }
@@ -41,6 +49,11 @@ public final class SonsIchigo {
             case "ichigo_lamina" -> LAMINA;
             case "ichigo_sair" -> SAIR;
             case "ichigo_corte" -> CORTE;
+            case "ichigo_mascara" -> MASCARA_VESTE;
+            case "ichigo_mugetsu_carga" -> MUGETSU_CARGA;
+            case "ichigo_mugetsu" -> MUGETSU;
+            case "ichigo_poderes_perdidos" -> PODERES_PERDIDOS;
+            case "ichigo_poderes_voltam" -> PODERES_VOLTAM;
             default -> null;
         });
     }
@@ -50,6 +63,15 @@ public final class SonsIchigo {
      * cedo ou foi interrompido) e a lâmina carregada (saiu do Bankai).
      */
     public static boolean cortaComOVisual(String tipo) {
-        return tipo.equals("ichigo_carga") || tipo.equals("ichigo_bankai_carga") || tipo.equals("ichigo_lamina");
+        return tipo.equals("ichigo_carga") || tipo.equals("ichigo_bankai_carga") || tipo.equals("ichigo_lamina")
+                || tipo.equals("ichigo_mugetsu_carga");
+    }
+
+    /** A máscara começa a quebrar esses ticks antes de sumir: o último estalo cai quando ela some. */
+    static final int QUEBRA_DA_MASCARA = 8;
+
+    /** O som de fim do visual {@code tipo}: a máscara Hollow quebrando quando os 11 s acabam. */
+    public static Optional<SonsGojo.NoFim> antesDoFim(String tipo) {
+        return tipo.equals("ichigo_mascara") ? Optional.of(new SonsGojo.NoFim(MASCARA_QUEBRA, QUEBRA_DA_MASCARA)) : Optional.empty();
     }
 }
