@@ -59,4 +59,46 @@ public final class LogicaHud {
         }
         return maior;
     }
+
+    /** Quantos ticks dura o brilho de "ficou pronto". */
+    public static final int BRILHO_TICKS = 8;
+
+    /**
+     * A parte escura da recarga num quadro de {@code lado} pixels, como um relógio: o claro cresce no sentido
+     * horário a partir do topo e o escuro é o resto do giro. Devolve o polígono em pares x, y relativos ao canto do
+     * quadro, começando no centro (para desenhar em leque); vazio sem recarga. {@code restante} acima de 1 conta 1.
+     */
+    public static float[] varredura(float restante, int lado) {
+        if (!(restante > 0)) return new float[0];
+        float r = Math.min(1f, restante);
+        double inicio = 360 * (1 - r);
+        float meio = lado / 2f;
+        List<float[]> pontos = new java.util.ArrayList<>();
+        pontos.add(new float[] {meio, meio});
+        pontos.add(noQuadrado(inicio, meio));
+        for (double canto : new double[] {45, 135, 225, 315}) {
+            if (canto > inicio) pontos.add(noQuadrado(canto, meio));
+        }
+        pontos.add(new float[] {meio, 0});
+        float[] saida = new float[pontos.size() * 2];
+        for (int i = 0; i < pontos.size(); i++) {
+            saida[2 * i] = pontos.get(i)[0];
+            saida[2 * i + 1] = pontos.get(i)[1];
+        }
+        return saida;
+    }
+
+    /** O ponto da borda do quadrado no ângulo dado, em graus no sentido horário a partir do topo. */
+    private static float[] noQuadrado(double graus, float meio) {
+        double a = Math.toRadians(graus);
+        double dx = Math.sin(a), dy = -Math.cos(a);
+        double escala = meio / Math.max(Math.abs(dx), Math.abs(dy));
+        return new float[] {(float) (meio + dx * escala), (float) (meio + dy * escala)};
+    }
+
+    /** A força do brilho de "ficou pronto": 1 no tick em que ficou pronto, caindo em linha reta até 0. */
+    public static float brilho(long ticksDesdePronta) {
+        if (ticksDesdePronta < 0 || ticksDesdePronta >= BRILHO_TICKS) return 0;
+        return 1 - ticksDesdePronta / (float) BRILHO_TICKS;
+    }
 }
