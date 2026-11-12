@@ -54,7 +54,7 @@ public final class Cid {
         Map<Tecla, Habilidade> kit = Map.of(Tecla.Z, new Redemoinho(), Tecla.X, new PosImagem(),
                 Tecla.C, new Prisao(), Tecla.G, new Overdrive(), Tecla.V, new EspadaAtomica(), Tecla.R, new Atomic());
         return new Personagem(ID, "Cid Kagenou", "The Eminence in Shadow", Magia::new, kit, List.of(EspadaDeSlime::new),
-                Arvore.VAZIA, new Trancas(Set.of(ESPADA_ATOMICA, ATOMIC, RECOVERY), false));
+                ArvoreCid.ARVORE, new Trancas(Set.of(ESPADA_ATOMICA, ATOMIC, RECOVERY), false));
     }
 
     /** O dano que passa pelo traje de slime: o golpe forte, com a passiva pronta, vem pela metade. */
@@ -152,8 +152,9 @@ public final class Cid {
             if (t % Redemoinho.ENTRE_CORTES != 0) return;
             // O primeiro corte respeita a proteção de quem acabou de apanhar de outra coisa; os dois seguintes
             // só passam por cima da proteção do corte anterior.
-            if (t == 0) ctx.danoEmArea(Redemoinho.RAIO, dano(ctx, Redemoinho.DANO));
-            else ctx.danoSeguidoEmArea(Redemoinho.RAIO, dano(ctx, Redemoinho.DANO));
+            float dano = dano(ctx, Redemoinho.DANO) * (float) ctx.melhorias().mais(ArvoreCid.REDEMOINHO_FORCA);
+            if (t == 0) ctx.danoEmArea(Redemoinho.RAIO, dano);
+            else ctx.danoSeguidoEmArea(Redemoinho.RAIO, dano);
         }
     }
 
@@ -269,8 +270,9 @@ public final class Cid {
             if (t < Prisao.ESPERA) return;
             Vetor onde = ctx.posicaoDe(alvo);
             if (onde == null) return;
-            ctx.paralisarAlvo(alvo, Prisao.PRESO);
-            ctx.visual(Prisao.CORRENTES, onde, new Vetor(0, 1, 0), 0f, Prisao.PRESO);
+            int preso = com.minerwk.core.maestria.Melhorias.escala(Prisao.PRESO, ctx.melhorias().mais(ArvoreCid.PRISAO_DURACAO));
+            ctx.paralisarAlvo(alvo, preso);
+            ctx.visual(Prisao.CORRENTES, onde, new Vetor(0, 1, 0), 0f, preso);
         }
     }
 
@@ -323,7 +325,7 @@ public final class Cid {
         @Override
         public void aoAcabar(Contexto ctx) {
             // Só quem leva até o fim paga o recuo; quem desliga antes sai inteiro.
-            if (ultimo >= Overdrive.DURACAO - 1) ctx.recuo(Overdrive.RECUO);
+            if (ultimo >= Overdrive.DURACAO - 1) ctx.recuo(Overdrive.RECUO * (float) ctx.melhorias().menos(ArvoreCid.OVERDRIVE_RECUO));
             ctx.sinalAoRecurso(Magia.SEM_GANHO, 0);
             ctx.recarga(OVERDRIVE, Overdrive.RECARGA);
             ctx.visualFim(OVERDRIVE, ctx.olhos());
@@ -370,7 +372,8 @@ public final class Cid {
             ctx.visualFim(CARGA, ctx.olhos());
             ctx.visual(ESPADA_ATOMICA, ctx.olhos(), rumo, (float) ALCANCE, FormasCid.CORTE_ATOMICO);
             ctx.tremor(.35f, 8, 16);
-            if (ctx.danoEmArco(ctx.olhos(), rumo, ALCANCE, ARCO, ALTURA, dano(ctx, DANO)) > 0) ctx.acertou(.8f);
+            if (ctx.danoEmArco(ctx.olhos(), rumo, ALCANCE, ARCO, ALTURA,
+                    dano(ctx, DANO) * (float) ctx.melhorias().mais(ArvoreCid.ESPADA_FORCA)) > 0) ctx.acertou(.8f);
         }
     }
 
@@ -522,7 +525,7 @@ public final class Cid {
         /** O soco: o dano, o visual, a tela que trava um instante e o tremor (mais forte no arremesso). */
         private void socar(Contexto ctx, Vetor onde, float tipo) {
             boolean forte = tipo == Atomic.ARREMESSO;
-            ctx.ferir(alvo, bonus * AtomicFinal.DANO_DO_SOCO);
+            ctx.ferir(alvo, bonus * AtomicFinal.DANO_DO_SOCO * (float) ctx.melhorias().mais(ArvoreCid.ATOMIC_FORCA));
             ctx.visual(Atomic.SOCO, onde, rumo, tipo, AtomicFinal.ENTRE_SOCOS);
             ctx.acertou(forte ? 1f : .6f);
             ctx.tremor(forte ? 1.4f : .7f, forte ? 8 : 5, 32);
@@ -533,7 +536,7 @@ public final class Cid {
             Vetor cid = AtomicFinal.cidNoEspaco(chegada, rumo, AtomicFinal.ATOMIC);
             Vetor meio = cid.mais(rumo.vezes(AtomicFinal.AO_LADO / 2)).mais(new Vetor(0, .9, 0));
             ctx.visualFim(Atomic.AURA, cid);
-            ctx.ferir(alvo, bonus * AtomicFinal.DANO);
+            ctx.ferir(alvo, bonus * AtomicFinal.DANO * (float) ctx.melhorias().mais(ArvoreCid.ATOMIC_FORCA));
             ctx.visual(ATOMIC, meio, rumo, 0f, AtomicFinal.TICKS_DO_CLARAO + 10);
             ctx.visualNaOrigem(Atomic.LUZ, 0f, AtomicFinal.TICKS_DA_LUZ, AtomicFinal.RAIO_DA_LUZ);
             ctx.cutscene(CutsceneAtomic.CLARAO, cid.mais(new Vetor(0, 1.62, 0)), rumo);

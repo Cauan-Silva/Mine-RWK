@@ -41,6 +41,7 @@ public final class MineRWKClient {
                 {
                     e.registerEntityRenderer(com.minerwk.registro.Entidades.TOJI.get(), com.minerwk.client.boss.RenderToji::new);
                     e.registerEntityRenderer(com.minerwk.registro.Entidades.ZANGETSU.get(), com.minerwk.client.boss.RenderZangetsu::new);
+                    e.registerEntityRenderer(com.minerwk.registro.Entidades.RAGNAROK.get(), com.minerwk.client.boss.RenderRagnarok::new);
                 });
         modBus.addListener(this::clientSetup);
         modBus.addListener(TeclasKit::registrar);

@@ -92,6 +92,9 @@ public final class RegrasArena {
         for (com.minerwk.boss.ZangetsuEntity z : arena.getEntities(Entidades.ZANGETSU.get(), LivingEntity::isAlive)) {
             segurar(arena, z, caixaDe(z.invocadorId(), z), 0);
         }
+        for (com.minerwk.boss.RagnarokEntity r : arena.getEntities(Entidades.RAGNAROK.get(), LivingEntity::isAlive)) {
+            segurar(arena, r, caixaDe(r.invocadorId(), r), 0);
+        }
     }
 
     /** A caixa da luta desse jogador; sem luta (alguém levado por comando), a da vaga onde a entidade está. */

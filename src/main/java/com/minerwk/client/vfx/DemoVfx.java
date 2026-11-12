@@ -51,6 +51,9 @@ public final class DemoVfx {
     /** O tick da prévia em que o Zangetsu apareceu (a arena leva um tempo para ficar pronta). */
     private static int zangetsuEm = -1;
     private static boolean fimDaDemo;
+    /** {@code ragnarok}: a luta contra o Ragnarok, da entrada à vitória, com os cinco golpes, a asa cortada e o pisão. */
+    private static final boolean RAGNAROK = MODO.equals("ragnarok");
+    private static int ragnarokEm = -1;
     /** {@code hollow}: o golpe fatal no Bankai, a forma Hollow de frente e de lado, as garras, o Sonído e o Cero. */
     private static final boolean HOLLOW = MODO.equals("hollow") || MODO.equals("hollow_perto");
     /** {@code hollow_perto}: só o modelo do Vasto Lorde, de perto: de frente, andando, de costas, de lado e num pulo. */
@@ -67,7 +70,7 @@ public final class DemoVfx {
     private static final boolean CID_ATOMICO = MODO.equals("cid_atomico");
     /** {@code cid_final}: o R inteiro num alvo parado, com a cutscene: a subida, o espaço, o Atomic e a volta. */
     private static final boolean CID_FINAL = MODO.equals("cid_final");
-    private static final int FIM_PREVIA = CID ? 250 : CID_FINAL ? 410 : CID_ATOMICO ? 215 : HOLLOW_PERTO || CID_PERTO ? 272 : HOLLOW ? 330 : ZANGETSU ? 2400 : TOJI ? 520 : ARVORE ? 100 : TRAJE ? 260 : TRAJE_ICHIGO ? 300 : ICHIGO ? 350 : MUGETSU ? 360 : R_COMPLETO ? 360
+    private static final int FIM_PREVIA = CID ? 250 : CID_FINAL ? 410 : CID_ATOMICO ? 215 : HOLLOW_PERTO || CID_PERTO ? 272 : HOLLOW ? 330 : ZANGETSU || RAGNAROK ? 2400 : TOJI ? 520 : ARVORE ? 100 : TRAJE ? 260 : TRAJE_ICHIGO ? 300 : ICHIGO ? 350 : MUGETSU ? 360 : R_COMPLETO ? 360
             : ENCANTAMENTO ? CARGA + 90 : ESTOURO + RoxoMaximo.TICKS_EXPLOSAO + 110;
     private static int ticks;
     private static int quadro;
@@ -101,7 +104,8 @@ public final class DemoVfx {
                 jogador.connection.sendCommand("tp @s ~150 ~12 ~");
             }
             if (ZANGETSU) jogador.connection.sendCommand("rwk despertar @s nao");
-            if (CID_PERTO || CID || CID_ATOMICO || CID_FINAL) {
+            if (RAGNAROK) jogador.connection.sendCommand("rwk despertar @s nao");
+            if (CID_PERTO || CID || CID_ATOMICO || CID_FINAL || RAGNAROK) {
                 jogador.connection.sendCommand("rwk trocar @s cid");
                 if (CID_ATOMICO || CID_FINAL) jogador.connection.sendCommand("rwk despertar @s sim");
                 jogador.connection.sendCommand("tp @s ~150 ~12 ~");
@@ -168,6 +172,10 @@ public final class DemoVfx {
         }
         if (ZANGETSU) {
             previaDoZangetsu(mc, jogador, t);
+            return;
+        }
+        if (RAGNAROK) {
+            previaDoRagnarok(mc, jogador, t);
             return;
         }
         if (HOLLOW_PERTO || CID_PERTO) {
@@ -756,6 +764,68 @@ public final class DemoVfx {
             mc.options.setCameraType(net.minecraft.client.CameraType.FIRST_PERSON);
             previa = -1;
         }
+    }
+
+    /**
+     * A luta inteira contra o Ragnarok, vista de fora: a entrada, os cinco golpes, a asa cortada, o pisão e a
+     * vitória. Os tempos contam de quando ele aparece, porque a arena leva um tempo para ficar pronta.
+     */
+    private static void previaDoRagnarok(Minecraft mc, LocalPlayer jogador, int t) {
+        if (t == 0) {
+            jogador.connection.sendCommand("gamerule sendCommandFeedback false");
+            jogador.connection.sendCommand("gamemode survival");
+        }
+        if (t <= 2) mc.gui.getChat().clearMessages(false);
+        if (t == 2) jogador.connection.sendCommand("rwk ragnarok @s");
+        net.minecraft.world.entity.Entity ragnarok = null;
+        for (net.minecraft.world.entity.Entity e : mc.level.entitiesForRendering()) {
+            if (e instanceof com.minerwk.boss.RagnarokEntity) ragnarok = e;
+        }
+        if (ragnarokEm < 0) {
+            if (ragnarok == null) return;
+            ragnarokEm = t;
+        }
+        int z = t - ragnarokEm;
+        // O jogador não pode cair no meio do roteiro.
+        if (z % 5 == 0) vidaDoJogador(20);
+        if (z == 100) golpeDoRagnarok(com.minerwk.core.boss.RagnarokBoss.SOCO);
+        if (z == 140) golpeDoRagnarok(com.minerwk.core.boss.RagnarokBoss.BARRAGEM);
+        if (z == 215) golpeDoRagnarok(com.minerwk.core.boss.RagnarokBoss.RAJADA);
+        if (z == 270) golpeDoRagnarok(com.minerwk.core.boss.RagnarokBoss.INVESTIDA);
+        if (z == 345) golpeDoRagnarok(com.minerwk.core.boss.RagnarokBoss.SOPRO);
+        // Abaixo da metade da vida a asa é cortada: sai a investida, entra o pisão.
+        if (z == 455) jogador.connection.sendCommand("damage @e[type=minerwk:ragnarok,limit=1,sort=nearest] 170");
+        if (z == 540) golpeDoRagnarok(com.minerwk.core.boss.RagnarokBoss.PISAO);
+        if (z == 600) jogador.connection.sendCommand("kill @e[type=minerwk:ragnarok]");
+        // Pelos olhos do jogador e sem a interface: é o tamanho que ele tem para quem luta.
+        mc.options.setCameraType(net.minecraft.client.CameraType.FIRST_PERSON);
+        mc.options.hideGui = true;
+        if (ragnarok != null) {
+            jogador.lookAt(net.minecraft.commands.arguments.EntityAnchorArgument.Anchor.EYES, ragnarok.position().add(0, 4, 0));
+        }
+        int volta = 600 + com.minerwk.arena.ArenasServidor.TICKS_DEPOIS_DA_VITORIA + 30;
+        if (z == volta) {
+            jogador.connection.sendCommand("rwk despertar @s nao");
+            jogador.connection.sendCommand("rwk maestria @s zerar");
+            jogador.connection.sendCommand("gamerule sendCommandFeedback true");
+            jogador.connection.sendCommand("gamemode creative");
+        }
+        if (z >= volta + 10) {
+            mc.options.hideGui = false;
+            fimDaDemo = true;
+        }
+    }
+
+    private static void golpeDoRagnarok(com.minerwk.core.boss.Golpe golpe) {
+        net.minecraft.server.MinecraftServer servidor = Minecraft.getInstance().getSingleplayerServer();
+        if (servidor == null) return;
+        servidor.execute(() -> {
+            for (net.minecraft.server.level.ServerLevel nivel : servidor.getAllLevels()) {
+                for (net.minecraft.world.entity.Entity e : nivel.getAllEntities()) {
+                    if (e instanceof com.minerwk.boss.RagnarokEntity ragnarok) ragnarok.forcar(golpe);
+                }
+            }
+        });
     }
 
     private static void golpeDoZangetsu(com.minerwk.core.boss.Golpe golpe) {

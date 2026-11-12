@@ -36,11 +36,15 @@ public final class Itens {
     /** Leva ao Zangetsu interior; feita na bancada com osso, pérola do Ender e espada de ferro. */
     public static final DeferredItem<com.minerwk.boss.MascaraRachada> MASCARA_RACHADA =
             REGISTRO.register("mascara_rachada", com.minerwk.boss.MascaraRachada::new);
+    /** Abre a Rosa Negra e leva ao Ragnarok; feito na bancada com ouro, ametista e pérola do Ender. */
+    public static final DeferredItem<com.minerwk.boss.AnelDaSucessao> ANEL_DA_SUCESSAO =
+            REGISTRO.register("anel_da_sucessao", com.minerwk.boss.AnelDaSucessao::new);
 
     public static void naAbaCriativa(net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent evento) {
         if (evento.getTabKey() == net.minecraft.world.item.CreativeModeTabs.COMBAT) {
             evento.accept(CONTRATO_TOJI.get());
             evento.accept(MASCARA_RACHADA.get());
+            evento.accept(ANEL_DA_SUCESSAO.get());
         }
     }
 

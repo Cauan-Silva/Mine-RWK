@@ -67,7 +67,7 @@ public final class ChamarizServidor {
 
     /** Bosses não caem na imagem: os do mod (a luta lê o alvo deles), o Wither e o Dragão. */
     static boolean enganavel(Mob m) {
-        return !(m instanceof com.minerwk.boss.TojiEntity || m instanceof com.minerwk.boss.ZangetsuEntity
+        return !(m instanceof com.minerwk.boss.TojiEntity || m instanceof com.minerwk.boss.ZangetsuEntity || m instanceof com.minerwk.boss.RagnarokEntity
                 || m instanceof net.minecraft.world.entity.boss.wither.WitherBoss
                 || m instanceof net.minecraft.world.entity.boss.enderdragon.EnderDragon);
     }

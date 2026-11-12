@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "minerwk:item/anel_da_sucessao"
+  }
+}

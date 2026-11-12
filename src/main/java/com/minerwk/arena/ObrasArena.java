@@ -175,6 +175,8 @@ public final class ObrasArena {
             case CONCRETO_CLARO -> Blocks.WHITE_CONCRETE.defaultBlockState();
             case VIDRO_AZUL -> Blocks.LIGHT_BLUE_STAINED_GLASS.defaultBlockState();
             case FUNDO_ESCURO -> Blocks.BLUE_CONCRETE.defaultBlockState();
+            case PORTAL_NEGRO -> Blocks.BLACK_CONCRETE.defaultBlockState();
+            case PORTAL_ROXO -> Blocks.CRYING_OBSIDIAN.defaultBlockState();
         };
     }
 }

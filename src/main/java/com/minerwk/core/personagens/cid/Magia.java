@@ -21,6 +21,8 @@ public final class Magia implements Recurso {
     static final int COR = 0x7A5CFF;
 
     private double atual = MAXIMO;
+    /** Da árvore: a reserva maior e a volta mais rápida. */
+    private double fatorMaximo = 1, fatorGanho = 1;
     /** Ticks desde o último golpe recebido; começa calmo. */
     private int semApanhar = CALMA;
     /** Ticks que faltam da pausa do ganho. */
@@ -43,7 +45,14 @@ public final class Magia implements Recurso {
 
     @Override
     public double maximo() {
-        return MAXIMO;
+        return MAXIMO * fatorMaximo;
+    }
+
+    @Override
+    public void melhorias(com.minerwk.core.maestria.Melhorias melhorias) {
+        fatorMaximo = melhorias.mais(ArvoreCid.MAGIA_RESERVA);
+        fatorGanho = melhorias.mais(ArvoreCid.MAGIA_FLUXO);
+        atual = Math.min(atual, maximo());
     }
 
     @Override
@@ -71,7 +80,7 @@ public final class Magia implements Recurso {
             semGanho--;
             return;
         }
-        atual = Math.min(MAXIMO, atual + (calmo ? GANHO_CALMO : GANHO));
+        atual = Math.min(maximo(), atual + (calmo ? GANHO_CALMO : GANHO) * fatorGanho);
     }
 
     @Override
@@ -81,6 +90,6 @@ public final class Magia implements Recurso {
 
     @Override
     public void carregar(double valor) {
-        atual = Double.isFinite(valor) ? Math.max(0, Math.min(MAXIMO, valor)) : 0;
+        atual = Double.isFinite(valor) ? Math.max(0, Math.min(maximo(), valor)) : 0;
     }
 }
