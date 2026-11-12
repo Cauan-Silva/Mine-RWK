@@ -144,64 +144,63 @@ def textura():
 cubo = h.cubo
 
 
-# O capuz, em fatias da testa à nuca: (z da frente, fundura, meia largura, altura da ponta). A da frente é a mais
-# alta e passa da testa; para trás ele baixa e estreita, como um capuz caído sobre a cabeça.
-FATIAS = [(-5.7, 2.3, 5.35, 36.3), (-3.4, 2.2, 5.3, 35.7), (-1.2, 2.2, 5.25, 35.1), (1.0, 2.0, 5.15, 34.6),
-          (3.0, 1.6, 5.0, 34.2)]
-BARRA_DO_CAPUZ, BEIRAL = 24.6, 32.0
-
-
-def perfil(meia, ponta):
-    """Meio arco do capuz, de baixo para cima: abre para os ombros, sobe reto ao lado do rosto e fecha em ogiva."""
-    sobe = ponta - BEIRAL
-    return [(meia + .75, BARRA_DO_CAPUZ), (meia, 28.0), (meia, BEIRAL), (meia - 1.0, BEIRAL + sobe * .42),
-            (meia * .45, BEIRAL + sobe * .78), (0, ponta)]
-
-
-def placa(de, ate, lado, z0, fundo, cor, grosso=.5, **faces):
-    """Uma placa do arco, do ponto {@code de} ao {@code ate} (x, y) do lado dado. O cubo nasce de pé e é girado em
-    z: ângulo positivo leva o alto para +x."""
-    dx, dy = (ate[0] - de[0]) * lado, ate[1] - de[1]
-    return cubo([de[0] * lado - grosso / 2, de[1], z0], [grosso, math.hypot(dx, dy) + .12, fundo], cor,
-                giro=[0, 0, round(math.degrees(math.atan2(dx, dy)), 2)], pivo=[de[0] * lado, de[1], 0], **faces)
-
-
-def meia_largura(pontos, y):
-    for (x1, y1), (x2, y2) in zip(pontos, pontos[1:]):
-        if y1 <= y <= y2:
-            return x1 + (x2 - x1) * (y - y1) / (y2 - y1)
-    return 0
+# O capuz veste a cabeça: as placas encostam na segunda camada da skin (meio bloco de 4,5) e passam da testa.
+JUSTO, BORDA = 4.5, -5.1
 
 
 def capuz():
-    """O capuz em ogiva: arcos de placas, da testa à nuca, cada um mais baixo e estreito que o da frente. Aberto na
-    frente, sem nada sobre o rosto, que é o da skin do jogador. Avesso roxo e o filete dourado na beirada."""
+    """O capuz justo à cabeça: teto, nuca e laterais encostados nela, sem nada sobre o rosto, que é o da skin do
+    jogador. Sem as arestas (as placas não se encontram nos cantos) e com gomos no teto, nos lados e na nuca, ele
+    fica arredondado; o teto sobe em ponta e os cantos de cima da abertura são fechados em arco, com o filete
+    dourado por dentro."""
     roxo = uv_de(COR_ROXO_ESCURO)
-    cubos = []
-    for i, (z0, fundo, meia, ponta) in enumerate(FATIAS):
-        pontos = perfil(meia, ponta)
-        for lado in (-1, 1):
-            dentro, fora = ('west', 'east') if lado > 0 else ('east', 'west')
-            for s in range(len(pontos) - 1):
-                faces = {dentro: roxo}
-                if s < 2:
-                    faces[fora] = TEMPORA
-                cubos.append(placa(pontos[s], pontos[s + 1], lado, z0, fundo, COR_EBANO if s != 3 else COR_EBANO_CLARO,
-                                   **faces))
-                if i == 0:
-                    cubos.append(placa(pontos[s], pontos[s + 1], lado, z0 - .1, .16, COR_OURO, grosso=.58))
-        # A ponta do arco, onde os dois lados se encontram.
-        cubos.append(cubo([-.3, ponta - .35, z0], [.6, .5, fundo], COR_EBANO_CLARO))
-    # A nuca: fecha o último arco, em degraus, e um gomo mais para trás, que arredonda o capuz.
-    z0, fundo, meia, ponta = FATIAS[-1]
-    pontos, z, alto = perfil(meia, ponta), z0 + fundo, .7
-    y = BARRA_DO_CAPUZ
-    while y < ponta - .2:
-        larga = max(meia_largura(pontos, y), meia_largura(pontos, min(y + alto, ponta))) + .2
-        cubos.append(cubo([-larga, y, z], [2 * larga, alto, .5], COR_EBANO, north=roxo))
-        y += alto
-    cubos.append(cubo([-3.9, 25.6, z + .5], [7.8, 7.0, .55], COR_EBANO, south=NUCA))
-    cubos.append(cubo([-2.6, 26.8, z + 1.05], [5.2, 4.4, .45], COR_EBANO_CLARO))
+    fundo = JUSTO - BORDA
+    cubos = [
+        cubo([-JUSTO, 32.5, BORDA], [2 * JUSTO, .5, fundo], COR_EBANO, up=TOPO, down=roxo),
+        cubo([-JUSTO, 24.0, JUSTO], [2 * JUSTO, 8.5, .5], COR_EBANO, south=NUCA, north=roxo),
+        # No modelo do GeckoLib a face "west" é a que olha para +x.
+        cubo([-JUSTO - .5, 24.0, BORDA], [.5, 8.5, fundo], COR_EBANO, east=TEMPORA, west=roxo),
+        cubo([JUSTO, 24.0, BORDA], [.5, 8.5, fundo], COR_EBANO, west=TEMPORA, east=roxo),
+        # Os gomos que arredondam os lados e a nuca.
+        cubo([-JUSTO - .85, 25.3, -3.9], [.35, 5.9, 7.4], COR_EBANO),
+        cubo([JUSTO + .5, 25.3, -3.9], [.35, 5.9, 7.4], COR_EBANO),
+        cubo([-3.4, 25.3, JUSTO + .5], [6.8, 6.0, .4], COR_EBANO_CLARO),
+    ]
+    # O teto em ponta: degraus que estreitam e encurtam para trás.
+    for meia, y, ate in ((3.4, 33.0, 3.7), (2.1, 33.4, 2.5), (.9, 33.8, 1.0)):
+        cubos.append(cubo([-meia, y, BORDA], [2 * meia, .4, ate - BORDA], COR_EBANO if meia > 1 else COR_EBANO_CLARO))
+    # A abertura em arco: os cantos de cima fechados em degraus, e o filete dourado um pouco maior por trás deles.
+    cantos = [(3.3, JUSTO, 31.2, 32.5), (2.3, 3.3, 31.9, 32.5), (3.9, JUSTO, 30.2, 31.2)]
+    for lado in (-1, 1):
+        for x0, x1, y0, y1 in cantos:
+            xa, xb = (x0, x1) if lado > 0 else (-x1, -x0)
+            cubos.append(cubo([xa, y0, BORDA], [xb - xa, y1 - y0, .5], COR_EBANO))
+            xo = xa - .18 if lado > 0 else xa
+            cubos.append(cubo([xo, y0 - .18, BORDA + .06], [xb - xa + .18, y1 - y0 + .18, .4], COR_OURO))
+        x = JUSTO - .18 if lado > 0 else -JUSTO
+        cubos.append(cubo([x, 24.0, BORDA + .06], [.18, 6.2, .4], COR_OURO))
+    cubos.append(cubo([-2.3, 32.32, BORDA + .06], [4.6, .18, .4], COR_OURO))
+    return cubos
+
+
+def base_do_capuz():
+    """A parte de baixo do capuz: o pano que desce do queixo e assenta nos ombros, em volta do pescoço. Fica no
+    corpo, e não na cabeça, para o capuz girar por dentro dela sem atravessar os ombros. Aberta na frente."""
+    fora, y0, alto = 5.45, 22.7, 2.7
+    cubos = [
+        cubo([-fora - .6, y0, -5.3], [.6, alto, 11.4], COR_EBANO, east=TEMPORA),
+        cubo([fora, y0, -5.3], [.6, alto, 11.4], COR_EBANO, west=TEMPORA),
+        cubo([-fora - .6, y0, 5.5], [2 * fora + 1.2, alto, .6], COR_EBANO),
+        # Um segundo gomo, mais baixo e largo, que deita o pano sobre os ombros.
+        cubo([-fora - 1.0, y0, -4.4], [.4, 1.5, 9.8], COR_EBANO_CLARO),
+        cubo([fora + .6, y0, -4.4], [.4, 1.5, 9.8], COR_EBANO_CLARO),
+        cubo([-4.9, y0, 6.1], [9.8, 1.5, .4], COR_EBANO_CLARO),
+    ]
+    # Na frente, só os dois lados: o meio fica aberto, com o filete dourado na beirada.
+    for lado in (-1, 1):
+        x = 2.9 if lado > 0 else -fora - .6
+        cubos.append(cubo([x, y0, -5.9], [fora + .6 - 2.9, alto, .6], COR_EBANO))
+        cubos.append(cubo([2.72 if lado > 0 else -2.9, y0, -5.84], [.18, alto, .5], COR_OURO))
     return cubos
 
 
@@ -322,6 +321,7 @@ def modelo():
             cubo([-4, 12, -2], [8, 12, 4], COR_EBANO, inflar=.32, north=PEITO, south=COSTAS, east=LATERAL, west=LATERAL,
                  up=uv_de(COR_EBANO_CLARO), down=uv_de(COR_EBANO_SOMBRA)),
             *gola(),
+            *base_do_capuz(),
         ]},
         {'name': 'armorLeftArm', 'pivot': [5, 22, 0], 'cubes': braco(1)},
         {'name': 'armorRightArm', 'pivot': [-5, 22, 0], 'cubes': braco(-1)},
