@@ -31,6 +31,8 @@ public final class Reiatsu implements Recurso {
     public static final int SELO_MAXIMO = 1200;
 
     private double atual = MAXIMO;
+    /** Da árvore: a reserva maior, o ganho mais rápido no Shikai e o Bankai que escorre menos. */
+    private double fatorMaximo = 1, fatorFluxo = 1, fatorDreno = 1;
     private boolean bankai;
     /** Ticks que faltam da pausa do dreno; só vale dentro do Bankai. */
     private int semDreno;
@@ -40,6 +42,14 @@ public final class Reiatsu implements Recurso {
     private double ultimoDreno;
     /** Ticks desde o último golpe recebido; começa calmo. */
     private int semApanhar = CALMA;
+
+    @Override
+    public void melhorias(com.minerwk.core.maestria.Melhorias melhorias) {
+        fatorMaximo = melhorias.mais(ArvoreIchigo.REIATSU_RESERVA);
+        fatorFluxo = melhorias.mais(ArvoreIchigo.REIATSU_FLUXO);
+        fatorDreno = melhorias.menos(ArvoreIchigo.BANKAI_FOLEGO);
+        atual = Math.min(atual, maximo());
+    }
 
     @Override
     public void forma(String forma) {
@@ -55,7 +65,7 @@ public final class Reiatsu implements Recurso {
             if (!bankai) return;
             semDreno = Math.max(0, ticks);
             // O kit avisa depois de o tick do recurso já ter rodado: a pausa vale desde este tick.
-            if (semDreno > 0) atual = Math.min(MAXIMO, atual + ultimoDreno);
+            if (semDreno > 0) atual = Math.min(maximo(), atual + ultimoDreno);
             ultimoDreno = 0;
         } else if (SELAR.equals(nome)) {
             selado = Math.max(0, Math.min(SELO_MAXIMO, ticks));
@@ -85,7 +95,7 @@ public final class Reiatsu implements Recurso {
 
     @Override
     public double maximo() {
-        return MAXIMO;
+        return Math.round(MAXIMO * fatorMaximo);
     }
 
     @Override
@@ -110,11 +120,11 @@ public final class Reiatsu implements Recurso {
             if (semDreno > 0) {
                 semDreno--;
             } else {
-                ultimoDreno = Math.min(atual, DRENO);
+                ultimoDreno = Math.min(atual, DRENO * fatorDreno);
                 atual -= ultimoDreno;
             }
         } else {
-            atual = Math.min(MAXIMO, atual + (semApanhar >= CALMA ? GANHO_CALMO : GANHO));
+            atual = Math.min(maximo(), atual + (semApanhar >= CALMA ? GANHO_CALMO : GANHO) * fatorFluxo);
         }
     }
 
@@ -134,7 +144,7 @@ public final class Reiatsu implements Recurso {
             selado = (int) Math.min(SELO_MAXIMO, Math.ceil(-valor));
             atual = 0;
         } else {
-            atual = Math.min(MAXIMO, valor);
+            atual = Math.min(maximo(), valor);
         }
     }
 }

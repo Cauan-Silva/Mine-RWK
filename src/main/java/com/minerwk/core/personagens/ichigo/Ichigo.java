@@ -15,7 +15,7 @@ import com.minerwk.core.kit.Vetor;
 import com.minerwk.core.vfx.FormasIchigo;
 import com.minerwk.core.vfx.GetsugaIchigo;
 import com.minerwk.core.vfx.MugetsuIchigo;
-import com.minerwk.core.maestria.Arvore;
+import com.minerwk.core.maestria.Melhorias;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -67,7 +67,7 @@ public final class Ichigo {
                 Tecla.C, new GetsugaNaLamina(), Tecla.V, new MascaraHollow(), Tecla.G, new SairDoBankai(),
                 Tecla.R, new Mugetsu()));
         return new Personagem(ID, "Ichigo Kurosaki", "Bleach", Reiatsu::new, shikai, List.of(Zangetsu::new),
-                Arvore.VAZIA, new Trancas(Set.of(MASCARA, MUGETSU), false), List.of(bankai));
+                ArvoreIchigo.ARVORE, new Trancas(Set.of(MASCARA, MUGETSU), false), List.of(bankai));
     }
 
     private static boolean noBankai(Contexto ctx) {
@@ -177,7 +177,7 @@ public final class Ichigo {
             ctx.apresentacao("ichigo_getsuga_disparo", "", "");
             ctx.visual(VISUAL, de, ctx.olhar(), forca, GetsugaIchigo.duracao(false));
             ctx.criarEfeito(new MeiaLua(de, ctx.olhar(), GetsugaIchigo.PASSO_SHIKAI, GetsugaIchigo.ALCANCE_SHIKAI,
-                    8 + 4 * forca, VISUAL));
+                    (8 + 4 * forca) * (float) ctx.melhorias().mais(ArvoreIchigo.GETSUGA_FORCA), VISUAL));
         }
     }
 
@@ -197,7 +197,7 @@ public final class Ichigo {
             float largura = mascarado(ctx) ? LARGURA_COM_MASCARA : 1f;
             ctx.visual(VISUAL, de, ctx.olhar(), largura, GetsugaIchigo.duracao(true));
             ctx.criarEfeito(new MeiaLua(de, ctx.olhar(), GetsugaIchigo.PASSO_BANKAI, GetsugaIchigo.ALCANCE_BANKAI,
-                    dano(ctx, 10), VISUAL, MeiaLua.RAIO * largura));
+                    dano(ctx, 10) * (float) ctx.melhorias().mais(ArvoreIchigo.NEGRO_FORCA), VISUAL, MeiaLua.RAIO * largura));
         }
     }
 
@@ -426,8 +426,9 @@ public final class Ichigo {
         @Override
         public void aoDisparar(Contexto ctx, float forca) {
             ctx.arma(mascarado(ctx) ? TENSA_CARREGADA_MASCARADA : TENSA_CARREGADA);
-            ctx.visual(LaminaCarregada.VISUAL, ctx.olhos(), ctx.olhar(), 1f, LaminaCarregada.DURACAO);
-            ctx.criarEfeito(new LaminaCarregada());
+            int duracao = Melhorias.escala(LaminaCarregada.DURACAO, ctx.melhorias().mais(ArvoreIchigo.LAMINA_DURACAO));
+            ctx.visual(LaminaCarregada.VISUAL, ctx.olhos(), ctx.olhar(), 1f, duracao);
+            ctx.criarEfeito(new LaminaCarregada(duracao));
         }
     }
 
@@ -435,11 +436,16 @@ public final class Ichigo {
     static final class LaminaCarregada implements Efeito {
         static final int DURACAO = 120;
         static final String VISUAL = "ichigo_lamina";
+        private final int duracao;
         private boolean acabou;
+
+        LaminaCarregada(int duracao) {
+            this.duracao = duracao;
+        }
 
         @Override
         public int duracao() {
-            return DURACAO;
+            return duracao;
         }
 
         @Override
@@ -472,9 +478,10 @@ public final class Ichigo {
 
         @Override
         public void aoDisparar(Contexto ctx, float forca) {
-            ctx.sinalAoRecurso(Reiatsu.SEM_DRENO, MascaraAtiva.DURACAO);
-            ctx.visual(MascaraAtiva.VISUAL, ctx.olhos(), ctx.olhar(), 1f, MascaraAtiva.DURACAO);
-            ctx.criarEfeito(new MascaraAtiva());
+            int duracao = Melhorias.escala(MascaraAtiva.DURACAO, ctx.melhorias().mais(ArvoreIchigo.MASCARA_DURACAO));
+            ctx.sinalAoRecurso(Reiatsu.SEM_DRENO, duracao);
+            ctx.visual(MascaraAtiva.VISUAL, ctx.olhos(), ctx.olhar(), 1f, duracao);
+            ctx.criarEfeito(new MascaraAtiva(duracao));
         }
     }
 
@@ -482,11 +489,16 @@ public final class Ichigo {
     static final class MascaraAtiva implements Efeito {
         static final int DURACAO = 220;
         static final String VISUAL = "ichigo_mascara";
+        private final int duracao;
         private boolean acabou;
+
+        MascaraAtiva(int duracao) {
+            this.duracao = duracao;
+        }
 
         @Override
         public int duracao() {
-            return DURACAO;
+            return duracao;
         }
 
         @Override
@@ -560,9 +572,10 @@ public final class Ichigo {
         private static void perderOsPoderes(Contexto ctx) {
             ctx.gastarRecurso(ctx.recurso());
             ctx.mudarForma(Forma.BASE);
-            ctx.sinalAoRecurso(Reiatsu.SELAR, SEM_PODERES);
-            for (String golpe : DO_SHIKAI) ctx.recarga(golpe, SEM_PODERES);
-            ctx.criarEfeito(new SemPoderes());
+            int ticks = Melhorias.escala(SEM_PODERES, ctx.melhorias().menos(ArvoreIchigo.PODERES_VOLTA));
+            ctx.sinalAoRecurso(Reiatsu.SELAR, ticks);
+            for (String golpe : DO_SHIKAI) ctx.recarga(golpe, ticks);
+            ctx.criarEfeito(new SemPoderes(ticks));
         }
     }
 
@@ -574,10 +587,15 @@ public final class Ichigo {
     static final class SemPoderes implements Efeito {
         /** Ticks depois do corte em que o reiatsu vai embora (o véu já passou), e quanto cada aviso dura. */
         static final int AVISO = 30, TICKS_DO_AVISO = 30;
+        private final int duracao;
+
+        SemPoderes(int duracao) {
+            this.duracao = duracao;
+        }
 
         @Override
         public int duracao() {
-            return SEM_PODERES;
+            return duracao;
         }
 
         @Override

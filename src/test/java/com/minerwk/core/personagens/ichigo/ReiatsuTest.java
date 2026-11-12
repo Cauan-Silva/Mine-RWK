@@ -10,6 +10,25 @@ import com.minerwk.core.kit.Forma;
 import org.junit.jupiter.api.Test;
 
 class ReiatsuTest {
+    @org.junit.jupiter.api.Test
+    void aArvoreAumentaAReservaOFluxoEOFolegoDoBankai() {
+        Reiatsu r = new Reiatsu();
+        r.melhorias(new com.minerwk.core.maestria.Melhorias(ArvoreIchigo.ARVORE, java.util.Map.of(
+                ArvoreIchigo.REIATSU_RESERVA, 2, ArvoreIchigo.REIATSU_FLUXO, 3, ArvoreIchigo.BANKAI_FOLEGO, 3)));
+        org.junit.jupiter.api.Assertions.assertEquals(240, r.maximo(), 1e-9);
+        r.carregar(100);
+        r.tick(new com.minerwk.core.kit.EstadoDoJogador(true, false, false));
+        org.junit.jupiter.api.Assertions.assertEquals(100 + Reiatsu.GANHO_CALMO * 1.3, r.atual(), 1e-9);
+        r.forma(Reiatsu.BANKAI);
+        r.carregar(100);
+        r.tick(new com.minerwk.core.kit.EstadoDoJogador(true, false, false));
+        org.junit.jupiter.api.Assertions.assertEquals(100 - Reiatsu.DRENO * .7, r.atual(), 1e-9);
+        // Sem os nós, a reserva volta ao normal e o que passava dela é cortado.
+        r.carregar(240);
+        r.melhorias(com.minerwk.core.maestria.Melhorias.NENHUMA);
+        org.junit.jupiter.api.Assertions.assertEquals(200, r.atual(), 1e-9);
+    }
+
     private static final EstadoDoJogador NADA = new EstadoDoJogador(false, false, false);
     private static final EstadoDoJogador APANHOU = new EstadoDoJogador(false, true, false);
 

@@ -63,6 +63,7 @@ class IchigoTest {
         public Object marcarAlvo(double alcance, double largura) { return alvoMarcado; }
         public Vetor posicaoDe(Object alvo) { return posAlvo; }
         public void arma(Arma a) { arma = a; }
+        public com.minerwk.core.maestria.Melhorias melhorias() { return kit.melhorias(); }
         public String forma() { return kit.forma(); }
         public boolean mudarForma(String forma) { return kit.mudarForma(forma, this); }
         public void criarEfeito(Efeito e) { kit.adicionarEfeito(e); }
@@ -407,6 +408,64 @@ class IchigoTest {
     // --- Parte 6: máscara Hollow, Mugetsu e a perda dos poderes ---
 
     /** No Bankai, já desperto (a máscara e o Mugetsu são trancados), com o reiatsu cheio. */
+    private void comNos(java.util.Map<String, Integer> nos) {
+        kit.definirMelhorias(new com.minerwk.core.maestria.Melhorias(ArvoreIchigo.ARVORE, nos));
+    }
+
+    @Test
+    void aArvoreTemODespertarNoMeioESoNosDeHabilidadesQueExistem() {
+        var arvore = ichigo.arvore();
+        assertEquals(13, arvore.nos().size());
+        var despertar = arvore.no(ArvoreIchigo.DESPERTAR).orElseThrow();
+        assertEquals(com.minerwk.core.maestria.No.Tipo.DESPERTAR, despertar.tipo());
+        assertEquals(20, despertar.nivelMinimo());
+        assertEquals(5, despertar.custoDoProximo(0));
+        Set<String> ids = new HashSet<>();
+        for (Habilidade h : ichigo.todasAsHabilidades()) ids.add(h.id());
+        for (var no : arvore.nos()) {
+            if (!no.alvo().isEmpty()) assertTrue(ids.contains(no.alvo()), "alvo desconhecido: " + no.alvo());
+        }
+        assertEquals(6, arvore.nos().stream().filter(n -> n.depoisDoDespertar()).count());
+    }
+
+    @Test
+    void osNosDeForcaAumentamOGetsugaEOGetsugaNegro() {
+        comNos(java.util.Map.of(ArvoreIchigo.GETSUGA_FORCA, 3, ArvoreIchigo.NEGRO_FORCA, 2));
+        ctx.inimigoEm = new Vetor(6, 0, 0);
+        usar(Tecla.Z);
+        ticks(30);
+        assertEquals(12f * 1.24f, ctx.danos.get(0), 1e-4);
+        ctx.danos.clear();
+        entrarNoBankai();
+        usar(Tecla.Z);
+        ticks(20);
+        assertEquals(10f * 1.16f, ctx.danos.get(0), 1e-4);
+    }
+
+    @Test
+    void oNoDaMascaraAFazDurarMais() {
+        comNos(java.util.Map.of(ArvoreIchigo.MASCARA_DURACAO, 3, ArvoreIchigo.LAMINA_DURACAO, 3));
+        bankaiDesperto();
+        usar(Tecla.V);
+        ticks(Ichigo.MascaraHollow.GESTO + 2);
+        Efeito mascara = kit.efeitos().stream().filter(e -> e instanceof Ichigo.MascaraAtiva).findFirst().orElseThrow();
+        assertEquals(286, mascara.duracao(), "220 ticks e mais 30%");
+        ticks(20);
+        usar(Tecla.C);
+        ticks(8);
+        Efeito lamina = kit.efeitos().stream().filter(e -> e instanceof Ichigo.LaminaCarregada).findFirst().orElseThrow();
+        assertEquals(156, lamina.duracao(), "120 ticks e mais 30%");
+    }
+
+    @Test
+    void oNoDosPoderesOsTrazDeVoltaMaisCedo() {
+        comNos(java.util.Map.of(ArvoreIchigo.PODERES_VOLTA, 3));
+        bankaiDesperto();
+        mugetsuInteiro();
+        Efeito sem = kit.efeitos().stream().filter(e -> e instanceof Ichigo.SemPoderes).findFirst().orElseThrow();
+        assertEquals(840, sem.duracao(), "60 s menos 30%");
+    }
+
     private void bankaiDesperto() {
         kit.definirDesperto(true);
         entrarNoBankai();
