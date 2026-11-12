@@ -289,6 +289,7 @@ public final class CamadaTraje {
             case TrajeIchigo.BANKAI -> Itens.TRAJE_ICHIGO_BANKAI.get();
             case TrajeIchigo.MUGETSU -> Itens.TRAJE_ICHIGO_MUGETSU.get();
             case TrajeIchigo.HOLLOW -> Itens.TRAJE_ICHIGO_HOLLOW.get();
+            case com.minerwk.core.traje.TrajeCid.SHADOW -> Itens.TRAJE_CID.get();
             default -> Itens.TRAJE_GOJO.get();
         }));
     }

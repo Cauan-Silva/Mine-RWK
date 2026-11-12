@@ -59,7 +59,9 @@ public final class DemoVfx {
     private static final Path PASTA = Path.of("demo");
     private static final int ESFERAS = RoxoMaximo.TICKS_ESFERAS;
     private static final int ESTOURO = ESFERAS + RoxoMaximo.TICKS_FUSAO;
-    private static final int FIM_PREVIA = HOLLOW_PERTO ? 272 : HOLLOW ? 330 : ZANGETSU ? 2400 : TOJI ? 520 : ARVORE ? 100 : TRAJE ? 260 : TRAJE_ICHIGO ? 300 : ICHIGO ? 350 : MUGETSU ? 360 : R_COMPLETO ? 360
+    /** {@code cid_perto}: o traje do Shadow de perto, com os mesmos planos da prévia de perto do Vasto Lorde. */
+    private static final boolean CID_PERTO = MODO.equals("cid_perto");
+    private static final int FIM_PREVIA = HOLLOW_PERTO || CID_PERTO ? 272 : HOLLOW ? 330 : ZANGETSU ? 2400 : TOJI ? 520 : ARVORE ? 100 : TRAJE ? 260 : TRAJE_ICHIGO ? 300 : ICHIGO ? 350 : MUGETSU ? 360 : R_COMPLETO ? 360
             : ENCANTAMENTO ? CARGA + 90 : ESTOURO + RoxoMaximo.TICKS_EXPLOSAO + 110;
     private static int ticks;
     private static int quadro;
@@ -85,7 +87,7 @@ public final class DemoVfx {
             mc.setScreen(null);
         }
         if (DEMO && ticks == 40) {
-            jogador.connection.sendCommand(ENCANTAMENTO || R_COMPLETO || TRAJE || TRAJE_ICHIGO || ICHIGO || MUGETSU || TOJI || ZANGETSU || HOLLOW ? "time set noon" : "time set midnight");
+            jogador.connection.sendCommand(ENCANTAMENTO || R_COMPLETO || TRAJE || TRAJE_ICHIGO || ICHIGO || MUGETSU || TOJI || ZANGETSU || HOLLOW || CID_PERTO ? "time set noon" : "time set midnight");
             if (ARVORE) jogador.connection.sendCommand("rwk trocar @s gojo");
             if (TOJI) {
                 jogador.connection.sendCommand("rwk trocar @s gojo");
@@ -93,6 +95,10 @@ public final class DemoVfx {
                 jogador.connection.sendCommand("tp @s ~150 ~12 ~");
             }
             if (ZANGETSU) jogador.connection.sendCommand("rwk despertar @s nao");
+            if (CID_PERTO) {
+                jogador.connection.sendCommand("rwk trocar @s cid");
+                jogador.connection.sendCommand("tp @s ~150 ~12 ~");
+            }
             if (TRAJE_ICHIGO || ICHIGO || MUGETSU || ZANGETSU || HOLLOW) {
                 jogador.connection.sendCommand("rwk trocar @s ichigo");
                 jogador.connection.sendCommand("tp @s ~150 ~12 ~");
@@ -157,7 +163,7 @@ public final class DemoVfx {
             previaDoZangetsu(mc, jogador, t);
             return;
         }
-        if (HOLLOW_PERTO) {
+        if (HOLLOW_PERTO || CID_PERTO) {
             previaDoHollowDePerto(mc, jogador, t);
             return;
         }
@@ -514,15 +520,22 @@ public final class DemoVfx {
             mc.options.fov().set(30);
             jogador.connection.sendCommand("gamerule sendCommandFeedback false");
             jogador.connection.sendCommand("gamerule doMobSpawning false");
-            jogador.connection.sendCommand("rwk despertar @s sim");
-            jogador.connection.sendCommand("rwk recarregar");
+            if (HOLLOW_PERTO) {
+                jogador.connection.sendCommand("rwk despertar @s sim");
+                jogador.connection.sendCommand("rwk recarregar");
+            }
         }
         // Ninguém por perto, senão a forma vai atrás (várias vezes: slime morto se divide em menores).
         if (t < 60 && t % 8 == 0) jogador.connection.sendCommand("kill @e[type=!minecraft:player,distance=..120]");
-        if (t == 6) tecla(com.minerwk.core.kit.Tecla.G, true);
-        if (t == 8) tecla(com.minerwk.core.kit.Tecla.G, false);
-        if (t == 56) jogador.connection.sendCommand("gamemode survival");
-        if (t == 60) jogador.connection.sendCommand("damage @s 1000 minecraft:generic");
+        if (HOLLOW_PERTO) {
+            if (t == 6) tecla(com.minerwk.core.kit.Tecla.G, true);
+            if (t == 8) tecla(com.minerwk.core.kit.Tecla.G, false);
+            if (t == 56) jogador.connection.sendCommand("gamemode survival");
+            if (t == 60) jogador.connection.sendCommand("damage @s 1000 minecraft:generic");
+        } else if (t == 70 || t == 90 || t == 240) {
+            // O Shadow: dois golpes de espada de frente e um de lado, para a espada e a barra aparecerem.
+            jogador.swing(net.minecraft.world.InteractionHand.MAIN_HAND);
+        }
         // A câmera de lado: um suporte invisível à direita dele, na altura do peito, olhando para ele.
         if (t == 202) {
             jogador.connection.sendCommand("execute at @s run summon minecraft:armor_stand ~-4.6 ~1.15 ~ "
@@ -533,8 +546,10 @@ public final class DemoVfx {
             jogador.connection.sendCommand("gamerule sendCommandFeedback true");
             jogador.connection.sendCommand("gamerule doMobSpawning true");
             jogador.connection.sendCommand("gamemode creative");
-            jogador.connection.sendCommand("rwk despertar @s nao");
-            jogador.connection.sendCommand("rwk recarregar");
+            if (HOLLOW_PERTO) {
+                jogador.connection.sendCommand("rwk despertar @s nao");
+                jogador.connection.sendCommand("rwk recarregar");
+            }
             jogador.connection.sendCommand("tp @s ~-150 ~ ~-30");
         }
         if (t >= FIM_PREVIA) {

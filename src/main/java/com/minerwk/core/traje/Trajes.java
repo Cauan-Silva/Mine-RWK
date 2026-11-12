@@ -15,6 +15,7 @@ public final class Trajes {
             if (Reiatsu.HOLLOW.equals(forma)) return Optional.of(TrajeIchigo.HOLLOW);
             return Optional.of(Reiatsu.BANKAI.equals(forma) ? TrajeIchigo.BANKAI : TrajeIchigo.SHIKAI);
         }
+        if ("cid".equals(personagem)) return Optional.of(TrajeCid.SHADOW);
         return Optional.empty();
     }
 }

@@ -72,7 +72,7 @@ public final class TecidoCliente {
         Set<UUID> vistos = new HashSet<>();
         for (AbstractClientPlayer p : mc.level.players()) {
             String traje = CamadaTraje.trajeDe(p);
-            if (!p.isAlive() || p.isSpectator() || !TrajeIchigo.eDoIchigo(traje)) continue;
+            if (!p.isAlive() || p.isSpectator() || !com.minerwk.core.traje.TrajeCid.temPano(traje)) continue;
             UUID id = p.getUUID();
             if (!ESTADOS.containsKey(id) && ESTADOS.size() >= MAXIMO) continue;
             vistos.add(id);
@@ -97,7 +97,7 @@ public final class TecidoCliente {
                 continue;
             }
             // O clique da espada deixa um rastro de corte (só quando ela está na mão).
-            if (p.swinging && p.swingTime == 0 && !PersonagensVistos.visto(p.getId()).semArma()) {
+            if (TrajeIchigo.eDoIchigo(traje) && p.swinging && p.swingTime == 0 && !PersonagensVistos.visto(p.getId()).semArma()) {
                 int forma = !TrajeIchigo.BANKAI.equals(traje) ? 0 : VisuaisAtivos.tem(p.getId(), "ichigo_lamina") ? 2 : 1;
                 Vec3 olhos = p.getEyePosition(), olhar = p.getLookAngle();
                 VisuaisAtivos.local(p.getId(), "ichigo_corte", new Vetor(olhos.x, olhos.y, olhos.z),

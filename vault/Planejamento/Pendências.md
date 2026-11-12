@@ -24,6 +24,11 @@ Voltar para [[00 Início]].
 - Gojo (revisão 09/11, menores que ficaram): o Roxo pode derrubar plantas vizinhas (o `BreakEvent` para mods de proteção entrou em 09/11, no Gojo peso); o Vermelho atravessa parede fina encostada no rosto; bola de fogo e crânio de Wither voltam a acelerar no Infinito (o dano é cancelado mesmo assim); TNT sem dono passa pelo Infinito; sobram até 2 ticks de Infinito e 5 de Paralisia depois de morrer. Corrigidos na revisão: efeitos acabam ao mudar de dimensão; golpes não atingem pets, montaria nem projéteis do próprio Gojo; Paralisia não cancela Espinhos nem dano em si mesmo; ícone da Paralisia escondido (falta textura).
 
 ## Para testar no jogo
+- Cid, parte 2, o traje do Shadow e a espada (12/11): **ver primeiro** `previas/cid_traje_perto.mp4` e `previas/cid_traje_quadros.jpg` (no jogo). Refeito pelas referências do autor (capuz aberto, rosto da skin, espada preta em cruz).
+  - **O capuz:** aberto na frente, com o rosto e o cabelo da skin. Ainda está quadrado demais? A ponta do teto e a gola aberta lembram a obra? Com skins de cabelo alto (segunda camada), algo atravessa o teto?
+  - **O conjunto:** friso dourado na abertura, colete roxo-escuro, linhas da cintura, losango na coxa, botas de cano roxo. Some à noite?
+  - **Pano:** a barra rasgada andando, correndo, pulando e no avanço da Pós-imagem. A perna atravessa?
+  - **A espada:** comprimento, a guarda em cruz com os losangos, o pomo. Em primeira pessoa ela aparece bem? Virar a cabeça faz o capuz atravessar a gola?
 - Cid, parte 1, o kit base (12/11): `/rwk trocar <jogador> cid`. Ainda **sem traje, sem VFX e sem som** (partes 2 a 4): os golpes aparecem como partículas do Minecraft.
   - **Z, Redemoinho de Ébano:** três cortes de 4 em raio 5. O raio está bom? Fere também animais e aldeões em volta, como os golpes em área dos outros personagens.
   - **X, Pós-imagem:** 9 blocos na mira. Os mobs que o miravam vão até o ponto de partida por 2 s: funciona com zumbi, esqueleto (ainda atira?), creeper e aranha? Piglins e o Warden podem não cair. Bosses não caem.

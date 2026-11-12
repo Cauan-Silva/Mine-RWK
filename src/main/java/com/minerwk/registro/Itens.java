@@ -26,6 +26,9 @@ public final class Itens {
     /** A forma Hollow completa, vestida nos 10 s em que o Hollow toma o corpo. */
     public static final DeferredItem<Traje> TRAJE_ICHIGO_HOLLOW =
             REGISTRO.register("traje_ichigo_hollow", () -> new Traje("ichigo_hollow"));
+    /** O traje do Shadow, com a espada de slime. */
+    public static final DeferredItem<Traje> TRAJE_CID = REGISTRO.register("traje_cid", () -> new Traje("cid"));
+
     /** Invoca o Toji; feito na bancada com papel, lingote de ouro e espada de ferro. */
     public static final DeferredItem<com.minerwk.boss.ContratoToji> CONTRATO_TOJI =
             REGISTRO.register("contrato_toji", com.minerwk.boss.ContratoToji::new);
