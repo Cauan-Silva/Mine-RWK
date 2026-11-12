@@ -68,6 +68,24 @@ class IchigoTest {
         public void criarEfeito(Efeito e) { kit.adicionarEfeito(e); }
         public double recurso() { return kit.recurso().atual(); }
         public void recarga(String habilidade, int ticks) { kit.recargas().iniciar(habilidade, agora, ticks); }
+        final List<Float> danosDiretos = new ArrayList<>();
+        final List<Vetor> pontosDiretos = new ArrayList<>();
+        public int danoDiretoUmaVez(Vetor c, double r, float d, Set<Object> atingidos) {
+            pontosDiretos.add(c);
+            if (inimigoEm != null && c.distancia(inimigoEm) <= r && atingidos.add("inimigo")) { danosDiretos.add(d); return 1; }
+            return 0;
+        }
+        public boolean gastarRecurso(double q) {
+            if (!kit.recurso().pode(q)) return false;
+            kit.recurso().gastar(q);
+            return true;
+        }
+        public void sinalAoRecurso(String sinal, int ticks) { kit.recurso().sinal(sinal, ticks); }
+        public boolean efeitoAtivo(Class<? extends Efeito> tipo) { return kit.efeitos().stream().anyMatch(tipo::isInstance); }
+        public String golpeEmAndamento() { return kit.execucao().map(e -> e.habilidade().id()).orElse(""); }
+        final List<String> cutscenes = new ArrayList<>();
+        public void cutscene(String id) { cutscenes.add(id); }
+        public void encerrarCutscene() { cutscenes.add("fim"); }
         final List<String> animacoes = new ArrayList<>(), visuais = new ArrayList<>(), fins = new ArrayList<>();
         int paradas;
         Vetor rumoDoVisual;
@@ -103,15 +121,15 @@ class IchigoTest {
     }
 
     @Test
-    void shikaiTemCincoGolpesEOBankaiQuatro() {
+    void shikaiTemCincoGolpesEOBankaiSeis() {
         assertEquals("ichigo", ichigo.id());
         assertEquals(Set.of(Tecla.Z, Tecla.X, Tecla.C, Tecla.V, Tecla.G), ichigo.habilidades().keySet());
         Forma bankai = ichigo.transformacoes().get(0);
         assertEquals(Reiatsu.BANKAI, bankai.id());
-        assertEquals(Set.of(Tecla.Z, Tecla.X, Tecla.C, Tecla.G), bankai.habilidades().keySet());
+        assertEquals(Set.of(Tecla.Z, Tecla.X, Tecla.C, Tecla.V, Tecla.G, Tecla.R), bankai.habilidades().keySet());
         Set<String> ids = new HashSet<>();
         for (Habilidade h : ichigo.todasAsHabilidades()) assertTrue(ids.add(h.id()), "id repetido: " + h.id());
-        assertEquals(9, ids.size());
+        assertEquals(11, ids.size());
         assertTrue(kit.recurso() instanceof Reiatsu);
     }
 
@@ -384,5 +402,255 @@ class IchigoTest {
         for (String animacao : ctx.animacoes) {
             assertTrue(arquivo.contains("\"" + animacao + "\": {"), "falta a animação " + animacao);
         }
+    }
+
+    // --- Parte 6: máscara Hollow, Mugetsu e a perda dos poderes ---
+
+    /** No Bankai, já desperto (a máscara e o Mugetsu são trancados), com o reiatsu cheio. */
+    private void bankaiDesperto() {
+        kit.definirDesperto(true);
+        entrarNoBankai();
+    }
+
+    @Test
+    void mascaraEMugetsuSaoTrancadosAteODespertar() {
+        assertEquals(Set.of(Ichigo.MASCARA, Ichigo.MUGETSU), ichigo.trancas().habilidades());
+        assertFalse(ichigo.trancas().passivas(), "a espada na mão não é trancada");
+        entrarNoBankai();
+        assertTrue(kit.trancada(Tecla.V) && kit.trancada(Tecla.R));
+        assertFalse(kit.apertar(Tecla.V, agora));
+        assertFalse(kit.apertar(Tecla.R, agora));
+        assertFalse(kit.trancada(Tecla.Z), "o resto do Bankai é livre");
+        kit.definirDesperto(true);
+        assertTrue(kit.apertar(Tecla.V, agora));
+    }
+
+    @Test
+    void mascaraDuraOnzeSegundosEParaODrenoDoBankai() {
+        bankaiDesperto();
+        usar(Tecla.V);
+        ticks(Ichigo.MascaraHollow.GESTO);
+        assertTrue(ctx.visuais.contains("ichigo_mascara"), "a máscara aparece no rosto");
+        assertTrue(ctx.efeitoAtivo(Ichigo.MascaraAtiva.class));
+        double comMascara = kit.recurso().atual();
+        assertEquals(Reiatsu.MAXIMO - 40, comMascara, 1, "custa 40 (mais o que o Bankai drenou durante o gesto)");
+        ticks(200);
+        assertEquals(comMascara, kit.recurso().atual(), 1e-6, "com a máscara o Bankai não drena");
+        assertTrue(ctx.efeitoAtivo(Ichigo.MascaraAtiva.class), "ainda dentro dos 11 s");
+        ticks(25);
+        assertFalse(ctx.efeitoAtivo(Ichigo.MascaraAtiva.class), "a máscara se desfaz aos 11 s");
+        assertEquals(220, Ichigo.MascaraAtiva.DURACAO);
+        double antes = kit.recurso().atual();
+        ticks(20);
+        assertEquals(antes - 2, kit.recurso().atual(), 1e-6, "sem a máscara o dreno volta: 2 por segundo");
+        assertEquals(Reiatsu.BANKAI, kit.forma(), "a máscara acabar não tira do Bankai");
+        assertFalse(kit.recargas().pronta(Ichigo.MASCARA, agora));
+        assertTrue(kit.recargas().restante(Ichigo.MASCARA, agora) > 500, "recarga de 40 s contada do uso");
+    }
+
+    @Test
+    void mascaraDeixaTodoDanoTrintaPorCentoMaior() {
+        bankaiDesperto();
+        ticks(1);
+        assertEquals(Ichigo.TENSA_ZANGETSU, ctx.arma);
+        usar(Tecla.V);
+        ticks(Ichigo.MascaraHollow.GESTO + 2);
+        assertEquals(Ichigo.TENSA_ZANGETSU.dano() * 1.3f, ctx.arma.dano(), 1e-4, "o ataque básico também");
+        assertEquals(Ichigo.TENSA_ZANGETSU.alcance(), ctx.arma.alcance());
+        ticks(8); // o resto do gesto da máscara
+        ctx.inimigoEm = new Vetor(10, 0, 0);
+        usar(Tecla.Z);
+        ticks(12);
+        assertEquals(List.of(13f), ctx.danos, "Getsuga negro de 10 vira 13");
+        // A lâmina carregada por cima da máscara: os dois bônus valem.
+        kit.recargas().limpar();
+        usar(Tecla.C);
+        ticks(6);
+        assertEquals(Ichigo.TENSA_CARREGADA.dano() * 1.3f, ctx.arma.dano(), 1e-4);
+        assertEquals(Ichigo.TENSA_CARREGADA.alcance(), ctx.arma.alcance());
+    }
+
+    @Test
+    void comAMascaraOGetsugaNegroFicaCinquentaPorCentoMaisLargo() {
+        bankaiDesperto();
+        // 2 blocos para o lado: fora do corte normal (meia largura 1,5), dentro do alargado (2,25).
+        ctx.inimigoEm = new Vetor(10, 0, 2);
+        usar(Tecla.Z);
+        ticks(14);
+        assertTrue(ctx.danos.isEmpty(), "sem máscara não alcança");
+        kit.recargas().limpar();
+        usar(Tecla.V);
+        ticks(Ichigo.MascaraHollow.GESTO + 8);
+        usar(Tecla.Z);
+        ticks(14);
+        assertEquals(1, ctx.danos.size(), "com a máscara alcança");
+    }
+
+    @Test
+    void sairDoBankaiDesfazAMascaraEODrenoVoltaAoNormal() {
+        bankaiDesperto();
+        usar(Tecla.V);
+        ticks(Ichigo.MascaraHollow.GESTO + 10);
+        usar(Tecla.G);
+        ticks(10);
+        assertEquals(Forma.BASE, kit.forma());
+        assertFalse(ctx.efeitoAtivo(Ichigo.MascaraAtiva.class));
+        assertTrue(ctx.fins.contains("ichigo_mascara"), "a máscara some do rosto na hora");
+        assertEquals(Ichigo.ZANGETSU, ctx.arma);
+        // De volta ao Bankai depois, o dreno é o normal (a pausa da máscara não sobrou).
+        kit.recargas().limpar();
+        kit.recurso().carregar(Reiatsu.MAXIMO);
+        usar(Tecla.G);
+        ticks(45);
+        double antes = kit.recurso().atual();
+        ticks(20);
+        assertEquals(antes - 2, kit.recurso().atual(), 1e-6);
+    }
+
+    @Test
+    void mugetsuPedeCemDeReiatsu() {
+        bankaiDesperto();
+        kit.recurso().carregar(99);
+        assertFalse(kit.apertar(Tecla.R, agora));
+        kit.recurso().carregar(100);
+        assertTrue(kit.apertar(Tecla.R, agora));
+    }
+
+    /** Usa o Mugetsu e espera a carga (a cutscene), o disparo e o véu inteiro. */
+    private void mugetsuInteiro() {
+        usar(Tecla.R);
+        ticks(Ichigo.Mugetsu.CARGA + Ichigo.Veu.TICKS + 12);
+    }
+
+    @Test
+    void mugetsuFereQuarentaSemArmaduraNumVeuDeNoveBlocosQueAndaQuarenta() {
+        bankaiDesperto();
+        ctx.inimigoEm = new Vetor(39, 0, 4);
+        mugetsuInteiro();
+        assertEquals(List.of(40f), ctx.danosDiretos, "40 de dano, uma vez, ignorando armadura");
+        assertTrue(ctx.danos.isEmpty(), "nada pelo dano comum");
+        double maisLonge = ctx.pontosDiretos.stream().mapToDouble(Vetor::x).max().orElse(0);
+        assertEquals(40, maisLonge, 1e-6, "o véu avança 40 blocos");
+        assertEquals(4.5, Ichigo.Veu.MEIA_LARGURA, "9 blocos de largura");
+        assertTrue(ctx.visuais.contains("ichigo_mugetsu_carga") && ctx.visuais.contains("ichigo_mugetsu"));
+        assertTrue(ctx.cutscenes.contains("ichigo_mugetsu"), "a carga é a cutscene");
+    }
+
+    @Test
+    void mugetsuNaoAlcancaQuemEstaForaDoVeu() {
+        bankaiDesperto();
+        ctx.inimigoEm = new Vetor(20, 0, 6);
+        mugetsuInteiro();
+        assertTrue(ctx.danosDiretos.isEmpty(), "6 blocos para o lado: fora dos 9 de largura");
+    }
+
+    @Test
+    void mugetsuNaoPassaDosQuarentaBlocos() {
+        bankaiDesperto();
+        ctx.inimigoEm = new Vetor(46, 0, 0);
+        mugetsuInteiro();
+        assertTrue(ctx.danosDiretos.isEmpty());
+    }
+
+    @Test
+    void mugetsuAtravessaParedesENaoParaEmBloco() {
+        bankaiDesperto();
+        ctx.paredeEm = v -> v.x() > 10;
+        ctx.inimigoEm = new Vetor(30, 0, 0);
+        mugetsuInteiro();
+        assertEquals(List.of(40f), ctx.danosDiretos);
+    }
+
+    @Test
+    void duranteACargaDoMugetsuOReiatsuNaoEscorreEEleGastaTudoNoCorte() {
+        bankaiDesperto();
+        usar(Tecla.R);
+        ticks(Ichigo.Mugetsu.CARGA - 1);
+        assertEquals(Reiatsu.MAXIMO, kit.recurso().atual(), 1e-6, "a carga dura 6 s: sem pausa, o Bankai drenaria 12");
+        assertEquals(Reiatsu.BANKAI, kit.forma());
+        ticks(3);
+        assertEquals(0, kit.recurso().atual(), 1e-9, "gasta todo o reiatsu, não só os 100");
+    }
+
+    @Test
+    void depoisDoMugetsuOIchigoPerdeOsPoderesPorSessentaSegundos() {
+        bankaiDesperto();
+        mugetsuInteiro();
+        assertEquals(Forma.BASE, kit.forma(), "volta ao Shikai");
+        ticks(1);
+        assertEquals(Ichigo.ZANGETSU, ctx.arma, "só o ataque básico");
+        assertEquals(1200, Ichigo.SEM_PODERES);
+        for (Tecla t : List.of(Tecla.Z, Tecla.X, Tecla.C, Tecla.V, Tecla.G)) {
+            assertFalse(kit.apertar(t, agora), "sem golpes: " + t);
+            String id = kit.habilidade(t).orElseThrow().id();
+            long falta = kit.recargas().restante(id, agora);
+            assertTrue(falta > 1100 && falta <= 1200, "o HUD mostra o tempo que falta em " + id + ": " + falta);
+        }
+        ticks(600);
+        assertEquals(0, kit.recurso().atual(), 1e-9, "sem reiatsu: nem regenera");
+        assertFalse(kit.apertar(Tecla.Z, agora));
+        ticks(620);
+        assertTrue(kit.recurso().atual() > 0, "passados os 60 s o reiatsu volta a subir");
+        kit.recurso().carregar(Reiatsu.MAXIMO);
+        assertTrue(kit.apertar(Tecla.Z, agora), "e os golpes voltam");
+    }
+
+    @Test
+    void mugetsuTemRecargaDeCentoEOitentaSegundosContadaDoGolpe() {
+        bankaiDesperto();
+        usar(Tecla.R);
+        ticks(Ichigo.Mugetsu.CARGA + 1);
+        long falta = kit.recargas().restante(Ichigo.MUGETSU, agora);
+        assertTrue(falta > 3590 && falta <= 3600, "180 s a partir do corte, faltam " + falta);
+    }
+
+    @Test
+    void comReiatsuExatoOBankaiNaoAcabaNoMeioDaCargaDoMugetsu() {
+        bankaiDesperto();
+        kit.recurso().carregar(100);
+        ctx.inimigoEm = new Vetor(10, 0, 0);
+        mugetsuInteiro();
+        assertEquals(List.of(40f), ctx.danosDiretos, "o corte sai");
+        // Saiu do Bankai pelo Mugetsu (60 s), não por falta de reiatsu (10 s).
+        assertTrue(kit.recargas().restante(Ichigo.ENTRAR_NO_BANKAI, agora) > 1000);
+    }
+
+    @Test
+    void golpeForteNaCargaCortaOMugetsuSemGastarNada() {
+        bankaiDesperto();
+        usar(Tecla.R);
+        ticks(40);
+        kit.levouDano(6f, agora, ctx);
+        ticks(Ichigo.Mugetsu.CARGA + 40);
+        assertTrue(ctx.danosDiretos.isEmpty(), "o corte não sai");
+        assertEquals(Reiatsu.BANKAI, kit.forma(), "continua no Bankai, com os poderes");
+        assertTrue(kit.recurso().atual() > 150, "não gastou os 100 nem o resto; só o dreno voltou");
+        assertTrue(ctx.fins.contains("ichigo_mugetsu_carga"), "o visual da carga some");
+        assertTrue(ctx.cutscenes.contains("fim"), "e a câmera volta ao jogador");
+        ticks(1);
+        assertEquals(Ichigo.TENSA_ZANGETSU, ctx.arma);
+    }
+
+    @Test
+    void golpeFracoNaoCortaOMugetsu() {
+        bankaiDesperto();
+        ctx.inimigoEm = new Vetor(10, 0, 0);
+        usar(Tecla.R);
+        ticks(40);
+        kit.levouDano(5.9f, agora, ctx);
+        ticks(Ichigo.Mugetsu.CARGA + Ichigo.Veu.TICKS);
+        assertEquals(List.of(40f), ctx.danosDiretos);
+    }
+
+    @Test
+    void mugetsuComAMascaraFereMaisEAMascaraAcabaComOsPoderes() {
+        bankaiDesperto();
+        usar(Tecla.V);
+        ticks(Ichigo.MascaraHollow.GESTO + 8);
+        kit.recurso().carregar(Reiatsu.MAXIMO);
+        ctx.inimigoEm = new Vetor(10, 0, 0);
+        mugetsuInteiro();
+        assertEquals(List.of(52f), ctx.danosDiretos, "40 com os 30% da máscara");
+        assertFalse(ctx.efeitoAtivo(Ichigo.MascaraAtiva.class), "fora do Bankai a máscara se desfaz");
     }
 }

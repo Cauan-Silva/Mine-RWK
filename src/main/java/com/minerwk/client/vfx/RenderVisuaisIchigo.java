@@ -242,7 +242,8 @@ final class RenderVisuaisIchigo {
         }
         double dis = GetsugaIchigo.dissolve(t, fim);
         float a = (float) (Math.min(1, (t + .5) / 1.5) * (1 - dis));
-        double e = GetsugaIchigo.escala(t) * (bankai ? 1 : .85 + .3 * v.forca);
+        // No Bankai a força é a largura: 1, ou 1,5 com a máscara Hollow.
+        double e = GetsugaIchigo.escala(t) * (bankai ? Math.max(1, v.forca) : .85 + .3 * v.forca);
         double andou = GetsugaIchigo.distancia(Math.min(t, fim), bankai);
         Vec3 c = o.add(b.frente.scale(andou));
         sulco(camera, v, b, andou, t, bankai);

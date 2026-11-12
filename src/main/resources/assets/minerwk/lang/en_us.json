@@ -140,6 +140,8 @@
   "entity.minerwk.toji": "Toji Fushiguro",
   "item.minerwk.contrato_toji": "Sorcerer Killer's Contract",
   "death.attack.minerwk.toji": "%1$s was slain by %2$s",
+  "death.attack.minerwk.direto": "%1$s was erased",
+  "death.attack.minerwk.direto.player": "%1$s was erased by %2$s",
   "mensagem.minerwk.toji.outro_personagem": "Only Gojo can call Toji",
   "mensagem.minerwk.toji.sem_no": "You need the Awakening node of the tree (H key)",
   "mensagem.minerwk.toji.ja_existe": "Your Toji is still alive",

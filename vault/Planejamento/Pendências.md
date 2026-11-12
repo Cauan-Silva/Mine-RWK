@@ -24,6 +24,12 @@ Voltar para [[00 Início]].
 - Gojo (revisão 09/11, menores que ficaram): o Roxo pode derrubar plantas vizinhas (o `BreakEvent` para mods de proteção entrou em 09/11, no Gojo peso); o Vermelho atravessa parede fina encostada no rosto; bola de fogo e crânio de Wither voltam a acelerar no Infinito (o dano é cancelado mesmo assim); TNT sem dono passa pelo Infinito; sobram até 2 ticks de Infinito e 5 de Paralisia depois de morrer. Corrigidos na revisão: efeitos acabam ao mudar de dimensão; golpes não atingem pets, montaria nem projéteis do próprio Gojo; Paralisia não cancela Espinhos nem dano em si mesmo; ícone da Paralisia escondido (falta textura).
 
 ## Para testar no jogo
+- Ichigo, parte 6, mecânica (11/11): máscara, Mugetsu e perda dos poderes, **ainda sem visual nem som próprios**. Para testar: `/rwk trocar <jogador> ichigo`, `/rwk despertar <jogador> sim`, entrar no Bankai (G):
+  - **V (máscara):** nada aparece no rosto ainda, mas por 11 s a barra de reiatsu para de descer, o Getsuga negro sai mais largo e tudo fere 30% mais. A duração e a recarga de 40 s estão boas?
+  - **R (Mugetsu):** precisa de 100 de reiatsu. Fica 6 s parado (a cutscene ainda não existe) e solta o véu (invisível por enquanto): 40 de dano em quem estiver nos 40 blocos à frente, numa faixa de 9. Levar um golpe forte nesses 6 s cancela.
+  - **Sem poderes:** depois do R, volta ao Shikai com o reiatsu em zero e os cinco golpes em recarga de 60 s; só o clique da espada funciona. Sair e entrar no jogo não devolve os poderes. 60 s é muito? pouco?
+  - **Sem despertar:** V e R aparecem com cadeado no Bankai.
+  - **Balanceamento:** o véu atravessa paredes; 40 de dano ignorando armadura mata quase qualquer jogador. É isso mesmo que se quer do golpe final?
 - Ichigo, parte 5 (11/11): som dos golpes. **Ouvir primeiro a prévia** `previas/sfx_ichigo.wav` (os 11 sons, 3 variações de cada, em fila). Depois no jogo (`/rwk trocar <jogador> ichigo`):
   - **Z (Shikai):** o som da carga cresce enquanto segura e para ao soltar; a saída do corte, o voo e o estouro quando a meia-lua se desfaz. Bater numa parede perto: o estouro do som chega atrasado em relação ao visual?
   - **Z (Bankai):** mais grave e mais rápido que o do Shikai. Dá para distinguir os dois de ouvido?

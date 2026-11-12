@@ -140,6 +140,8 @@
   "entity.minerwk.toji": "Toji Fushiguro",
   "item.minerwk.contrato_toji": "Contrato do Matador de Feiticeiros",
   "death.attack.minerwk.toji": "%1$s foi morto por %2$s",
+  "death.attack.minerwk.direto": "%1$s foi apagado",
+  "death.attack.minerwk.direto.player": "%1$s foi apagado por %2$s",
   "mensagem.minerwk.toji.outro_personagem": "Só o Gojo pode chamar o Toji",
   "mensagem.minerwk.toji.sem_no": "Falta o nó Despertar da árvore (tecla H)",
   "mensagem.minerwk.toji.ja_existe": "O seu Toji ainda está vivo",

@@ -23,14 +23,44 @@ public final class Reiatsu implements Recurso {
     static final int COR_SHIKAI = 0x8FD8FF;
     static final int COR_BANKAI = 0x8E1B1B;
 
+    /** Sinal: o Bankai para de drenar por esses ticks (a máscara Hollow, a carga do Mugetsu). Zero acaba a pausa. */
+    public static final String SEM_DRENO = "sem_dreno";
+    /** Sinal: o reiatsu vai a zero e fica selado por esses ticks, sem regenerar (a perda dos poderes). */
+    public static final String SELAR = "selar";
+    /** O selo mais longo que existe: 60 segundos. Um valor salvo nunca sela por mais do que isso. */
+    public static final int SELO_MAXIMO = 1200;
+
     private double atual = MAXIMO;
     private boolean bankai;
+    /** Ticks que faltam da pausa do dreno; só vale dentro do Bankai. */
+    private int semDreno;
+    /** Ticks que faltam do selo. */
+    private int selado;
+    /** O que o Bankai drenou no último tick: uma pausa pedida nesse tick devolve isso. */
+    private double ultimoDreno;
     /** Ticks desde o último golpe recebido; começa calmo. */
     private int semApanhar = CALMA;
 
     @Override
     public void forma(String forma) {
         bankai = BANKAI.equals(forma);
+        // A pausa é de quem está no Bankai: sair dele a desfaz.
+        if (!bankai) semDreno = 0;
+        ultimoDreno = 0;
+    }
+
+    @Override
+    public void sinal(String nome, int ticks) {
+        if (SEM_DRENO.equals(nome)) {
+            if (!bankai) return;
+            semDreno = Math.max(0, ticks);
+            // O kit avisa depois de o tick do recurso já ter rodado: a pausa vale desde este tick.
+            if (semDreno > 0) atual = Math.min(MAXIMO, atual + ultimoDreno);
+            ultimoDreno = 0;
+        } else if (SELAR.equals(nome)) {
+            selado = Math.max(0, Math.min(SELO_MAXIMO, ticks));
+            if (selado > 0) atual = 0;
+        }
     }
 
     /** No Bankai, sem reiatsu: a forma tem de acabar. */
@@ -72,20 +102,39 @@ public final class Reiatsu implements Recurso {
     @Override
     public void tick(EstadoDoJogador estado) {
         semApanhar = estado.apanhou() ? 0 : Math.min(CALMA, semApanhar + 1);
-        if (bankai) {
-            atual = Math.max(0, atual - DRENO);
+        ultimoDreno = 0;
+        if (selado > 0) {
+            selado--;
+            atual = 0;
+        } else if (bankai) {
+            if (semDreno > 0) {
+                semDreno--;
+            } else {
+                ultimoDreno = Math.min(atual, DRENO);
+                atual -= ultimoDreno;
+            }
         } else {
             atual = Math.min(MAXIMO, atual + (semApanhar >= CALMA ? GANHO_CALMO : GANHO));
         }
     }
 
+    /** O valor salvo: o reiatsu, ou os ticks de selo que faltam com o sinal trocado. */
     @Override
     public double salvar() {
-        return atual;
+        return selado > 0 ? -selado : atual;
     }
 
     @Override
     public void carregar(double valor) {
-        atual = Double.isFinite(valor) ? Math.max(0, Math.min(MAXIMO, valor)) : 0;
+        selado = 0;
+        ultimoDreno = 0;
+        if (!Double.isFinite(valor)) {
+            atual = 0;
+        } else if (valor < 0) {
+            selado = (int) Math.min(SELO_MAXIMO, Math.ceil(-valor));
+            atual = 0;
+        } else {
+            atual = Math.min(MAXIMO, valor);
+        }
     }
 }

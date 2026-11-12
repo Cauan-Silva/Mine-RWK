@@ -181,6 +181,27 @@ public interface Contexto {
         return true;
     }
 
+    /** Manda um sinal ao recurso do jogador (ver {@link Recurso#sinal}). */
+    default void sinalAoRecurso(String sinal, int ticks) {
+    }
+
+    /** Se o jogador tem um efeito desse tipo em andamento. */
+    default boolean efeitoAtivo(Class<? extends Efeito> tipo) {
+        return false;
+    }
+
+    /** O id do golpe que o jogador está executando (da carga ao fim), ou vazio. */
+    default String golpeEmAndamento() {
+        return "";
+    }
+
+    /**
+     * Como {@link #danoUmaVez}, mas o dano ignora a armadura do alvo. Devolve quantos foram feridos.
+     */
+    default int danoDiretoUmaVez(Vetor centro, double raio, float dano, java.util.Set<Object> atingidos) {
+        return danoUmaVez(centro, raio, dano, atingidos);
+    }
+
     /** A forma em que o jogador está. */
     default String forma() {
         return Forma.BASE;

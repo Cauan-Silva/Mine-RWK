@@ -209,6 +209,24 @@ public final class ContextoServidor implements Contexto {
         return feridos[0];
     }
 
+    /** Dano que não conta a armadura do alvo (o Mugetsu); o tipo está em {@code data/minerwk/damage_type}. */
+    public static final net.minecraft.resources.ResourceKey<net.minecraft.world.damagesource.DamageType> DANO_DIRETO =
+            net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.DAMAGE_TYPE,
+                    com.minerwk.MineRWK.id("direto"));
+
+    @Override
+    public int danoDiretoUmaVez(Vetor centro, double raio, float dano, Set<Object> atingidos) {
+        var fonte = new net.minecraft.world.damagesource.DamageSource(nivel().registryAccess()
+                .registryOrThrow(net.minecraft.core.registries.Registries.DAMAGE_TYPE).getHolderOrThrow(DANO_DIRETO), jogador);
+        int[] feridos = {0};
+        ServicoKits.comoGolpeDoKit(jogador, () -> {
+            for (LivingEntity alvo : naEsfera(LivingEntity.class, vec(centro), raio, e -> true)) {
+                if (atingidos.add(alvo.getUUID()) && alvo.hurt(fonte, dano)) feridos[0]++;
+            }
+        });
+        return feridos[0];
+    }
+
     @Override
     public void arremessar(Vetor centro, double raio, double forca, int congelar, Vetor eixo) {
         for (LivingEntity alvo : naEsfera(LivingEntity.class, vec(centro), raio, e -> true)) {
@@ -430,6 +448,21 @@ public final class ContextoServidor implements Contexto {
         if (kit.isEmpty() || !kit.get().recurso().pode(quantidade)) return false;
         kit.get().recurso().gastar(quantidade);
         return true;
+    }
+
+    @Override
+    public void sinalAoRecurso(String sinal, int ticks) {
+        kit().ifPresent(k -> k.recurso().sinal(sinal, ticks));
+    }
+
+    @Override
+    public boolean efeitoAtivo(Class<? extends com.minerwk.core.kit.Efeito> tipo) {
+        return kit().map(k -> k.efeitos().stream().anyMatch(tipo::isInstance)).orElse(false);
+    }
+
+    @Override
+    public String golpeEmAndamento() {
+        return kit().flatMap(KitDoJogador::execucao).map(e -> e.habilidade().id()).orElse("");
     }
 
     @Override

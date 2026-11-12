@@ -29,6 +29,12 @@ public final class Ichigo {
     public static final String ID = "ichigo";
     /** Id do G do Shikai: é ele que entra em recarga quando o Bankai acaba. */
     public static final String ENTRAR_NO_BANKAI = "ichigo_bankai";
+    /** Ids da máscara Hollow e do Mugetsu: os dois golpes que só o despertar libera. */
+    public static final String MASCARA = "ichigo_mascara", MUGETSU = "ichigo_mugetsu";
+    /** Depois do Mugetsu: 60 s sem golpes e sem reiatsu. */
+    public static final int SEM_PODERES = 1200;
+    /** Com a máscara, todo dano causado é 30% maior. */
+    static final float BONUS_DA_MASCARA = 1.3f;
     /** Recarga do Bankai para quem saiu por vontade (5 s) e para quem ficou sem reiatsu (10 s). */
     static final int RECARGA_AO_SAIR = 100, RECARGA_ESGOTADO = 200;
     /** O Shunpo do Bankai com alvo: a quantos blocos atrás dele o Ichigo surge. */
@@ -40,6 +46,12 @@ public final class Ichigo {
     public static final Arma ZANGETSU = new Arma(7, 1.4f, 0);
     public static final Arma TENSA_ZANGETSU = new Arma(6, 2.2f, 0);
     public static final Arma TENSA_CARREGADA = new Arma(12, 2.2f, 5);
+    /** As duas com a máscara Hollow no rosto. */
+    static final Arma TENSA_MASCARADA = reforcada(TENSA_ZANGETSU), TENSA_CARREGADA_MASCARADA = reforcada(TENSA_CARREGADA);
+
+    private static Arma reforcada(Arma a) {
+        return new Arma(a.dano() * BONUS_DA_MASCARA, a.velocidade(), a.alcance());
+    }
 
     /** Dos olhos aos pés: os visuais de chão nascem nos pés do Ichigo. */
     private static final Vetor ATE_OS_PES = new Vetor(0, -1.62, 0);
@@ -51,13 +63,23 @@ public final class Ichigo {
         Map<Tecla, Habilidade> shikai = Map.of(Tecla.Z, new GetsugaTensho(), Tecla.X, new Shunpo(),
                 Tecla.C, new GetsugaNoChao(), Tecla.V, new Arremesso(), Tecla.G, new Bankai());
         Forma bankai = new Forma(Reiatsu.BANKAI, Map.of(Tecla.Z, new GetsugaNegro(), Tecla.X, new ShunpoDoBankai(),
-                Tecla.C, new GetsugaNaLamina(), Tecla.G, new SairDoBankai()));
+                Tecla.C, new GetsugaNaLamina(), Tecla.V, new MascaraHollow(), Tecla.G, new SairDoBankai(),
+                Tecla.R, new Mugetsu()));
         return new Personagem(ID, "Ichigo Kurosaki", "Bleach", Reiatsu::new, shikai, List.of(Zangetsu::new),
-                Arvore.VAZIA, Trancas.NENHUMA, List.of(bankai));
+                Arvore.VAZIA, new Trancas(Set.of(MASCARA, MUGETSU), false), List.of(bankai));
     }
 
     private static boolean noBankai(Contexto ctx) {
         return Reiatsu.BANKAI.equals(ctx.forma());
+    }
+
+    private static boolean mascarado(Contexto ctx) {
+        return ctx.efeitoAtivo(MascaraAtiva.class);
+    }
+
+    /** O dano de um golpe, já com o bônus da máscara se ela está no rosto. */
+    private static float dano(Contexto ctx, float base) {
+        return mascarado(ctx) ? base * BONUS_DA_MASCARA : base;
     }
 
     /** De onde o Getsuga sai: 1 bloco à frente dos olhos, ou dos próprios olhos se há parede colada. */
@@ -116,12 +138,13 @@ public final class Ichigo {
     static final class Zangetsu implements Passiva {
         @Override
         public void tick(Contexto ctx, EstadoDoJogador estado) {
-            if (noBankai(ctx) && ctx.recurso() <= 1e-6) {
+            // O Mugetsu gasta tudo e ele mesmo tira do Bankai: no meio dele, zero de reiatsu não encerra a forma.
+            if (noBankai(ctx) && ctx.recurso() <= 1e-6 && !MUGETSU.equals(ctx.golpeEmAndamento())) {
                 ctx.mudarForma(Forma.BASE);
                 ctx.recarga(ENTRAR_NO_BANKAI, RECARGA_ESGOTADO);
                 desfazer(ctx);
             }
-            ctx.arma(noBankai(ctx) ? TENSA_ZANGETSU : ZANGETSU);
+            ctx.arma(!noBankai(ctx) ? ZANGETSU : mascarado(ctx) ? TENSA_MASCARADA : TENSA_ZANGETSU);
         }
     }
 
@@ -160,6 +183,7 @@ public final class Ichigo {
     /** Z do Bankai: sai na hora, mais rápido e mais longe. */
     static final class GetsugaNegro extends Golpe {
         static final String VISUAL = "ichigo_getsuga_negro";
+        static final float LARGURA_COM_MASCARA = 1.5f;
 
         GetsugaNegro() {
             super(VISUAL, Numeros.instantanea(2, 2, 4, 15, 30));
@@ -168,8 +192,11 @@ public final class Ichigo {
         @Override
         public void aoDisparar(Contexto ctx, float forca) {
             Vetor de = saida(ctx);
-            ctx.visual(VISUAL, de, ctx.olhar(), 1f, GetsugaIchigo.duracao(true));
-            ctx.criarEfeito(new MeiaLua(de, ctx.olhar(), GetsugaIchigo.PASSO_BANKAI, GetsugaIchigo.ALCANCE_BANKAI, 10, VISUAL));
+            // Com a máscara o corte é 50% mais largo; a força do visual leva a largura ao cliente.
+            float largura = mascarado(ctx) ? LARGURA_COM_MASCARA : 1f;
+            ctx.visual(VISUAL, de, ctx.olhar(), largura, GetsugaIchigo.duracao(true));
+            ctx.criarEfeito(new MeiaLua(de, ctx.olhar(), GetsugaIchigo.PASSO_BANKAI, GetsugaIchigo.ALCANCE_BANKAI,
+                    dano(ctx, 10), VISUAL, MeiaLua.RAIO * largura));
         }
     }
 
@@ -178,7 +205,7 @@ public final class Ichigo {
         /** Meia largura do corte (3 blocos de ponta a ponta). */
         static final double RAIO = 1.5;
         private final Vetor direcao;
-        private final double passo, alcance;
+        private final double passo, alcance, raio;
         private final float dano;
         /** O visual que acompanha esta meia-lua: é encerrado se ela bater num bloco. */
         private final String visual;
@@ -188,6 +215,11 @@ public final class Ichigo {
         private boolean parou;
 
         MeiaLua(Vetor origem, Vetor direcao, double passo, double alcance, float dano, String visual) {
+            this(origem, direcao, passo, alcance, dano, visual, RAIO);
+        }
+
+        MeiaLua(Vetor origem, Vetor direcao, double passo, double alcance, float dano, String visual, double raio) {
+            this.raio = raio;
             this.ponto = origem;
             this.direcao = direcao.normalizado();
             this.passo = passo;
@@ -211,8 +243,8 @@ public final class Ichigo {
                 return;
             }
             // Dois pontos por tick: o passo é maior que o corte, e ninguém pode ficar no vão.
-            int feridos = ctx.danoUmaVez(ponto.mais(direcao.vezes(p / 2)), RAIO, dano, atingidos)
-                    + ctx.danoUmaVez(proximo, RAIO, dano, atingidos);
+            int feridos = ctx.danoUmaVez(ponto.mais(direcao.vezes(p / 2)), raio, dano, atingidos)
+                    + ctx.danoUmaVez(proximo, raio, dano, atingidos);
             if (feridos > 0) ctx.acertou(.5f);
             ponto = proximo;
             andou += p;
@@ -392,7 +424,7 @@ public final class Ichigo {
 
         @Override
         public void aoDisparar(Contexto ctx, float forca) {
-            ctx.arma(TENSA_CARREGADA);
+            ctx.arma(mascarado(ctx) ? TENSA_CARREGADA_MASCARADA : TENSA_CARREGADA);
             ctx.visual(LaminaCarregada.VISUAL, ctx.olhos(), ctx.olhar(), 1f, LaminaCarregada.DURACAO);
             ctx.criarEfeito(new LaminaCarregada());
         }
@@ -416,12 +448,163 @@ public final class Ichigo {
                 ctx.visualFim(VISUAL, ctx.olhos());
                 return;
             }
-            ctx.arma(TENSA_CARREGADA);
+            ctx.arma(mascarado(ctx) ? TENSA_CARREGADA_MASCARADA : TENSA_CARREGADA);
         }
 
         @Override
         public boolean encerrado() {
             return acabou;
+        }
+    }
+
+    /**
+     * V do Bankai (trancado): veste a máscara Hollow. Por 11 s todo dano causado é 30% maior, o Getsuga negro
+     * fica mais largo e o Bankai para de drenar.
+     */
+    static final class MascaraHollow extends Golpe {
+        /** A mão passa pelo rosto: a máscara só vale no fim do gesto. */
+        static final int GESTO = 8;
+
+        MascaraHollow() {
+            super(MASCARA, Numeros.instantanea(GESTO, 2, 6, 40, 800));
+        }
+
+        /** A animação do gesto entra com a apresentação da máscara; por enquanto ele não toca nenhuma. */
+        @Override
+        protected String animacao() {
+            return "";
+        }
+
+        @Override
+        public void aoDisparar(Contexto ctx, float forca) {
+            ctx.sinalAoRecurso(Reiatsu.SEM_DRENO, MascaraAtiva.DURACAO);
+            ctx.visual(MascaraAtiva.VISUAL, ctx.olhos(), ctx.olhar(), 1f, MascaraAtiva.DURACAO);
+            ctx.criarEfeito(new MascaraAtiva());
+        }
+    }
+
+    /** A máscara no rosto. Quem pergunta por ela são os golpes e o ataque básico; acaba antes se o Bankai acabar. */
+    static final class MascaraAtiva implements Efeito {
+        static final int DURACAO = 220;
+        static final String VISUAL = "ichigo_mascara";
+        private boolean acabou;
+
+        @Override
+        public int duracao() {
+            return DURACAO;
+        }
+
+        @Override
+        public void tick(Contexto ctx, int t) {
+            if (noBankai(ctx)) return;
+            acabou = true;
+            ctx.visualFim(VISUAL, ctx.olhos());
+        }
+
+        @Override
+        public boolean encerrado() {
+            return acabou;
+        }
+    }
+
+    /**
+     * R do Bankai (trancado): o Getsuga Tensho final. A carga é a cutscene; no corte ele gasta todo o reiatsu,
+     * solta o véu e perde os poderes por 60 s.
+     */
+    static final class Mugetsu extends Golpe {
+        /** A cutscene: 6 segundos da transformação ao corte. */
+        static final int CARGA = 120;
+        static final String VISUAL_DA_CARGA = "ichigo_mugetsu_carga", VISUAL = "ichigo_mugetsu";
+        /** Os golpes do Shikai, que ficam em recarga enquanto ele está sem poderes. */
+        private static final List<String> DO_SHIKAI = List.of("ichigo_getsuga", "ichigo_shunpo", "ichigo_getsuga_chao",
+                "ichigo_arremesso", ENTRAR_NO_BANKAI);
+
+        Mugetsu() {
+            super(MUGETSU, Numeros.instantanea(CARGA, 2, 20, 100, 3600));
+        }
+
+        /** As animações da forma final entram com a cutscene; por enquanto ele não toca nenhuma. */
+        @Override
+        protected String animacao() {
+            return "";
+        }
+
+        /** Um golpe forte durante a cutscene corta o Mugetsu, como no R do Gojo. */
+        @Override
+        public float danoQueInterrompe() {
+            return 6f;
+        }
+
+        @Override
+        public void aoIniciarCarga(Contexto ctx) {
+            super.aoIniciarCarga(ctx);
+            // A carga dura 6 s: sem a pausa, o Bankai drenaria o reiatsu de que o corte precisa.
+            ctx.sinalAoRecurso(Reiatsu.SEM_DRENO, CARGA + 2);
+            ctx.visual(VISUAL_DA_CARGA, ctx.olhos(), ctx.olhar(), 0f, CARGA + 6);
+            ctx.cutscene(MUGETSU);
+        }
+
+        @Override
+        public void aoInterromper(Contexto ctx) {
+            super.aoInterromper(ctx);
+            ctx.sinalAoRecurso(Reiatsu.SEM_DRENO, 0);
+            ctx.visualFim(VISUAL_DA_CARGA, ctx.olhos());
+            ctx.encerrarCutscene();
+        }
+
+        @Override
+        public void aoDisparar(Contexto ctx, float forca) {
+            // Reto, no nível do chão: o véu sobe dele.
+            Vetor rumo = new Vetor(ctx.olhar().x(), 0, ctx.olhar().z());
+            rumo = rumo.comprimento() < 1e-6 ? new Vetor(0, 0, 1) : rumo.normalizado();
+            ctx.visualFim(VISUAL_DA_CARGA, ctx.olhos());
+            ctx.visual(VISUAL, pes(ctx), rumo, 1f, Veu.TICKS + Veu.RESTO);
+            ctx.tremor(.8f, 20, 24);
+            // O dano é medido antes de os poderes irem embora (a máscara ainda conta).
+            ctx.criarEfeito(new Veu(ctx.olhos(), rumo, dano(ctx, Veu.DANO)));
+            perderOsPoderes(ctx);
+        }
+
+        /** O custo da obra: de volta ao Shikai, sem reiatsu e com todos os golpes parados por 60 s. */
+        private static void perderOsPoderes(Contexto ctx) {
+            ctx.gastarRecurso(ctx.recurso());
+            ctx.mudarForma(Forma.BASE);
+            ctx.sinalAoRecurso(Reiatsu.SELAR, SEM_PODERES);
+            for (String golpe : DO_SHIKAI) ctx.recarga(golpe, SEM_PODERES);
+        }
+    }
+
+    /**
+     * O véu do Mugetsu: uma parede de escuridão de 9 blocos de largura que avança 40 blocos em linha reta.
+     * Atravessa tudo (não para em bloco nem quebra nada) e fere cada inimigo uma vez, sem contar a armadura.
+     */
+    static final class Veu implements Efeito {
+        static final float DANO = 40;
+        static final double ALCANCE = 40, MEIA_LARGURA = 4.5, PASSO = 2;
+        /** Ticks do avanço, e os do céu voltando ao normal depois (só no visual). */
+        static final int TICKS = (int) (ALCANCE / PASSO), RESTO = 30;
+        private final Vetor origem, rumo;
+        private final float dano;
+        private final Set<Object> atingidos = new HashSet<>();
+
+        Veu(Vetor origem, Vetor rumo, float dano) {
+            this.origem = origem;
+            this.rumo = rumo;
+            this.dano = dano;
+        }
+
+        @Override
+        public int duracao() {
+            return TICKS;
+        }
+
+        @Override
+        public void tick(Contexto ctx, int t) {
+            // Dois pontos por tick: o passo é de 2 blocos e a faixa tem de ficar sem vãos.
+            double ate = (t + 1) * PASSO;
+            int feridos = ctx.danoDiretoUmaVez(origem.mais(rumo.vezes(ate - PASSO / 2)), MEIA_LARGURA, dano, atingidos)
+                    + ctx.danoDiretoUmaVez(origem.mais(rumo.vezes(ate)), MEIA_LARGURA, dano, atingidos);
+            if (feridos > 0) ctx.acertou(1f);
         }
     }
 }

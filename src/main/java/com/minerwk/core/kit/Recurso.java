@@ -32,6 +32,13 @@ public interface Recurso {
     }
 
     /** Valor para salvar nos dados do jogador. */
+    /**
+     * Um aviso do kit ao recurso, com um tempo em ticks: cada recurso entende os seus (o Reiatsu pausa o
+     * dreno do Bankai ou fica selado). Quem não conhece o sinal o ignora.
+     */
+    default void sinal(String nome, int ticks) {
+    }
+
     double salvar();
 
     /** Restaura um valor salvo, limitado a [0, máximo]. */

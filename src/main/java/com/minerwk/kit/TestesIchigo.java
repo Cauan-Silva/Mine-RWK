@@ -168,4 +168,104 @@ public final class TestesIchigo {
         helper.assertTrue(Math.abs(giro - 90) < 15, "deveria encarar o zumbi, giro " + giro);
         helper.succeed();
     }
+
+    // --- Parte 6: máscara Hollow, Mugetsu e a perda dos poderes ---
+
+    /** Ichigo desperto (a máscara e o Mugetsu são trancados), já no Bankai e com o reiatsu cheio. */
+    private static KitDoJogador bankaiDesperto(ServerPlayer jogador) {
+        ServicoKits.definirDespertou(jogador, true);
+        KitDoJogador kit = ServicoKits.kit(jogador).orElseThrow();
+        kit.mudarForma(Reiatsu.BANKAI, new ContextoServidor(jogador));
+        kit.recurso().carregar(Reiatsu.MAXIMO);
+        return kit;
+    }
+
+    /** Um alvo que aguenta o golpe e tem armadura pesada: só dano que ignora armadura tira o valor cheio. */
+    private static net.minecraft.world.entity.animal.IronGolem blindado(GameTestHelper helper, int x, int z) {
+        var golem = helper.spawn(EntityType.IRON_GOLEM, new BlockPos(x, 2, z));
+        golem.setNoAi(true);
+        golem.getAttribute(Attributes.ARMOR).setBaseValue(30);
+        golem.getAttribute(Attributes.ARMOR_TOUGHNESS).setBaseValue(12);
+        return golem;
+    }
+
+    @GameTest(template = "vazio")
+    public static void mascaraEMugetsuSaoTrancadosNoServidor(GameTestHelper helper) {
+        ServerPlayer jogador = ichigo(helper);
+        ServicoKits.definirDespertou(jogador, false);
+        KitDoJogador kit = ServicoKits.kit(jogador).orElseThrow();
+        kit.mudarForma(Reiatsu.BANKAI, new ContextoServidor(jogador));
+        ServicoKits.usarTecla(jogador, Tecla.V, true);
+        ServicoKits.usarTecla(jogador, Tecla.R, true);
+        ticks(jogador, 4);
+        helper.assertTrue(kit.execucao().isEmpty(), "sem despertar, a máscara e o Mugetsu não começam");
+        ServicoKits.definirDespertou(jogador, true);
+        ServicoKits.usarTecla(jogador, Tecla.V, true);
+        ticks(jogador, 2);
+        helper.assertTrue(kit.execucao().map(e -> e.habilidade().id().equals(Ichigo.MASCARA)).orElse(false), "desperto, a máscara começa");
+        helper.succeed();
+    }
+
+    @GameTest(template = "vazio")
+    public static void mascaraAumentaODanoDoGetsugaNegroEDoAtaqueBasico(GameTestHelper helper) {
+        ServerPlayer jogador = ichigo(helper);
+        bankaiDesperto(jogador);
+        var alvo = blindado(helper, 5, 1);
+        alvo.getAttribute(Attributes.ARMOR).setBaseValue(0);
+        alvo.getAttribute(Attributes.ARMOR_TOUGHNESS).setBaseValue(0);
+        ServicoKits.usarTecla(jogador, Tecla.V, true);
+        ticks(jogador, 20);
+        helper.assertTrue(perto(ArmaServidor.atual(jogador).dano(), 6 * 1.3f), "a Tensa com a máscara fere 7,8, fere "
+                + ArmaServidor.atual(jogador).dano());
+        ServicoKits.usarTecla(jogador, Tecla.Z, true);
+        ticks(jogador, 12);
+        helper.assertTrue(perto(alvo.getHealth(), 100 - 13), "Getsuga negro de 10 vira 13: sobrou " + alvo.getHealth());
+        helper.succeed();
+    }
+
+    @GameTest(template = "vazio")
+    public static void mugetsuIgnoraArmaduraETiraOsPoderes(GameTestHelper helper) {
+        ServerPlayer jogador = ichigo(helper);
+        KitDoJogador kit = bankaiDesperto(jogador);
+        var alvo = blindado(helper, 6, 1);
+        // A mesma armadura segura quase todo o Getsuga negro: é a prova de que o Mugetsu não a conta.
+        ServicoKits.usarTecla(jogador, Tecla.Z, true);
+        ticks(jogador, 12);
+        float comArmadura = 100 - alvo.getHealth();
+        helper.assertTrue(comArmadura > 0 && comArmadura < 5, "o Getsuga negro (10) deveria ser quase todo absorvido, tirou " + comArmadura);
+        alvo.setHealth(100);
+        alvo.invulnerableTime = 0;
+        kit.recurso().carregar(Reiatsu.MAXIMO);
+        ServicoKits.usarTecla(jogador, Tecla.R, true);
+        ticks(jogador, 125);
+        helper.assertTrue(perto(alvo.getHealth(), 60), "o Mugetsu tira 40 mesmo com armadura: sobrou " + alvo.getHealth());
+        helper.assertTrue(Forma.BASE.equals(kit.forma()), "depois do Mugetsu ele volta ao Shikai");
+        helper.assertTrue(kit.recurso().atual() == 0, "sem reiatsu, tem " + kit.recurso().atual());
+        long agora = jogador.level().getGameTime();
+        for (Tecla t : java.util.List.of(Tecla.Z, Tecla.X, Tecla.C, Tecla.V, Tecla.G)) {
+            long falta = kit.recargas().restante(kit.habilidade(t).orElseThrow().id(), agora);
+            helper.assertTrue(falta > 1100 && falta <= 1200, "o golpe da tecla " + t + " fica 60 s parado, faltam " + falta);
+        }
+        helper.assertTrue(kit.recargas().restante(Ichigo.MUGETSU, agora) > 3500, "e o Mugetsu, 180 s");
+        ticks(jogador, 30);
+        helper.assertTrue(Ichigo.ZANGETSU.equals(ArmaServidor.atual(jogador)), "sobra o ataque básico da Zangetsu");
+        helper.assertTrue(kit.recurso().atual() == 0, "selado: não regenera");
+        helper.succeed();
+    }
+
+    @GameTest(template = "vazio")
+    public static void semPoderesSobreviveASalvarECarregar(GameTestHelper helper) {
+        ServerPlayer jogador = ichigo(helper);
+        KitDoJogador kit = bankaiDesperto(jogador);
+        ServicoKits.usarTecla(jogador, Tecla.R, true);
+        ticks(jogador, 125);
+        helper.assertTrue(kit.recurso().atual() == 0, "o Mugetsu saiu");
+        // Sair e entrar no jogo: o kit é remontado a partir do que foi salvo.
+        double salvo = kit.recurso().salvar();
+        helper.assertTrue(salvo < 0, "o selo vai para o disco (valor salvo " + salvo + ")");
+        Reiatsu outro = new Reiatsu();
+        outro.carregar(salvo);
+        helper.assertTrue(outro.atual() == 0 && !outro.pode(1), "ao voltar ele continua sem reiatsu");
+        helper.succeed();
+    }
 }

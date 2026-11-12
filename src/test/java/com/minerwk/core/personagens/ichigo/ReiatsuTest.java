@@ -109,4 +109,82 @@ class ReiatsuTest {
         r.carregar(Double.NaN);
         assertEquals(0, r.atual());
     }
+
+    // --- Parte 6: a máscara pausa o dreno e o Mugetsu sela o reiatsu ---
+
+    @Test
+    void sinalSemDrenoPausaODrenoDoBankaiPorUmTempo() {
+        Reiatsu r = com(100);
+        r.forma(Reiatsu.BANKAI);
+        r.sinal(Reiatsu.SEM_DRENO, 40);
+        for (int i = 0; i < 40; i++) r.tick(NADA);
+        assertEquals(100, r.atual(), 1e-9);
+        for (int i = 0; i < 20; i++) r.tick(NADA);
+        assertEquals(98, r.atual(), 1e-6, "acabou a pausa: 2 por segundo de novo");
+    }
+
+    @Test
+    void sinalSemDrenoComZeroAcabaAPausaNaHora() {
+        Reiatsu r = com(100);
+        r.forma(Reiatsu.BANKAI);
+        r.sinal(Reiatsu.SEM_DRENO, 400);
+        r.sinal(Reiatsu.SEM_DRENO, 0);
+        for (int i = 0; i < 20; i++) r.tick(NADA);
+        assertEquals(98, r.atual(), 1e-6);
+    }
+
+    @Test
+    void sairDoBankaiAcabaComAPausaDoDreno() {
+        Reiatsu r = com(100);
+        r.forma(Reiatsu.BANKAI);
+        r.sinal(Reiatsu.SEM_DRENO, 400);
+        r.forma("base");
+        r.forma(Reiatsu.BANKAI);
+        for (int i = 0; i < 20; i++) r.tick(NADA);
+        assertEquals(98, r.atual(), 1e-6);
+    }
+
+    @Test
+    void seladoFicaEmZeroSemRegenerarAteOSeloAcabar() {
+        Reiatsu r = com(150);
+        r.sinal(Reiatsu.SELAR, 100);
+        assertEquals(0, r.atual(), 1e-9);
+        assertFalse(r.pode(1));
+        for (int i = 0; i < 100; i++) r.tick(NADA);
+        assertEquals(0, r.atual(), 1e-9);
+        for (int i = 0; i < 20; i++) r.tick(NADA);
+        assertEquals(3, r.atual(), 1e-6, "selo aberto: volta a regenerar");
+    }
+
+    @Test
+    void oSeloSobreviveASairEEntrarNoJogo() {
+        Reiatsu r = com(150);
+        r.sinal(Reiatsu.SELAR, 100);
+        for (int i = 0; i < 30; i++) r.tick(NADA);
+        double salvo = r.salvar();
+        Reiatsu outro = new Reiatsu();
+        outro.carregar(salvo);
+        assertEquals(0, outro.atual(), 1e-9);
+        for (int i = 0; i < 70; i++) outro.tick(NADA);
+        assertEquals(0, outro.atual(), 1e-9, "faltavam 70 ticks de selo");
+        outro.tick(NADA);
+        assertTrue(outro.atual() > 0);
+    }
+
+    @Test
+    void valorSalvoAbsurdoNaoSelaParaSempre() {
+        Reiatsu r = new Reiatsu();
+        r.carregar(-1e12);
+        for (int i = 0; i < Reiatsu.SELO_MAXIMO + 1; i++) r.tick(NADA);
+        assertTrue(r.atual() > 0, "o selo salvo nunca passa do máximo");
+        r.carregar(Double.NaN);
+        assertEquals(0, r.atual(), 1e-9);
+    }
+
+    @Test
+    void sinalDesconhecidoNaoFazNada() {
+        Reiatsu r = com(100);
+        r.sinal("outro", 50);
+        assertEquals(100, r.atual(), 1e-9);
+    }
 }
