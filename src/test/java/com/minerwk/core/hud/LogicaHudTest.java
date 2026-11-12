@@ -57,4 +57,13 @@ class LogicaHudTest {
         assertEquals(1, LogicaHud.fracaoXp(500, 110), 1e-9);
         assertEquals(1, LogicaHud.fracaoXp(0, 0), 1e-9);
     }
+
+    @Test
+    void semPoderesQuandoNaoHaRecursoETodosOsGolpesEstaoParados() {
+        assertEquals(1150, LogicaHud.semPoderes(0, java.util.List.of(1150L, 1150L, 1100L)), "o aviso mostra o tempo do último a voltar");
+        assertEquals(0, LogicaHud.semPoderes(0, java.util.List.of(1150L, 0L, 1100L)), "um golpe pronto: ainda tem poderes");
+        assertEquals(0, LogicaHud.semPoderes(5, java.util.List.of(1150L, 1150L)), "com recurso não é perda de poderes");
+        assertEquals(0, LogicaHud.semPoderes(0, java.util.List.of()), "sem golpes na forma não há o que avisar");
+        assertEquals(0, LogicaHud.semPoderes(0, java.util.List.of(30L, 40L)), "recargas curtas ao mesmo tempo não são o custo do Mugetsu");
+    }
 }

@@ -52,7 +52,12 @@ public final class CutsceneCliente {
                     "gojo_roxo_200_carga", false, true, -1),
             // O despertar no meio da luta contra o Toji: só quem caiu assiste; nenhum visual a corta.
             CutsceneDespertar.ID, new Roteiro(CutsceneDespertar.COREOGRAFIA, CutsceneDespertar.PALAVRAS,
-                    "", false, false, -1));
+                    "", false, false, -1),
+            // O Mugetsu do Ichigo: uma parte só, da carga ao véu. Quem a corta é o próprio golpe, se for
+            // interrompido (ele manda o fim da cutscene); o visual da carga acabar no corte não a encerra.
+            com.minerwk.core.personagens.ichigo.CutsceneMugetsu.ID, new Roteiro(
+                    com.minerwk.core.personagens.ichigo.CutsceneMugetsu.COREOGRAFIA,
+                    com.minerwk.core.personagens.ichigo.CutsceneMugetsu.PALAVRAS, "", false, false, -1));
 
     private static Roteiro roteiroDe(String id) {
         Roteiro r = ROTEIROS.get(id);
@@ -259,6 +264,13 @@ public final class CutsceneCliente {
     private static double suave(double t) {
         t = Math.max(0, Math.min(1, t));
         return t * t * (3 - 2 * t);
+    }
+
+    /** Na câmera de cinema o nome de quem faz o golpe apareceria por cima do rosto dele, nos closes. */
+    public static void aoNome(net.neoforged.neoforge.client.event.RenderNameTagEvent evento) {
+        if (atual != null && comCamera && evento.getEntity().getId() == atual.dono()) {
+            evento.setCanRender(net.neoforged.neoforge.common.util.TriState.FALSE);
+        }
     }
 
     /** Barras de cinema e as palavras do encantamento. */

@@ -40,6 +40,8 @@ public final class DemoVfx {
     private static final boolean TRAJE_ICHIGO = MODO.equals("ichigo_traje");
     /** {@code ichigo}: os golpes do Shikai (Z, X, C, V), a entrada do Bankai e os golpes dele, num alvo parado. */
     private static final boolean ICHIGO = MODO.equals("ichigo");
+    /** {@code ichigo_mugetsu}: o Bankai, a máscara Hollow de frente, e o Mugetsu inteiro com a perda dos poderes. */
+    private static final boolean MUGETSU = MODO.equals("ichigo_mugetsu");
     /** {@code arvore}: a tela da árvore do Gojo em três momentos (sem pontos, com compras e desperto). */
     private static final boolean ARVORE = MODO.equals("arvore");
     /** {@code toji}: a luta contra o Toji: a entrada, a Nuvem, a investida, a queda com a cutscene, o Desaparecer e a fase 3. */
@@ -48,7 +50,7 @@ public final class DemoVfx {
     private static final Path PASTA = Path.of("demo");
     private static final int ESFERAS = RoxoMaximo.TICKS_ESFERAS;
     private static final int ESTOURO = ESFERAS + RoxoMaximo.TICKS_FUSAO;
-    private static final int FIM_PREVIA = TOJI ? 520 : ARVORE ? 100 : TRAJE ? 260 : TRAJE_ICHIGO ? 300 : ICHIGO ? 350 : R_COMPLETO ? 360
+    private static final int FIM_PREVIA = TOJI ? 520 : ARVORE ? 100 : TRAJE ? 260 : TRAJE_ICHIGO ? 300 : ICHIGO ? 350 : MUGETSU ? 360 : R_COMPLETO ? 360
             : ENCANTAMENTO ? CARGA + 90 : ESTOURO + RoxoMaximo.TICKS_EXPLOSAO + 110;
     private static int ticks;
     private static int quadro;
@@ -74,14 +76,14 @@ public final class DemoVfx {
             mc.setScreen(null);
         }
         if (DEMO && ticks == 40) {
-            jogador.connection.sendCommand(ENCANTAMENTO || R_COMPLETO || TRAJE || TRAJE_ICHIGO || ICHIGO || TOJI ? "time set noon" : "time set midnight");
+            jogador.connection.sendCommand(ENCANTAMENTO || R_COMPLETO || TRAJE || TRAJE_ICHIGO || ICHIGO || MUGETSU || TOJI ? "time set noon" : "time set midnight");
             if (ARVORE) jogador.connection.sendCommand("rwk trocar @s gojo");
             if (TOJI) {
                 jogador.connection.sendCommand("rwk trocar @s gojo");
                 jogador.connection.sendCommand("rwk despertar @s nao");
                 jogador.connection.sendCommand("tp @s ~150 ~12 ~");
             }
-            if (TRAJE_ICHIGO || ICHIGO) {
+            if (TRAJE_ICHIGO || ICHIGO || MUGETSU) {
                 jogador.connection.sendCommand("rwk trocar @s ichigo");
                 jogador.connection.sendCommand("tp @s ~150 ~12 ~");
             }
@@ -219,6 +221,54 @@ public final class DemoVfx {
             if (t == 36 || t == 44 || t == 248 || t == 292 || t == 302) jogador.swing(net.minecraft.world.InteractionHand.MAIN_HAND);
             if (t == FIM_PREVIA - 3) {
                 jogador.connection.sendCommand("kill @e[type=minecraft:husk,distance=..60]");
+                jogador.connection.sendCommand("kill @e[type=minecraft:armor_stand,distance=..60]");
+                jogador.connection.sendCommand("tp @s ~-150 ~ ~-30");
+            }
+            if (t >= FIM_PREVIA) {
+                mc.setCameraEntity(jogador);
+                mc.options.setCameraType(net.minecraft.client.CameraType.FIRST_PERSON);
+                previa = -1;
+            }
+            return;
+        }
+        if (MUGETSU) {
+            mc.gui.getChat().clearMessages(false);
+            // De lado, por uma câmera fixa: a entrada do Bankai. De frente: a máscara se formando. De lado de
+            // novo: a carga do Mugetsu (a cutscene toma a câmera quando existe), o corte, o véu e os poderes indo.
+            boolean frente = t >= 52 && t < 118;
+            net.minecraft.world.entity.Entity camera = jogador;
+            if (!frente) {
+                for (net.minecraft.world.entity.Entity e : mc.level.entitiesForRendering()) {
+                    if (e instanceof net.minecraft.world.entity.decoration.ArmorStand && e.distanceToSqr(jogador) < 60 * 60) camera = e;
+                }
+            }
+            // Durante uma cutscene a câmera é dela.
+            if (!com.minerwk.client.camera.CutsceneCliente.ativa()) {
+                if (mc.getCameraEntity() != camera) mc.setCameraEntity(camera);
+                mc.options.setCameraType(frente ? net.minecraft.client.CameraType.THIRD_PERSON_FRONT
+                        : net.minecraft.client.CameraType.THIRD_PERSON_BACK);
+            }
+            jogador.setXRot(frente ? 6 : 2);
+            if (t == 0) {
+                jogador.setYRot(0);
+                jogador.connection.sendCommand("rwk despertar @s sim");
+                jogador.connection.sendCommand("kill @e[type=minecraft:armor_stand,distance=..60]");
+                jogador.connection.sendCommand("execute at @s run summon minecraft:armor_stand ~-5 ~0.8 ~9 "
+                        + "{Invisible:1b,NoGravity:1b,Marker:0b,Rotation:[-100f,4f]}");
+                jogador.connection.sendCommand("kill @e[type=minecraft:husk,distance=..80]");
+                jogador.connection.sendCommand("execute at @s run summon minecraft:husk ~ ~ ~18 {NoAI:1b}");
+            }
+            if (t == 2 || t == 48 || t == 122) jogador.connection.sendCommand("rwk recarregar");
+            // G: Bankai. V: a máscara. R: o Mugetsu.
+            if (t == 6) tecla(com.minerwk.core.kit.Tecla.G, true);
+            if (t == 8) tecla(com.minerwk.core.kit.Tecla.G, false);
+            if (t == 56) tecla(com.minerwk.core.kit.Tecla.V, true);
+            if (t == 58) tecla(com.minerwk.core.kit.Tecla.V, false);
+            if (t == 128) tecla(com.minerwk.core.kit.Tecla.R, true);
+            if (t == 130) tecla(com.minerwk.core.kit.Tecla.R, false);
+            curarJogador();
+            if (t == FIM_PREVIA - 3) {
+                jogador.connection.sendCommand("kill @e[type=minecraft:husk,distance=..80]");
                 jogador.connection.sendCommand("kill @e[type=minecraft:armor_stand,distance=..60]");
                 jogador.connection.sendCommand("tp @s ~-150 ~ ~-30");
             }

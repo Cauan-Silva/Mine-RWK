@@ -95,6 +95,7 @@
   "config.minerwk.olhosBrilhando": "Glowing eyes without the blindfold",
   "mensagem.minerwk.maestria": "Mastery %s: +%s point(s)",
   "hud.minerwk.nivel": "Lv %s",
+  "hud.minerwk.sem_poderes": "Powers lost: %s s",
   "key.minerwk.arvore": "Skill tree",
   "tela.minerwk.arvore": "Skill tree",
   "tela.minerwk.arvore.titulo": "%s's skill tree",
@@ -187,5 +188,9 @@
   "subtitles.minerwk.ichigo_mugetsu": "Mugetsu",
   "subtitles.minerwk.ichigo_poderes_perdidos": "Ichigo's reiatsu fades away",
   "subtitles.minerwk.ichigo_poderes_voltam": "Ichigo's reiatsu returns",
-  "item.minerwk.traje_ichigo_mugetsu": "Ichigo's final form"
+  "item.minerwk.traje_ichigo_mugetsu": "Ichigo's final form",
+  "cutscene.minerwk.ichigo_mugetsu.1": "The Final Getsuga Tenshō",
+  "cutscene.minerwk.ichigo_mugetsu.1.jp": "最後の月牙天衝",
+  "cutscene.minerwk.ichigo_mugetsu.2": "Mugetsu",
+  "cutscene.minerwk.ichigo_mugetsu.2.jp": "無月"
 }

@@ -127,6 +127,34 @@ A["ichigo_getsuga_lamina"] = anim(0.85, {
     "head": [(0, N), (0.20, [-6, -8, 0]), (0.55, [-6, -8, 0]), (0.85, N, C)],
 })
 
+# V do Bankai: a mão livre passa pelo rosto de cima para baixo e a máscara aparece (0,4 s); a cabeça
+# baixa com a mão e sobe já mascarada.
+A["ichigo_mascara"] = anim(0.9, {
+    "left_arm": [(0, N), (0.14, [-150, 38, 12], OUTC), (0.26, [-128, 44, 8]), (0.40, [-92, 36, 0], EXPO),
+                 (0.55, [-40, 10, -14], OUTC), (0.9, N, C)],
+    "right_arm": [(0, N), (0.26, [8, 0, 16], OUTC), (0.55, [10, 0, 18]), (0.9, N, C)],
+    "torso": [(0, N), (0.26, [6, 8, 0], OUTC), (0.40, [-4, 6, 0], EXPO), (0.55, [-3, 4, 0]), (0.9, N, C)],
+    "head": [(0, N), (0.26, [18, 0, 0], OUTC), (0.40, [-10, 0, 0], EXPO), (0.55, [-8, 0, 0]), (0.9, N, C)],
+})
+
+# R do Bankai: o Mugetsu. Os tempos seguem a cutscene (core/vfx/MugetsuIchigo): até 1,5 s o reiatsu sobe e
+# o corpo se abre para trás; na forma final ele fica reto, de braços soltos; aos 4,2 s (o silêncio) o braço
+# direito sobe devagar com a lâmina preta; aos 6 s, o corte: desce de uma vez e segura.
+ABERTO_D, ABERTO_E = [20, 0, 38], [20, 0, -38]
+ERGUE = [-172, -8, -10]
+A["ichigo_mugetsu"] = anim(7.3, {
+    "right_arm": [(0, N), (0.5, ABERTO_D, OUTC)] + tremer(ABERTO_D, 0.5, 1.4, 0.1, 2.5) + [(1.4, ABERTO_D),
+                  (1.6, [4, 0, 8], OUTC), (4.2, [4, 0, 8]), (5.6, ERGUE, C), (5.95, [-176, -8, -10]),
+                  (6.06, [-30, 30, 12], EXPO), (6.16, [-12, 38, 14], OUTC), (6.9, [-16, 34, 12]), (7.3, N, C)],
+    "left_arm": [(0, N), (0.5, ABERTO_E, OUTC)] + tremer(ABERTO_E, 0.5, 1.4, 0.1, 2.5) + [(1.4, ABERTO_E),
+                 (1.6, [4, 0, -8], OUTC), (4.2, [4, 0, -8]), (5.6, [14, 0, -20], C), (6.06, [30, 0, -26], EXPO),
+                 (6.9, [26, 0, -22]), (7.3, N, C)],
+    "torso": [(0, N), (0.5, [-12, 0, 0], OUTC), (1.4, [-14, 0, 0]), (1.6, N, OUTC), (4.2, N), (5.6, [-8, -14, 0], C),
+              (6.06, [14, 22, 0], EXPO), (6.16, [18, 26, 0], OUTC), (6.9, [15, 22, 0]), (7.3, N, C)],
+    "head": [(0, N), (0.5, [-22, 0, 0], OUTC), (1.4, [-24, 0, 0]), (1.6, [6, 0, 0], OUTC), (4.2, [4, 0, 0]),
+             (5.6, [-6, 8, 0], C), (6.06, [0, -10, 0], OUTC), (6.9, [0, -10, 0]), (7.3, N, C)],
+})
+
 saida = {"format_version": "1.8.0", "geckolib_format_version": 2, "animations": A}
 p = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "src/main/resources/assets/minerwk/player_animations/ichigo.json")
 with open(p, "w", encoding="utf-8") as f:

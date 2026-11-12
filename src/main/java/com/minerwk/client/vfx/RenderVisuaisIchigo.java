@@ -808,20 +808,20 @@ final class RenderVisuaisIchigo {
         abrir(false, false);
         // O chão coberto de tinta por onde o véu já passou.
         Vec3 e0 = o.add(b.lado().scale(-meia)).add(0, .06, 0), d0 = o.add(b.lado().scale(meia)).add(0, .06, 0);
-        quad(e0, d0, d0.add(b.frente().scale(frente)), e0.add(b.frente().scale(frente)), TINTA, .82f * op);
+        quad(e0, d0, d0.add(b.frente().scale(frente)), e0.add(b.frente().scale(frente)), TINTA, .93f * op);
         // As cortinas atravessadas e as duas laterais, trecho a trecho.
-        double passo = 2;
+        double passo = 1.5;
         for (double z = 0; z < frente; z += passo) {
             double z1 = Math.min(frente, z + passo);
             Vec3 c0 = o.add(b.frente().scale(z)), c1 = o.add(b.frente().scale(z1));
             for (int i = 0; i < colunas; i++) {
                 double u0 = -1 + 2.0 * i / colunas, u1 = -1 + 2.0 * (i + 1) / colunas;
                 pano(c1.add(b.lado().scale(u0 * meia)), c1.add(b.lado().scale(u1 * meia)),
-                        MugetsuIchigo.altura(u0, z1, t), MugetsuIchigo.altura(u1, z1, t), .5f * op);
+                        MugetsuIchigo.altura(u0, z1, t), MugetsuIchigo.altura(u1, z1, t), .8f * op);
             }
             for (int lado = -1; lado <= 1; lado += 2) {
                 pano(c0.add(b.lado().scale(lado * meia)), c1.add(b.lado().scale(lado * meia)),
-                        MugetsuIchigo.altura(lado, z, t), MugetsuIchigo.altura(lado, z1, t), .7f * op);
+                        MugetsuIchigo.altura(lado, z, t), MugetsuIchigo.altura(lado, z1, t), .9f * op);
             }
         }
         // A frente: a face que avança, mais cheia. Ela ainda está subindo do chão, então é mais baixa.
@@ -829,7 +829,7 @@ final class RenderVisuaisIchigo {
         for (int i = 0; i < colunas; i++) {
             double u0 = -1 + 2.0 * i / colunas, u1 = -1 + 2.0 * (i + 1) / colunas;
             double h0 = Math.max(2.5, MugetsuIchigo.altura(u0, frente - 1.2, t)), h1 = Math.max(2.5, MugetsuIchigo.altura(u1, frente - 1.2, t));
-            pano(cf.add(b.lado().scale(u0 * meia)), cf.add(b.lado().scale(u1 * meia)), h0, h1, .92f * op);
+            pano(cf.add(b.lado().scale(u0 * meia)), cf.add(b.lado().scale(u1 * meia)), h0, h1, .98f * op);
         }
         fechar();
     }

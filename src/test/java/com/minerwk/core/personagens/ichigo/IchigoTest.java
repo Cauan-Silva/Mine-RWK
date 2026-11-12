@@ -674,4 +674,21 @@ class IchigoTest {
         assertTrue(Ichigo.Mugetsu.SILENCIO < Ichigo.Mugetsu.CARGA);
         assertTrue(Ichigo.Mugetsu.CARGA - Ichigo.Mugetsu.SILENCIO >= 20, "ao menos 1 s de silêncio");
     }
+
+    @Test
+    void aMascaraEOMugetsuTocamAsSuasAnimacoes() throws Exception {
+        bankaiDesperto();
+        usar(Tecla.V);
+        ticks(Ichigo.MascaraHollow.GESTO + 8);
+        kit.recurso().carregar(Reiatsu.MAXIMO);
+        usar(Tecla.R);
+        ticks(4);
+        assertTrue(ctx.animacoes.contains("ichigo_mascara") && ctx.animacoes.contains("ichigo_mugetsu"), ctx.animacoes.toString());
+        String arquivo = java.nio.file.Files.readString(
+                java.nio.file.Path.of("src/main/resources/assets/minerwk/player_animations/ichigo.json"));
+        assertTrue(arquivo.contains("\"ichigo_mascara\"") && arquivo.contains("\"ichigo_mugetsu\""));
+        // A do Mugetsu cobre a carga inteira e o corte: 6 s e mais o gesto final.
+        var anim = com.google.gson.JsonParser.parseString(arquivo).getAsJsonObject().getAsJsonObject("animations");
+        assertTrue(anim.getAsJsonObject("ichigo_mugetsu").get("animation_length").getAsDouble() >= Ichigo.Mugetsu.CARGA / 20.0 + .5);
+    }
 }

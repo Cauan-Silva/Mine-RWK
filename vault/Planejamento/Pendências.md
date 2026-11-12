@@ -24,6 +24,14 @@ Voltar para [[00 Início]].
 - Gojo (revisão 09/11, menores que ficaram): o Roxo pode derrubar plantas vizinhas (o `BreakEvent` para mods de proteção entrou em 09/11, no Gojo peso); o Vermelho atravessa parede fina encostada no rosto; bola de fogo e crânio de Wither voltam a acelerar no Infinito (o dano é cancelado mesmo assim); TNT sem dono passa pelo Infinito; sobram até 2 ticks de Infinito e 5 de Paralisia depois de morrer. Corrigidos na revisão: efeitos acabam ao mudar de dimensão; golpes não atingem pets, montaria nem projéteis do próprio Gojo; Paralisia não cancela Espinhos nem dano em si mesmo; ícone da Paralisia escondido (falta textura).
 
 ## Para testar no jogo
+- Ichigo, parte 6, apresentação (11/11): **ver primeiro as folhas de quadros** `previas/ichigo_mugetsu.png` e `previas/ichigo_mugetsu_cutscene.png` e **ouvir** `previas/sfx_ichigo.wav` (os seis últimos sons). No jogo (`/rwk trocar <jogador> ichigo`, `/rwk despertar <jogador> sim`, G):
+  - **V:** a mão passa pelo rosto e a máscara aparece; fica bem em skins diferentes (cabeça com camada de chapéu)? O som de formar e o de quebrar aos 11 s.
+  - **R, a cutscene:** os seis planos. O corte para a forma final aos 1,5 s, as duas palavras, o silêncio antes do corte. A forma final convence sem o cabelo longo? O ritmo de 6 s está bom ou arrasta?
+  - **R, o véu:** no plano aberto dá para ver a parede preta avançar; de outro jogador, de fora e de dentro dela; o céu escurecendo e voltando.
+  - **Depois:** o aviso "Sem poderes: N s" no HUD (encosta em outras mensagens?), o reiatsu indo embora 1,5 s depois do corte e voltando aos 60 s, com som.
+  - **Golpe forte na cutscene:** a câmera volta, o som e a fumaça param, a forma final some.
+  - **Com `cutscenes = false`** na config: só as palavras, sem a câmera.
+  - **Em terreno fechado** (floresta, caverna): a câmera da cutscene entra em blocos? Na prévia o último plano entrou numa árvore.
 - Ichigo, parte 6, mecânica (11/11): máscara, Mugetsu e perda dos poderes, **ainda sem visual nem som próprios**. Para testar: `/rwk trocar <jogador> ichigo`, `/rwk despertar <jogador> sim`, entrar no Bankai (G):
   - **V (máscara):** nada aparece no rosto ainda, mas por 11 s a barra de reiatsu para de descer, o Getsuga negro sai mais largo e tudo fere 30% mais. A duração e a recarga de 40 s estão boas?
   - **R (Mugetsu):** precisa de 100 de reiatsu. Fica 6 s parado (a cutscene ainda não existe) e solta o véu (invisível por enquanto): 40 de dano em quem estiver nos 40 blocos à frente, numa faixa de 9. Levar um golpe forte nesses 6 s cancela.

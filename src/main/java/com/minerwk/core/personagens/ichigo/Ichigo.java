@@ -470,12 +470,6 @@ public final class Ichigo {
             super(MASCARA, Numeros.instantanea(GESTO, 2, 6, 40, 800));
         }
 
-        /** A animação do gesto entra com a apresentação da máscara; por enquanto ele não toca nenhuma. */
-        @Override
-        protected String animacao() {
-            return "";
-        }
-
         @Override
         public void aoDisparar(Contexto ctx, float forca) {
             ctx.sinalAoRecurso(Reiatsu.SEM_DRENO, MascaraAtiva.DURACAO);
@@ -524,12 +518,6 @@ public final class Ichigo {
 
         Mugetsu() {
             super(MUGETSU, Numeros.instantanea(CARGA, 2, 20, 100, 3600));
-        }
-
-        /** As animações da forma final entram com a cutscene; por enquanto ele não toca nenhuma. */
-        @Override
-        protected String animacao() {
-            return "";
         }
 
         /** Um golpe forte durante a cutscene corta o Mugetsu, como no R do Gojo. */

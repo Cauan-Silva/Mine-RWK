@@ -68,6 +68,7 @@ public final class MineRWKClient {
         NeoForge.EVENT_BUS.addListener(CutsceneCliente::aoEntrada);
         NeoForge.EVENT_BUS.addListener(CutsceneCliente::aoCamadaGui);
         NeoForge.EVENT_BUS.addListener(CutsceneCliente::aoMao);
+        NeoForge.EVENT_BUS.addListener(CutsceneCliente::aoNome);
         NeoForge.EVENT_BUS.addListener((ClientPlayerNetworkEvent.LoggingOut e) -> CutsceneCliente.encerrar());
         modBus.addListener((RegisterGuiLayersEvent e) -> e.registerAboveAll(CutsceneCliente.CAMADA, CutsceneCliente::desenhar));
         modBus.addListener((RegisterGuiLayersEvent e) -> e.registerAbove(VanillaGuiLayers.CAMERA_OVERLAYS,

@@ -10,6 +10,8 @@
 | Arquivo | Origem |
 | --- | --- |
 | `assets/minerwk/player_animations/gojo.json` | Minezin (mesmo autor) |
+| `assets/minerwk/geo/traje/ichigo_mugetsu.geo.json`, `textures/traje/ichigo_mugetsu.png` | Minezin (mesmo autor): a forma final do Mugetsu (`geo/armaduras/ichigo_mugetsu.geo.json` e a textura), sem mudança; passam por `ferramentas/gerar_traje_ichigo.py` |
+| `assets/minerwk/textures/traje/ichigo_mascara.png` e a forma da máscara em `client/traje/CamadaTraje` | Minezin (mesmo autor): `textures/ichigo/mascara.png` e a geometria de `CamadaHollow` |
 | `assets/minerwk/player_animations/ichigo.json` | Gerado por `ferramentas/gerar_animacoes_ichigo.py`; as poses do Getsuga, da onda e da entrada do Bankai partem das do Minezin (mesmo autor), `player_animation/ichigo.json` |
 | `assets/minerwk/animations/boss/toji.animation.json` | Minezin (mesmo autor): as 14 animações do Toji (`animations/nemesis/1.animation.json`), sem mudança |
 
