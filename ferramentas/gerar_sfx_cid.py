@@ -1,0 +1,138 @@
+"""Sons do Cid, sintetizados pelo motor em camadas (ferramentas/sfx_motor.py). Sem áudio de terceiros.
+
+Rodar: python ferramentas/gerar_sfx_cid.py [--preview caminho.wav]
+Escreve os .ogg em assets/minerwk/sounds/cid/, as entradas do sounds.json, as legendas e o manifesto
+ferramentas/sfx_cid_manifesto.json. Os tempos repetem os ticks do Java (Cid.java e FormasCid): o teste
+SonsCidTest confere os MARCOS contra o kit. Mudou um tempo no Java, mudar aqui e gerar de novo.
+
+O som do Cid é de slime e de magia contida: a lâmina é fina e molhada (um silvo curto, sem o aço cheio do
+Ichigo), o slime é um estalo úmido e grave, as correntes são elos secos que correm e travam, e a magia é
+um zumbido grave, com dois tons quase juntos batendo um no outro. Nada de vidro (Gojo) nem de rugido (Hollow).
+Esta é a parte 4: os golpes base. O Atomic e o Ragnarok ganham os seus sons nas partes deles.
+"""
+import argparse
+import numpy as np
+import sfx_motor as m
+
+T = m.TICK
+ENTRE_CORTES, VIDA_DO_CORTE, REDEMOINHO = 5 * T, 7 * T, 17 * T   # FormasCid: ENTRE_CORTES, VIDA_DO_CORTE, REDEMOINHO
+RISCOS = 9 * T            # FormasCid.RISCOS: a partida da Pós-imagem
+VOO = 10 * T              # Cid.Prisao: ALCANCE / PASSO, o voo inteiro do slime
+FECHAR, SOLTAR, PRESO = 4 * T, 6 * T, 50 * T   # FormasCid.FECHAR e SOLTAR, e Cid.Prisao.PRESO
+ESTOURO, OVERDRIVE = 8 * T, 160 * T    # FormasCid.ESTOURO e Cid.Overdrive.DURACAO
+TRAJE = 12 * T            # FormasCid.TRAJE
+
+# nome -> (duração em s, alcance em blocos, legenda pt, legenda en)
+SONS = {
+    'cid_redemoinho': (REDEMOINHO + .35, 32, 'A espada de slime gira em três cortes', 'The slime sword spins in three cuts'),
+    'cid_pos_imagem': (RISCOS + .45, 32, 'Shadow some e deixa um vulto', 'Shadow vanishes, leaving an afterimage'),
+    'cid_slime': (VOO + .2, 32, 'Um pedaço de slime é lançado', 'A lump of slime is thrown'),
+    'cid_correntes': (PRESO + .4, 32, 'Correntes negras se fecham', 'Black chains snap shut'),
+    'cid_overdrive': (OVERDRIVE + .3, 32, 'A magia transborda', 'Magic overflows'),
+    'cid_traje': (TRAJE + .3, 24, 'O traje de slime absorve o golpe', 'The slime suit absorbs the blow'),
+}
+
+
+
+def ticks(segundos):
+    return round(segundos / T)
+
+
+# Marcos em ticks, tirados das constantes que a síntese usa e conferidos contra o Java pelo SonsCidTest.
+MARCOS = {
+    'cid_redemoinho': {'entre_cortes': ticks(ENTRE_CORTES), 'vida_do_corte': ticks(VIDA_DO_CORTE), 'fim': ticks(REDEMOINHO)},
+    'cid_pos_imagem': {'fim': ticks(RISCOS)},
+    'cid_slime': {'fim': ticks(VOO)},
+    'cid_correntes': {'fecha': ticks(FECHAR), 'soltar': ticks(SOLTAR), 'solta': ticks(PRESO)},
+    'cid_overdrive': {'estouro': ticks(ESTOURO), 'fim': ticks(OVERDRIVE)},
+    'cid_traje': {'fim': ticks(TRAJE)},
+}
+
+
+def silvo(s, ini, dur, lo=1800, hi=12000, curva=1.4):
+    """A lâmina fina cortando o ar: ruído agudo que abre e fecha rápido."""
+    return s.ruido(lo, hi, .2) * s.crescer(ini, ini + dur * .55, curva) * s.janela(ini, ini + dur, dur * .3)
+
+
+def umido(s, ini, forca=1., f=170):
+    """O estalo molhado do slime: um baque grave e curto com um chiado abafado por cima."""
+    baque = s.sub(ini, f, f * .4, 14, 2.5)
+    chiado = s.passa_baixa(s.ruido(300, 3200, .5), 1800) * s.env(ini, .004, 26)
+    gota = .5 * s.tom(f * 4.2, f * 2.1, .5, ini, ini + .07) * s.env(ini, .002, 38)
+    return forca * (baque + .7 * chiado + gota)
+
+
+def magia(s, f=62, bate=3.1):
+    """O zumbido da magia: dois tons graves quase juntos (batem um no outro) e um terceiro uma quinta acima."""
+    return np.tanh(2.2 * (s.tom(f, harmonicos=(1, 2, 3)) + .9 * s.tom(f + bate, harmonicos=(1, 2, 3))
+                          + .35 * s.tom(f * 1.5 + bate * .5, harmonicos=(1, 2))))
+
+
+def elos(s, ini, fim, densidade, f=2100):
+    """Elos correndo: estalos metálicos curtos e secos, cada um num tom um pouco diferente."""
+    x = np.zeros(s.n)
+    for k in range(max(1, int(densidade * (fim - ini)))):
+        t0 = ini + (fim - ini) * (k + s.rng.uniform(0, .6)) / max(1, int(densidade * (fim - ini)))
+        tom = f * s.rng.uniform(.8, 1.35)
+        x += s.rng.uniform(.5, 1.) * (s.tom(tom) + .5 * s.tom(tom * 1.52) + .3 * s.tom(tom * 2.7)) * s.env(t0, .001, 70)
+    return x
+
+
+def sintese(nome, s):
+    if nome == 'cid_redemoinho':
+        # Três cortes, um a cada 5 ticks: o silvo fino da lâmina esticada, um fio de magia na ponta e o slime
+        # chicoteando por baixo. O terceiro é o mais forte e deixa a cauda.
+        x = np.zeros(s.n)
+        for i in range(3):
+            t0, f = i * ENTRE_CORTES, 1 + .12 * i
+            x += (.75 + .15 * i) * silvo(s, t0, VIDA_DO_CORTE * .75, 1500 * f, 12500)
+            x += .5 * s.transiente(t0, 7500, .006)
+            x += .22 * s.tom(980 * f, 1900 * f, .7, t0, t0 + VIDA_DO_CORTE * .7, (1, 2.01)) * s.janela(t0, t0 + VIDA_DO_CORTE * .7, .05)
+            x += .45 * s.passa_baixa(s.ruido(80, 900, .8), 420) * s.janela(t0, t0 + VIDA_DO_CORTE * .6, .06)
+        return s.reverb(x + .5 * s.sub(2 * ENTRE_CORTES, 110, 50, 7, 2.5), .7, .2, 7000)
+    if nome == 'cid_pos_imagem':
+        # Ele some: o ar puxado de uma vez, um baque abafado, e o vulto fica chiando baixinho e se desfazendo.
+        some = 1.0 * silvo(s, 0, .16, 500, 9000, 1.1) + .7 * s.transiente(0, 4500, .008) + .7 * s.sub(0, 140, 48, 9, 2.5)
+        vulto = .22 * s.girar(magia(s, 110, 4.3), hz=11, prof=.6) * s.janela(.04, RISCOS + .35, .12) * (1 - .8 * s.crescer(.04, RISCOS + .35, .8))
+        chia = .2 * s.ruido(2500, 9000, .3) * s.janela(.05, RISCOS + .2, .1) * (1 - s.crescer(.05, RISCOS + .2, .7))
+        return s.reverb(some + vulto + chia, .9, .25, 5500)
+    if nome == 'cid_slime':
+        # O arremesso: o estalo molhado ao sair da mão e o slime voando, um borbulhar grave que vai embora.
+        sai = 1.1 * umido(s, 0, 1., 190) + .5 * silvo(s, 0, .1, 700, 6000)
+        voa = s.girar(s.passa_baixa(s.ruido(90, 2400, .7), 900), hz=14, prof=.7) * s.janela(.03, VOO + .05, .06) * (1 - .6 * s.crescer(0, VOO, 1.))
+        bolhas = .3 * sum(s.tom(300 + 90 * k, 520 + 120 * k, .6, .06 * k + .04, .06 * k + .1) * s.env(.06 * k + .04, .004, 45) for k in range(6))
+        return s.reverb(sai + .5 * voa + bolhas, .6, .16, 4500)
+    if nome == 'cid_correntes':
+        # As correntes sobem do chão correndo (4 ticks), travam num estalo seco e ficam esticadas, rangendo
+        # de vez em quando, até soltarem.
+        sobem = .55 * elos(s, 0, FECHAR, 110) + .5 * umido(s, 0, .8, 120)
+        trava = 1.2 * s.transiente(FECHAR, 6500, .008) + .9 * elos(s, FECHAR, FECHAR + .04, 160, 1700) + .9 * s.sub(FECHAR, 130, 55, 9, 3)
+        range_ = .14 * s.girar(np.tanh(3 * s.tom(310, 290, 1., FECHAR, PRESO, (1, 2.3, 3.7), vibrato=.02, vib_hz=6)), hz=1.3, prof=.9)
+        range_ = range_ * s.janela(FECHAR + .1, PRESO - SOLTAR, .2)
+        # Elas começam a soltar junto com o visual, que some nos últimos ticks.
+        solta = .5 * elos(s, PRESO - SOLTAR, PRESO + .05, 60, 1500) * (1 - .6 * s.crescer(PRESO - SOLTAR, PRESO + .05, 1.))
+        return s.reverb(sobem + trava + s.passa_baixa(range_, 2600) + solta, 1.0, .22, 5000)
+    if nome == 'cid_overdrive':
+        # A magia transborda: um estouro seco, o grave abrindo junto com o anel (8 ticks) e depois o zumbido
+        # baixo que fica os 8 s, pulsando devagar, e some no fim.
+        estouro = 1.2 * s.transiente(0, 6000, .01) + 1.2 * s.sub(0, 100, 34, 2.4, 4) + .6 * silvo(s, 0, ESTOURO, 400, 8000, .8)
+        zumbe = s.girar(magia(s), hz=.9, prof=.35) * s.crescer(0, ESTOURO, .7) * s.janela(0, OVERDRIVE, .25)
+        fio = .07 * s.girar(s.tom(742, 760, 1., 0, OVERDRIVE, (1, 2.01)), hz=2.3, prof=.8) * s.janela(.2, OVERDRIVE, .4)
+        return estouro + s.reverb(.42 * s.passa_baixa(zumbe, 900) + fio, 1.6, .25, 3000)
+    if nome == 'cid_traje':
+        # O traje engole o golpe: um baque surdo, o slime espirrando e voltando para o lugar.
+        engole = 1.1 * umido(s, 0, 1., 120) + .6 * s.transiente(0, 2500, .012)
+        espirra = .5 * s.passa_baixa(s.ruido(400, 5000, .4), 3000) * s.env(.01, .01, 12)
+        volta = .3 * sum(s.tom(240 + 70 * k, 420 + 90 * k, .6, .12 + .07 * k, .18 + .07 * k) * s.env(.12 + .07 * k, .004, 40) for k in range(4))
+        return s.reverb(engole + espirra + volta, .5, .15, 3500)
+    raise ValueError(nome)
+
+
+def gerar(preview=None):
+    m.escrever(SONS, sintese, 'SFX do Cid:', preview, pasta_sons='cid', marcos=MARCOS)
+
+
+if __name__ == '__main__':
+    a = argparse.ArgumentParser()
+    a.add_argument('--preview')
+    gerar(a.parse_args().preview)

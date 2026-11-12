@@ -48,3 +48,4 @@ Voltar para [[00 Início]].
 - [[2026-11-12 Cid parte 1]]: o Cid começa: Magia, Redemoinho de Ébano, Pós-imagem, Prisão de Correntes Negras, Overdrive e o traje de slime no servidor, com apresentação provisória
 - [[2026-11-12 Cid parte 2]]: o traje do Shadow (sobretudo, capuz aberto com o rosto da skin, barra de pano) e a espada preta em cruz, gerados por script e refeitos pelas referências do autor
 - [[2026-11-12 Cid parte 3]]: os visuais e as animações dos golpes base do Cid (Redemoinho, Pós-imagem, Prisão de Correntes e Overdrive)
+- [[2026-11-12 Cid parte 4]]: os sons dos golpes base do Cid, sintetizados (lâmina fina, slime, correntes e o zumbido da magia)

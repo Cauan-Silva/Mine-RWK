@@ -24,6 +24,13 @@ Voltar para [[00 Início]].
 - Gojo (revisão 09/11, menores que ficaram): o Roxo pode derrubar plantas vizinhas (o `BreakEvent` para mods de proteção entrou em 09/11, no Gojo peso); o Vermelho atravessa parede fina encostada no rosto; bola de fogo e crânio de Wither voltam a acelerar no Infinito (o dano é cancelado mesmo assim); TNT sem dono passa pelo Infinito; sobram até 2 ticks de Infinito e 5 de Paralisia depois de morrer. Corrigidos na revisão: efeitos acabam ao mudar de dimensão; golpes não atingem pets, montaria nem projéteis do próprio Gojo; Paralisia não cancela Espinhos nem dano em si mesmo; ícone da Paralisia escondido (falta textura).
 
 ## Para testar no jogo
+- Cid, parte 4, os sons dos golpes base (12/11): **ouvir primeiro** `previas/sfx_cid.wav` (os seis sons, três variações de cada, em sequência). No jogo: `/rwk trocar <jogador> cid`.
+  - Ninguém ouviu ainda: foram conferidos só por duração, pico e volume médio. O volume de cada um está parelho com os do Ichigo?
+  - **Z:** três silvos finos, o terceiro mais forte. Dá para contar os três cortes de ouvido?
+  - **C:** o estalo molhado do arremesso; depois as correntes correndo, travando num estalo seco e rangendo até soltar. O rangido de 2,5 s cansa?
+  - **G:** o estouro e o zumbido grave dos 8 s. Fica parado onde o Overdrive foi ligado (não segue o jogador): com a Velocidade II dá para sair de perto dele; incomoda? Desligar com G corta o zumbido.
+  - **X** e o **traje de slime:** o sumiço com o vulto chiando (o som dura 0,9 s e o vulto 2 s; não há som na chegada: faz falta?), e o baque surdo quando o traje amortece.
+  - **Falta:** o clique da espada (ataque básico) não tem som nem rastro próprios, como tem o do Ichigo.
 - Cid, parte 3, os visuais e as animações dos golpes base (12/11): **ver primeiro** `previas/cid_parte3_golpes.mp4` (`./gradlew runClientDemo -Pdemo=cid`). Ainda **sem som** (parte 4).
   - **Z, Redemoinho:** três arcos pretos com o fio azul-violeta, um para cada lado. Dá para ler os três cortes? O giro do corpo (uma volta) fica bom em primeira pessoa ou enjoa?
   - **X, Pós-imagem:** o vulto que fica 2 s, tremendo e sumindo, e os riscos da partida. O vulto é reconhecível como "ele"? Os riscos mostram 9 blocos mesmo quando uma parede encurta o passo.

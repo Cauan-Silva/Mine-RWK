@@ -925,5 +925,107 @@
         "attenuation_distance": 96
       }
     ]
+  },
+  "cid_redemoinho": {
+    "subtitle": "subtitles.minerwk.cid_redemoinho",
+    "sounds": [
+      {
+        "name": "minerwk:cid/cid_redemoinho",
+        "attenuation_distance": 32
+      },
+      {
+        "name": "minerwk:cid/cid_redemoinho_2",
+        "attenuation_distance": 32
+      },
+      {
+        "name": "minerwk:cid/cid_redemoinho_3",
+        "attenuation_distance": 32
+      }
+    ]
+  },
+  "cid_pos_imagem": {
+    "subtitle": "subtitles.minerwk.cid_pos_imagem",
+    "sounds": [
+      {
+        "name": "minerwk:cid/cid_pos_imagem",
+        "attenuation_distance": 32
+      },
+      {
+        "name": "minerwk:cid/cid_pos_imagem_2",
+        "attenuation_distance": 32
+      },
+      {
+        "name": "minerwk:cid/cid_pos_imagem_3",
+        "attenuation_distance": 32
+      }
+    ]
+  },
+  "cid_slime": {
+    "subtitle": "subtitles.minerwk.cid_slime",
+    "sounds": [
+      {
+        "name": "minerwk:cid/cid_slime",
+        "attenuation_distance": 32
+      },
+      {
+        "name": "minerwk:cid/cid_slime_2",
+        "attenuation_distance": 32
+      },
+      {
+        "name": "minerwk:cid/cid_slime_3",
+        "attenuation_distance": 32
+      }
+    ]
+  },
+  "cid_correntes": {
+    "subtitle": "subtitles.minerwk.cid_correntes",
+    "sounds": [
+      {
+        "name": "minerwk:cid/cid_correntes",
+        "attenuation_distance": 32
+      },
+      {
+        "name": "minerwk:cid/cid_correntes_2",
+        "attenuation_distance": 32
+      },
+      {
+        "name": "minerwk:cid/cid_correntes_3",
+        "attenuation_distance": 32
+      }
+    ]
+  },
+  "cid_overdrive": {
+    "subtitle": "subtitles.minerwk.cid_overdrive",
+    "sounds": [
+      {
+        "name": "minerwk:cid/cid_overdrive",
+        "attenuation_distance": 32
+      },
+      {
+        "name": "minerwk:cid/cid_overdrive_2",
+        "attenuation_distance": 32
+      },
+      {
+        "name": "minerwk:cid/cid_overdrive_3",
+        "attenuation_distance": 32
+      }
+    ]
+  },
+  "cid_traje": {
+    "subtitle": "subtitles.minerwk.cid_traje",
+    "sounds": [
+      {
+        "name": "minerwk:cid/cid_traje",
+        "attenuation_distance": 24
+      },
+      {
+        "name": "minerwk:cid/cid_traje_2",
+        "attenuation_distance": 24
+      },
+      {
+        "name": "minerwk:cid/cid_traje_3",
+        "attenuation_distance": 24
+      }
+    ]
   }
 }

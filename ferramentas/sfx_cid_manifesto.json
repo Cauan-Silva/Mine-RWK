@@ -1,0 +1,175 @@
+{
+  "cid_redemoinho": {
+    "duration": 1.2,
+    "sample_rate": 48000,
+    "channels": 1,
+    "peak": 0.66727,
+    "rms": 0.11069,
+    "sha256": "d0815be8c4e8877926f094090206557867dee3c779c4adf91d2b60513ab5ede0",
+    "ticks": 24,
+    "marcos": {
+      "entre_cortes": 5,
+      "vida_do_corte": 7,
+      "fim": 17
+    }
+  },
+  "cid_redemoinho_2": {
+    "duration": 1.1538,
+    "sample_rate": 48000,
+    "channels": 1,
+    "peak": 0.69725,
+    "rms": 0.11645,
+    "sha256": "43fc10a6e4b12383ca206b832c019086be62d217b107cafbf347b74ed976d85e"
+  },
+  "cid_redemoinho_3": {
+    "duration": 1.25,
+    "sample_rate": 48000,
+    "channels": 1,
+    "peak": 0.71166,
+    "rms": 0.11874,
+    "sha256": "9134f8ee66ee18b55dd22f52e05aa99e55f0838617b97ccdccd4ef3da8ac105d"
+  },
+  "cid_pos_imagem": {
+    "duration": 0.9,
+    "sample_rate": 48000,
+    "channels": 1,
+    "peak": 0.59951,
+    "rms": 0.07306,
+    "sha256": "254ffdcf296703284b54d7d0027f62e56fa79e575e390d1f2e6df5a76e795b8c",
+    "ticks": 18,
+    "marcos": {
+      "fim": 9
+    }
+  },
+  "cid_pos_imagem_2": {
+    "duration": 0.8654,
+    "sample_rate": 48000,
+    "channels": 1,
+    "peak": 0.58793,
+    "rms": 0.07457,
+    "sha256": "3d86034f04154b4b8c7d1292ce2c3f83f2983c75e2d644e75805ca3e3f3779a0"
+  },
+  "cid_pos_imagem_3": {
+    "duration": 0.9375,
+    "sample_rate": 48000,
+    "channels": 1,
+    "peak": 0.65182,
+    "rms": 0.07735,
+    "sha256": "7474afaacbdcbad600fabf0e13d8d725dce2744baf014ebae95adbc2bf0b1f18"
+  },
+  "cid_slime": {
+    "duration": 0.7,
+    "sample_rate": 48000,
+    "channels": 1,
+    "peak": 0.61015,
+    "rms": 0.11247,
+    "sha256": "ff3ce180ce1e1d86a73fb7ba578d14302f4cd1987fd2a8d42740a7d452cd9433",
+    "ticks": 14,
+    "marcos": {
+      "fim": 10
+    }
+  },
+  "cid_slime_2": {
+    "duration": 0.6731,
+    "sample_rate": 48000,
+    "channels": 1,
+    "peak": 0.60628,
+    "rms": 0.11161,
+    "sha256": "ceba8d74b07891ed976173a5ea86720b9287b156da7bada740f587d64c9c4588"
+  },
+  "cid_slime_3": {
+    "duration": 0.7291,
+    "sample_rate": 48000,
+    "channels": 1,
+    "peak": 0.59691,
+    "rms": 0.09055,
+    "sha256": "b03f21dd93733c28e2e32d4a9c005a151276487c312ff3df582a2bcd99aaec80"
+  },
+  "cid_correntes": {
+    "duration": 2.9,
+    "sample_rate": 48000,
+    "channels": 1,
+    "peak": 0.62985,
+    "rms": 0.06497,
+    "sha256": "1454fd5b34895abd7bc49e5a6949511f8720aeddb74198fd6e9685faff8b179e",
+    "ticks": 58,
+    "marcos": {
+      "fecha": 4,
+      "soltar": 6,
+      "solta": 50
+    }
+  },
+  "cid_correntes_2": {
+    "duration": 2.7885,
+    "sample_rate": 48000,
+    "channels": 1,
+    "peak": 0.59929,
+    "rms": 0.06565,
+    "sha256": "addc22985c28a2be6c1392c929c7867e10b473dc0f94e74133e9269080009af9"
+  },
+  "cid_correntes_3": {
+    "duration": 3.0208,
+    "sample_rate": 48000,
+    "channels": 1,
+    "peak": 0.62509,
+    "rms": 0.07062,
+    "sha256": "ec341bb239d1df3de6c0ae5f8f8b687e18a3b25581f24cfd6c661f3bc1d03d86"
+  },
+  "cid_overdrive": {
+    "duration": 8.3,
+    "sample_rate": 48000,
+    "channels": 1,
+    "peak": 0.71141,
+    "rms": 0.09498,
+    "sha256": "898408624977be6cec1a404bbff1e932306f6b03377de6f3f8a72b8628d32cb0",
+    "ticks": 166,
+    "marcos": {
+      "estouro": 8,
+      "fim": 160
+    }
+  },
+  "cid_overdrive_2": {
+    "duration": 7.9807,
+    "sample_rate": 48000,
+    "channels": 1,
+    "peak": 0.5942,
+    "rms": 0.077,
+    "sha256": "00a53a9cc8bea5b1818951b585ee6c99eead3d6fc90f0e5388245e64da993bbd"
+  },
+  "cid_overdrive_3": {
+    "duration": 8.6458,
+    "sample_rate": 48000,
+    "channels": 1,
+    "peak": 0.58093,
+    "rms": 0.08834,
+    "sha256": "10fecce39976bee33f55fb0d5d443054206f970b8055a125f045c9824a7bd856"
+  },
+  "cid_traje": {
+    "duration": 0.9,
+    "sample_rate": 48000,
+    "channels": 1,
+    "peak": 0.54251,
+    "rms": 0.07398,
+    "sha256": "fd7e85b0d2fac65b9c1360af0335ffb6762b6dfb2a633c05636c7777624a34a1",
+    "ticks": 18,
+    "marcos": {
+      "fim": 12
+    }
+  },
+  "cid_traje_2": {
+    "duration": 0.8654,
+    "sample_rate": 48000,
+    "channels": 1,
+    "peak": 0.5812,
+    "rms": 0.08224,
+    "sha256": "e644e6b5b5199e366206c4c38ca1046bcb30de6c7d14f7fbfadf4cd59f59f150"
+  },
+  "cid_traje_3": {
+    "duration": 0.9375,
+    "sample_rate": 48000,
+    "channels": 1,
+    "peak": 0.59979,
+    "rms": 0.08144,
+    "sha256": "1d3111437620a373757c704b06d1dd9cec57602cfd6f42b58c13028faa48b974"
+  }
+}

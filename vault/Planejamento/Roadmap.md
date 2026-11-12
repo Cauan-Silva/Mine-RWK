@@ -83,7 +83,7 @@ Um por vez, sempre: pesquisa canônica → kit aprovado → código → VFX → 
 | # | Personagem | Por que nessa posição |
 | --- | --- | --- |
 | 1 | [[Ichigo]] | Espada + forma (Bankai/Mugetsu). Kit e spec ([[2026-11-11 Ichigo]]) aprovados em 11/11. As 8 partes feitas (falta o teste do autor no jogo): formas no núcleo e Reiatsu ([[2026-11-11 Ichigo parte 1]]); kit do Shikai e do Bankai ([[2026-11-11 Ichigo parte 2]]); arma e traje com pano ([[2026-11-11 Ichigo parte 3]]); VFX e animações ([[2026-11-11 Ichigo parte 4]]); som (parte 5); máscara e Mugetsu (parte 6); árvore, boss Zangetsu interior e mundo interior ([[2026-11-12 Ichigo parte 7]]); forma Hollow completa ([[2026-11-12 Ichigo parte 8]]) |
-| 2 | [[Cid]] | Espada + ultimate de área. Passou à frente a pedido do autor (12/11). Spec [[2026-11-12 Cid]] aprovado em 12/11, em sete partes. **Partes 1 a 3 feitas** (núcleo e kit base, [[2026-11-12 Cid parte 1]]; arma e traje, [[2026-11-12 Cid parte 2]]; VFX e animações dos golpes base, [[2026-11-12 Cid parte 3]]); a seguir, a parte 4: som |
+| 2 | [[Cid]] | Espada + ultimate de área. Passou à frente a pedido do autor (12/11). Spec [[2026-11-12 Cid]] aprovado em 12/11, em sete partes. **Partes 1 a 4 feitas** (núcleo e kit base, [[2026-11-12 Cid parte 1]]; arma e traje, [[2026-11-12 Cid parte 2]]; VFX e animações dos golpes base, [[2026-11-12 Cid parte 3]]; som, [[2026-11-12 Cid parte 4]]); a seguir, a parte 5: Espada Atômica (V) e Recovery Atomic |
 | 3 | Tanjiro | Espada + respirações, efeitos de água/fogo |
 | 3 | Asta | Espadas + forma demônio |
 | 4 | Killua | Rápido, elétrico, sem invocações |
