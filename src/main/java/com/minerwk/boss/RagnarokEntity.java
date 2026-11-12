@@ -2,9 +2,13 @@ package com.minerwk.boss;
 
 import com.minerwk.MineRWK;
 import com.minerwk.core.arena.CaixaArena;
+import com.minerwk.core.boss.CutsceneAsa;
 import com.minerwk.core.boss.Golpe;
 import com.minerwk.core.boss.MotorBoss;
 import com.minerwk.core.boss.RagnarokBoss;
+import com.minerwk.core.boss.SonsRagnarok;
+import com.minerwk.rede.Cutscene;
+import com.minerwk.registro.Sons;
 import com.minerwk.core.kit.Vetor;
 import com.minerwk.kit.ServicoKits;
 import com.minerwk.rede.Envio;
@@ -100,6 +104,8 @@ public final class RagnarokEntity extends Monster implements GeoEntity {
     private boolean entrou;
     /** Tick de jogo em que a asa cortada some do corpo (0: não está para sumir). */
     private long asaCaiEm;
+    /** Ticks de jogo da cena da asa: o corte do Shadow e o urro (0: já passou). */
+    private long corteEm, urroEm;
     /** Onde o murro cai. */
     private Vec3 pontoDoGolpe;
     private boolean miraTravada;
@@ -206,10 +212,20 @@ public final class RagnarokEntity extends Monster implements GeoEntity {
         }
         long agora = level().getGameTime();
         barra.setProgress(getHealth() / getMaxHealth());
+        if (corteEm > 0 && agora >= corteEm) {
+            corteEm = 0;
+            cortarAAsa();
+        }
         if (asaCaiEm > 0 && agora >= asaCaiEm) {
             asaCaiEm = 0;
             estado(SEM_ASA, true);
-            particulas(ParticleTypes.LARGE_SMOKE, getX(), getY() + 5, getZ(), 40, 1.2, 1, 1.2, .04);
+            Vec3 chao = naBase(CutsceneAsa.ASA.x() * 1.7, 0, CutsceneAsa.ASA.z());
+            particulas(ParticleTypes.LARGE_SMOKE, chao.x, chao.y + .5, chao.z, 40, 1.2, .4, 1.2, .04);
+            particulas(ParticleTypes.CAMPFIRE_COSY_SMOKE, chao.x, chao.y + .2, chao.z, 12, 1.5, .1, 1.5, .02);
+        }
+        if (urroEm > 0 && agora >= urroEm) {
+            urroEm = 0;
+            som(SonsRagnarok.RUGIDO, 6f);
         }
         tickProjeteis();
         if (ticksDeLuta % RagnarokBoss.CALOR_A_CADA == 0) calor();
@@ -306,7 +322,8 @@ public final class RagnarokEntity extends Monster implements GeoEntity {
         } else if (golpe == RagnarokBoss.INVESTIDA) {
             decolar(golpe);
         } else if (golpe == RagnarokBoss.SOPRO) {
-            tocar(SoundEvents.ENDER_DRAGON_GROWL, 2f, .6f);
+            som(SonsRagnarok.SOPRO_CARGA, 4f);
+            visual("ragnarok_carga", boca(), direcao, 1f, golpe.aviso());
         } else if (golpe == RagnarokBoss.PISAO) {
             visual("toji_sombra", position(), direcao, (float) RagnarokBoss.RAIO_PISAO, golpe.aviso() + golpe.janela());
         }
@@ -337,7 +354,6 @@ public final class RagnarokEntity extends Monster implements GeoEntity {
                     visual("toji_linha", position(), girar(direcao, -RagnarokBoss.VARREDURA / 2), (float) RagnarokBoss.ALCANCE_SOPRO, ticks);
                 }
                 if (!miraTravada) encarar(alvo.position().subtract(position()));
-                particulas(ParticleTypes.SOUL_FIRE_FLAME, boca().x, boca().y, boca().z, 3, .3, .3, .3, .02);
             } else if (naJanela) {
                 soprar(tj);
             }
@@ -350,9 +366,15 @@ public final class RagnarokEntity extends Monster implements GeoEntity {
         if (golpe == RagnarokBoss.SOCO) socar(RagnarokBoss.RAIO_SOCO, RagnarokBoss.DANO_SOCO);
         else if (golpe == RagnarokBoss.BARRAGEM) socar(RagnarokBoss.RAIO_BARRAGEM, RagnarokBoss.DANO_BARRAGEM);
         else if (golpe == RagnarokBoss.RAJADA) lancarRajada();
-        else if (golpe == RagnarokBoss.PISAO) {
-            tocar(SoundEvents.GENERIC_EXPLODE.value(), 1.6f, .6f);
-            particulas(ParticleTypes.CAMPFIRE_COSY_SMOKE, getX(), getY() + .2, getZ(), 30, 1.5, .1, 1.5, .05);
+        else if (golpe == RagnarokBoss.INVESTIDA) som(SonsRagnarok.INVESTIDA, 4f);
+        else if (golpe == RagnarokBoss.SOPRO) {
+            som(SonsRagnarok.SOPRO, 5f);
+            // O cliente refaz a varredura com as mesmas contas: só precisa da mira travada e do sentido.
+            visual("ragnarok_sopro", position(), direcao, sentido, golpe.janela());
+        } else if (golpe == RagnarokBoss.PISAO) {
+            som(SonsRagnarok.PISAO, 4f);
+            visual("ragnarok_onda", position(), direcao, (float) RagnarokBoss.RAIO_PISAO, golpe.janela());
+            particulas(ParticleTypes.CAMPFIRE_COSY_SMOKE, getX(), getY() + .2, getZ(), 12, 1.5, .1, 1.5, .03);
         }
     }
 
@@ -362,9 +384,9 @@ public final class RagnarokEntity extends Monster implements GeoEntity {
     private void socar(double raio, float dano) {
         if (pontoDoGolpe == null) return;
         Vec3 centro = pontoDoGolpe;
-        tocar(SoundEvents.GENERIC_EXPLODE.value(), 1.4f, .8f);
-        particulas(ParticleTypes.EXPLOSION, centro.x, centro.y + .5, centro.z, 3, raio * .3, .2, raio * .3, 0);
-        particulas(ParticleTypes.FLAME, centro.x, centro.y + .3, centro.z, 30, raio * .4, .3, raio * .4, .08);
+        som(SonsRagnarok.SOCO, 4f);
+        visual("ragnarok_cratera", centro, direcao, (float) raio, 30);
+        particulas(ParticleTypes.CAMPFIRE_COSY_SMOKE, centro.x, centro.y + .3, centro.z, 6, raio * .4, .2, raio * .4, .02);
         for (LivingEntity e : candidatos(new AABB(centro, centro).inflate(raio + 1, 3, raio + 1))) {
             Vec3 d = e.position().subtract(centro);
             if (Math.abs(d.y) > 3 || d.horizontalDistance() > raio + e.getBbWidth() / 2) continue;
@@ -374,10 +396,15 @@ public final class RagnarokEntity extends Monster implements GeoEntity {
 
     /** Cinco projéteis de magia em leque, rentes ao chão, na altura do peito de um jogador. */
     private void lancarRajada() {
-        tocar(SoundEvents.BLAZE_SHOOT, 2f, .7f);
+        som(SonsRagnarok.RAJADA, 4f);
         for (int i = 0; i < RagnarokBoss.PROJETEIS; i++) {
             Vec3 rumo = girar(direcao, RagnarokBoss.desvioDaRajada(i));
-            projeteis.add(new Projetil(position().add(0, 1.2, 0).add(rumo.scale(RagnarokBoss.LARGURA / 2 + .5)), rumo));
+            Vec3 de = position().add(0, 1.2, 0).add(rumo.scale(RagnarokBoss.LARGURA / 2 + .5));
+            projeteis.add(new Projetil(de, rumo));
+            // O cliente desenha o voo inteiro: até a primeira parede ou o alcance.
+            Vec3 bloco = blocoEntre(de, de.add(rumo.scale(RagnarokBoss.ALCANCE_RAJADA)));
+            double ate = bloco == null ? RagnarokBoss.ALCANCE_RAJADA : bloco.distanceTo(de);
+            visual("ragnarok_projetil", de, rumo, (float) ate, (int) Math.ceil(ate / RagnarokBoss.PASSO_RAJADA) + 7);
         }
     }
 
@@ -391,8 +418,6 @@ public final class RagnarokEntity extends Monster implements GeoEntity {
             for (LivingEntity e : naLinha(p.ponto, bloco != null ? bloco : proximo, RagnarokBoss.RAIO_RAJADA)) {
                 if (p.feridos.add(e.getUUID()) && ferir(e, RagnarokBoss.DANO_RAJADA)) empurrar(e, .4, p.rumo);
             }
-            particulas(ParticleTypes.DRAGON_BREATH, proximo.x, proximo.y, proximo.z, 4, .25, .25, .25, .01);
-            particulas(ParticleTypes.FLAME, proximo.x, proximo.y, proximo.z, 2, .2, .2, .2, .01);
             if (bloco != null) {
                 projeteis.remove(p);
                 continue;
@@ -425,7 +450,7 @@ public final class RagnarokEntity extends Monster implements GeoEntity {
         antes = saida;
         setNoGravity(true);
         estado(VOANDO, true);
-        tocar(SoundEvents.ENDER_DRAGON_FLAP, 2f, .6f);
+        som(SonsRagnarok.ASAS, 4f);
         visual("toji_linha", saida, direcao, (float) comprimento, golpe.aviso() + golpe.janela());
     }
 
@@ -441,7 +466,7 @@ public final class RagnarokEntity extends Monster implements GeoEntity {
             for (LivingEntity e : naLinha(antes.add(0, 1, 0), chao.add(0, 1, 0), RagnarokBoss.RAIO_INVESTIDA)) {
                 if (atingidos.add(e.getUUID()) && ferir(e, RagnarokBoss.DANO_INVESTIDA)) empurrar(e, 1.2, direcao);
             }
-            particulas(ParticleTypes.FLAME, ponto.x, ponto.y + 2, ponto.z, 12, 1.2, 1.5, 1.2, .05);
+            particulas(ParticleTypes.FLAME, ponto.x, ponto.y + 2, ponto.z, 4, 1.2, 1.5, 1.2, .03);
         }
         antes = chao;
     }
@@ -458,18 +483,9 @@ public final class RagnarokEntity extends Monster implements GeoEntity {
         Vec3 fim = position().add(0, 1, 0).add(rumo.scale(RagnarokBoss.ALCANCE_SOPRO));
         Vec3 bloco = blocoEntre(de, fim);
         if (bloco != null) fim = bloco;
-        if (tj % 6 == 0) tocar(SoundEvents.BLAZE_BURN, 2f, .5f);
-        Vec3 b = boca();
-        for (double s = 0; s <= 1; s += .25) {
-            Vec3 p = b.add(de.subtract(b).scale(s));
-            particulas(ParticleTypes.SOUL_FIRE_FLAME, p.x, p.y, p.z, 2, .2, .2, .2, .01);
-        }
         double longe = fim.distanceTo(de);
-        for (double s = 0; s <= longe; s += 1.2) {
-            Vec3 p = de.add(rumo.scale(s));
-            particulas(ParticleTypes.SOUL_FIRE_FLAME, p.x, p.y, p.z, 2, .3, .3, .3, .01);
-            if (((int) s) % 4 == 0) particulas(ParticleTypes.FLAME, p.x, p.y, p.z, 1, .3, .3, .3, .02);
-        }
+        // O feixe é desenhado no cliente; aqui só a fumaça de onde ele bate.
+        if (tj % 3 == 0) particulas(ParticleTypes.LARGE_SMOKE, fim.x, fim.y, fim.z, 2, .4, .2, .4, .02);
         if (longe < .5) return;
         for (LivingEntity e : naLinha(de, fim, RagnarokBoss.RAIO_SOPRO)) {
             if (atingidos.add(e.getUUID()) && ferir(e, RagnarokBoss.DANO_SOPRO)) empurrar(e, 1.0, rumo);
@@ -478,11 +494,6 @@ public final class RagnarokEntity extends Monster implements GeoEntity {
 
     /** Um tick do pisão: a onda abre em aro pelo chão e fere quem não pulou. */
     private void onda(int tj) {
-        double r = RagnarokBoss.raioDaOnda(tj);
-        for (int k = 0; k < 16; k++) {
-            double a = Math.PI * 2 * k / 16;
-            particulas(ParticleTypes.FLAME, getX() + Math.cos(a) * r, getY() + .2, getZ() + Math.sin(a) * r, 1, .1, .05, .1, .01);
-        }
         for (LivingEntity e : candidatos(getBoundingBox().inflate(RagnarokBoss.RAIO_PISAO + 2, 2, RagnarokBoss.RAIO_PISAO + 2))) {
             Vec3 d = e.position().subtract(position());
             if (!RagnarokBoss.naOnda(tj, d.horizontalDistance(), d.y)) continue;
@@ -557,16 +568,40 @@ public final class RagnarokEntity extends Monster implements GeoEntity {
         asaCaiEm = agora + RagnarokBoss.ASA_CAI;
         getNavigation().stop();
         triggerAnim(CONTROLE, "asa");
-        tocar(SoundEvents.ENDER_DRAGON_HURT, 2f, .5f);
+        corteEm = agora + CutsceneAsa.CORTE;
+        urroEm = agora + CutsceneAsa.URRO;
+        // Quem invocou assiste: a câmera presa aos olhos dele, virada para quem ele encara.
+        if (dono.connection != null) {
+            Envio.para(dono, new Cutscene(CutsceneAsa.ID, getId(), vetor(getEyePosition()), vetor(direcao), agora));
+        }
         barra.setColor(BossEvent.BossBarColor.PURPLE);
         avisar(dono, "mensagem.minerwk.ragnarok.asa");
+    }
+
+    /** Um ponto em volta dos pés dele: (lado, cima, frente), na base da {@link CutsceneAsa} (lado negativo: a asa esquerda). */
+    private Vec3 naBase(double lado, double cima, double frente) {
+        Vec3 l = new Vec3(-direcao.z, 0, direcao.x);
+        return position().add(l.scale(lado)).add(0, cima, 0).add(direcao.scale(frente));
+    }
+
+    /** O Shadow passa: o risco preto atravessa a raiz da asa esquerda e deixa o vulto dele no ar. */
+    private void cortarAAsa() {
+        som(SonsRagnarok.CORTE, 4f);
+        Vec3 raiz = naBase(CutsceneAsa.ASA.x() * .5, CutsceneAsa.ASA.y() + .3, CutsceneAsa.ASA.z());
+        // Para fora, do lado da asa.
+        Vec3 l = new Vec3(-direcao.z, 0, direcao.x).scale(Math.signum(CutsceneAsa.ASA.x()));
+        Vec3 risco = new Vec3(0, 1, 0).add(l.scale(.35)).add(direcao.scale(.25)).normalize();
+        visual("ragnarok_corte", raiz, risco, 1f, 16);
+        // O vulto do Pós-imagem do Cid, de onde o corte começou: é ele quem passou.
+        visual("cid_pos_imagem", raiz.subtract(risco.scale(4.5)).add(l.scale(1.2)).add(0, 1.62, 0), risco, 0f, 30); // o vulto espera a altura dos olhos
+        particulas(ParticleTypes.DAMAGE_INDICATOR, raiz.x, raiz.y, raiz.z, 10, .4, .8, .4, .1);
     }
 
     /** A chegada: o rugido, as chamas e a fala. */
     private void entrar(ServerPlayer dono) {
         entrou = true;
         triggerAnim(CONTROLE, "entrada");
-        tocar(SoundEvents.ENDER_DRAGON_GROWL, 3f, .5f);
+        som(SonsRagnarok.ENTRADA, 6f);
         particulas(ParticleTypes.FLAME, getX(), getY() + 3, getZ(), 120, 1.5, 3, 1.5, .08);
         if (dono.connection != null) {
             dono.displayClientMessage(Component.translatable("mensagem.minerwk.ragnarok.fala_entrada"), false);
@@ -577,7 +612,7 @@ public final class RagnarokEntity extends Monster implements GeoEntity {
 
     /** A luta acabou sem vitória: ele volta pelo portal. */
     private void sumir() {
-        tocar(SoundEvents.ENDER_DRAGON_GROWL, 2f, .8f);
+        som(SonsRagnarok.RUGIDO, 4f);
         particulas(ParticleTypes.LARGE_SMOKE, getX(), getY() + 3, getZ(), 80, 1.5, 3, 1.5, .03);
         ServerPlayer dono = jogadorAtual();
         if (dono != null) avisar(dono, "mensagem.minerwk.ragnarok.sumiu");
@@ -599,7 +634,8 @@ public final class RagnarokEntity extends Monster implements GeoEntity {
         barra.setProgress(0);
         projeteis.clear();
         pousar();
-        tocar(SoundEvents.ENDER_DRAGON_DEATH, 2f, .7f);
+        corteEm = urroEm = 0;
+        som(SonsRagnarok.MORTE, 6f);
         ServerPlayer dono = jogadorAtual();
         if (dono == null) return;
         // Venceu: a Espada Atômica, o I Am Atomic e o Recovery Atomic são dele, e o resto da árvore abre.
@@ -699,9 +735,9 @@ public final class RagnarokEntity extends Monster implements GeoEntity {
         if (level() instanceof ServerLevel nivel) nivel.sendParticles(tipo, x, y, z, quantidade, dx, dy, dz, velocidade);
     }
 
-    /** Sons provisórios, do próprio jogo, até o Ragnarok ganhar os dele. */
-    private void tocar(SoundEvent som, float volume, float tom) {
-        level().playSound(null, getX(), getY(), getZ(), som, SoundSource.HOSTILE, volume, tom);
+    /** Um som dele ({@link SonsRagnarok}); o volume acima de 1 só aumenta o alcance. */
+    private void som(String id, float volume) {
+        level().playSound(null, getX(), getY(), getZ(), Sons.doRagnarok(id), SoundSource.HOSTILE, volume, 1f);
     }
 
     private static Vetor vetor(Vec3 v) {

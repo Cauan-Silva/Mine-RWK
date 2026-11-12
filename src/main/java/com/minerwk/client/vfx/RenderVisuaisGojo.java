@@ -95,6 +95,7 @@ public final class RenderVisuaisGojo {
                 default -> {
                     if (RenderVisuaisIchigo.eDoIchigo(v.tipo)) RenderVisuaisIchigo.desenhar(q.camera(), q.parcial(), v, t);
                     else if (RenderVisuaisCid.eDoCid(v.tipo)) RenderVisuaisCid.desenhar(q.camera(), q.parcial(), v, t);
+                    else if (RenderVisuaisRagnarok.eDoRagnarok(v.tipo)) RenderVisuaisRagnarok.desenhar(q.camera(), q.parcial(), v, t);
                     else RenderVisuaisToji.desenhar(q.camera(), q.parcial(), v, t);
                 }
             }

@@ -1197,5 +1197,192 @@
         "attenuation_distance": 64
       }
     ]
+  },
+  "ragnarok_entrada": {
+    "subtitle": "subtitles.minerwk.ragnarok_entrada",
+    "sounds": [
+      {
+        "name": "minerwk:ragnarok/ragnarok_entrada",
+        "attenuation_distance": 96
+      },
+      {
+        "name": "minerwk:ragnarok/ragnarok_entrada_2",
+        "attenuation_distance": 96
+      },
+      {
+        "name": "minerwk:ragnarok/ragnarok_entrada_3",
+        "attenuation_distance": 96
+      }
+    ]
+  },
+  "ragnarok_soco": {
+    "subtitle": "subtitles.minerwk.ragnarok_soco",
+    "sounds": [
+      {
+        "name": "minerwk:ragnarok/ragnarok_soco",
+        "attenuation_distance": 64
+      },
+      {
+        "name": "minerwk:ragnarok/ragnarok_soco_2",
+        "attenuation_distance": 64
+      },
+      {
+        "name": "minerwk:ragnarok/ragnarok_soco_3",
+        "attenuation_distance": 64
+      }
+    ]
+  },
+  "ragnarok_rajada": {
+    "subtitle": "subtitles.minerwk.ragnarok_rajada",
+    "sounds": [
+      {
+        "name": "minerwk:ragnarok/ragnarok_rajada",
+        "attenuation_distance": 64
+      },
+      {
+        "name": "minerwk:ragnarok/ragnarok_rajada_2",
+        "attenuation_distance": 64
+      },
+      {
+        "name": "minerwk:ragnarok/ragnarok_rajada_3",
+        "attenuation_distance": 64
+      }
+    ]
+  },
+  "ragnarok_asas": {
+    "subtitle": "subtitles.minerwk.ragnarok_asas",
+    "sounds": [
+      {
+        "name": "minerwk:ragnarok/ragnarok_asas",
+        "attenuation_distance": 64
+      },
+      {
+        "name": "minerwk:ragnarok/ragnarok_asas_2",
+        "attenuation_distance": 64
+      },
+      {
+        "name": "minerwk:ragnarok/ragnarok_asas_3",
+        "attenuation_distance": 64
+      }
+    ]
+  },
+  "ragnarok_investida": {
+    "subtitle": "subtitles.minerwk.ragnarok_investida",
+    "sounds": [
+      {
+        "name": "minerwk:ragnarok/ragnarok_investida",
+        "attenuation_distance": 64
+      },
+      {
+        "name": "minerwk:ragnarok/ragnarok_investida_2",
+        "attenuation_distance": 64
+      },
+      {
+        "name": "minerwk:ragnarok/ragnarok_investida_3",
+        "attenuation_distance": 64
+      }
+    ]
+  },
+  "ragnarok_sopro_carga": {
+    "subtitle": "subtitles.minerwk.ragnarok_sopro_carga",
+    "sounds": [
+      {
+        "name": "minerwk:ragnarok/ragnarok_sopro_carga",
+        "attenuation_distance": 64
+      },
+      {
+        "name": "minerwk:ragnarok/ragnarok_sopro_carga_2",
+        "attenuation_distance": 64
+      },
+      {
+        "name": "minerwk:ragnarok/ragnarok_sopro_carga_3",
+        "attenuation_distance": 64
+      }
+    ]
+  },
+  "ragnarok_sopro": {
+    "subtitle": "subtitles.minerwk.ragnarok_sopro",
+    "sounds": [
+      {
+        "name": "minerwk:ragnarok/ragnarok_sopro",
+        "attenuation_distance": 80
+      },
+      {
+        "name": "minerwk:ragnarok/ragnarok_sopro_2",
+        "attenuation_distance": 80
+      },
+      {
+        "name": "minerwk:ragnarok/ragnarok_sopro_3",
+        "attenuation_distance": 80
+      }
+    ]
+  },
+  "ragnarok_pisao": {
+    "subtitle": "subtitles.minerwk.ragnarok_pisao",
+    "sounds": [
+      {
+        "name": "minerwk:ragnarok/ragnarok_pisao",
+        "attenuation_distance": 64
+      },
+      {
+        "name": "minerwk:ragnarok/ragnarok_pisao_2",
+        "attenuation_distance": 64
+      },
+      {
+        "name": "minerwk:ragnarok/ragnarok_pisao_3",
+        "attenuation_distance": 64
+      }
+    ]
+  },
+  "ragnarok_corte": {
+    "subtitle": "subtitles.minerwk.ragnarok_corte",
+    "sounds": [
+      {
+        "name": "minerwk:ragnarok/ragnarok_corte",
+        "attenuation_distance": 64
+      },
+      {
+        "name": "minerwk:ragnarok/ragnarok_corte_2",
+        "attenuation_distance": 64
+      },
+      {
+        "name": "minerwk:ragnarok/ragnarok_corte_3",
+        "attenuation_distance": 64
+      }
+    ]
+  },
+  "ragnarok_rugido": {
+    "subtitle": "subtitles.minerwk.ragnarok_rugido",
+    "sounds": [
+      {
+        "name": "minerwk:ragnarok/ragnarok_rugido",
+        "attenuation_distance": 96
+      },
+      {
+        "name": "minerwk:ragnarok/ragnarok_rugido_2",
+        "attenuation_distance": 96
+      },
+      {
+        "name": "minerwk:ragnarok/ragnarok_rugido_3",
+        "attenuation_distance": 96
+      }
+    ]
+  },
+  "ragnarok_morte": {
+    "subtitle": "subtitles.minerwk.ragnarok_morte",
+    "sounds": [
+      {
+        "name": "minerwk:ragnarok/ragnarok_morte",
+        "attenuation_distance": 96
+      },
+      {
+        "name": "minerwk:ragnarok/ragnarok_morte_2",
+        "attenuation_distance": 96
+      },
+      {
+        "name": "minerwk:ragnarok/ragnarok_morte_3",
+        "attenuation_distance": 96
+      }
+    ]
   }
 }

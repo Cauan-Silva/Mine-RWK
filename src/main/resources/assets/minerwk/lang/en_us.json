@@ -311,5 +311,18 @@
   "mensagem.minerwk.ragnarok.venceu": "Ragnarok defeated: the Atomic Sword, I Am Atomic and Recovery Atomic are now yours",
   "mensagem.minerwk.ragnarok.sumiu": "The Black Rose closed and Ragnarok went back through it",
   "mensagem.minerwk.ragnarok.asa": "One wing down: it no longer flies, but it hits faster and burns farther",
-  "mensagem.minerwk.ragnarok.fala_entrada": "<Ragnarok> Which of these worms is this Shadow?"
+  "mensagem.minerwk.ragnarok.fala_entrada": "<Ragnarok> Which of these worms is this Shadow?",
+  "subtitles.minerwk.ragnarok_entrada": "Ragnarok roars",
+  "subtitles.minerwk.ragnarok_soco": "A fist cracks the ground",
+  "subtitles.minerwk.ragnarok_rajada": "Wings hurl magic",
+  "subtitles.minerwk.ragnarok_asas": "Huge wings beat",
+  "subtitles.minerwk.ragnarok_investida": "Ragnarok swoops past",
+  "subtitles.minerwk.ragnarok_sopro_carga": "Fire gathers in the maw",
+  "subtitles.minerwk.ragnarok_sopro": "Demon Breath roars",
+  "subtitles.minerwk.ragnarok_pisao": "A stomp shakes the ground",
+  "subtitles.minerwk.ragnarok_corte": "Shadow cuts the wing",
+  "subtitles.minerwk.ragnarok_rugido": "Ragnarok howls in pain",
+  "subtitles.minerwk.ragnarok_morte": "Ragnarok falls",
+  "cutscene.minerwk.ragnarok_asa.1": "Worm... my wing!",
+  "cutscene.minerwk.ragnarok_asa.1.jp": "グォォォッ！"
 }

@@ -311,5 +311,18 @@
   "mensagem.minerwk.ragnarok.venceu": "Ragnarok derrotado: a Espada Atômica, o I Am Atomic e o Recovery Atomic agora são seus",
   "mensagem.minerwk.ragnarok.sumiu": "A Rosa Negra se fechou e o Ragnarok voltou por ela",
   "mensagem.minerwk.ragnarok.asa": "Uma asa a menos: ele não voa mais, mas bate mais rápido e queima mais longe",
-  "mensagem.minerwk.ragnarok.fala_entrada": "<Ragnarok> Qual destes vermes é o tal Shadow?"
+  "mensagem.minerwk.ragnarok.fala_entrada": "<Ragnarok> Qual destes vermes é o tal Shadow?",
+  "subtitles.minerwk.ragnarok_entrada": "Ragnarok ruge",
+  "subtitles.minerwk.ragnarok_soco": "Um murro racha o chão",
+  "subtitles.minerwk.ragnarok_rajada": "As asas lançam magia",
+  "subtitles.minerwk.ragnarok_asas": "Asas enormes batem",
+  "subtitles.minerwk.ragnarok_investida": "Ragnarok passa voando",
+  "subtitles.minerwk.ragnarok_sopro_carga": "O fogo se junta na boca",
+  "subtitles.minerwk.ragnarok_sopro": "O Sopro do Demônio",
+  "subtitles.minerwk.ragnarok_pisao": "Um pisão faz o chão tremer",
+  "subtitles.minerwk.ragnarok_corte": "Shadow corta a asa",
+  "subtitles.minerwk.ragnarok_rugido": "Ragnarok urra de dor",
+  "subtitles.minerwk.ragnarok_morte": "Ragnarok cai",
+  "cutscene.minerwk.ragnarok_asa.1": "Verme... a minha asa!",
+  "cutscene.minerwk.ragnarok_asa.1.jp": "グォォォッ！"
 }

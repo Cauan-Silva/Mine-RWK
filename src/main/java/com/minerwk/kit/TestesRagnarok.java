@@ -56,7 +56,8 @@ public final class TestesRagnarok {
         jogador.setYRot(-90);
         jogador.setXRot(0);
         ChunkPos centro = new ChunkPos(jogador.blockPosition());
-        for (int dx = -1; dx <= 3; dx++) {
+        // A investida atravessa até 34 blocos para os dois lados: fora dos chunks forçados ele pararia de agir.
+        for (int dx = -3; dx <= 3; dx++) {
             for (int dz = -1; dz <= 1; dz++) helper.getLevel().setChunkForced(centro.x + dx, centro.z + dz, true);
         }
         return jogador;
