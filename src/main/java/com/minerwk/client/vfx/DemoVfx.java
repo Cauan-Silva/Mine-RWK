@@ -52,12 +52,14 @@ public final class DemoVfx {
     private static int zangetsuEm = -1;
     private static boolean fimDaDemo;
     /** {@code hollow}: o golpe fatal no Bankai, a forma Hollow de frente e de lado, as garras, o Sonído e o Cero. */
-    private static final boolean HOLLOW = MODO.equals("hollow");
+    private static final boolean HOLLOW = MODO.equals("hollow") || MODO.equals("hollow_perto");
+    /** {@code hollow_perto}: só o modelo do Vasto Lorde, de perto: de frente, andando, de costas, de lado e num pulo. */
+    private static final boolean HOLLOW_PERTO = MODO.equals("hollow_perto");
     private static final int CARGA = 100;
     private static final Path PASTA = Path.of("demo");
     private static final int ESFERAS = RoxoMaximo.TICKS_ESFERAS;
     private static final int ESTOURO = ESFERAS + RoxoMaximo.TICKS_FUSAO;
-    private static final int FIM_PREVIA = HOLLOW ? 330 : ZANGETSU ? 2400 : TOJI ? 520 : ARVORE ? 100 : TRAJE ? 260 : TRAJE_ICHIGO ? 300 : ICHIGO ? 350 : MUGETSU ? 360 : R_COMPLETO ? 360
+    private static final int FIM_PREVIA = HOLLOW_PERTO ? 272 : HOLLOW ? 330 : ZANGETSU ? 2400 : TOJI ? 520 : ARVORE ? 100 : TRAJE ? 260 : TRAJE_ICHIGO ? 300 : ICHIGO ? 350 : MUGETSU ? 360 : R_COMPLETO ? 360
             : ENCANTAMENTO ? CARGA + 90 : ESTOURO + RoxoMaximo.TICKS_EXPLOSAO + 110;
     private static int ticks;
     private static int quadro;
@@ -153,6 +155,10 @@ public final class DemoVfx {
         }
         if (ZANGETSU) {
             previaDoZangetsu(mc, jogador, t);
+            return;
+        }
+        if (HOLLOW_PERTO) {
+            previaDoHollowDePerto(mc, jogador, t);
             return;
         }
         if (HOLLOW) {
@@ -482,6 +488,64 @@ public final class DemoVfx {
      * A forma Hollow: entra no Bankai, leva um golpe fatal e a forma ataca sozinha dois golens (um perto, para
      * as garras, e um longe, para o Sonído). De frente no começo (a máscara e os chifres), depois de lado.
      */
+    /**
+     * O modelo do Vasto Lorde de perto, sem inimigo por perto (a forma fica parada): a câmera do jogo com o
+     * campo de visão fechado em 30 graus faz o papel da lente. De frente parado, de frente andando, de costas
+     * andando, e de lado parado com um pulo, para o pano aparecer.
+     */
+    private static void previaDoHollowDePerto(Minecraft mc, LocalPlayer jogador, int t) {
+        mc.gui.getChat().clearMessages(false);
+        mc.options.hideGui = true;
+        net.minecraft.world.entity.Entity camera = jogador;
+        boolean deLado = t >= 206 && t < 262;
+        if (deLado) {
+            for (net.minecraft.world.entity.Entity e : mc.level.entitiesForRendering()) {
+                if (e instanceof net.minecraft.world.entity.decoration.ArmorStand && e.distanceToSqr(jogador) < 30 * 30) camera = e;
+            }
+        }
+        if (mc.getCameraEntity() != camera) mc.setCameraEntity(camera);
+        mc.options.setCameraType(camera != jogador ? net.minecraft.client.CameraType.FIRST_PERSON
+                : t < 160 ? net.minecraft.client.CameraType.THIRD_PERSON_FRONT : net.minecraft.client.CameraType.THIRD_PERSON_BACK);
+        mc.options.keyUp.setDown(t >= 112 && t < 200);
+        mc.options.keyJump.setDown(t >= 226 && t < 229);
+        jogador.setYRot(0);
+        jogador.setXRot(0);
+        if (t == 0) {
+            mc.options.fov().set(30);
+            jogador.connection.sendCommand("gamerule sendCommandFeedback false");
+            jogador.connection.sendCommand("gamerule doMobSpawning false");
+            jogador.connection.sendCommand("rwk despertar @s sim");
+            jogador.connection.sendCommand("rwk recarregar");
+        }
+        // Ninguém por perto, senão a forma vai atrás (várias vezes: slime morto se divide em menores).
+        if (t < 60 && t % 8 == 0) jogador.connection.sendCommand("kill @e[type=!minecraft:player,distance=..120]");
+        if (t == 6) tecla(com.minerwk.core.kit.Tecla.G, true);
+        if (t == 8) tecla(com.minerwk.core.kit.Tecla.G, false);
+        if (t == 56) jogador.connection.sendCommand("gamemode survival");
+        if (t == 60) jogador.connection.sendCommand("damage @s 1000 minecraft:generic");
+        // A câmera de lado: um suporte invisível à direita dele, na altura do peito, olhando para ele.
+        if (t == 202) {
+            jogador.connection.sendCommand("execute at @s run summon minecraft:armor_stand ~-4.6 ~1.15 ~ "
+                    + "{Invisible:1b,NoGravity:1b,Marker:1b,Rotation:[-90f,0f]}");
+        }
+        if (t == FIM_PREVIA - 4) {
+            jogador.connection.sendCommand("kill @e[type=minecraft:armor_stand,distance=..60]");
+            jogador.connection.sendCommand("gamerule sendCommandFeedback true");
+            jogador.connection.sendCommand("gamerule doMobSpawning true");
+            jogador.connection.sendCommand("gamemode creative");
+            jogador.connection.sendCommand("rwk despertar @s nao");
+            jogador.connection.sendCommand("rwk recarregar");
+            jogador.connection.sendCommand("tp @s ~-150 ~ ~-30");
+        }
+        if (t >= FIM_PREVIA) {
+            mc.options.fov().set(70);
+            mc.options.hideGui = false;
+            mc.setCameraEntity(jogador);
+            mc.options.setCameraType(net.minecraft.client.CameraType.FIRST_PERSON);
+            previa = -1;
+        }
+    }
+
     private static void previaDoHollow(Minecraft mc, LocalPlayer jogador, int t) {
         mc.gui.getChat().clearMessages(false);
         // Uma câmera fixa perto, de lado: na de frente do jogo o golem taparia a vista.
