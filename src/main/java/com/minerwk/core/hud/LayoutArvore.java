@@ -36,6 +36,8 @@ public final class LayoutArvore {
     private final List<Integer> nos = new ArrayList<>();
     private final int quantosAntes;
     private final int cx;
+    /** O passo entre os nós de um galho: {@link #PASSO_X}, ou menos quando a tela é estreita. */
+    private final int passoX;
     private final int[] yDoGalho;
     private final int yDespertar;
     private final int yRaiz;
@@ -52,6 +54,9 @@ public final class LayoutArvore {
         boolean cabePainel = largura >= 2 * alcance + NO + PAINEL_L + 3 * MARGEM;
         int fimDaArvore = cabePainel ? largura - PAINEL_L - 2 * MARGEM : largura - MARGEM;
         cx = (MARGEM + fimDaArvore) / 2;
+        // Sem espaço para o passo cheio, os nós se aproximam até caber (sem se encostar: o mínimo é NO + 2).
+        int cabe = (cx - MARGEM - NO / 2) / (1 + maior);
+        passoX = Math.max(NO + 2, Math.min(PASSO_X, cabe));
 
         // De cima para baixo: os galhos de depois (o mais alto primeiro), o Despertar, os de antes e a raiz.
         yDoGalho = new int[nos.size()];
@@ -107,11 +112,11 @@ public final class LayoutArvore {
     }
 
     public Retangulo ponta(int galho) {
-        return celula(cx + lado(galho) * PASSO_X, yDoGalho[galho]);
+        return celula(cx + lado(galho) * passoX, yDoGalho[galho]);
     }
 
     public Retangulo no(int galho, int i) {
-        return celula(cx + lado(galho) * PASSO_X * (i + 2), yDoGalho[galho]);
+        return celula(cx + lado(galho) * passoX * (i + 2), yDoGalho[galho]);
     }
 
     public List<Linha> linhas() {

@@ -868,14 +868,19 @@ public final class DemoVfx {
 
     /**
      * A árvore com galhos de cada personagem (100 ticks cada): sem pontos, com compras e desperta. O Cid passa
-     * de novo em escala de interface 4, onde o painel não cabe e o detalhe vai para junto do mouse.
+     * de novo na maior escala de interface que a janela aceita. A escala do autor e o feedback de comandos voltam
+     * ao que eram no fim.
      */
+    /** A escala de interface do autor antes da prévia da árvore; -1 enquanto não guardada. */
+    private static int escalaOriginal = -1;
+
     private static void previaDaArvore(Minecraft mc, LocalPlayer jogador, int t) {
         mc.gui.getChat().clearMessages(false);
         String[] ordem = {"gojo", "ichigo", "cid", "cid"};
         int bloco = Math.min(3, t / 100), u = t - bloco * 100;
         String p = ordem[bloco];
         if (u == 0) {
+            if (bloco == 0) escalaOriginal = mc.options.guiScale().get();
             if (bloco == 3) {
                 mc.options.guiScale().set(4);
                 mc.resizeDisplay();
@@ -902,7 +907,8 @@ public final class DemoVfx {
         if (t >= FIM_PREVIA - 4 && t < FIM_PREVIA - 2) {
             jogador.connection.sendCommand("rwk maestria @s zerar");
             jogador.connection.sendCommand("rwk despertar @s nao");
-            mc.options.guiScale().set(0);
+            jogador.connection.sendCommand("gamerule sendCommandFeedback true");
+            if (escalaOriginal >= 0) mc.options.guiScale().set(escalaOriginal);
             mc.resizeDisplay();
         }
         if (t >= FIM_PREVIA) previa = -1;

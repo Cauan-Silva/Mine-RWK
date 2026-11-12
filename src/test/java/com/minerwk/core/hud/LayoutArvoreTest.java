@@ -12,7 +12,9 @@ class LayoutArvoreTest {
     /** As formas do Cid e do Ichigo: quantos nós cada galho tem, antes e depois do Despertar. */
     private static final List<List<List<Integer>>> FORMAS = List.of(
             List.of(List.of(2, 1, 1, 2), List.of(2, 1, 1)),
-            List.of(List.of(2, 1, 3), List.of(2, 2, 2)));
+            List.of(List.of(2, 1, 3), List.of(2, 2, 2)),
+            // Um personagem futuro com um galho de 4 nós ainda cabe em 320 de largura.
+            List.of(List.of(4, 1), List.of(4, 2)));
     private static final int[][] TELAS = {{320, 240}, {854, 480}};
 
     private static List<Retangulo> todos(LayoutArvore l, List<Integer> antes, List<Integer> depois) {
