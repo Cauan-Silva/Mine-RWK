@@ -82,34 +82,46 @@ A["cid_recovery"] = anim(4.0, {
     "head": [(0, N), (0.18, [-12, 0, 0], OUTC), (0.34, [24, 0, 0], EXPO), (3.0, [22, 0, 0]), (3.12, [-30, 0, 0], OUTC), (3.5, [-28, 0, 0]), (4.0, N, C)],
 })
 
-# R, o I Am Atomic final. Os socos: um a cada 0,3 s, alternando os braços, o tronco girando com cada um. A
-# animação começa no primeiro soco e recomeça na chegada ao espaço (o quinto soco é o da passagem).
+# R, o I Am Atomic final. Os socos: um a cada 0,6 s, alternando os braços, o tronco girando com cada um. Antes
+# de cada soco o braço arma para trás; no golpe ele estica e FICA esticado os 3 ticks da parada de impacto. A
+# animação começa no primeiro soco e recomeça no primeiro do espaço (o quinto soco é o da passagem).
 def socos():
     d, e, tr = [(0, N)], [(0, N)], [(0, N)]
     for k in range(5):
-        t = 0.3 * k
+        t = 0.6 * k
         bate, guarda = [-92, -8 if k % 2 == 0 else 8, 0], [-38, 0, 0]
         direito = k % 2 == 0
-        (d if direito else e).append((t + 0.04, bate, EXPO))
-        (e if direito else d).append((t + 0.04, guarda, OUTC))
-        (d if direito else e).append((t + 0.22, [-80, 0, 0]))
-        tr.append((t + 0.04, [4, -24 if direito else 24, 0], EXPO))
-    d += [(1.5, N, C)]
-    e += [(1.5, N, C)]
-    tr += [(1.5, N, C)]
-    return anim(1.5, {"right_arm": d, "left_arm": e, "torso": tr,
-                      "head": [(0, N), (0.04, [4, 0, 0], OUTC), (1.3, [4, 0, 0]), (1.5, N, C)]})
+        braco, outro = (d, e) if direito else (e, d)
+        if k > 0:
+            braco.append((t - 0.14, [20, 0, 10 if direito else -10], OUTC))
+            tr.append((t - 0.14, [-2, 22 if direito else -22, 0], OUTC))
+        braco.append((t + 0.04, bate, EXPO))
+        outro.append((t + 0.04, guarda, OUTC))
+        braco.append((t + 0.19, bate))
+        braco.append((t + 0.36, [-70, 0, 0], OUTC))
+        tr.append((t + 0.04, [6, -30 if direito else 30, 0], EXPO))
+        tr.append((t + 0.19, [6, -30 if direito else 30, 0]))
+    d += [(3.0, N, C)]
+    e += [(3.0, N, C)]
+    tr += [(3.0, N, C)]
+    return anim(3.0, {"right_arm": d, "left_arm": e, "torso": tr,
+                      "head": [(0, N), (0.04, [4, 0, 0], OUTC), (2.8, [4, 0, 0]), (3.0, N, C)]})
 
 
 A["cid_atomic"] = socos()
 
-# As três palavras: ele para, baixa os braços abertos ao lado do corpo, o rosto erguido, e a magia cresce 2 s.
-# No Atomic os braços abrem de uma vez; meio segundo assim e volta.
-A["cid_atomic_fala"] = anim(3.0, {
-    "right_arm": [(0, N), (0.5, [8, 0, 16], OUTC), (2.0, [14, 0, 30]), (2.08, [10, 0, 78], EXPO), (2.6, [10, 0, 72]), (3.0, N, C)],
-    "left_arm": [(0, N), (0.5, [8, 0, -16], OUTC), (2.0, [14, 0, -30]), (2.08, [10, 0, -78], EXPO), (2.6, [10, 0, -72]), (3.0, N, C)],
-    "torso": [(0, N), (0.5, [-3, 0, 0], OUTC), (2.0, [-6, 0, 0]), (2.08, [-12, 0, 0], EXPO), (2.6, [-10, 0, 0]), (3.0, N, C)],
-    "head": [(0, N), (0.5, [6, 0, 0], OUTC), (1.3, [0, 0, 0]), (2.0, [-10, 0, 0]), (2.08, [-24, 0, 0], EXPO), (2.6, [-20, 0, 0]), (3.0, N, C)],
+# As palavras (5,5 s até o Atomic). "I" e "am": ele para, os braços abertos ao lado do corpo, a magia crescendo.
+# Na carga (2,8 s) ergue a espada acima da cabeça e olha para ela; na terceira palavra (4,3 s) baixa o rosto,
+# imóvel. No Atomic os braços abrem de uma vez; meio segundo assim e volta.
+A["cid_atomic_fala"] = anim(6.5, {
+    "right_arm": [(0, N), (0.5, [8, 0, 16], OUTC), (2.7, [14, 0, 30]), (3.5, [-150, 0, 10], OUTC), (4.3, [-172, 0, 4]),
+                  (5.5, [-172, 0, 4]), (5.58, [10, 0, 78], EXPO), (6.1, [10, 0, 72]), (6.5, N, C)],
+    "left_arm": [(0, N), (0.5, [8, 0, -16], OUTC), (2.7, [14, 0, -30]), (4.3, [18, 0, -40]), (5.5, [18, 0, -40]),
+                 (5.58, [10, 0, -78], EXPO), (6.1, [10, 0, -72]), (6.5, N, C)],
+    "torso": [(0, N), (0.5, [-3, 0, 0], OUTC), (2.7, [-6, 0, 0]), (4.3, [-9, 0, 0]), (5.5, [-9, 0, 0]),
+              (5.58, [-14, 0, 0], EXPO), (6.1, [-10, 0, 0]), (6.5, N, C)],
+    "head": [(0, N), (0.5, [6, 0, 0], OUTC), (1.4, [0, 0, 0]), (2.7, [-6, 0, 0]), (3.6, [-24, 0, 0], OUTC), (4.3, [4, 0, 0], C),
+             (5.5, [6, 0, 0]), (5.58, [-24, 0, 0], EXPO), (6.1, [-20, 0, 0]), (6.5, N, C)],
 })
 
 saida = {"format_version": "1.8.0", "geckolib_format_version": 2, "animations": A}

@@ -72,6 +72,14 @@ public final class EspacoCliente {
         }
     }
 
+    /** Quanto o clarão do Atomic ilumina o céu do espaço agora, de 0 a 1. */
+    static double forcaDoAtomic() {
+        Minecraft mc = Minecraft.getInstance();
+        if (mc.level == null || atomicEm == Long.MIN_VALUE) return 0;
+        double t = mc.level.getGameTime() - atomicEm + mc.getTimer().getGameTimeDeltaPartialTick(false);
+        return AtomicFinal.clarao(t) * Math.min(1, .25 + AtomicFinal.raioDoClarao(t) * 2);
+    }
+
     private static double branco(float parcial) {
         ClientLevel nivel = Minecraft.getInstance().level;
         return nivel == null || atomicEm == Long.MIN_VALUE ? 0 : AtomicFinal.branco(nivel.getGameTime() - atomicEm + parcial);
@@ -304,6 +312,20 @@ public final class EspacoCliente {
         private void luzes() {
             int gomos = 72;
             double borda = BORDA - Math.PI / 2;
+            // O Atomic acende o planeta: um banho roxo sobre a calota inteira, do tamanho do clarão.
+            double banho = forcaDoAtomic();
+            if (banho > .004) {
+                for (int i = 0; i < 6; i++) {
+                    double a0 = BORDA * i / 6 - Math.PI / 2, a1 = BORDA * (i + 1) / 6 - Math.PI / 2;
+                    for (int k = 0; k < gomos; k++) {
+                        double g0 = Math.PI * 2 * k / gomos, g1 = Math.PI * 2 * (k + 1) / gomos;
+                        ponto(direcao(a0, g0).scale(R * .985), 0x9A7CFF, .5 * banho);
+                        ponto(direcao(a1, g0).scale(R * .985), 0x9A7CFF, .5 * banho);
+                        ponto(direcao(a1, g1).scale(R * .985), 0x9A7CFF, .5 * banho);
+                        ponto(direcao(a0, g1).scale(R * .985), 0x9A7CFF, .5 * banho);
+                    }
+                }
+            }
             for (int k = 0; k < gomos; k++) {
                 double g0 = Math.PI * 2 * k / gomos, g1 = Math.PI * 2 * (k + 1) / gomos;
                 double d0 = .3 + .7 * Math.pow(.5 + .5 * Math.cos(g0 - SOL), 2), d1 = .3 + .7 * Math.pow(.5 + .5 * Math.cos(g1 - SOL), 2);

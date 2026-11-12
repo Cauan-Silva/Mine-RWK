@@ -62,6 +62,7 @@ final class RenderVisuaisCid {
                 case "cid_atomic_aura" -> aura(camera, parcial, v, o, t, sai);
                 case "cid_atomic" -> atomic(o, t);
                 case "cid_atomic_luz" -> luzNoCeu(o, t);
+                case "cid_atomic_onda" -> ondaNoChao(o, t);
                 default -> {
                 }
             }
@@ -613,20 +614,64 @@ final class RenderVisuaisCid {
 
     // ---------------------------------------------------------------- R: I Am Atomic final
 
-    /** Um soco: o estalo de luz no ponto e os riscos abrindo em volta da direção do golpe. */
+    /** Aro de luz num plano qualquer (o anel deitado só serve para o chão): {@code e1} e {@code e2} são os eixos dele. */
+    private static void aro(Vec3 c, Vec3 e1, Vec3 e2, double raio, double largura, int cor, float alpha) {
+        int n = 28;
+        for (int i = 0; i < n; i++) {
+            double a0 = Math.PI * 2 * i / n, a1 = Math.PI * 2 * (i + 1) / n;
+            fita(c.add(e1.scale(Math.cos(a0) * raio)).add(e2.scale(Math.sin(a0) * raio)),
+                    c.add(e1.scale(Math.cos(a1) * raio)).add(e2.scale(Math.sin(a1) * raio)), largura, cor, alpha, alpha);
+        }
+    }
+
+    /**
+     * Um soco. Nos ticks da parada de impacto, o clarão seco no ponto do golpe; depois a onda de choque abre
+     * em aro, atravessada ao arremesso, e o rastro de luz segue o alvo. {@code forca} diz o tipo: 0 no mundo
+     * (para cima), 1 no espaço (para a frente), 2 o arremesso final e 3 o da passagem.
+     */
     private static void soco(VisuaisAtivos.Visual v, Vec3 o, double t) {
-        double u = Math.min(1, t / AtomicFinal.ENTRE_SOCOS);
-        float some = (float) (1 - u);
+        int tipo = Math.round(v.forca);
+        boolean forte = tipo >= 2;
+        double tam = forte ? 1.8 : 1;
         Vec3 d = vec(v.direcao);
         Vec3 lado = d.cross(CIMA);
         lado = lado.lengthSqr() < 1e-6 ? new Vec3(1, 0, 0) : lado.normalize();
+        // Para onde o alvo é arremessado, e os dois eixos do aro atravessado a esse rumo.
+        Vec3 rumo = tipo == 0 || tipo == 3 ? CIMA : d;
+        Vec3 e1 = lado, e2 = rumo == CIMA ? d : CIMA;
+        double u = Math.min(1, t / AtomicFinal.ENTRE_SOCOS);
+        float some = (float) (1 - u);
         abrir(true);
+        // A parada: tudo branco no ponto, sem se mexer.
+        if (t < AtomicFinal.PARADA) {
+            float p = (float) (1 - t / (AtomicFinal.PARADA + 1));
+            halo(o, 3.2 * tam, BRANCO, p);
+            halo(o, 5.5 * tam, CLARO, p * .7f);
+            halo(o, 9 * tam, MAGIA, p * .4f);
+            for (int k = 0; k < 8; k++) {
+                double a = Math.PI * k / 4 + acaso(k + v.inicio);
+                Vec3 r = e1.scale(Math.cos(a)).add(e2.scale(Math.sin(a)));
+                fita(o.subtract(r.scale(4.5 * tam)), o.add(r.scale(4.5 * tam)), .09 * tam, BRANCO, p * .8f, p * .8f);
+            }
+        }
+        // O arremesso: a onda abre e o rastro segue o alvo.
+        double s = Math.max(0, t - AtomicFinal.PARADA) / (AtomicFinal.ENTRE_SOCOS - AtomicFinal.PARADA);
+        if (s > 0) {
+            double abre = 1 - (1 - s) * (1 - s);
+            float f = (float) (1 - s);
+            aro(o, e1, e2, (1 + 5 * abre) * tam, (.6 - .4 * abre) * tam, MAGIA, f * .9f);
+            aro(o.add(rumo.scale(1.5 * abre * tam)), e1, e2, (.6 + 4 * abre) * tam, .4 * tam, MAGIA, f * .7f);
+            aro(o.add(rumo.scale(3.5 * abre * tam)), e1, e2, (.4 + 2.2 * abre) * tam, .25 * tam, BRANCO, f * .6f);
+            double vai = (rumo == CIMA ? AtomicFinal.SUBIDA : forte ? AtomicFinal.ARREMESSO : AtomicFinal.EMPURRAO) * abre;
+            if (tipo == 3) vai = 60 * abre;
+            fita(o, o.add(rumo.scale(vai)), .9 * tam * (1 - s), MAGIA, 0, f * .8f);
+            fita(o, o.add(rumo.scale(vai)), .3 * tam * (1 - s), BRANCO, 0, f);
+        }
         halo(o, .5 + 1.6 * u, MAGIA, some * .8f);
-        halo(o, .3 + .8 * u, BRANCO, some);
-        for (int k = 0; k < 10; k++) {
-            double a = Math.PI * 2 * (k + acaso(k + v.inicio)) / 10;
-            Vec3 r = lado.scale(Math.cos(a)).add(CIMA.scale(Math.sin(a)));
-            fita(o.add(r.scale(.3 + 1.2 * u)), o.add(r.scale(.8 + 2.6 * u)), .1, CLARO, some, 0);
+        for (int k = 0; k < 12; k++) {
+            double a = Math.PI * 2 * (k + acaso(k + v.inicio)) / 12;
+            Vec3 r = e1.scale(Math.cos(a)).add(e2.scale(Math.sin(a)));
+            fita(o.add(r.scale(.3 + 1.2 * u * tam)), o.add(r.scale(.8 + 3.4 * u * tam)), .1, CLARO, some, 0);
         }
         fechar();
     }
@@ -644,58 +689,136 @@ final class RenderVisuaisCid {
         fechar();
     }
 
-    /** As três palavras: a magia roxa cresce em volta dele, parada, até o Atomic. */
+    /**
+     * As palavras: a magia roxa cresce em volta dele, parada, enquanto ele diz as duas primeiras; na carga ela
+     * é toda sugada para a espada, erguida acima da cabeça, e na terceira palavra só resta o ponto de luz lá.
+     */
     private static void aura(Vec3 camera, float parcial, VisuaisAtivos.Visual v, Vec3 o, double t, float sai) {
-        double g = AtomicFinal.aura(AtomicFinal.FALA + t);
+        double c = AtomicFinal.carga(AtomicFinal.FALA + t);
+        double g = AtomicFinal.aura(AtomicFinal.FALA + t) * (1 - c);
         Vec3 pes = pes(camera, parcial, v, o);
-        Vec3 meio = pes.add(0, 1, 0);
+        Vec3 meio = pes.add(0, 1, 0), espada = pes.add(0, 3.1, 0);
         boolean primeira = euEmPrimeiraPessoa(v);
         abrir(true);
         if (!primeira) {
-            halo(meio, 1.4 + 4.5 * g, ROXO, sai * (float) (.3 + .4 * g));
-            halo(meio, .9 + 2.2 * g, MAGIA, sai * (float) (.3 + .45 * g));
-            halo(meio, .4 + .9 * g, BRANCO, sai * (float) (.15 + .5 * g * g));
+            halo(meio, 1.4 + 4.5 * g, ROXO, sai * (float) (.3 + .4 * g) * (float) (1 - c));
+            halo(meio, .9 + 2.2 * g, MAGIA, sai * (float) (.3 + .45 * g) * (float) (1 - c));
+            halo(meio, .4 + .9 * g, BRANCO, sai * (float) (.15 + .5 * g * g) * (float) (1 - c));
         }
-        anel(pes.add(0, -.2, 0), .3 + 2.5 * g, .8 + 3.4 * g, MAGIA, 0, sai * (float) (.25 + .5 * g));
+        anel(pes.add(0, -.2, 0), .3 + 2.5 * g, .8 + 3.4 * g, MAGIA, 0, sai * (float) ((.25 + .5 * g) * (1 - c)));
         // A magia sobe em fios, cada vez mais altos e mais longe dele.
         for (int k = 0; k < 34; k++) {
             double raio = (primeira ? 1.3 : .45) + (1.2 + 2.2 * g) * acaso(k), a = Math.PI * 2 * acaso(k + 50) + t * .03;
             double fase = (t / (9 + 8 * acaso(k + 100)) + acaso(k + 150)) % 1;
             double alto = (2 + 5 * g) * fase;
             Vec3 p = pes.add(Math.cos(a) * raio, alto - .3, Math.sin(a) * raio);
-            float f = sai * (float) (Math.sin(fase * Math.PI) * (.35 + .55 * g));
+            float f = sai * (float) (Math.sin(fase * Math.PI) * (.35 + .55 * g) * (1 - c));
             fita(p, p.add(0, .5 + 1.3 * g, 0), .06 + .05 * g, k % 3 == 0 ? CLARO : MAGIA, f, 0);
+        }
+        if (c > 0) {
+            // A carga: riscos de todo lado correm para a ponta da espada, cada vez mais curtos e rápidos.
+            double desde = AtomicFinal.FALA + t - AtomicFinal.CARGA;
+            boolean cheia = c >= 1;
+            if (!cheia) {
+                for (int k = 0; k < 46; k++) {
+                    double y = 2 * acaso(k + 300) - 1, giro = Math.PI * 2 * acaso(k + 340), h = Math.sqrt(1 - y * y);
+                    Vec3 r = new Vec3(h * Math.cos(giro), y, h * Math.sin(giro));
+                    double fase = (desde / (5 + 5 * acaso(k + 380)) + acaso(k + 420)) % 1;
+                    double longe = (9 - 5 * c) * (1 - fase) + .2;
+                    float f = sai * (float) (Math.sin(fase * Math.PI) * (.4 + .6 * c));
+                    fita(espada.add(r.scale(longe + 1.4)), espada.add(r.scale(longe)), .07, k % 3 == 0 ? BRANCO : MAGIA, 0, f);
+                }
+                aro(espada, new Vec3(1, 0, 0), new Vec3(0, 0, 1), 6 * (1 - c) + .3, .12, CLARO, sai * (float) c * .7f);
+            }
+            // O ponto de luz na espada: cresce com a carga e, cheia, treme quieto até o estouro.
+            double pulso = cheia ? 1 + .12 * Math.sin(desde * 1.9) : c;
+            halo(espada, 2.6 * pulso, ROXO, sai * (float) (.6 * c));
+            halo(espada, 1.3 * pulso, MAGIA, sai * (float) (.9 * c));
+            halo(espada, .55 * pulso, BRANCO, sai * (float) c);
+            if (cheia) {
+                fita(espada.add(-7, 0, 0), espada.add(7, 0, 0), .05, BRANCO, 0, 0);
+                for (int k = 0; k < 4; k++) {
+                    double a = Math.PI * k / 4 + desde * .02;
+                    Vec3 r = new Vec3(Math.cos(a), Math.sin(a), 0);
+                    fita(espada, espada.add(r.scale(3.5 * pulso)), .05, CLARO, sai * .8f, 0);
+                    fita(espada, espada.subtract(r.scale(3.5 * pulso)), .05, CLARO, sai * .8f, 0);
+                }
+            }
         }
         fechar();
     }
 
-    /** O Atomic: uma esfera de luz roxa que estoura, cresce devagar e some; os dois ficam dentro dela. */
+    /**
+     * O Atomic: um ponto branco que estoura numa esfera de luz roxa; ela cresce devagar, cada vez mais depressa,
+     * até engolir a câmera, com ondas de choque saindo dela uma atrás da outra. Os dois ficam dentro.
+     */
     private static void atomic(Vec3 o, double t) {
         float a = (float) AtomicFinal.clarao(t);
         if (a <= .004f) return;
-        double raio = RAIO_DO_ATOMIC * (.12 + .88 * AtomicFinal.raioDoClarao(t));
+        double raio = RAIO_DO_ATOMIC * (.05 + .95 * AtomicFinal.raioDoClarao(t));
         abrir(true);
+        // O estouro: nos primeiros ticks tudo é branco em volta do ponto.
+        if (t < 8) {
+            float e = (float) (1 - t / 8);
+            halo(o, 60, BRANCO, e);
+            halo(o, 130, CLARO, e * .7f);
+            for (int k = 0; k < 6; k++) {
+                double g = Math.PI * k / 6;
+                Vec3 r = new Vec3(Math.cos(g), Math.sin(g) * .25, Math.sin(g));
+                fita(o.subtract(r.scale(220 * e)), o.add(r.scale(220 * e)), 1.2, BRANCO, e, e);
+            }
+        }
         halo(o, raio * 1.9, ROXO, a * .5f);
         halo(o, raio * 1.3, ROXO, a);
         halo(o, raio * 1.1, MAGIA, a);
         halo(o, raio * .9, MAGIA, a);
         halo(o, raio * .7, CLARO, a);
         halo(o, raio * .45, BRANCO, a);
-        // A onda de choque, deitada, e os raios que saem do meio.
-        double onda = raio * (1.2 + t / 14.0);
-        anel(o, onda * .93, onda, CLARO, 0, a * .55f);
-        for (int k = 0; k < 28; k++) {
+        // As ondas de choque, deitadas, uma a cada 14 ticks, e os raios que saem do meio.
+        for (int k = 0; k < 4; k++) {
+            double idade = t - k * 14;
+            if (idade <= 0) continue;
+            double onda = raio * 1.1 + idade * 3.2;
+            float f = a * (float) Math.max(0, 1 - idade / 40) * .6f;
+            anel(o, onda * .94, onda, CLARO, 0, f);
+        }
+        for (int k = 0; k < 36; k++) {
             double y = 2 * acaso(k) - 1, giro = Math.PI * 2 * acaso(k + 40), h = Math.sqrt(1 - y * y);
             Vec3 r = new Vec3(h * Math.cos(giro), y, h * Math.sin(giro));
-            double longe = raio * (1.3 + 1.4 * acaso(k + 80));
-            fita(o.add(r.scale(raio * .5)), o.add(r.scale(longe)), raio * .05, k % 2 == 0 ? CLARO : MAGIA, a * .5f, 0);
+            double longe = raio * (1.3 + 1.4 * acaso(k + 80)) + 6;
+            fita(o.add(r.scale(raio * .5)), o.add(r.scale(longe)), raio * .04 + .15, k % 2 == 0 ? CLARO : MAGIA, a * .5f, 0);
         }
         fechar();
     }
 
-    private static final double RAIO_DO_ATOMIC = 80;
+    /**
+     * A onda de choque no chão, na volta: um aro de luz e poeira que abre a partir do ponto de partida, com
+     * riscos de poeira subindo atrás dele. Só visual: nada quebra.
+     */
+    private static void ondaNoChao(Vec3 o, double t) {
+        float f = (float) AtomicFinal.onda(t);
+        if (f <= .004f) return;
+        double raio = AtomicFinal.RAIO_DA_ONDA * 1.5 * AtomicFinal.raioDaOnda(t);
+        Vec3 chao = o.add(0, .08, 0);
+        abrir(true);
+        anel(chao, raio * .8, raio, CLARO, 0, f * .9f);
+        anel(chao, raio, raio + 1.2, MAGIA, f * .9f, 0);
+        parede(chao, raio, 0, 1.6 * f + .3, CLARO, f * .55f, 0);
+        if (t < 4) halo(o.add(0, 1, 0), 6, BRANCO, (float) (1 - t / 4) * .8f);
+        fechar();
+        abrir(false);
+        for (int k = 0; k < 40; k++) {
+            double a = Math.PI * 2 * (k + acaso(k + 500)) / 40, r = raio * (.55 + .45 * acaso(k + 540));
+            double alto = (.6 + 2.2 * acaso(k + 580)) * Math.sin(Math.PI * Math.min(1, t / AtomicFinal.TICKS_DA_ONDA));
+            Vec3 p = chao.add(Math.cos(a) * r, 0, Math.sin(a) * r);
+            fita(p, p.add(Math.cos(a) * .6, alto, Math.sin(a) * .6), .5, 0x8C8698, f * .45f, 0);
+        }
+        fechar();
+    }
 
-    /** No mundo de onde saíram: uma luz azul-violeta bem no alto, que acende de uma vez e some em 3 s. */
+    private static final double RAIO_DO_ATOMIC = 200;
+
+    /** No mundo de onde saíram: uma luz azul-violeta bem no alto, que acende de uma vez e some devagar. */
     private static void luzNoCeu(Vec3 o, double t) {
         float a = (float) AtomicFinal.luz(t);
         if (a <= .004f) return;
@@ -707,6 +830,10 @@ final class RenderVisuaisCid {
         halo(alto, 38, CLARO, a * .9f);
         halo(alto, 14, BRANCO, a);
         anel(alto, 60 * abre + 2 * t, 64 * abre + 2 * t, CLARO, 0, a * .5f);
+        anel(alto, 20 * abre + 1.2 * t, 23 * abre + 1.2 * t, MAGIA, 0, a * .5f);
+        // A coluna de luz que desce até o ponto de onde eles saíram, afinando.
+        fita(alto, o, 5 * a + .3, MAGIA, a * .5f, 0);
+        fita(alto, o, 1.5 * a + .1, BRANCO, a * .6f, 0);
         fechar();
     }
 }

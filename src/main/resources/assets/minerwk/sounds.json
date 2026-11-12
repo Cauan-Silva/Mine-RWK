@@ -1180,5 +1180,22 @@
         "attenuation_distance": 160
       }
     ]
+  },
+  "cid_atomic_onda": {
+    "subtitle": "subtitles.minerwk.cid_atomic_onda",
+    "sounds": [
+      {
+        "name": "minerwk:cid/cid_atomic_onda",
+        "attenuation_distance": 64
+      },
+      {
+        "name": "minerwk:cid/cid_atomic_onda_2",
+        "attenuation_distance": 64
+      },
+      {
+        "name": "minerwk:cid/cid_atomic_onda_3",
+        "attenuation_distance": 64
+      }
+    ]
   }
 }

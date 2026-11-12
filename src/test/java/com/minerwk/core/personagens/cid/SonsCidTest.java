@@ -79,7 +79,7 @@ class SonsCidTest {
         Set<String> usados = new HashSet<>();
         for (String tipo : new String[] {Cid.Redemoinho.VISUAL, Cid.PosImagem.VISUAL, Cid.Prisao.VISUAL, Cid.Prisao.CORRENTES,
                 Cid.OVERDRIVE, Cid.TRAJE, Cid.EspadaAtomica.CARGA, Cid.ESPADA_ATOMICA, Cid.RecoveryAtomic.CARGA, Cid.RECOVERY,
-                Cid.Atomic.SOCO, Cid.Atomic.RISCO, Cid.Atomic.AURA, Cid.ATOMIC, Cid.Atomic.LUZ}) {
+                Cid.Atomic.SOCO, Cid.Atomic.RISCO, Cid.Atomic.AURA, Cid.ATOMIC, Cid.Atomic.LUZ, Cid.Atomic.ONDA}) {
             usados.add(SonsCid.doVisual(tipo).orElseThrow());
             assertEquals(SonsCid.doVisual(tipo), SonsDosVisuais.doVisual(tipo), tipo);
         }
@@ -131,7 +131,11 @@ class SonsCidTest {
         assertEquals(FormasCid.ONDA, marco(m, SonsCid.RECOVERY, "onda"));
         assertEquals(AtomicFinal.ENTRE_SOCOS, marco(m, SonsCid.ATOMIC_SOCO, "fim"), "um soco acaba antes do seguinte");
         assertEquals(AtomicFinal.TICKS_DO_RISCO, marco(m, SonsCid.ATOMIC_RISCO, "fim"));
-        assertEquals(AtomicFinal.TICKS_DA_FALA, marco(m, SonsCid.ATOMIC_AURA, "fim"), "o tom sobe as três palavras inteiras");
+        assertEquals(AtomicFinal.PARADA, marco(m, SonsCid.ATOMIC_SOCO, "parada"), "o arremesso soa depois da parada de impacto");
+        assertEquals(AtomicFinal.CARGA - AtomicFinal.FALA, marco(m, SonsCid.ATOMIC_AURA, "carga"), "o tom sobe as duas primeiras palavras");
+        assertEquals(AtomicFinal.TERCEIRA - AtomicFinal.FALA, marco(m, SonsCid.ATOMIC_AURA, "muda"), "some na carga: a terceira é dita no silêncio");
+        assertEquals(AtomicFinal.TICKS_DA_FALA, marco(m, SonsCid.ATOMIC_AURA, "fim"));
+        assertEquals(AtomicFinal.TICKS_DA_ONDA, marco(m, SonsCid.ATOMIC_ONDA, "fim"));
         assertEquals(AtomicFinal.TICKS_DO_CLARAO, marco(m, SonsCid.ATOMIC, "clarao"));
         assertEquals(AtomicFinal.TICKS_DA_LUZ, marco(m, SonsCid.ATOMIC_LUZ, "fim"), "o estouro distante dura a luz no céu");
         assertEquals(FormasCid.COLUNA, marco(m, SonsCid.RECOVERY, "fim"));

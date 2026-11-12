@@ -386,6 +386,9 @@ public final class Cid {
      */
     static final class Atomic extends Golpe {
         static final String SOCO = "cid_atomic_soco", RISCO = "cid_atomic_risco", AURA = "cid_atomic_aura", LUZ = "cid_atomic_luz";
+        static final String ONDA = "cid_atomic_onda";
+        /** O tipo do soco, na força do visual: no mundo (para cima), no espaço, o arremesso final e o da passagem. */
+        static final float NO_MUNDO = 0, NO_ESPACO = 1, ARREMESSO = 2, PASSAGEM = 3;
         static final String ANIM_DOS_SOCOS = "cid_atomic", ANIM_DA_FALA = "cid_atomic_fala";
         static final double CUSTO = 100;
         private final Habilidade recovery = new RecoveryAtomic();
@@ -434,6 +437,8 @@ public final class Cid {
         private int pulo;
         private boolean atomic, voltou;
         private int ultimo;
+        /** O bônus do Overdrive vale o do disparo: o golpe dura mais que ele. */
+        private float bonus = -1;
 
         Sequencia(Object alvo, Vetor pes, Vetor centro, Vetor rumo) {
             this.alvo = alvo;
@@ -455,6 +460,7 @@ public final class Cid {
         @Override
         public void tick(Contexto ctx, int t) {
             ultimo = t;
+            if (bonus < 0) bonus = dano(ctx, 1f);
             int tempo = t + pulo;
             if (!atomic && tempo < AtomicFinal.ATOMIC && !ctx.alvoVivo(alvo)) {
                 pulo += AtomicFinal.ATOMIC - tempo;
@@ -468,6 +474,12 @@ public final class Cid {
             if (tempo < AtomicFinal.ATOMIC) noEspaco(ctx, tempo);
             if (tempo == AtomicFinal.ATOMIC) atomic(ctx);
             if (tempo == AtomicFinal.VOLTA) voltar(ctx, true);
+            // A onda de choque chega ao ponto de partida: empurra quem está perto e levanta poeira; não fere nem quebra nada.
+            if (tempo == AtomicFinal.VOLTA + AtomicFinal.ATRASO_DA_ONDA) {
+                ctx.visual(Atomic.ONDA, pes, CIMA, 0f, AtomicFinal.TICKS_DA_ONDA);
+                ctx.empurrar(pes, AtomicFinal.RAIO_DA_ONDA, AtomicFinal.FORCA_DA_ONDA);
+                ctx.tremor(1.6f, 16, 32);
+            }
         }
 
         private void subir(Contexto ctx, int tempo) {
@@ -476,7 +488,7 @@ public final class Cid {
                 ctx.apresentacao(Atomic.ANIM_DOS_SOCOS, "", "");
                 ctx.cutscene(CutsceneAtomic.SUBIDA, ctx.olhos(), rumo);
             }
-            if (AtomicFinal.soco(tempo)) socar(ctx, alvoAgora);
+            if (AtomicFinal.soco(tempo)) socar(ctx, alvoAgora, Atomic.NO_MUNDO);
             // O alvo já vai para o ponto do tick seguinte: ele sobe enquanto o soco ainda soa.
             ctx.pontosDaViagem(alvo, AtomicFinal.cidNaSubida(pes, centro, rumo, tempo), AtomicFinal.alvoNaSubida(centro, tempo + 1),
                     alvoAgora);
@@ -486,16 +498,19 @@ public final class Cid {
         private void passar(Contexto ctx, int tempo) {
             Vetor deOnde = AtomicFinal.cidNaSubida(pes, centro, rumo, Math.min(tempo, AtomicFinal.PASSAGEM));
             ctx.visual(Atomic.RISCO, deOnde, CIMA, 0f, AtomicFinal.TICKS_DO_RISCO);
-            chegada = ctx.aoEspaco(alvo);
-            if (tempo < AtomicFinal.ATOMIC) {
-                ctx.cutscene(CutsceneAtomic.ESPACO, chegada.mais(new Vetor(0, 1.62, 0)), rumo);
-                ctx.apresentacao(Atomic.ANIM_DOS_SOCOS, "", "");
+            if (tempo == AtomicFinal.PASSAGEM) {
+                ctx.visual(Atomic.SOCO, AtomicFinal.alvoNaSubida(centro, tempo), rumo, Atomic.PASSAGEM, AtomicFinal.ENTRE_SOCOS);
+                ctx.tremor(1.2f, 8, 40);
             }
+            chegada = ctx.aoEspaco(alvo);
+            if (tempo < AtomicFinal.ATOMIC) ctx.cutscene(CutsceneAtomic.ESPACO, chegada.mais(new Vetor(0, 1.62, 0)), rumo);
         }
 
         private void noEspaco(Contexto ctx, int tempo) {
             Vetor alvoAgora = AtomicFinal.alvoNoEspaco(chegada, rumo, tempo);
-            if (AtomicFinal.soco(tempo)) socar(ctx, alvoAgora);
+            // A animação dos socos recomeça no primeiro de lá (a chegada é parada).
+            if (tempo == AtomicFinal.PRIMEIRO_NO_ESPACO) ctx.apresentacao(Atomic.ANIM_DOS_SOCOS, "", "");
+            if (AtomicFinal.soco(tempo)) socar(ctx, alvoAgora, tempo == AtomicFinal.ULTIMO_SOCO ? Atomic.ARREMESSO : Atomic.NO_ESPACO);
             if (tempo == AtomicFinal.FALA) {
                 ctx.apresentacao(Atomic.ANIM_DA_FALA, "", "");
                 ctx.visual(Atomic.AURA, AtomicFinal.cidNoEspaco(chegada, rumo, tempo), CIMA, 0f, AtomicFinal.TICKS_DA_FALA + 2);
@@ -504,10 +519,13 @@ public final class Cid {
                     alvoAgora);
         }
 
-        private void socar(Contexto ctx, Vetor onde) {
-            ctx.ferir(alvo, dano(ctx, AtomicFinal.DANO_DO_SOCO));
-            ctx.visual(Atomic.SOCO, onde, rumo, 0f, AtomicFinal.ENTRE_SOCOS);
-            ctx.acertou(.5f);
+        /** O soco: o dano, o visual, a tela que trava um instante e o tremor (mais forte no arremesso). */
+        private void socar(Contexto ctx, Vetor onde, float tipo) {
+            boolean forte = tipo == Atomic.ARREMESSO;
+            ctx.ferir(alvo, bonus * AtomicFinal.DANO_DO_SOCO);
+            ctx.visual(Atomic.SOCO, onde, rumo, tipo, AtomicFinal.ENTRE_SOCOS);
+            ctx.acertou(forte ? 1f : .6f);
+            ctx.tremor(forte ? 1.4f : .7f, forte ? 8 : 5, 32);
         }
 
         private void atomic(Contexto ctx) {
@@ -515,10 +533,11 @@ public final class Cid {
             Vetor cid = AtomicFinal.cidNoEspaco(chegada, rumo, AtomicFinal.ATOMIC);
             Vetor meio = cid.mais(rumo.vezes(AtomicFinal.AO_LADO / 2)).mais(new Vetor(0, .9, 0));
             ctx.visualFim(Atomic.AURA, cid);
-            ctx.ferir(alvo, dano(ctx, AtomicFinal.DANO));
+            ctx.ferir(alvo, bonus * AtomicFinal.DANO);
             ctx.visual(ATOMIC, meio, rumo, 0f, AtomicFinal.TICKS_DO_CLARAO + 10);
             ctx.visualNaOrigem(Atomic.LUZ, 0f, AtomicFinal.TICKS_DA_LUZ, AtomicFinal.RAIO_DA_LUZ);
             ctx.cutscene(CutsceneAtomic.CLARAO, cid.mais(new Vetor(0, 1.62, 0)), rumo);
+            ctx.tremor(2.5f, AtomicFinal.TICKS_DO_CLARAO - 20, 64);
         }
 
         private void voltar(Contexto ctx, boolean comCena) {

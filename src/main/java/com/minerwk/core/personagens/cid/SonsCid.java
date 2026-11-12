@@ -24,10 +24,10 @@ public final class SonsCid {
      * espaço (depois de um instante de silêncio) e o estouro distante, ouvido do chão.
      */
     public static final String ATOMIC_SOCO = "cid_atomic_soco", ATOMIC_RISCO = "cid_atomic_risco", ATOMIC_AURA = "cid_atomic_aura";
-    public static final String ATOMIC = "cid_atomic", ATOMIC_LUZ = "cid_atomic_luz";
+    public static final String ATOMIC = "cid_atomic", ATOMIC_LUZ = "cid_atomic_luz", ATOMIC_ONDA = "cid_atomic_onda";
 
     public static final List<String> TODOS = List.of(REDEMOINHO, POS_IMAGEM, SLIME, CORRENTES, OVERDRIVE, TRAJE,
-            ESPADA_CARGA, ESPADA_ATOMICA, RECOVERY_CARGA, RECOVERY, ATOMIC_SOCO, ATOMIC_RISCO, ATOMIC_AURA, ATOMIC, ATOMIC_LUZ);
+            ESPADA_CARGA, ESPADA_ATOMICA, RECOVERY_CARGA, RECOVERY, ATOMIC_SOCO, ATOMIC_RISCO, ATOMIC_AURA, ATOMIC, ATOMIC_LUZ, ATOMIC_ONDA);
 
     private SonsCid() {
     }

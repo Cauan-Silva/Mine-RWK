@@ -370,16 +370,16 @@ public final class TestesCid {
         float vida = jogador.getHealth();
         jogador.hurt(jogador.damageSources().cactus(), 10);
         helper.assertTrue(perto(jogador.getHealth(), vida), "o Cid não recebe dano");
-        ticks(jogador, 22);
+        ticks(jogador, 40);
         helper.assertTrue(perto(zumbi.getHealth(), 92), "quatro socos no mundo, vida " + zumbi.getHealth());
         helper.assertTrue(zumbi.getY() - zumbiAntes.y > 40, "o alvo subiu, " + (zumbi.getY() - zumbiAntes.y));
-        helper.assertTrue(jogador.getY() - cidAntes.y > 40 && jogador.isNoGravity(), "e o Cid surge ao lado, sem cair");
-        ticks(jogador, 70);
+        helper.assertTrue(jogador.getY() - cidAntes.y > 30 && jogador.isNoGravity(), "e o Cid surge ao lado, sem cair");
+        ticks(jogador, 106);
         helper.assertTrue(perto(zumbi.getHealth(), 84), "mais quatro socos lá em cima, vida " + zumbi.getHealth());
-        ticks(jogador, 8);
+        ticks(jogador, 80);
         helper.assertTrue(perto(zumbi.getHealth(), 40), "o Atomic tira 44, vida " + zumbi.getHealth());
         helper.assertTrue(EspacoServidor.emViagem(jogador), "o clarão ainda dura");
-        ticks(jogador, 42);
+        ticks(jogador, 70);
         helper.assertTrue(!EspacoServidor.emViagem(jogador) && !EspacoServidor.emViagem(zumbi), "a viagem acabou");
         helper.assertTrue(jogador.position().distanceTo(cidAntes) < .01 && !jogador.isNoGravity(), "o Cid volta ao ponto de partida");
         helper.assertTrue(zumbi.position().distanceTo(zumbiAntes) < .01 && !zumbi.isNoGravity() && zumbi.isNoAi(),
@@ -401,10 +401,10 @@ public final class TestesCid {
         zumbi.setHealth(3);
         net.minecraft.world.phys.Vec3 cidAntes = jogador.position();
         ServicoKits.usarTecla(jogador, Tecla.R, true);
-        ticks(jogador, 12);
+        ticks(jogador, 18);
         helper.assertTrue(!zumbi.isAlive(), "o segundo soco mata");
         helper.assertTrue(EspacoServidor.emViagem(jogador), "o Cid segue para o Atomic");
-        ticks(jogador, 45);
+        ticks(jogador, 76);
         helper.assertTrue(!EspacoServidor.emViagem(jogador), "e volta sem esperar os socos que faltavam");
         helper.assertTrue(jogador.position().distanceTo(cidAntes) < .01 && !jogador.isNoGravity(), "ao ponto de partida");
         helper.succeed();

@@ -30,6 +30,8 @@ class CidAtomicTest {
         final List<Vetor> pesDoCid = new ArrayList<>(), centros = new ArrayList<>();
         final List<String> visuais = new ArrayList<>(), cutscenes = new ArrayList<>(), animacoes = new ArrayList<>();
         final List<String> naOrigem = new ArrayList<>();
+        final List<Float> tiposDeSoco = new ArrayList<>();
+        int tremores, empurroes;
         int viagens, fins, idas, cutscenesEncerradas;
         double devolvido;
         boolean noEspaco;
@@ -51,7 +53,7 @@ class CidAtomicTest {
         public void visualNaOrigem(String tipo, float forca, int duracao, double raio) {
             naOrigem.add(tipo);
             assertEquals(96, raio);
-            assertEquals(60, duracao);
+            assertEquals(AtomicFinal.TICKS_DA_LUZ, duracao);
         }
         public void devolverRecurso(double q) { devolvido += q; kit.recurso().carregar(kit.recurso().atual() + q); }
         public void criarEfeito(Efeito e) { kit.adicionarEfeito(e); }
@@ -61,10 +63,16 @@ class CidAtomicTest {
         public void apresentacao(String animacao, String efeito, String som) { if (!animacao.isEmpty()) animacoes.add(animacao); }
         public void visual(String tipo, Vetor origem, Vetor direcao, float forca, int duracao) {
             visuais.add(tipo);
+            if (tipo.equals(Cid.Atomic.SOCO)) tiposDeSoco.add(forca);
             assertTrue(duracao > 0, tipo);
         }
         public void cutscene(String id, Vetor origem, Vetor direcao) { cutscenes.add(id); }
         public void encerrarCutscene() { cutscenesEncerradas++; }
+        public void tremor(float forca, int duracao, double raio) { tremores++; }
+        public void empurrar(Vetor centro, double raio, double forca) {
+            empurroes++;
+            assertEquals(pes(), centro, "a onda sai do ponto de partida");
+        }
     }
 
     private final KitDoJogador kit = new KitDoJogador(Cid.criar());
@@ -90,56 +98,75 @@ class CidAtomicTest {
     void aLinhaDoTempoTemQuatroSocosEmCadaLado() {
         List<Integer> socos = new ArrayList<>();
         for (int t = 0; t < AtomicFinal.FIM; t++) if (AtomicFinal.soco(t)) socos.add(t);
-        assertEquals(List.of(0, 6, 12, 18, 30, 36, 42, 48), socos, "a passagem (24) não fere");
-        assertEquals(24, AtomicFinal.PASSAGEM);
-        assertEquals(54, AtomicFinal.FALA);
-        assertEquals(94, AtomicFinal.ATOMIC, "40 ticks de palavras");
-        assertEquals(134, AtomicFinal.VOLTA);
+        assertEquals(List.of(0, 12, 24, 36, 64, 76, 88, 100), socos, "a passagem (48) não fere");
+        assertEquals(48, AtomicFinal.PASSAGEM);
+        assertEquals(112, AtomicFinal.FALA);
+        assertEquals(168, AtomicFinal.CARGA, "duas palavras e os silêncios");
+        assertEquals(222, AtomicFinal.ATOMIC, "a carga e a terceira palavra");
+        assertEquals(292, AtomicFinal.VOLTA);
+        assertTrue(AtomicFinal.FIM >= 300, "o golpe dura pelo menos 15 s");
         assertTrue(AtomicFinal.FIM >= AtomicFinal.ATOMIC + AtomicFinal.TICKS_DA_LUZ, "o golpe cobre a luz no céu");
     }
 
     @Test
     void cadaSocoSobeOAlvoDozeBlocosEOCidSurgeAoLado() {
         assertEquals(0, AtomicFinal.alturaDoAlvo(0));
-        assertEquals(12, AtomicFinal.alturaDoAlvo(5), 1e-9, "5 ticks para subir");
-        assertEquals(12, AtomicFinal.alturaDoAlvo(6), 1e-9);
-        assertEquals(48, AtomicFinal.alturaDoAlvo(23), 1e-9);
+        assertEquals(0, AtomicFinal.alturaDoAlvo(AtomicFinal.PARADA), 1e-9, "a parada de impacto: 3 ticks sem sair do lugar");
+        assertTrue(AtomicFinal.alturaDoAlvo(AtomicFinal.PARADA + 2) > 5, "e sai de uma vez");
+        assertEquals(12, AtomicFinal.alturaDoAlvo(10), 1e-9, "7 ticks para subir");
+        assertEquals(12, AtomicFinal.alturaDoAlvo(12), 1e-9);
+        assertEquals(12, AtomicFinal.alturaDoAlvo(15), 1e-9, "parado de novo no segundo soco");
+        assertEquals(48, AtomicFinal.alturaDoAlvo(47), 1e-9);
         assertEquals(48, AtomicFinal.alturaDoAlvo(400), 1e-9);
-        for (int t = 1; t < 24; t++) assertTrue(AtomicFinal.alturaDoAlvo(t) >= AtomicFinal.alturaDoAlvo(t - 1));
+        for (int t = 1; t < 48; t++) assertTrue(AtomicFinal.alturaDoAlvo(t) >= AtomicFinal.alturaDoAlvo(t - 1));
         assertEquals(0, AtomicFinal.alturaDoCid(0), "o primeiro soco é no chão");
-        assertEquals(0, AtomicFinal.alturaDoCid(3));
-        assertEquals(12, AtomicFinal.alturaDoCid(4), "surge 2 ticks antes do segundo soco");
-        assertEquals(36, AtomicFinal.alturaDoCid(18));
-        assertEquals(48, AtomicFinal.alturaDoCid(22));
+        assertEquals(0, AtomicFinal.alturaDoCid(8));
+        assertEquals(12, AtomicFinal.alturaDoCid(9), "surge 3 ticks antes do segundo soco");
+        assertEquals(36, AtomicFinal.alturaDoCid(36));
+        assertEquals(48, AtomicFinal.alturaDoCid(45));
         Vetor pes = new Vetor(0, 64, 0), alvo = new Vetor(3, 64.9, 0), rumo = new Vetor(1, 0, 0);
         assertEquals(pes, AtomicFinal.cidNaSubida(pes, alvo, rumo, 0));
-        Vetor aoLado = AtomicFinal.cidNaSubida(pes, alvo, rumo, 6);
+        Vetor aoLado = AtomicFinal.cidNaSubida(pes, alvo, rumo, 12);
         assertEquals(76, aoLado.y(), 1e-9, "os pés na altura dos pés do alvo");
         assertEquals(3 - AtomicFinal.AO_LADO, aoLado.x(), 1e-9, "do lado de onde ele veio");
     }
 
     @Test
     void noEspacoCadaSocoEmpurraOAlvoEOCidVaiAtras() {
-        assertEquals(0, AtomicFinal.empurraoDoAlvo(30));
-        assertEquals(2.5, AtomicFinal.empurraoDoAlvo(35), 1e-9);
-        assertEquals(10, AtomicFinal.empurraoDoAlvo(200), 1e-9);
-        assertEquals(0, AtomicFinal.avancoDoCid(30));
-        assertEquals(2.5, AtomicFinal.avancoDoCid(34));
-        assertEquals(10, AtomicFinal.avancoDoCid(90));
+        assertEquals(0, AtomicFinal.empurraoDoAlvo(64));
+        assertEquals(0, AtomicFinal.empurraoDoAlvo(67), 1e-9, "a parada de impacto");
+        assertEquals(2.5, AtomicFinal.empurraoDoAlvo(74), 1e-9);
+        assertEquals(7.5, AtomicFinal.empurraoDoAlvo(100), 1e-9, "três empurrões antes do último soco");
+        assertEquals(16.5, AtomicFinal.empurraoDoAlvo(300), 1e-9, "o último arremessa 9 blocos");
+        assertEquals(0, AtomicFinal.avancoDoCid(64));
+        assertEquals(2.5, AtomicFinal.avancoDoCid(73));
+        assertEquals(7.5, AtomicFinal.avancoDoCid(100));
+        assertEquals(7.5, AtomicFinal.avancoDoCid(300), "depois do último ele fica");
         Vetor rumo = new Vetor(0, 0, 1);
-        double entre = AtomicFinal.alvoNoEspaco(ESPACO, rumo, 90).z() - AtomicFinal.cidNoEspaco(ESPACO, rumo, 90).z();
-        assertEquals(AtomicFinal.AO_LADO, entre, 1e-9, "no fim os dois estão frente a frente");
+        double antes = AtomicFinal.alvoNoEspaco(ESPACO, rumo, 100).z() - AtomicFinal.cidNoEspaco(ESPACO, rumo, 100).z();
+        assertEquals(AtomicFinal.AO_LADO, antes, 1e-9, "em cada soco os dois estão frente a frente");
+        double entre = AtomicFinal.alvoNoEspaco(ESPACO, rumo, 200).z() - AtomicFinal.cidNoEspaco(ESPACO, rumo, 200).z();
+        assertEquals(AtomicFinal.AO_LADO + 9, entre, 1e-9, "nas palavras o alvo está longe");
     }
 
     @Test
     void asTresPalavrasOClaraoEALuz() {
-        assertEquals(-1, AtomicFinal.palavra(53));
-        assertEquals(0, AtomicFinal.palavra(54));
-        assertEquals(1, AtomicFinal.palavra(68));
-        assertEquals(2, AtomicFinal.palavra(93));
-        assertEquals(-1, AtomicFinal.palavra(94));
-        assertEquals(0, AtomicFinal.aura(54));
-        assertEquals(1, AtomicFinal.aura(94));
+        assertEquals(-1, AtomicFinal.palavra(111));
+        assertEquals(0, AtomicFinal.palavra(112));
+        assertEquals(-1, AtomicFinal.palavra(136), "um silêncio entre as palavras");
+        assertEquals(1, AtomicFinal.palavra(140));
+        assertEquals(-1, AtomicFinal.palavra(180), "a carga é muda");
+        assertEquals(2, AtomicFinal.palavra(198));
+        assertEquals(2, AtomicFinal.palavra(221));
+        assertEquals(-1, AtomicFinal.palavra(222));
+        assertEquals(0, AtomicFinal.aura(112));
+        assertEquals(1, AtomicFinal.aura(168));
+        assertEquals(0, AtomicFinal.carga(168));
+        assertEquals(1, AtomicFinal.carga(198), "a magia toda na espada antes da terceira palavra");
+        assertTrue(AtomicFinal.raioDoClarao(20) < .2, "a esfera nasce pequena e cresce devagar");
+        assertEquals(1, AtomicFinal.onda(0));
+        assertEquals(0, AtomicFinal.onda(AtomicFinal.TICKS_DA_ONDA));
+        assertEquals(1, AtomicFinal.raioDaOnda(AtomicFinal.TICKS_DA_ONDA));
         assertEquals(0, AtomicFinal.raioDoClarao(0));
         assertEquals(1, AtomicFinal.raioDoClarao(AtomicFinal.TICKS_DO_CLARAO));
         assertEquals(0, AtomicFinal.branco(0), "primeiro o clarão roxo, depois o branco");
@@ -196,10 +223,12 @@ class CidAtomicTest {
         ticks(AtomicFinal.FALA - AtomicFinal.PASSAGEM);
         assertEquals(8, ctx.feridas.size(), "mais quatro no espaço");
         for (int i = 0; i < 8; i++) assertEquals(2f, ctx.feridas.get(i));
-        assertEquals(List.of(0, 6, 12, 18, 30, 36, 42, 48), ctx.ticksDasFeridas.stream().map(t -> (int) (t - t0)).toList());
+        assertEquals(List.of(0, 12, 24, 36, 64, 76, 88, 100), ctx.ticksDasFeridas.stream().map(t -> (int) (t - t0)).toList());
+        assertEquals(List.of(0f, 0f, 0f, 0f, 3f, 1f, 1f, 1f, 2f), ctx.tiposDeSoco, "o da passagem não fere, e o último é o arremesso");
+        assertTrue(ctx.tremores >= 9, "cada soco treme a tela");
         assertTrue(ctx.visuais.contains(Cid.Atomic.AURA));
         ticks(AtomicFinal.TICKS_DA_FALA - 1);
-        assertEquals(8, ctx.feridas.size(), "40 ticks parados");
+        assertEquals(8, ctx.feridas.size(), "as palavras e a carga, parados");
         assertTrue(ctx.naOrigem.isEmpty());
         ticks(1);
         assertEquals(44f, ctx.feridas.get(8), "o Atomic");
@@ -209,6 +238,10 @@ class CidAtomicTest {
         assertEquals(0, ctx.fins);
         ticks(AtomicFinal.TICKS_DO_CLARAO);
         assertEquals(1, ctx.fins, "voltam quando o clarão some");
+        assertFalse(ctx.visuais.contains(Cid.Atomic.ONDA), "a onda espera o branco abrir");
+        ticks(AtomicFinal.ATRASO_DA_ONDA);
+        assertTrue(ctx.visuais.contains(Cid.Atomic.ONDA), "a onda de choque no chão");
+        assertEquals(1, ctx.empurroes, "que empurra quem está perto");
         assertTrue(ctx.cutscenes.contains(CutsceneAtomic.CEU));
         ticks(AtomicFinal.DEPOIS_DA_VOLTA + 3);
         assertTrue(kit.efeitos().isEmpty());
@@ -245,7 +278,7 @@ class CidAtomicTest {
         ticks(AtomicFinal.TICKS_DO_CLARAO + 1);
         assertEquals(1, ctx.fins);
         assertTrue(agora - t0 < AtomicFinal.ATOMIC, "não espera os socos que faltavam");
-        ticks(40);
+        ticks(AtomicFinal.DEPOIS_DA_VOLTA + 5);
         assertTrue(kit.efeitos().isEmpty());
         assertTrue(ctx.feridas.size() <= socos + 1);
     }
@@ -253,7 +286,7 @@ class CidAtomicTest {
     @Test
     void morrerOuSairNoMeioDevolveOsDois() {
         comecar();
-        ticks(40);
+        ticks(AtomicFinal.PASSAGEM + 10);
         assertTrue(ctx.noEspaco);
         kit.descartar(ctx);
         assertEquals(1, ctx.fins);
@@ -270,7 +303,7 @@ class CidAtomicTest {
         assertTrue(kit.apertar(Tecla.R, agora));
         ticks(AtomicFinal.ATOMIC + 10);
         assertEquals(2.6f, ctx.feridas.get(0), 1e-5);
-        assertEquals(57.2f, ctx.feridas.get(ctx.feridas.size() - 1), 1e-4);
+        assertEquals(57.2f, ctx.feridas.get(ctx.feridas.size() - 1), 1e-4, "o bônus é o do disparo, mesmo com o Overdrive já acabado");
     }
 
     @Test
@@ -281,6 +314,7 @@ class CidAtomicTest {
         assertEquals(AtomicFinal.DEPOIS_DA_VOLTA, CutsceneAtomic.doCeu().duracao());
         assertEquals(3, CutsceneAtomic.PALAVRAS.size());
         assertEquals(AtomicFinal.FALA - AtomicFinal.PASSAGEM, CutsceneAtomic.PALAVRAS.get(0).inicio(), "as palavras contam da chegada");
-        assertTrue(CutsceneAtomic.PALAVRAS.get(2).fim() <= AtomicFinal.ATOMIC - AtomicFinal.PASSAGEM);
+        assertTrue(CutsceneAtomic.PALAVRAS.get(1).fim() <= AtomicFinal.CARGA - AtomicFinal.PASSAGEM, "a carga é muda");
+        assertEquals(AtomicFinal.ATOMIC - AtomicFinal.PASSAGEM, CutsceneAtomic.PALAVRAS.get(2).fim(), "a terceira vai até o estouro");
     }
 }

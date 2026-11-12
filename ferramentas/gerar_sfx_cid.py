@@ -26,7 +26,9 @@ TRAJE = 12 * T            # FormasCid.TRAJE
 CARGA_DA_ESPADA, VOO_DO_CORTE, CORTE_ATOMICO = 12 * T, 4 * T, 10 * T   # FormasCid, os mesmos nomes
 CARGA_DO_RECOVERY, ONDA, COLUNA = 60 * T, 10 * T, 40 * T               # FormasCid, os mesmos nomes
 # AtomicFinal: ENTRE_SOCOS, TICKS_DO_RISCO, TICKS_DA_FALA, TICKS_DO_CLARAO e TICKS_DA_LUZ
-SOCO, RISCO, FALA, CLARAO, LUZ = 6 * T, 14 * T, 40 * T, 40 * T, 60 * T
+SOCO, RISCO, FALA, CLARAO, LUZ = 12 * T, 14 * T, 110 * T, 70 * T, 120 * T
+# AtomicFinal: PARADA, CARGA - FALA, TERCEIRA - FALA e TICKS_DA_ONDA
+PARADA, DUAS, MUDA, CHOQUE = 3 * T, 56 * T, 86 * T, 24 * T
 SILENCIO = .22            # o instante sem som antes do estouro, no espaço
 
 # nome -> (duração em s, alcance em blocos, legenda pt, legenda en)
@@ -46,6 +48,7 @@ SONS = {
     'cid_atomic_aura': (FALA + .1, 48, 'A magia cresce em silêncio', 'Magic swells in silence'),
     'cid_atomic': (CLARAO + 1.6, 96, 'I am atomic', 'I am atomic'),
     'cid_atomic_luz': (LUZ + 1.5, 160, 'Um estouro distante no céu', 'A distant burst in the sky'),
+    'cid_atomic_onda': (CHOQUE + 1.3, 64, 'Uma onda de choque varre o chão', 'A shockwave sweeps the ground'),
 }
 
 
@@ -66,11 +69,12 @@ MARCOS = {
     'cid_espada_atomica': {'voo': ticks(VOO_DO_CORTE), 'fim': ticks(CORTE_ATOMICO)},
     'cid_recovery_carga': {'fim': ticks(CARGA_DO_RECOVERY)},
     'cid_recovery': {'onda': ticks(ONDA), 'fim': ticks(COLUNA)},
-    'cid_atomic_soco': {'fim': ticks(SOCO)},
+    'cid_atomic_soco': {'parada': ticks(PARADA), 'fim': ticks(SOCO)},
     'cid_atomic_risco': {'fim': ticks(RISCO)},
-    'cid_atomic_aura': {'fim': ticks(FALA)},
+    'cid_atomic_aura': {'carga': ticks(DUAS), 'muda': ticks(MUDA), 'fim': ticks(FALA)},
     'cid_atomic': {'clarao': ticks(CLARAO)},
     'cid_atomic_luz': {'fim': ticks(LUZ)},
+    'cid_atomic_onda': {'fim': ticks(CHOQUE)},
 }
 
 
@@ -186,11 +190,14 @@ def sintese(nome, s):
         ar = .2 * s.girar(s.ruido(2500, 12000, .25), hz=6, prof=.5) * s.janela(0, COLUNA, .5)
         return abre + s.reverb(acorde + sinos + ar, 2.0, .35, 7000)
     if nome == 'cid_atomic_soco':
-        # Um soco seco: o estalo, o baque curto e o ar cortado. Sem cauda: o seguinte vem em 6 ticks.
-        bate = 1.2 * s.transiente(0, 3800, .006) + 1.3 * s.sub(0, 150, 60, 16, 3)
-        ar = .5 * silvo(s, 0, SOCO * .6, 700, 7000, .8)
-        fio = .2 * s.tom(880, 440, .5, 0, SOCO * .8, (1, 2.01)) * s.env(0, .003, 22)
-        return s.reverb(bate + ar + fio, .35, .12, 5000)
+        # Um soco pesado: o estalo seco e o baque grave no instante do golpe, um nada de silêncio (a parada de
+        # impacto) e então o alvo sai: o segundo baque, mais fundo, e o ar rasgado que vai embora.
+        bate = 1.3 * s.transiente(0, 3200, .007) + 1.6 * s.sub(0, 120, 42, 11, 3.5)
+        osso = .5 * s.passa_baixa(s.ruido(200, 2400, .6), 1500) * s.env(0, .002, 34)
+        sai = 1.2 * s.sub(PARADA, 85, 30, 7, 3) + .5 * s.transiente(PARADA, 1800, .012)
+        ar = .6 * silvo(s, PARADA, SOCO - PARADA, 500, 6000, .7)
+        fio = .15 * s.tom(660, 220, .6, PARADA, SOCO, (1, 2.01)) * s.env(PARADA, .004, 14)
+        return s.reverb(bate + osso + sai + ar + fio, .5, .16, 4200)
     if nome == 'cid_atomic_risco':
         # Os dois somem para cima: o ar rasgado que sobe e vai embora, com um fio de magia junto.
         sobe = 1.0 * s.ruido(500, 11000, .3) * s.janela(0, RISCO, .04) * (1 - .7 * s.crescer(0, RISCO, .8))
@@ -198,23 +205,26 @@ def sintese(nome, s):
         parte = 1.0 * s.sub(0, 120, 40, 6, 3) + .6 * s.transiente(0, 5000, .008)
         return s.reverb(sobe + tomq + parte, 1.4, .3, 6500)
     if nome == 'cid_atomic_aura':
-        # As três palavras: quase nada no começo, e um tom limpo que sobe devagar e fica cada vez mais fino,
-        # até sumir no instante do Atomic (o estouro é outro som).
-        sobe = .45 * s.tom(180, 1760, 2.2, 0, FALA, (1, 2.005, 3.01)) * s.crescer(0, FALA, 1.6)
-        zumbe = .35 * s.passa_baixa(magia(s, 58, 2.2), 700) * s.crescer(0, FALA, 1.2)
-        ar = .2 * s.ruido(4000, 13000, .2) * s.crescer(FALA * .4, FALA, 2.5)
-        return s.reverb((sobe + zumbe + ar) * s.janela(0, FALA + .04, .03), .8, .25, 8000)
+        # "I" e "am": quase nada no começo, e um tom limpo que sobe devagar. Na carga ele dispara para o agudo
+        # e some, como se fosse sugado, e o zumbido grave some junto: a terceira palavra é dita no silêncio.
+        sobe = .45 * s.tom(180, 880, 1.8, 0, DUAS, (1, 2.005, 3.01)) * s.crescer(0, DUAS, 1.6) * s.janela(0, DUAS + .05, .04)
+        zumbe = .4 * s.passa_baixa(magia(s, 58, 2.2), 700) * s.crescer(0, DUAS, 1.2) * s.janela(0, MUDA - .2, .5)
+        suga = .5 * s.tom(880, 5200, 2.4, DUAS, MUDA, (1, 2.005)) * s.janela(DUAS, MUDA, .05) * (1 - s.crescer(DUAS + .2, MUDA, 1.3))
+        ar = .35 * s.ruido(2500, 13000, .3) * s.crescer(DUAS, MUDA - .25, 2.) * s.janela(DUAS, MUDA - .15, .1)
+        fecha = .7 * s.transiente(MUDA - .12, 6000, .01) + .5 * s.sub(MUDA - .12, 200, 60, 20, 3)
+        return s.reverb(sobe + zumbe + suga + ar + fecha, .6, .2, 8000) * s.janela(0, MUDA + .25, .03)
     if nome == 'cid_atomic':
-        # O espaço fica mudo um instante (só um fio agudo), e a magia se solta: o grave que abre devagar, o
-        # acorde atômico largo e a luz chiando por cima, tudo crescendo com o clarão e sumindo com ele.
+        # O espaço fica mudo um instante (só um fio agudo), e a magia se solta: o estalo, o grave que abre
+        # devagar, o acorde atômico largo e a luz chiando por cima; o ronco cresce com a esfera até o branco.
         fio = .12 * s.tom(3520, 3520, 1., 0, SILENCIO, (1,)) * s.janela(0, SILENCIO, .04)
-        abre = 1.5 * s.sub(SILENCIO, 70, 26, 1.1, 4) + 1.0 * s.transiente(SILENCIO, 4500, .014)
+        abre = 1.7 * s.sub(SILENCIO, 70, 22, .8, 4) + 1.2 * s.transiente(SILENCIO, 4500, .016)
         acorde = sum(a * s.tom(f, harmonicos=(1, 2.005, 3.01), vibrato=.004, vib_hz=5)
                      for f, a in ((110, .6), (165, .45), (220, .5), (330, .4), (440, .32), (660, .2), (880, .12)))
         acorde = .5 * acorde * s.env(SILENCIO, .05, 1.1, .3) * s.janela(SILENCIO, CLARAO + 1.2, .7)
         luz = .3 * s.girar(s.ruido(1500, 13000, .25), hz=5, prof=.5) * s.env(SILENCIO, .04, 1.4, .2) * s.janela(SILENCIO, CLARAO + .8, .6)
-        ronco = .45 * s.passa_baixa(s.ruido(30, 400, .9), 180) * s.env(SILENCIO, .08, .9, .3) * s.janela(SILENCIO, CLARAO + 1.2, .8)
-        return fio + abre + s.reverb(acorde + luz + ronco, 2.4, .4, 6000)
+        ronco = .7 * s.passa_baixa(s.ruido(30, 400, .9), 180) * (.35 + .65 * s.crescer(SILENCIO, CLARAO, 1.4)) * s.janela(SILENCIO, CLARAO + 1.2, .8)
+        cresce = .3 * s.tom(55, 110, 1.5, SILENCIO, CLARAO, (1, 2, 3)) * s.crescer(SILENCIO, CLARAO, 1.8) * s.janela(SILENCIO, CLARAO + .6, .5)
+        return fio + abre + s.reverb(acorde + luz + ronco + cresce, 2.4, .4, 6000)
     if nome == 'cid_atomic_luz':
         # Do chão: o estouro vem de muito longe e de cima, abafado, um trovão comprido que rola e some.
         ronco = s.passa_baixa(s.ruido(25, 500, 1.), 220) * s.env(.12, .25, .7, .25) * s.janela(.1, LUZ + 1.3, 1.)
@@ -222,6 +232,12 @@ def sintese(nome, s):
         grave = 1.0 * s.sub(.12, 55, 24, .9, 3)
         acorde = .12 * sum(s.tom(f, harmonicos=(1, 2.005)) for f in (110, 165, 220)) * s.env(.2, .3, .8, .2) * s.janela(.2, LUZ + 1., .8)
         return s.reverb(ronco + rola + grave + acorde, 3.0, .5, 2200)
+    if nome == 'cid_atomic_onda':
+        # A volta: o baque fundo no chão, a poeira varrida para fora e o ronco que rola e some.
+        baque = 1.6 * s.sub(0, 75, 24, 2.2, 3.5) + .9 * s.transiente(0, 2200, .014)
+        varre = .7 * s.passa_baixa(s.ruido(120, 5000, .5), 2600) * s.janela(0, CHOQUE, .03) * (1 - .8 * s.crescer(0, CHOQUE, .7))
+        rola = .4 * s.girar(s.passa_baixa(s.ruido(40, 600, .8), 260), hz=4, prof=.5) * s.janela(.05, CHOQUE + 1., .7)
+        return s.reverb(baque + varre + rola, 1.6, .3, 3800)
     raise ValueError(nome)
 
 
