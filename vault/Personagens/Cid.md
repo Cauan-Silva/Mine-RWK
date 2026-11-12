@@ -74,6 +74,7 @@ Recurso: **Magia**, máximo 100, regenera sozinha; os golpes pequenos gastam pou
 - O traje ganha o capuz.
 
 ## Fontes
+- Vídeo da cena do I Am Atomic final (2ª temporada, ep. 12), mandado pelo autor e visto em quadros em 12/11/2026: https://www.youtube.com/watch?v=jMKKiWbqlQw. O R leva ao espaço de verdade (dimensão própria); ver o spec.
 - Fandom, The Eminence in Shadow Wiki, "Ragnarok", lida em 12/11/2026: https://the-eminence-in-shadow.fandom.com/wiki/Ragnarok
 - Fandom, The Eminence in Shadow Wiki, "Cid Kagenou" (Appearance; Powers & Abilities), lida em 12/11/2026: https://the-eminence-in-shadow.fandom.com/wiki/Cid_Kagenou. As indicações de volume, capítulo e episódio são as referências dessa página.
 - Kit do Minezin: `vault/Personagens/Cid.md` e `core/cid/PoderesCid.java` do repositório Minezin.
