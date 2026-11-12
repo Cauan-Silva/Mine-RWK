@@ -44,6 +44,8 @@ public final class DemoVfx {
     private static final boolean MUGETSU = MODO.equals("ichigo_mugetsu");
     /** {@code arvore}: a tela da árvore do Gojo em três momentos (sem pontos, com compras e desperto). */
     private static final boolean ARVORE = MODO.equals("arvore");
+    /** {@code hud}: a HUD do Gojo, do Ichigo no Bankai e do Cid, com uma recarga correndo, o brilho e o cadeado. */
+    private static final boolean HUD = MODO.equals("hud");
     /** {@code toji}: a luta contra o Toji: a entrada, a Nuvem, a investida, a queda com a cutscene, o Desaparecer e a fase 3. */
     private static final boolean TOJI = MODO.equals("toji");
     /** {@code zangetsu}: a luta contra o Zangetsu interior, do mundo interior à vitória, com a queda e a máscara. */
@@ -70,7 +72,7 @@ public final class DemoVfx {
     private static final boolean CID_ATOMICO = MODO.equals("cid_atomico");
     /** {@code cid_final}: o R inteiro num alvo parado, com a cutscene: a subida, o espaço, o Atomic e a volta. */
     private static final boolean CID_FINAL = MODO.equals("cid_final");
-    private static final int FIM_PREVIA = CID ? 250 : CID_FINAL ? 410 : CID_ATOMICO ? 215 : HOLLOW_PERTO || CID_PERTO ? 272 : HOLLOW ? 330 : ZANGETSU || RAGNAROK ? 2400 : TOJI ? 520 : ARVORE ? 100 : TRAJE ? 260 : TRAJE_ICHIGO ? 300 : ICHIGO ? 350 : MUGETSU ? 360 : R_COMPLETO ? 360
+    private static final int FIM_PREVIA = HUD ? 280 : CID ? 250 : CID_FINAL ? 410 : CID_ATOMICO ? 215 : HOLLOW_PERTO || CID_PERTO ? 272 : HOLLOW ? 330 : ZANGETSU || RAGNAROK ? 2400 : TOJI ? 520 : ARVORE ? 100 : TRAJE ? 260 : TRAJE_ICHIGO ? 300 : ICHIGO ? 350 : MUGETSU ? 360 : R_COMPLETO ? 360
             : ENCANTAMENTO ? CARGA + 90 : ESTOURO + RoxoMaximo.TICKS_EXPLOSAO + 110;
     private static int ticks;
     private static int quadro;
@@ -150,6 +152,10 @@ public final class DemoVfx {
     }
 
     private static void tocarPrevia(Minecraft mc, LocalPlayer jogador, int t) {
+        if (HUD) {
+            previaDaHud(mc, jogador, t);
+            return;
+        }
         if (ARVORE) {
             mc.gui.getChat().clearMessages(false);
             if (t == 0) jogador.connection.sendCommand("rwk maestria @s zerar");
@@ -868,6 +874,37 @@ public final class DemoVfx {
         servidor.execute(() -> servidor.getPlayerList().getPlayers().forEach(p -> {
             if (p.isAlive()) p.setHealth(p.getMaxHealth());
         }));
+    }
+
+    /** A HUD nova: cada personagem usa um golpe (varredura), recarrega tudo (brilho) e o Cid mostra o cadeado. */
+    private static void previaDaHud(Minecraft mc, LocalPlayer jogador, int t) {
+        mc.gui.getChat().clearMessages(false);
+        mc.options.hideGui = false;
+        mc.options.setCameraType(net.minecraft.client.CameraType.FIRST_PERSON);
+        jogador.setXRot(-10);
+        if (t == 0) {
+            jogador.connection.sendCommand("gamerule sendCommandFeedback false");
+            jogador.connection.sendCommand("gamemode survival");
+            jogador.connection.sendCommand("rwk trocar @s gojo");
+            jogador.connection.sendCommand("rwk despertar @s nao");
+        }
+        if (t == 10) tecla(com.minerwk.core.kit.Tecla.Z, true);
+        if (t == 12) tecla(com.minerwk.core.kit.Tecla.Z, false);
+        if (t == 20) tecla(com.minerwk.core.kit.Tecla.C, true);
+        if (t == 22) tecla(com.minerwk.core.kit.Tecla.C, false);
+        if (t == 70) jogador.connection.sendCommand("rwk recarregar");
+        if (t == 90) jogador.connection.sendCommand("rwk trocar @s ichigo");
+        if (t == 95) tecla(com.minerwk.core.kit.Tecla.G, true);
+        if (t == 97) tecla(com.minerwk.core.kit.Tecla.G, false);
+        if (t == 150) tecla(com.minerwk.core.kit.Tecla.X, true);
+        if (t == 152) tecla(com.minerwk.core.kit.Tecla.X, false);
+        if (t == 175) jogador.connection.sendCommand("rwk recarregar");
+        if (t == 195) jogador.connection.sendCommand("rwk trocar @s cid");
+        if (t == 200) tecla(com.minerwk.core.kit.Tecla.Z, true);
+        if (t == 202) tecla(com.minerwk.core.kit.Tecla.Z, false);
+        if (t == 250) jogador.connection.sendCommand("rwk recarregar");
+        if (t == FIM_PREVIA - 2) jogador.connection.sendCommand("gamemode creative");
+        if (t >= FIM_PREVIA) previa = -1;
     }
 
     private static void tecla(com.minerwk.core.kit.Tecla tecla, boolean apertou) {

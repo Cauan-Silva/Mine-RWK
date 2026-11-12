@@ -325,3 +325,4 @@ Voltar para [[00 Início]].
 - `/rwk anim` com `gojo_vermelho`, `gojo_infinito`, `gojo_roxo`, `gojo_roxo_200`, `gojo_vazio_infinito` (o `gojo_dominio` virou `gojo_vazio_infinito`) (o `gojo_azul` já foi confirmado em 09/11). `/rwk parar` interrompe.
 - `/rwk som`: toca o som de teste e mostra a legenda.
 - `/rwk fx <efeito>`: depois de criar um `.fx` no editor do Photon2, confirmar que aparece na posição do jogador; sem arquivo, deve responder "não encontrado".
+- UI parte 1 (12/11): ver a HUD nova no jogo com o Gojo, o Ichigo (Shikai e Bankai) e o Cid, em escala de GUI 2, 3 e 4: os ícones, a varredura da recarga, o brilho quando fica pronta, o cadeado, o véu sem recurso e a barra com o ícone. Prévia: `previas/ui_parte1_hud.mp4`; folha dos ícones: `previas/icones.png`. Dizer quais ícones não leem como o golpe.
