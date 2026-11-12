@@ -48,7 +48,8 @@ Spec e plano: [[2026-11-09 Núcleo dos kits]] (em `Desenvolvimento/Specs` e `Des
 
 ### 1.4 Base visual e de som
 - [x] Pipeline de áudio: `ferramentas/sfx_motor.py` e `gerar_sfx_gojo.py`, portados do Minezin, e o `SonsGojoTest`, que confere os ticks do som contra o Java; ver [[2026-11-10 Som do Gojo parte 1]]
-- [ ] `THIRD_PARTY_NOTICES.md` para gravações CC0 e Sonniss
+- [x] `THIRD_PARTY_NOTICES.md` para gravações CC0: Kenney e BigSoundBank, com `art/audio/cc0/fontes.json` e o `GravacoesCc0Test` ([[2026-11-12 Sons híbridos]])
+- [ ] Sons híbridos (gravação CC0 + síntese) nos outros personagens, depois do autor aprovar o piloto do Ragnarok
 - [x] Configuração do cliente (`minerwk-client.toml`: tremor, VFX reduzido, sons, HUD)
 - [x] Tremor de tela próprio (`core/camera/Tremor`, pacote `Tremer`)
 - [x] HUD de recargas e recurso (os ícones vêm com o Gojo)

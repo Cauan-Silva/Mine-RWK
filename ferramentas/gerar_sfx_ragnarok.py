@@ -1,11 +1,12 @@
-"""Sons do Ragnarok, sintetizados pelo motor em camadas (ferramentas/sfx_motor.py). Sem áudio de terceiros.
+"""Sons do Ragnarok, sintetizados pelo motor em camadas (ferramentas/sfx_motor.py). Gravações CC0 de terceiros e síntese.
 
 Rodar: python ferramentas/gerar_sfx_ragnarok.py [--preview caminho.wav]
 Escreve os .ogg em assets/minerwk/sounds/ragnarok/, as entradas do sounds.json, as legendas e o manifesto
 ferramentas/sfx_ragnarok_manifesto.json. Os ids repetem core/boss/SonsRagnarok.java (o SonsRagnarokTest confere).
 
-Um demônio de sete blocos em chamas: tudo é grave e pesado. O rugido é um tom bem baixo cheio de harmônicos,
-rasgado por ruído e tremendo; o fogo é ruído largo que estala; a terra é o sub-grave com pedras caindo.
+Um demônio de sete blocos em chamas: tudo é grave e pesado. Híbrido: gravações CC0 (art/audio/cc0, fontes em
+fontes.json) dão o corpo real (rosnados descidos de tom, fogo, explosões, pedras, pano, lâmina) e a síntese reforça
+os graves e faz a magia.
 """
 import argparse
 import numpy as np
@@ -63,54 +64,99 @@ def batida_de_asa(s, ini, forca=1.):
     return forca * (1.1 * ar + .5 * s.sub(ini + .12, 55, 35, 6, 2))
 
 
+G = 'bigsoundbank/'
+K = 'kenney/'
+ROSNADOS = [G + 'rosnado_zumbi_%s.ogg' % c for c in 'abcd']
+EXPLOSOES = [G + 'explosao_a.ogg', G + 'explosao_b.ogg'] + [K + 'explosionCrunch_00%d.ogg' % i for i in range(3)]
+PEDRAS = [G + 'pedras_%s.ogg' % c for c in 'abc']
+MURROS = [K + 'impactPunch_heavy_00%d.ogg' % i for i in range(3)] + [G + 'soco_a.ogg', G + 'soco_b.ogg']
+BAQUES = [K + 'impactSoft_heavy_00%d.ogg' % i for i in range(3)]
+SUBGRAVE = [K + 'lowFrequency_explosion_000.ogg', K + 'lowFrequency_explosion_001.ogg']
+WHOOSH = [G + 'whoosh_a.ogg', G + 'whoosh_b.ogg', G + 'whoosh_c.ogg']
+BANDEIRAS = [G + 'bandeira_a.ogg', G + 'bandeira_b.ogg']
+CHAMAS = [G + 'fogo_chama.ogg', G + 'fogo_chama_b.ogg', G + 'fogo_galhos.ogg']
+JATO = [K + 'thrusterFire_000.ogg', K + 'thrusterFire_001.ogg']
+TROVOES = [G + 'trovao_a.ogg', G + 'trovao_b.ogg']
+MAGIA = [K + 'forceField_000.ogg', K + 'forceField_001.ogg']
+LASERS = [K + 'laserLarge_00%d.ogg' % i for i in range(3)]
+FACAS = [K + 'knifeSlice.ogg', K + 'knifeSlice2.ogg']
+
+
+def garganta(s, ini, dur, tom=.5, forca=1.):
+    """O rugido gravado: um rosnado descido de tom (a garganta de sete blocos) com um mugido ainda mais grave por
+    baixo, e a voz sintetizada só como reforço dos graves."""
+    forma = s.janela(ini, ini + dur, .1)
+    gravado = s.amostra(ROSNADOS, ini, 1., tom) + s.amostra(G + 'mugido.ogg', ini + .05, .55, tom * .95)
+    return forca * (gravado + .3 * rugido(s, ini, dur, 70, 52, 1., .4)) * forma
+
+
+def chao(s, ini, forca=1., tom=.6):
+    """O chão cedendo, gravado: a explosão grave, o baque e as pedras caindo depois."""
+    return forca * (s.amostra(EXPLOSOES, ini, .9, tom) + s.amostra(SUBGRAVE, ini, .8, .9)
+                    + s.amostra(PEDRAS, ini + .06, .45, .9) + .5 * s.sub(ini, 60, 26, 2.4, 4))
+
+
 def sintese(nome, s):
     if nome == 'ragnarok_entrada':
-        # O portal ronca, os pés pesam no chão e o rugido sobe para o céu.
-        portal = .4 * s.passa_baixa(s.ruido(20, 400, 1.), 160) * s.janela(0, 1.0, .3)
-        return s.reverb(portal + terra(s, .25, .8) + rugido(s, .7, 2.1, 82, 60), 2.2, .35, 3000)
+        # O portal ronca (trovão), os pés pesam e o rugido sobe para o céu.
+        portal = s.amostra(TROVOES, 0, .7, .7) + .3 * s.passa_baixa(s.ruido(20, 400, 1.), 160) * s.janela(0, 1.0, .3)
+        pes = s.amostra(BAQUES, .25, .8, .6) + s.amostra(PEDRAS, .3, .35, .8)
+        return s.reverb(portal + pes + garganta(s, .7, 2.2, .5, 1.1), 2.2, .3, 3000)
     if nome == 'ragnarok_soco':
-        # O braço caindo (ar), o murro e a terra; as chamas do punho espalham.
-        ar = .5 * s.passa_baixa(s.ruido(100, 2500, .6), 900) * s.crescer(0, .14, 2) * s.env(.14, .001, 30)
-        return ar + s.reverb(terra(s, .14) + fogo(s, .16, .7, .4), 1.4, .25, 2500)
+        # O braço caindo (ar), o murro, a terra e as chamas do punho.
+        ar = s.amostra(WHOOSH, 0, .45, .6) * (s.t < .16)
+        murro = s.amostra(MURROS, .14, 1., .55) + chao(s, .14, .9)
+        chama = s.amostra(G + 'fogo_ignicao.ogg', .15, .4, .8) * s.janela(.15, 1.2, .2)
+        return ar + s.reverb(murro + chama, 1.3, .2, 2500)
     if nome == 'ragnarok_rajada':
-        # Duas batidas de asa juntas e cinco silvos de magia saindo em leque.
-        silvos = sum(.35 * s.tom(900 + 140 * k, 380 + 60 * k, .6, .1 + .04 * k, .9, (1, 2.01), (1, .3))
+        # Duas batidas de asa juntas e a magia saindo em leque.
+        asa = s.amostra(BANDEIRAS, 0, 1., .55) + .4 * batida_de_asa(s, 0, 1.)
+        magia = s.amostra(MAGIA, .1, .5, .8) + s.amostra(LASERS, .1, .35, .6)
+        silvos = sum(.2 * s.tom(900 + 140 * k, 380 + 60 * k, .6, .1 + .04 * k, .9, (1, 2.01), (1, .3))
                      * s.env(.1 + .04 * k, .02, 4) for k in range(5))
-        return batida_de_asa(s, 0, 1.2) + s.reverb(silvos + .4 * fogo(s, .1, .6, .5, 7000), 1.0, .25, 6000)
+        return asa + s.reverb(magia + silvos, 1.0, .25, 6000)
     if nome == 'ragnarok_asas':
-        # Três batidas na subida, cada vez mais fortes.
-        return s.reverb(sum(batida_de_asa(s, d, f) for d, f in ((0, .8), (.4, 1.), (.8, 1.2))), 1.2, .2, 1500)
+        # Três batidas na subida, cada vez mais fortes: pano gravado descido de tom.
+        batidas = sum(f * (s.amostra(BANDEIRAS, d, 1., .5) + .3 * batida_de_asa(s, d, 1.))
+                      for d, f in ((0, .7), (.4, .85), (.8, 1.)))
+        return s.reverb(batidas + s.amostra(G + 'voo_pombo.ogg', 0, .25, .35), 1.2, .2, 1500)
     if nome == 'ragnarok_investida':
         # O rasante: o ar rasgado chegando e indo, com o fogo do corpo passando junto.
         passa = np.where(s.t < .55, s.crescer(0, .55, 2.5), np.exp(-(s.t - .55) * 3))
-        ar = 1.0 * s.ruido(150, 4500, .4) * passa
-        return s.reverb(ar + .6 * fogo(s, .2, 1.0, .8) * passa + .5 * s.sub(.5, 60, 35, 3, 2.5), 1.0, .2, 3000)
+        ar = s.amostra(WHOOSH, .1, 1., .5) + s.amostra(G + 'vento_forte.ogg', 0, .5, .8) * passa
+        chama = s.amostra(CHAMAS, 0, .5, .9) * passa
+        return s.reverb(ar + chama + .4 * s.sub(.5, 60, 35, 3, 2.5), 1.0, .2, 3000)
     if nome == 'ragnarok_sopro_carga':
-        # Ele puxa o ar: o fogo sendo sugado e um ronco que sobe até o feixe sair, no tick 40.
-        puxa = s.ruido(200, 6000, .3) * s.crescer(0, CARGA, 1.8) * s.janela(0, CARGA, .05)
-        ronco = .6 * s.tom(45, 95, 1.5, 0, CARGA, (1, 2, 3, 5), (1, .6, .4, .2)) * s.janela(0, CARGA, .2)
-        return .5 * puxa + ronco + .4 * fogo(s, 0, CARGA, .6, 3000) * s.crescer(0, CARGA, 1.2)
+        # Ele puxa o ar: o ronco sobe, o fogo é sugado para a boca até o feixe sair, no tick 40.
+        sobe = s.crescer(0, CARGA, 1.6) * s.janela(0, CARGA, .05)
+        ronco = s.amostra(K + 'spaceEngineLow_000.ogg', 0, .6, .7) + .4 * s.tom(45, 95, 1.5, 0, CARGA, (1, 2, 3), (1, .5, .3))
+        puxa = s.amostra(WHOOSH, CARGA - 1.0, .6, .5, inverter=True) + s.amostra(G + 'fogo_galhos.ogg', 0, .5, .7)
+        return (ronco + puxa) * sobe
     if nome == 'ragnarok_sopro':
-        # O feixe: um rugido de fogo de 2 s, com a garganta por baixo.
-        jato = 1.0 * fogo(s, 0, FEIXE + .2, 1.0, 9000) + .5 * s.ruido(800, 12000, .1) * s.janela(0, FEIXE, .05)
-        return s.reverb(jato + .7 * rugido(s, 0, FEIXE, 70, 55, aspero=1.), 1.6, .3, 5000)
+        # O feixe: o jato de fogo gravado, a chama e a garganta por baixo.
+        corpo = s.janela(0, FEIXE + .25, .05)
+        jato = s.amostra(JATO, 0, 1., .65) + s.amostra(CHAMAS, 0, .6, .8) + s.amostra(G + 'fogo_ignicao.ogg', 0, .6, .7)
+        return s.reverb((jato + .6 * garganta(s, 0, FEIXE, .45)) * corpo, 1.5, .25, 5000)
     if nome == 'ragnarok_pisao':
-        # A perna sobe, desce, e a onda corre pelo chão rachando tudo.
-        onda = .5 * s.estalos(.2, 1.0, 70, 3000) * s.env(.2, .05, 2) + .4 * fogo(s, .2, .9, .5)
-        return s.reverb(terra(s, 0, 1.2) + onda, 1.6, .3, 2500)
+        # A perna desce, a onda corre pelo chão rachando tudo.
+        onda = (s.amostra(TROVOES, .05, .5, .9) + s.amostra(PEDRAS, .2, .6, 1.)
+                + s.amostra(CHAMAS, .2, .3, .9) * s.janela(.2, 1.2, .2))
+        return s.reverb(chao(s, 0, 1.1, .5) + onda, 1.5, .25, 2500)
     if nome == 'ragnarok_corte':
-        # A lâmina de slime: o silvo fino, o corte molhado e o osso partindo.
-        silvo = .8 * s.ruido(2500, 14000, 0) * s.crescer(0, .07, 2) * s.env(.07, .001, 20)
-        osso = .7 * s.transiente(.07, 3500, .02) + .5 * s.estalos(.07, .2, 120, 3000) + .7 * s.sub(.07, 90, 40, 6, 3)
+        # A lâmina de slime: o corte gravado, o osso partindo e o eco violeta da magia.
+        lamina = (s.amostra(G + 'espada_corta.ogg', 0, 1., 1.) + s.amostra(FACAS, .02, .6, .8)
+                  + s.amostra(G + 'espada_ar.ogg', 0, .4, .9))
+        osso = s.amostra(MURROS, .07, .6, .8) + s.amostra(K + 'chop.ogg', .08, .5, .6) + .5 * s.sub(.07, 90, 40, 6, 3)
         magia = .3 * s.tom(1200, 600, .5, .07, .6, (1, 2), (1, .3)) * s.env(.07, .01, 5)
-        return s.reverb(silvo + osso + magia, .8, .25, 5000)
+        return s.reverb(lamina + osso + magia, .8, .25, 5000)
     if nome == 'ragnarok_rugido':
-        # O urro: começa estrangulado e se abre em raiva.
-        return s.reverb(rugido(s, 0, 2.2, 110, 64, 1.1, 1.0), 2.0, .35, 3500)
+        # O urro de dor: o rosnado e o rugido do gato bem graves, abrindo em raiva.
+        dor = garganta(s, 0, 2.2, .55, 1.) + s.amostra(G + 'rugido_gato.ogg', .1, .6, .4) * s.janela(.1, 2.2, .2)
+        return s.reverb(dor + s.amostra(G + 'grunhidos.ogg', 0, .25, .5), 2.0, .3, 3500)
     if nome == 'ragnarok_morte':
         # O último rugido, caindo, e o corpo enorme no chão.
-        ultimo = rugido(s, 0, 1.8, 74, 38, .9, .8) * (1 - .6 * s.crescer(0, 1.8, 1))
-        return s.reverb(ultimo + terra(s, 1.7, 1.3), 2.4, .35, 2500)
+        ultimo = garganta(s, 0, 1.8, .42, 1.) * (1 - .6 * s.crescer(0, 1.8, 1))
+        return s.reverb(ultimo + chao(s, 1.7, 1.3, .5) + s.amostra(BAQUES, 1.7, .9, .5), 2.4, .3, 2500)
     raise KeyError(nome)
 
 

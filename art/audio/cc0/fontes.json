@@ -1,0 +1,407 @@
+{
+ "bigsoundbank/bandeira_a.ogg": {
+  "autor": "BigSoundBank.com, Joseph Sardin",
+  "origem": "https://bigsoundbank.com/flag-1-s1787.html",
+  "som": "flag-1",
+  "licenca": "CC0 1.0",
+  "trecho": null
+ },
+ "bigsoundbank/bandeira_b.ogg": {
+  "autor": "BigSoundBank.com, Joseph Sardin",
+  "origem": "https://bigsoundbank.com/flag-2-s1788.html",
+  "som": "flag-2",
+  "licenca": "CC0 1.0",
+  "trecho": null
+ },
+ "bigsoundbank/espada_ar.ogg": {
+  "autor": "BigSoundBank.com, Joseph Sardin",
+  "origem": "https://bigsoundbank.com/sword-through-the-air-s0128.html",
+  "som": "sword-through-the-air",
+  "licenca": "CC0 1.0",
+  "trecho": null
+ },
+ "bigsoundbank/espada_corta.ogg": {
+  "autor": "BigSoundBank.com, Joseph Sardin",
+  "origem": "https://bigsoundbank.com/sword-that-cuts-s0127.html",
+  "som": "sword-that-cuts",
+  "licenca": "CC0 1.0",
+  "trecho": null
+ },
+ "bigsoundbank/explosao_a.ogg": {
+  "autor": "BigSoundBank.com, Joseph Sardin",
+  "origem": "https://bigsoundbank.com/explosion-1-s1807.html",
+  "som": "explosion-1",
+  "licenca": "CC0 1.0",
+  "trecho": null
+ },
+ "bigsoundbank/explosao_b.ogg": {
+  "autor": "BigSoundBank.com, Joseph Sardin",
+  "origem": "https://bigsoundbank.com/explosion-2-s1808.html",
+  "som": "explosion-2",
+  "licenca": "CC0 1.0",
+  "trecho": null
+ },
+ "bigsoundbank/fogo_chama.ogg": {
+  "autor": "BigSoundBank.com, Joseph Sardin",
+  "origem": "https://bigsoundbank.com/gasoline-fire-1-s1340.html",
+  "som": "gasoline-fire-1",
+  "licenca": "CC0 1.0",
+  "trecho": [
+   1.5,
+   6.0
+  ]
+ },
+ "bigsoundbank/fogo_chama_b.ogg": {
+  "autor": "BigSoundBank.com, Joseph Sardin",
+  "origem": "https://bigsoundbank.com/gasoline-fire-2-s1341.html",
+  "som": "gasoline-fire-2",
+  "licenca": "CC0 1.0",
+  "trecho": [
+   0.0,
+   3.5
+  ]
+ },
+ "bigsoundbank/fogo_galhos.ogg": {
+  "autor": "BigSoundBank.com, Joseph Sardin",
+  "origem": "https://bigsoundbank.com/big-branching-fire-1-s0987.html",
+  "som": "big-branching-fire-1",
+  "licenca": "CC0 1.0",
+  "trecho": [
+   0.5,
+   4.5
+  ]
+ },
+ "bigsoundbank/fogo_ignicao.ogg": {
+  "autor": "BigSoundBank.com, Joseph Sardin",
+  "origem": "https://bigsoundbank.com/gasoline-fire-1-s1340.html",
+  "som": "gasoline-fire-1",
+  "licenca": "CC0 1.0",
+  "trecho": [
+   0.0,
+   2.5
+  ]
+ },
+ "bigsoundbank/grunhidos.ogg": {
+  "autor": "BigSoundBank.com, Joseph Sardin",
+  "origem": "https://bigsoundbank.com/grunts-s0486.html",
+  "som": "grunts",
+  "licenca": "CC0 1.0",
+  "trecho": [
+   0.2,
+   2.2
+  ]
+ },
+ "bigsoundbank/mugido.ogg": {
+  "autor": "BigSoundBank.com, Joseph Sardin",
+  "origem": "https://bigsoundbank.com/cow-moos-3-s2383.html",
+  "som": "cow-moos-3",
+  "licenca": "CC0 1.0",
+  "trecho": [
+   0.9,
+   null
+  ]
+ },
+ "bigsoundbank/pedras_a.ogg": {
+  "autor": "BigSoundBank.com, Joseph Sardin",
+  "origem": "https://bigsoundbank.com/fall-of-stone-s1022.html",
+  "som": "fall-of-stone",
+  "licenca": "CC0 1.0",
+  "trecho": [
+   1.5,
+   4.5
+  ]
+ },
+ "bigsoundbank/pedras_b.ogg": {
+  "autor": "BigSoundBank.com, Joseph Sardin",
+  "origem": "https://bigsoundbank.com/fall-of-stone-s1022.html",
+  "som": "fall-of-stone",
+  "licenca": "CC0 1.0",
+  "trecho": [
+   11.5,
+   14.5
+  ]
+ },
+ "bigsoundbank/pedras_c.ogg": {
+  "autor": "BigSoundBank.com, Joseph Sardin",
+  "origem": "https://bigsoundbank.com/fall-of-stone-s1022.html",
+  "som": "fall-of-stone",
+  "licenca": "CC0 1.0",
+  "trecho": [
+   16.3,
+   19.3
+  ]
+ },
+ "bigsoundbank/rosnado_zumbi_a.ogg": {
+  "autor": "BigSoundBank.com, Joseph Sardin",
+  "origem": "https://bigsoundbank.com/zombie-7-s2112.html",
+  "som": "zombie-7",
+  "licenca": "CC0 1.0",
+  "trecho": null
+ },
+ "bigsoundbank/rosnado_zumbi_b.ogg": {
+  "autor": "BigSoundBank.com, Joseph Sardin",
+  "origem": "https://bigsoundbank.com/zombie-2-s2107.html",
+  "som": "zombie-2",
+  "licenca": "CC0 1.0",
+  "trecho": [
+   0.0,
+   2.5
+  ]
+ },
+ "bigsoundbank/rosnado_zumbi_c.ogg": {
+  "autor": "BigSoundBank.com, Joseph Sardin",
+  "origem": "https://bigsoundbank.com/zombie-3-s2108.html",
+  "som": "zombie-3",
+  "licenca": "CC0 1.0",
+  "trecho": [
+   1.4,
+   3.6
+  ]
+ },
+ "bigsoundbank/rosnado_zumbi_d.ogg": {
+  "autor": "BigSoundBank.com, Joseph Sardin",
+  "origem": "https://bigsoundbank.com/zombie-1-s2106.html",
+  "som": "zombie-1",
+  "licenca": "CC0 1.0",
+  "trecho": [
+   6.3,
+   8.6
+  ]
+ },
+ "bigsoundbank/rugido_gato.ogg": {
+  "autor": "BigSoundBank.com, Joseph Sardin",
+  "origem": "https://bigsoundbank.com/cat-roar-1-s1881.html",
+  "som": "cat-roar-1",
+  "licenca": "CC0 1.0",
+  "trecho": null
+ },
+ "bigsoundbank/soco_a.ogg": {
+  "autor": "BigSoundBank.com, Joseph Sardin",
+  "origem": "https://bigsoundbank.com/punch-5-s2460.html",
+  "som": "punch-5",
+  "licenca": "CC0 1.0",
+  "trecho": null
+ },
+ "bigsoundbank/soco_b.ogg": {
+  "autor": "BigSoundBank.com, Joseph Sardin",
+  "origem": "https://bigsoundbank.com/punch-6-s2461.html",
+  "som": "punch-6",
+  "licenca": "CC0 1.0",
+  "trecho": null
+ },
+ "bigsoundbank/trovao_a.ogg": {
+  "autor": "BigSoundBank.com, Joseph Sardin",
+  "origem": "https://bigsoundbank.com/thunder-2-s3113.html",
+  "som": "thunder-2",
+  "licenca": "CC0 1.0",
+  "trecho": [
+   1.9,
+   null
+  ]
+ },
+ "bigsoundbank/trovao_b.ogg": {
+  "autor": "BigSoundBank.com, Joseph Sardin",
+  "origem": "https://bigsoundbank.com/thunder-4-s3115.html",
+  "som": "thunder-4",
+  "licenca": "CC0 1.0",
+  "trecho": [
+   1.3,
+   4.5
+  ]
+ },
+ "bigsoundbank/vento_forte.ogg": {
+  "autor": "BigSoundBank.com, Joseph Sardin",
+  "origem": "https://bigsoundbank.com/strong-wind-1-s0146.html",
+  "som": "strong-wind-1",
+  "licenca": "CC0 1.0",
+  "trecho": [
+   40.5,
+   44.5
+  ]
+ },
+ "bigsoundbank/voo_pombo.ogg": {
+  "autor": "BigSoundBank.com, Joseph Sardin",
+  "origem": "https://bigsoundbank.com/flight-of-a-pigeon-s0840.html",
+  "som": "flight-of-a-pigeon",
+  "licenca": "CC0 1.0",
+  "trecho": null
+ },
+ "bigsoundbank/whoosh_a.ogg": {
+  "autor": "BigSoundBank.com, Joseph Sardin",
+  "origem": "https://bigsoundbank.com/whoosh-4-s1796.html",
+  "som": "whoosh-4",
+  "licenca": "CC0 1.0",
+  "trecho": null
+ },
+ "bigsoundbank/whoosh_b.ogg": {
+  "autor": "BigSoundBank.com, Joseph Sardin",
+  "origem": "https://bigsoundbank.com/whoosh-8-s1801.html",
+  "som": "whoosh-8",
+  "licenca": "CC0 1.0",
+  "trecho": null
+ },
+ "bigsoundbank/whoosh_c.ogg": {
+  "autor": "BigSoundBank.com, Joseph Sardin",
+  "origem": "https://bigsoundbank.com/whoosh-2-s0573.html",
+  "som": "whoosh-2",
+  "licenca": "CC0 1.0",
+  "trecho": [
+   2.3,
+   3.3
+  ]
+ },
+ "kenney/chop.ogg": {
+  "autor": "RPG Audio 1.0, Kenney (www.kenney.nl)",
+  "origem": "https://kenney.nl/assets/rpg-audio",
+  "som": "chop.ogg",
+  "licenca": "CC0 1.0",
+  "trecho": null
+ },
+ "kenney/explosionCrunch_000.ogg": {
+  "autor": "Sci-Fi Sounds 1.0, Kenney (www.kenney.nl)",
+  "origem": "https://kenney.nl/assets/sci-fi-sounds",
+  "som": "explosionCrunch_000.ogg",
+  "licenca": "CC0 1.0",
+  "trecho": null
+ },
+ "kenney/explosionCrunch_001.ogg": {
+  "autor": "Sci-Fi Sounds 1.0, Kenney (www.kenney.nl)",
+  "origem": "https://kenney.nl/assets/sci-fi-sounds",
+  "som": "explosionCrunch_001.ogg",
+  "licenca": "CC0 1.0",
+  "trecho": null
+ },
+ "kenney/explosionCrunch_002.ogg": {
+  "autor": "Sci-Fi Sounds 1.0, Kenney (www.kenney.nl)",
+  "origem": "https://kenney.nl/assets/sci-fi-sounds",
+  "som": "explosionCrunch_002.ogg",
+  "licenca": "CC0 1.0",
+  "trecho": null
+ },
+ "kenney/forceField_000.ogg": {
+  "autor": "Sci-Fi Sounds 1.0, Kenney (www.kenney.nl)",
+  "origem": "https://kenney.nl/assets/sci-fi-sounds",
+  "som": "forceField_000.ogg",
+  "licenca": "CC0 1.0",
+  "trecho": null
+ },
+ "kenney/forceField_001.ogg": {
+  "autor": "Sci-Fi Sounds 1.0, Kenney (www.kenney.nl)",
+  "origem": "https://kenney.nl/assets/sci-fi-sounds",
+  "som": "forceField_001.ogg",
+  "licenca": "CC0 1.0",
+  "trecho": null
+ },
+ "kenney/impactPunch_heavy_000.ogg": {
+  "autor": "Impact Sounds 1.0, Kenney (www.kenney.nl)",
+  "origem": "https://kenney.nl/assets/impact-sounds",
+  "som": "impactPunch_heavy_000.ogg",
+  "licenca": "CC0 1.0",
+  "trecho": null
+ },
+ "kenney/impactPunch_heavy_001.ogg": {
+  "autor": "Impact Sounds 1.0, Kenney (www.kenney.nl)",
+  "origem": "https://kenney.nl/assets/impact-sounds",
+  "som": "impactPunch_heavy_001.ogg",
+  "licenca": "CC0 1.0",
+  "trecho": null
+ },
+ "kenney/impactPunch_heavy_002.ogg": {
+  "autor": "Impact Sounds 1.0, Kenney (www.kenney.nl)",
+  "origem": "https://kenney.nl/assets/impact-sounds",
+  "som": "impactPunch_heavy_002.ogg",
+  "licenca": "CC0 1.0",
+  "trecho": null
+ },
+ "kenney/impactSoft_heavy_000.ogg": {
+  "autor": "Impact Sounds 1.0, Kenney (www.kenney.nl)",
+  "origem": "https://kenney.nl/assets/impact-sounds",
+  "som": "impactSoft_heavy_000.ogg",
+  "licenca": "CC0 1.0",
+  "trecho": null
+ },
+ "kenney/impactSoft_heavy_001.ogg": {
+  "autor": "Impact Sounds 1.0, Kenney (www.kenney.nl)",
+  "origem": "https://kenney.nl/assets/impact-sounds",
+  "som": "impactSoft_heavy_001.ogg",
+  "licenca": "CC0 1.0",
+  "trecho": null
+ },
+ "kenney/impactSoft_heavy_002.ogg": {
+  "autor": "Impact Sounds 1.0, Kenney (www.kenney.nl)",
+  "origem": "https://kenney.nl/assets/impact-sounds",
+  "som": "impactSoft_heavy_002.ogg",
+  "licenca": "CC0 1.0",
+  "trecho": null
+ },
+ "kenney/knifeSlice.ogg": {
+  "autor": "RPG Audio 1.0, Kenney (www.kenney.nl)",
+  "origem": "https://kenney.nl/assets/rpg-audio",
+  "som": "knifeSlice.ogg",
+  "licenca": "CC0 1.0",
+  "trecho": null
+ },
+ "kenney/knifeSlice2.ogg": {
+  "autor": "RPG Audio 1.0, Kenney (www.kenney.nl)",
+  "origem": "https://kenney.nl/assets/rpg-audio",
+  "som": "knifeSlice2.ogg",
+  "licenca": "CC0 1.0",
+  "trecho": null
+ },
+ "kenney/laserLarge_000.ogg": {
+  "autor": "Sci-Fi Sounds 1.0, Kenney (www.kenney.nl)",
+  "origem": "https://kenney.nl/assets/sci-fi-sounds",
+  "som": "laserLarge_000.ogg",
+  "licenca": "CC0 1.0",
+  "trecho": null
+ },
+ "kenney/laserLarge_001.ogg": {
+  "autor": "Sci-Fi Sounds 1.0, Kenney (www.kenney.nl)",
+  "origem": "https://kenney.nl/assets/sci-fi-sounds",
+  "som": "laserLarge_001.ogg",
+  "licenca": "CC0 1.0",
+  "trecho": null
+ },
+ "kenney/laserLarge_002.ogg": {
+  "autor": "Sci-Fi Sounds 1.0, Kenney (www.kenney.nl)",
+  "origem": "https://kenney.nl/assets/sci-fi-sounds",
+  "som": "laserLarge_002.ogg",
+  "licenca": "CC0 1.0",
+  "trecho": null
+ },
+ "kenney/lowFrequency_explosion_000.ogg": {
+  "autor": "Sci-Fi Sounds 1.0, Kenney (www.kenney.nl)",
+  "origem": "https://kenney.nl/assets/sci-fi-sounds",
+  "som": "lowFrequency_explosion_000.ogg",
+  "licenca": "CC0 1.0",
+  "trecho": null
+ },
+ "kenney/lowFrequency_explosion_001.ogg": {
+  "autor": "Sci-Fi Sounds 1.0, Kenney (www.kenney.nl)",
+  "origem": "https://kenney.nl/assets/sci-fi-sounds",
+  "som": "lowFrequency_explosion_001.ogg",
+  "licenca": "CC0 1.0",
+  "trecho": null
+ },
+ "kenney/spaceEngineLow_000.ogg": {
+  "autor": "Sci-Fi Sounds 1.0, Kenney (www.kenney.nl)",
+  "origem": "https://kenney.nl/assets/sci-fi-sounds",
+  "som": "spaceEngineLow_000.ogg",
+  "licenca": "CC0 1.0",
+  "trecho": null
+ },
+ "kenney/thrusterFire_000.ogg": {
+  "autor": "Sci-Fi Sounds 1.0, Kenney (www.kenney.nl)",
+  "origem": "https://kenney.nl/assets/sci-fi-sounds",
+  "som": "thrusterFire_000.ogg",
+  "licenca": "CC0 1.0",
+  "trecho": null
+ },
+ "kenney/thrusterFire_001.ogg": {
+  "autor": "Sci-Fi Sounds 1.0, Kenney (www.kenney.nl)",
+  "origem": "https://kenney.nl/assets/sci-fi-sounds",
+  "som": "thrusterFire_001.ogg",
+  "licenca": "CC0 1.0",
+  "trecho": null
+ }
+}

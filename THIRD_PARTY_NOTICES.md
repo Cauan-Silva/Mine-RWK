@@ -4,6 +4,11 @@
 | Arquivo | Origem | Licença |
 | --- | --- | --- |
 | `assets/minerwk/sounds/teste/teste.ogg` (era `computerNoise_000.ogg`) | Sci-Fi Sounds 1.0, Kenney (www.kenney.nl) | CC0 1.0 |
+| `art/audio/cc0/bigsoundbank/*.ogg` (trechos; fonte e trecho de cada um em `art/audio/cc0/fontes.json`) | BigSoundBank.com, Joseph Sardin (https://bigsoundbank.com) | CC0 1.0 |
+| `art/audio/cc0/kenney/impact*.ogg` | Impact Sounds 1.0, Kenney (www.kenney.nl) | CC0 1.0 |
+| `art/audio/cc0/kenney/knifeSlice*.ogg`, `chop.ogg` | RPG Audio 1.0, Kenney (www.kenney.nl) | CC0 1.0 |
+| `art/audio/cc0/kenney/explosionCrunch*`, `laserLarge*`, `lowFrequency_explosion*`, `forceField*`, `thrusterFire*`, `spaceEngineLow*` | Sci-Fi Sounds 1.0, Kenney (www.kenney.nl) | CC0 1.0 |
+| `assets/minerwk/sounds/ragnarok/*.ogg` | Gerados por `ferramentas/gerar_sfx_ragnarok.py`: as gravações CC0 acima, mudadas de tom, cortadas e mixadas com síntese própria | do projeto, sobre CC0 |
 | `assets/minerwk/sounds/gojo/*.ogg` | Síntese própria por `ferramentas/gerar_sfx_gojo.py`, com o motor `ferramentas/sfx_motor.py` portado do Minezin (mesmo autor). Sem áudio de terceiros. | do projeto |
 
 ## Animações
