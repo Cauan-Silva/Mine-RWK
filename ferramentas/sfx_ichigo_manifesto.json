@@ -1,0 +1,313 @@
+{
+  "ichigo_getsuga_carga": {
+    "duration": 0.55,
+    "sample_rate": 48000,
+    "channels": 1,
+    "peak": 0.56776,
+    "rms": 0.1236,
+    "sha256": "7a7ee72e05312acb2a4d7d9e825d005ad9ae81324f1ba646576b2cda2e64dd7d",
+    "ticks": 11,
+    "marcos": {
+      "cheia": 10
+    }
+  },
+  "ichigo_getsuga_carga_2": {
+    "duration": 0.5288,
+    "sample_rate": 48000,
+    "channels": 1,
+    "peak": 0.60536,
+    "rms": 0.12763,
+    "sha256": "3b6ff9e8349746a67597db59679e483bf7af071e662bdae55d5711ea71741482"
+  },
+  "ichigo_getsuga_carga_3": {
+    "duration": 0.5729,
+    "sample_rate": 48000,
+    "channels": 1,
+    "peak": 0.63734,
+    "rms": 0.15255,
+    "sha256": "01cf897b3b9b34748948bc8a0076b632a507adef94c25b7ef3dac05c51e4ba31"
+  },
+  "ichigo_getsuga": {
+    "duration": 2.15,
+    "sample_rate": 48000,
+    "channels": 1,
+    "peak": 0.62418,
+    "rms": 0.08427,
+    "sha256": "573c185b4d94d4f08f83fdb6baede078540a228441277c5080abe1fed4207256",
+    "ticks": 43,
+    "marcos": {
+      "voo": 15,
+      "fim": 31
+    }
+  },
+  "ichigo_getsuga_2": {
+    "duration": 2.0673,
+    "sample_rate": 48000,
+    "channels": 1,
+    "peak": 0.63156,
+    "rms": 0.08868,
+    "sha256": "0e5a18ff1ce9ca970dbd642d51a7525ea143a1e1f3c3ebe4138512e6aa8fb583"
+  },
+  "ichigo_getsuga_3": {
+    "duration": 2.2396,
+    "sample_rate": 48000,
+    "channels": 1,
+    "peak": 0.63,
+    "rms": 0.09602,
+    "sha256": "a14be7518046048bc2706584bc1f7395a84b0d4051c158d1f3ba888064b069c3"
+  },
+  "ichigo_getsuga_negro": {
+    "duration": 2.0,
+    "sample_rate": 48000,
+    "channels": 1,
+    "peak": 0.55687,
+    "rms": 0.08488,
+    "sha256": "7428c8905ff4823b5b0b832c1995263bbaefb15793c761c8f1dd5fa107fbe9b2",
+    "ticks": 40,
+    "marcos": {
+      "voo": 12,
+      "fim": 28
+    }
+  },
+  "ichigo_getsuga_negro_2": {
+    "duration": 1.9231,
+    "sample_rate": 48000,
+    "channels": 1,
+    "peak": 0.58381,
+    "rms": 0.0817,
+    "sha256": "951b946d3a9c40fe2ff36394617d7491e1ffa24081205cb75298b82dbc0836a8"
+  },
+  "ichigo_getsuga_negro_3": {
+    "duration": 2.0833,
+    "sample_rate": 48000,
+    "channels": 1,
+    "peak": 0.65802,
+    "rms": 0.08297,
+    "sha256": "7acc1078a8ab6a0d973f4dd0d33711685da2bbb81ee6037606c961e72cc7c3b6"
+  },
+  "ichigo_shunpo": {
+    "duration": 0.75,
+    "sample_rate": 48000,
+    "channels": 1,
+    "peak": 0.59649,
+    "rms": 0.0926,
+    "sha256": "f61b68516e2b84317d91956d1a2d876a10469913f492a55e1b1032c65242d165",
+    "ticks": 15,
+    "marcos": {
+      "fim": 9
+    }
+  },
+  "ichigo_shunpo_2": {
+    "duration": 0.7211,
+    "sample_rate": 48000,
+    "channels": 1,
+    "peak": 0.68179,
+    "rms": 0.10108,
+    "sha256": "f32195aabf74a8f94af0b731f0e767f9847b71fa4aed20d5158c9f8465575146"
+  },
+  "ichigo_shunpo_3": {
+    "duration": 0.7812,
+    "sample_rate": 48000,
+    "channels": 1,
+    "peak": 0.64066,
+    "rms": 0.10432,
+    "sha256": "992f186e98e018ef08e40beb77f19eb3bca49b69fe6a3527f3d8d6ba28dd920e"
+  },
+  "ichigo_onda": {
+    "duration": 2.0,
+    "sample_rate": 48000,
+    "channels": 1,
+    "peak": 0.60285,
+    "rms": 0.13702,
+    "sha256": "6c629cbbf3cfa37e5b5e86d9197dd74bbe30e1a236c40bf07490556b840c874f",
+    "ticks": 40,
+    "marcos": {
+      "fim": 16
+    }
+  },
+  "ichigo_onda_2": {
+    "duration": 1.9231,
+    "sample_rate": 48000,
+    "channels": 1,
+    "peak": 0.62258,
+    "rms": 0.1505,
+    "sha256": "b4d892b2847d915e387cad99d7216f25c470de40e81b36884a230c1909d1bd2d"
+  },
+  "ichigo_onda_3": {
+    "duration": 2.0833,
+    "sample_rate": 48000,
+    "channels": 1,
+    "peak": 0.60812,
+    "rms": 0.14681,
+    "sha256": "41d1fd79c58c2877006d62a4726c5032173d13b5cd1d1d241b726fd90441f976"
+  },
+  "ichigo_arremesso": {
+    "duration": 1.05,
+    "sample_rate": 48000,
+    "channels": 1,
+    "peak": 0.58673,
+    "rms": 0.1358,
+    "sha256": "a38f0c483e06a028882834ba1a7b86fb56fffc33e02e10388109b345f53ad94e",
+    "ticks": 21,
+    "marcos": {
+      "volta": 8,
+      "fim": 16
+    }
+  },
+  "ichigo_arremesso_2": {
+    "duration": 1.0096,
+    "sample_rate": 48000,
+    "channels": 1,
+    "peak": 0.58384,
+    "rms": 0.12598,
+    "sha256": "1bbae6f503897378b3a465273362f24976ff4ffd0e750f514735341f8b084b96"
+  },
+  "ichigo_arremesso_3": {
+    "duration": 1.0937,
+    "sample_rate": 48000,
+    "channels": 1,
+    "peak": 0.66201,
+    "rms": 0.14334,
+    "sha256": "8815b395ccde4ff2fbdc89d92bb1732acaaf2794c7573583bbda5524a3a43cc2"
+  },
+  "ichigo_bankai_carga": {
+    "duration": 1.55,
+    "sample_rate": 48000,
+    "channels": 1,
+    "peak": 0.60166,
+    "rms": 0.13269,
+    "sha256": "f99b03c6f61d60ab5139dc9ecd9ca1f8b86cd03869e6a20987dba3c7790f78ee",
+    "ticks": 31,
+    "marcos": {
+      "libera": 30
+    }
+  },
+  "ichigo_bankai_carga_2": {
+    "duration": 1.4904,
+    "sample_rate": 48000,
+    "channels": 1,
+    "peak": 0.62065,
+    "rms": 0.13855,
+    "sha256": "3697965c34c6e7b196fffee55b4d31f8f88d8d1d605a891b262c7ba2a93b683f"
+  },
+  "ichigo_bankai_carga_3": {
+    "duration": 1.6146,
+    "sample_rate": 48000,
+    "channels": 1,
+    "peak": 0.6131,
+    "rms": 0.13862,
+    "sha256": "5169c5ead755adc771f0429d191b412e7a7499fda9e4a4b42971169c9988cd14"
+  },
+  "ichigo_bankai": {
+    "duration": 3.3,
+    "sample_rate": 48000,
+    "channels": 1,
+    "peak": 0.65713,
+    "rms": 0.12932,
+    "sha256": "d87e2afc4b52b801bb46e4db4cc3da088a81405c36558ca7c802f3294e81a7fa",
+    "ticks": 66,
+    "marcos": {
+      "fim": 34
+    }
+  },
+  "ichigo_bankai_2": {
+    "duration": 3.1731,
+    "sample_rate": 48000,
+    "channels": 1,
+    "peak": 0.61,
+    "rms": 0.14793,
+    "sha256": "2753c7f86278982d1ec42cc0360fa24f3210b856e28b494311c9e06e63ef9e8d"
+  },
+  "ichigo_bankai_3": {
+    "duration": 3.4375,
+    "sample_rate": 48000,
+    "channels": 1,
+    "peak": 0.61423,
+    "rms": 0.15118,
+    "sha256": "8778f87ff668a533763ec518c3b46df03667090570ef86c93c30f3c19f4f182f"
+  },
+  "ichigo_lamina": {
+    "duration": 6.3,
+    "sample_rate": 48000,
+    "channels": 1,
+    "peak": 0.61784,
+    "rms": 0.08898,
+    "sha256": "0bccfab73a15b3ac0c1be6261a51d329b0e9dc8490ec7218efa065d964a551ec",
+    "ticks": 126,
+    "marcos": {
+      "fim": 120
+    }
+  },
+  "ichigo_lamina_2": {
+    "duration": 6.0577,
+    "sample_rate": 48000,
+    "channels": 1,
+    "peak": 0.70359,
+    "rms": 0.09325,
+    "sha256": "eb6f0327e98d75e4fb6ca72daee51231b39807e492918c7023f7f142ed5d3e01"
+  },
+  "ichigo_lamina_3": {
+    "duration": 6.5625,
+    "sample_rate": 48000,
+    "channels": 1,
+    "peak": 0.60169,
+    "rms": 0.08498,
+    "sha256": "b419661e86877ec4a13bd0dfb1224dd8633a04d743b4e866dfe370b6433a91c5"
+  },
+  "ichigo_sair": {
+    "duration": 1.2,
+    "sample_rate": 48000,
+    "channels": 1,
+    "peak": 0.60043,
+    "rms": 0.12474,
+    "sha256": "6fad97a8a95892f1e1ec15eb1f2de7d1fc676d23fab28367ea500f506d070b42",
+    "ticks": 24,
+    "marcos": {
+      "fim": 14
+    }
+  },
+  "ichigo_sair_2": {
+    "duration": 1.1538,
+    "sample_rate": 48000,
+    "channels": 1,
+    "peak": 0.68718,
+    "rms": 0.14987,
+    "sha256": "f858e973e8207e35972caf386b1b61784dd42fbd58aeba37283847221065e45a"
+  },
+  "ichigo_sair_3": {
+    "duration": 1.25,
+    "sample_rate": 48000,
+    "channels": 1,
+    "peak": 0.6676,
+    "rms": 0.14886,
+    "sha256": "0d82b71c06f3ddeee98f8d4646e215839604b2caf6d1df543959160c0df7c7b5"
+  },
+  "ichigo_corte": {
+    "duration": 0.45,
+    "sample_rate": 48000,
+    "channels": 1,
+    "peak": 0.6228,
+    "rms": 0.11684,
+    "sha256": "e9aa989b2b44879621817661a026c5e14a12c20830b1ab073069cc37037b68c5",
+    "ticks": 9,
+    "marcos": {
+      "fim": 7
+    }
+  },
+  "ichigo_corte_2": {
+    "duration": 0.4327,
+    "sample_rate": 48000,
+    "channels": 1,
+    "peak": 0.65259,
+    "rms": 0.12445,
+    "sha256": "73985464f66b1106f6c0dc64c6819747ab20a8eff6ce2ccf7ba9841a0993cbf3"
+  },
+  "ichigo_corte_3": {
+    "duration": 0.4687,
+    "sample_rate": 48000,
+    "channels": 1,
+    "peak": 0.58485,
+    "rms": 0.09752,
+    "sha256": "eceb2b2ba72463970ea89fb4d9b4f1fea3324bc41ecdd8ca4c722ddfd0c43e96"
+  }
+}

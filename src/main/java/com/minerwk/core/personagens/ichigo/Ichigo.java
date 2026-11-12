@@ -23,7 +23,7 @@ import java.util.Set;
 /**
  * Ichigo Kurosaki (Bleach). A forma base é o Shikai; o G leva ao Bankai, que troca os golpes e gasta o
  * reiatsu até acabar. Cada golpe toca a animação de mesmo id e manda os visuais {@code ichigo_*}, que o
- * cliente desenha a partir de {@code core/vfx}. O som entra depois.
+ * cliente desenha a partir de {@code core/vfx}. O som de cada golpe sai do visual dele ({@link SonsIchigo}).
  */
 public final class Ichigo {
     public static final String ID = "ichigo";

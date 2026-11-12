@@ -24,7 +24,17 @@ Voltar para [[00 Início]].
 - Gojo (revisão 09/11, menores que ficaram): o Roxo pode derrubar plantas vizinhas (o `BreakEvent` para mods de proteção entrou em 09/11, no Gojo peso); o Vermelho atravessa parede fina encostada no rosto; bola de fogo e crânio de Wither voltam a acelerar no Infinito (o dano é cancelado mesmo assim); TNT sem dono passa pelo Infinito; sobram até 2 ticks de Infinito e 5 de Paralisia depois de morrer. Corrigidos na revisão: efeitos acabam ao mudar de dimensão; golpes não atingem pets, montaria nem projéteis do próprio Gojo; Paralisia não cancela Espinhos nem dano em si mesmo; ícone da Paralisia escondido (falta textura).
 
 ## Para testar no jogo
-- Ichigo, parte 4 (11/11): VFX e animações (prévia em `previas/ichigo.mp4`); os golpes ainda não têm som:
+- Ichigo, parte 5 (11/11): som dos golpes. **Ouvir primeiro a prévia** `previas/sfx_ichigo.wav` (os 11 sons, 3 variações de cada, em fila). Depois no jogo (`/rwk trocar <jogador> ichigo`):
+  - **Z (Shikai):** o som da carga cresce enquanto segura e para ao soltar; a saída do corte, o voo e o estouro quando a meia-lua se desfaz. Bater numa parede perto: o estouro do som chega atrasado em relação ao visual?
+  - **Z (Bankai):** mais grave e mais rápido que o do Shikai. Dá para distinguir os dois de ouvido?
+  - **X:** o passo. Vários Shunpos seguidos no Bankai (recarga de 2 s) cansam?
+  - **C (Shikai):** a espada cravando e a onda; **V:** o giro na ida, a volta e o baque na mão caem junto com a espada?
+  - **G:** a pressão se juntando na carga e o estouro na liberação. O estouro tem peso de transformação? Cortar a carga (levar um golpe forte) para o som.
+  - **C (Bankai):** a lâmina acesa soa pelos 6 s sem incomodar; sair do Bankai no meio apaga o som.
+  - **Clique da espada:** o corte curto a cada ataque básico. Com cliques rápidos vira uma rajada?
+  - **Geral:** volume de cada som em relação aos do Gojo e aos do jogo; de perto e de longe; outro jogador ouvindo; legendas ligadas; a opção `SFX de anime` desligada.
+  - **Ainda sem som:** máscara, Mugetsu e forma Hollow (partes 6 e 8, que ainda não existem).
+- Ichigo, parte 4 (11/11): VFX e animações (prévia em `previas/ichigo.mp4`):
   - **Getsuga (Z):** o reiatsu azul sobe enquanto segura; a meia-lua sai do corte, acompanha o dano e se parte em lascas na parede (atirar de perto numa parede e ver se as lascas aparecem do lado de cá). No Bankai é preta com borda vermelha. Ver de frente, de lado e em primeira pessoa se o tamanho e o brilho agradam.
   - **Shunpo (X):** riscos, vultos e poeira no caminho; conferir em primeira pessoa se não atrapalha a visão.
   - **Ajustes ainda sem prévia** (gravar com `./gradlew runClientDemo -Pdemo=ichigo` ou ver no jogo): o rasgo no chão por onde o Getsuga passa; o rastro de corte em cada clique da espada (Shikai, Bankai e maior com o C do Bankai), em primeira e terceira pessoa; o tranco de câmera no Getsuga e o clarão na onda e na entrada do Bankai (ver se não ficou demais).

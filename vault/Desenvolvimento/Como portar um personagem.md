@@ -78,6 +78,8 @@ Tudo sintetizado aqui, sem áudio de terceiros. Ver [[2026-11-10 Som do Gojo par
   - Entidade (boss) toca pelo servidor, com `level().playSound`.
 - **Caráter:** combinar com o personagem. Os do Gojo têm tom e zumbido de energia; os do Toji, que não tem energia amaldiçoada, são secos (impacto, metal, ar).
 - Créditos em `THIRD_PARTY_NOTICES.md`, mesmo sendo sintetizado (a linha diz qual gerador fez).
+- **Ligação com os visuais:** cada personagem tem um `Sons<Personagem>` em `core/personagens/<id>/` com `doVisual` e `cortaComOVisual`, e entra em `core/personagens/SonsDosVisuais`, que é a quem o cliente pergunta. O Ichigo ([[2026-11-11 Ichigo parte 5]]) tira todos os sons dos visuais, sem nada pela apresentação.
+
 
 ## 7. Traje
 GeckoLib, automático ao escolher o personagem, sem item no inventário. Ver [[2026-11-10 Traje do Gojo]].

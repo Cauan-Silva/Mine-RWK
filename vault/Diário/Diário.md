@@ -39,3 +39,4 @@ Voltar para [[00 Início]].
 - [[2026-11-11 Ichigo parte 2]]: kit do Shikai e do Bankai (nove golpes, Shunpo, ataque básico da Zangetsu) com apresentação provisória
 - [[2026-11-11 Ichigo parte 3]]: Zangetsu e Tensa Zangetsu na mão, traje do Shikai e do Bankai e o pano animado trazido do Minezin
 - [[2026-11-11 Ichigo parte 4]]: VFX dos golpes do Ichigo (Getsuga em volume, Shunpo, onda, arremesso, entrada do Bankai) e nove animações do jogador
+- [[2026-11-11 Ichigo parte 5]]: som dos golpes do Ichigo (11 sons sintetizados, presos aos visuais) e o `SonsDosVisuais` para todos os personagens

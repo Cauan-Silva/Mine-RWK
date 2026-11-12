@@ -3,6 +3,7 @@ package com.minerwk.client.vfx;
 import com.minerwk.MineRWK;
 import com.minerwk.client.ConfigCliente;
 import com.minerwk.core.kit.Vetor;
+import com.minerwk.core.personagens.SonsDosVisuais;
 import com.minerwk.core.personagens.gojo.SonsGojo;
 import java.util.IdentityHashMap;
 import java.util.Iterator;
@@ -16,7 +17,8 @@ import net.minecraft.sounds.SoundSource;
 /**
  * O som preso ao visual: toca no ponto do visual quando ele começa, para junto se o visual for encerrado
  * antes da hora (carga solta cedo ou interrompida) e, para alguns, toca no meio do visual (uppercut,
- * subida e fusão do R) ou um pouco antes de ele acabar (o domínio rachando). Qual som vai com qual visual fica no núcleo ({@link SonsGojo}).
+ * subida e fusão do R) ou um pouco antes de ele acabar (o domínio rachando). Qual som vai com qual visual
+ * fica no núcleo ({@link SonsDosVisuais}, que pergunta a cada personagem; os sons do meio e do fim, só o Gojo tem).
  */
 public final class SonsVisuais {
     /** Sons que param junto com o visual, enquanto ele existe. */
@@ -43,9 +45,9 @@ public final class SonsVisuais {
 
     /** Um visual começou: toca o som dele, se tiver. */
     static void aoComecar(VisuaisAtivos.Visual v) {
-        SonsGojo.doVisual(v.tipo).ifPresent(id -> {
+        SonsDosVisuais.doVisual(v.tipo).ifPresent(id -> {
             SoundInstance som = tocar(id, v.origem);
-            if (som != null && SonsGojo.cortaComOVisual(v.tipo)) TOCANDO.put(v, som);
+            if (som != null && SonsDosVisuais.cortaComOVisual(v.tipo)) TOCANDO.put(v, som);
         });
     }
 

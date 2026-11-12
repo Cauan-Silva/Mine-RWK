@@ -145,7 +145,10 @@ public final class VisuaisAtivos {
         ClientLevel nivel = Minecraft.getInstance().level;
         if (nivel == null) return;
         if (ATIVOS.size() >= LIMITE) despejar();
-        ATIVOS.add(new Visual(dono, tipo, origem, direcao, forca, duracao, nivel.getGameTime()));
+        Visual novo = new Visual(dono, tipo, origem, direcao, forca, duracao, nivel.getGameTime());
+        ATIVOS.add(novo);
+        // O visual criado no cliente (o rastro do clique da espada) também tem som.
+        SonsVisuais.aoComecar(novo);
     }
 
     /** Se o dono tem um visual desse tipo em andamento (não encerrado). */
