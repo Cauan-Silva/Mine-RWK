@@ -24,6 +24,13 @@ Voltar para [[00 Início]].
 - Gojo (revisão 09/11, menores que ficaram): o Roxo pode derrubar plantas vizinhas (o `BreakEvent` para mods de proteção entrou em 09/11, no Gojo peso); o Vermelho atravessa parede fina encostada no rosto; bola de fogo e crânio de Wither voltam a acelerar no Infinito (o dano é cancelado mesmo assim); TNT sem dono passa pelo Infinito; sobram até 2 ticks de Infinito e 5 de Paralisia depois de morrer. Corrigidos na revisão: efeitos acabam ao mudar de dimensão; golpes não atingem pets, montaria nem projéteis do próprio Gojo; Paralisia não cancela Espinhos nem dano em si mesmo; ícone da Paralisia escondido (falta textura).
 
 ## Para testar no jogo
+- Cid, parte 3, os visuais e as animações dos golpes base (12/11): **ver primeiro** `previas/cid_parte3_golpes.mp4` (`./gradlew runClientDemo -Pdemo=cid`). Ainda **sem som** (parte 4).
+  - **Z, Redemoinho:** três arcos pretos com o fio azul-violeta, um para cada lado. Dá para ler os três cortes? O giro do corpo (uma volta) fica bom em primeira pessoa ou enjoa?
+  - **X, Pós-imagem:** o vulto que fica 2 s, tremendo e sumindo, e os riscos da partida. O vulto é reconhecível como "ele"? Os riscos mostram 9 blocos mesmo quando uma parede encurta o passo.
+  - **C, Prisão:** o slime voando (miolo preto e gotas), o respingo, e as quatro correntes que sobem da poça e seguram o alvo. Em alvos grandes ou baixos (golem, aranha, Ragnarok) as correntes ficam pequenas ou nascem fora do chão (o desenho supõe a altura de um jogador)?
+  - **Traje de slime:** ao amortecer um golpe de 8 ou mais, gotas pretas saltam do corpo com um clarão. Dá para notar?
+  - **G, Overdrive:** o estouro ao ligar, os fios subindo em volta do corpo e o anel nos pés. De dia aparece? À noite fica forte demais? Em primeira pessoa só o anel aparece.
+  - As cores (preto do slime, azul-violeta da magia) combinam com o traje?
 - Cid, parte 2, o traje do Shadow e a espada (12/11): **ver primeiro** `previas/cid_traje_perto.mp4` e `previas/cid_traje_quadros.jpg` (no jogo). Refeito pelas referências do autor (capuz aberto, rosto da skin, espada preta em cruz).
   - **O capuz:** aberto na frente, com o rosto e o cabelo da skin. A ponta e as lapelas da gola lembram a obra? Com skins de cabelo alto (segunda camada), algo atravessa o teto?
   - **O conjunto:** friso dourado na abertura, colete roxo-escuro, linhas da cintura, losango na coxa, botas de cano roxo. Some à noite?

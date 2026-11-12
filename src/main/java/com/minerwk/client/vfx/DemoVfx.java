@@ -61,7 +61,9 @@ public final class DemoVfx {
     private static final int ESTOURO = ESFERAS + RoxoMaximo.TICKS_FUSAO;
     /** {@code cid_perto}: o traje do Shadow de perto, com os mesmos planos da prévia de perto do Vasto Lorde. */
     private static final boolean CID_PERTO = MODO.equals("cid_perto");
-    private static final int FIM_PREVIA = HOLLOW_PERTO || CID_PERTO ? 272 : HOLLOW ? 330 : ZANGETSU ? 2400 : TOJI ? 520 : ARVORE ? 100 : TRAJE ? 260 : TRAJE_ICHIGO ? 300 : ICHIGO ? 350 : MUGETSU ? 360 : R_COMPLETO ? 360
+    /** {@code cid}: os golpes base do Cid (G, Z, C e X) em alvos parados, vistos de lado. */
+    private static final boolean CID = MODO.equals("cid");
+    private static final int FIM_PREVIA = CID ? 250 : HOLLOW_PERTO || CID_PERTO ? 272 : HOLLOW ? 330 : ZANGETSU ? 2400 : TOJI ? 520 : ARVORE ? 100 : TRAJE ? 260 : TRAJE_ICHIGO ? 300 : ICHIGO ? 350 : MUGETSU ? 360 : R_COMPLETO ? 360
             : ENCANTAMENTO ? CARGA + 90 : ESTOURO + RoxoMaximo.TICKS_EXPLOSAO + 110;
     private static int ticks;
     private static int quadro;
@@ -87,7 +89,7 @@ public final class DemoVfx {
             mc.setScreen(null);
         }
         if (DEMO && ticks == 40) {
-            jogador.connection.sendCommand(ENCANTAMENTO || R_COMPLETO || TRAJE || TRAJE_ICHIGO || ICHIGO || MUGETSU || TOJI || ZANGETSU || HOLLOW || CID_PERTO ? "time set noon" : "time set midnight");
+            jogador.connection.sendCommand(ENCANTAMENTO || R_COMPLETO || TRAJE || TRAJE_ICHIGO || ICHIGO || MUGETSU || TOJI || ZANGETSU || HOLLOW || CID_PERTO || CID ? "time set noon" : "time set midnight");
             if (ARVORE) jogador.connection.sendCommand("rwk trocar @s gojo");
             if (TOJI) {
                 jogador.connection.sendCommand("rwk trocar @s gojo");
@@ -95,7 +97,7 @@ public final class DemoVfx {
                 jogador.connection.sendCommand("tp @s ~150 ~12 ~");
             }
             if (ZANGETSU) jogador.connection.sendCommand("rwk despertar @s nao");
-            if (CID_PERTO) {
+            if (CID_PERTO || CID) {
                 jogador.connection.sendCommand("rwk trocar @s cid");
                 jogador.connection.sendCommand("tp @s ~150 ~12 ~");
             }
@@ -165,6 +167,10 @@ public final class DemoVfx {
         }
         if (HOLLOW_PERTO || CID_PERTO) {
             previaDoHollowDePerto(mc, jogador, t);
+            return;
+        }
+        if (CID) {
+            previaDoCid(mc, jogador, t);
             return;
         }
         if (HOLLOW) {
@@ -494,6 +500,50 @@ public final class DemoVfx {
      * A forma Hollow: entra no Bankai, leva um golpe fatal e a forma ataca sozinha dois golens (um perto, para
      * as garras, e um longe, para o Sonído). De frente no começo (a máscara e os chifres), depois de lado.
      */
+    /** Os golpes base do Cid, de lado, por uma câmera fixa: o Overdrive, o Redemoinho, a Prisão e a Pós-imagem. */
+    private static void previaDoCid(Minecraft mc, LocalPlayer jogador, int t) {
+        mc.gui.getChat().clearMessages(false);
+        net.minecraft.world.entity.Entity camera = jogador;
+        for (net.minecraft.world.entity.Entity e : mc.level.entitiesForRendering()) {
+            if (e instanceof net.minecraft.world.entity.decoration.ArmorStand && e.distanceToSqr(jogador) < 60 * 60) camera = e;
+        }
+        if (mc.getCameraEntity() != camera) mc.setCameraEntity(camera);
+        mc.options.setCameraType(net.minecraft.client.CameraType.THIRD_PERSON_BACK);
+        mc.options.hideGui = true;
+        jogador.setXRot(2);
+        if (t == 0) {
+            jogador.setYRot(0);
+            jogador.connection.sendCommand("gamerule sendCommandFeedback false");
+            jogador.connection.sendCommand("kill @e[type=minecraft:armor_stand,distance=..60]");
+            jogador.connection.sendCommand("execute at @s run summon minecraft:armor_stand ~-2.2 ~0.7 ~5 "
+                    + "{Invisible:1b,NoGravity:1b,Marker:0b,Rotation:[-90f,8f]}");
+            jogador.connection.sendCommand("kill @e[type=minecraft:husk,distance=..60]");
+            jogador.connection.sendCommand("execute at @s run summon minecraft:husk ~ ~ ~4 {NoAI:1b,Rotation:[180f,0f],Health:200f,attributes:[{id:\"minecraft:generic.max_health\",base:200d}]}");
+            jogador.connection.sendCommand("execute at @s run summon minecraft:husk ~ ~ ~11 {NoAI:1b,Rotation:[180f,0f]}");
+            jogador.connection.sendCommand("rwk recarregar");
+        }
+        // G liga o Overdrive; Z gira (o alvo de perto apanha); C prende o de perto; X atravessa; G desliga.
+        int[][] teclas = {{10, 12, 4}, {50, 52, 0}, {95, 97, 2}, {185, 187, 1}, {215, 217, 4}};
+        com.minerwk.core.kit.Tecla[] qual = {com.minerwk.core.kit.Tecla.Z, com.minerwk.core.kit.Tecla.X,
+                com.minerwk.core.kit.Tecla.C, com.minerwk.core.kit.Tecla.V, com.minerwk.core.kit.Tecla.G};
+        for (int[] k : teclas) {
+            if (t == k[0]) tecla(qual[k[2]], true);
+            if (t == k[1]) tecla(qual[k[2]], false);
+        }
+        if (t == FIM_PREVIA - 3) {
+            jogador.connection.sendCommand("kill @e[type=minecraft:husk,distance=..60]");
+            jogador.connection.sendCommand("kill @e[type=minecraft:armor_stand,distance=..60]");
+            jogador.connection.sendCommand("gamerule sendCommandFeedback true");
+            jogador.connection.sendCommand("tp @s ~-150 ~ ~-30");
+        }
+        if (t >= FIM_PREVIA) {
+            mc.options.hideGui = false;
+            mc.setCameraEntity(jogador);
+            mc.options.setCameraType(net.minecraft.client.CameraType.FIRST_PERSON);
+            previa = -1;
+        }
+    }
+
     /**
      * O modelo do Vasto Lorde de perto, sem inimigo por perto (a forma fica parada): a câmera do jogo com o
      * campo de visão fechado em 30 graus faz o papel da lente. De frente parado, de frente andando, de costas

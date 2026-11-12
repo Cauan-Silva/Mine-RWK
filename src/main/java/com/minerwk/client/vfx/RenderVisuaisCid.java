@@ -1,0 +1,420 @@
+package com.minerwk.client.vfx;
+
+import com.minerwk.core.kit.Vetor;
+import com.minerwk.core.vfx.FormasCid;
+import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.BufferBuilder;
+import com.mojang.blaze3d.vertex.BufferUploader;
+import com.mojang.blaze3d.vertex.DefaultVertexFormat;
+import com.mojang.blaze3d.vertex.MeshData;
+import com.mojang.blaze3d.vertex.Tesselator;
+import com.mojang.blaze3d.vertex.VertexFormat;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.GameRenderer;
+import net.minecraft.util.Mth;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.phys.Vec3;
+
+/**
+ * Os visuais do Cid: o slime é tinta preta, opaca, e a magia é azul-violeta e soma luz. Cor chapada com luz
+ * por vértice, sem textura. Os tempos e as formas vêm de {@code core/vfx/FormasCid}; o servidor manda cada
+ * visual como {@code MostrarVisual} com o tipo começando em {@code cid_}. Tudo relativo à câmera.
+ */
+final class RenderVisuaisCid {
+    private static final int TINTA = 0x0B0912, EBANO = 0x1B1626, MAGIA = 0x7A5CFF, CLARO = 0xCBBEFF, ROXO = 0x5B2FA8;
+    private static final Vec3 CIMA = new Vec3(0, 1, 0);
+    private static final double ALCANCE = 128;
+
+    private static BufferBuilder buffer;
+
+    private RenderVisuaisCid() {
+    }
+
+    static boolean eDoCid(String tipo) {
+        return tipo.startsWith("cid_");
+    }
+
+    /** Desenha {@code v}; {@code t} é a idade em ticks. */
+    static void desenhar(Vec3 camera, float parcial, VisuaisAtivos.Visual v, double t) {
+        Vec3 o = new Vec3(v.origem.x() - camera.x, v.origem.y() - camera.y, v.origem.z() - camera.z);
+        if (o.lengthSqr() > ALCANCE * ALCANCE) return;
+        // Visual encerrado antes da hora (o slime que bateu, o Overdrive desligado): some em poucos ticks.
+        float sai = v.fimEm < 0 ? 1 : (float) Math.max(0, 1 - (t - (v.fimEm - v.inicio)) / VisuaisAtivos.SAIDA);
+        try {
+            switch (v.tipo) {
+                case "cid_redemoinho" -> redemoinho(camera, parcial, v, o, t);
+                case "cid_pos_imagem" -> posImagem(v, o, t);
+                case "cid_slime" -> slime(camera, v, o, t, sai);
+                case "cid_correntes" -> correntes(v, o, t);
+                case "cid_overdrive" -> overdrive(camera, parcial, v, o, t, sai);
+                case "cid_traje" -> traje(camera, parcial, v, o, t);
+                default -> {
+                }
+            }
+        } finally {
+            if (buffer != null) {
+                // Um desenho falhou no meio do lote: joga fora o que estava pela metade.
+                MeshData resto = buffer.build();
+                if (resto != null) resto.close();
+                buffer = null;
+                Pincel.restaurar();
+            }
+        }
+    }
+
+    // ---------------------------------------------------------------- lotes e primitivas
+
+    private static void abrir(boolean aditivo) {
+        RenderSystem.enableBlend();
+        if (aditivo) RenderSystem.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE);
+        else RenderSystem.defaultBlendFunc();
+        RenderSystem.disableCull();
+        RenderSystem.enableDepthTest();
+        RenderSystem.depthMask(false);
+        RenderSystem.setShader(GameRenderer::getPositionColorShader);
+        buffer = Tesselator.getInstance().begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
+    }
+
+    private static void fechar() {
+        MeshData malha = buffer.build();
+        buffer = null;
+        if (malha != null) BufferUploader.drawWithShader(malha);
+        Pincel.restaurar();
+    }
+
+    private static void ponto(Vec3 p, int cor, float alpha) {
+        buffer.addVertex((float) p.x, (float) p.y, (float) p.z)
+                .setColor((cor >> 16) & 255, (cor >> 8) & 255, cor & 255, (int) (Mth.clamp(alpha, 0, 1) * 255));
+    }
+
+    private static void quad(Vec3 a, Vec3 b, Vec3 c, Vec3 d, int cor, float alpha) {
+        ponto(a, cor, alpha);
+        ponto(b, cor, alpha);
+        ponto(c, cor, alpha);
+        ponto(d, cor, alpha);
+    }
+
+    private static int luz(int cor, double l) {
+        int r = (int) Math.min(255, ((cor >> 16) & 255) * l), g = (int) Math.min(255, ((cor >> 8) & 255) * l);
+        int b = (int) Math.min(255, (cor & 255) * l);
+        return r << 16 | g << 8 | b;
+    }
+
+    /** Fita de {@code a} a {@code b} virada para a câmera (que está na origem). */
+    private static void fita(Vec3 a, Vec3 b, double largura, int cor, float alphaA, float alphaB) {
+        Vec3 l = b.subtract(a).cross(a.add(b).scale(.5));
+        if (l.lengthSqr() < 1e-12) return;
+        l = l.normalize().scale(largura / 2);
+        ponto(a.subtract(l), cor, alphaA);
+        ponto(a.add(l), cor, alphaA);
+        ponto(b.add(l), cor, alphaB);
+        ponto(b.subtract(l), cor, alphaB);
+    }
+
+    /** Brilho redondo virado para a câmera: cheio no centro, zero na borda. */
+    private static void halo(Vec3 c, double raio, int cor, float alpha) {
+        if (alpha <= .004f || c.lengthSqr() < 1e-8) return;
+        Vec3 ver = c.normalize();
+        Vec3 x = ver.cross(CIMA);
+        x = (x.lengthSqr() < 1e-6 ? new Vec3(1, 0, 0) : x.normalize()).scale(raio);
+        Vec3 y = x.cross(ver);
+        int n = 14;
+        for (int i = 0; i < n; i++) {
+            double a0 = Math.PI * 2 * i / n, a1 = Math.PI * 2 * (i + 1) / n;
+            ponto(c, cor, alpha);
+            ponto(c.add(x.scale(Math.cos(a0))).add(y.scale(Math.sin(a0))), cor, 0);
+            ponto(c.add(x.scale(Math.cos(a1))).add(y.scale(Math.sin(a1))), cor, 0);
+            ponto(c, cor, alpha);
+        }
+    }
+
+    /** Anel deitado: {@code dentro} e {@code fora} são as opacidades das duas beiradas. */
+    private static void anel(Vec3 c, double r0, double r1, int cor, float dentro, float fora) {
+        int n = 32;
+        for (int i = 0; i < n; i++) {
+            double a0 = Math.PI * 2 * i / n, a1 = Math.PI * 2 * (i + 1) / n;
+            Vec3 u0 = new Vec3(Math.cos(a0), 0, Math.sin(a0)), u1 = new Vec3(Math.cos(a1), 0, Math.sin(a1));
+            ponto(c.add(u0.scale(r0)), cor, dentro);
+            ponto(c.add(u0.scale(r1)), cor, fora);
+            ponto(c.add(u1.scale(r1)), cor, fora);
+            ponto(c.add(u1.scale(r0)), cor, dentro);
+        }
+    }
+
+    /** Caixa alinhada ao mundo, com cada face num tom (parece sólida sem textura). */
+    private static void caixa(Vec3 c, double hx, double hy, double hz, int cor, float alpha) {
+        Vec3 a = c.add(-hx, -hy, -hz), b = c.add(hx, -hy, -hz), d = c.add(hx, -hy, hz), e = c.add(-hx, -hy, hz);
+        Vec3 f = c.add(-hx, hy, -hz), g = c.add(hx, hy, -hz), h = c.add(hx, hy, hz), i = c.add(-hx, hy, hz);
+        quad(f, g, h, i, luz(cor, 1.6), alpha);
+        quad(a, b, d, e, luz(cor, .6), alpha);
+        quad(a, b, g, f, cor, alpha);
+        quad(e, d, h, i, cor, alpha);
+        quad(a, e, i, f, luz(cor, .8), alpha);
+        quad(b, d, h, g, luz(cor, .8), alpha);
+    }
+
+    private static double acaso(double n) {
+        double x = Math.sin(n * 127.1 + 311.7) * 43758.5453;
+        return x - Math.floor(x);
+    }
+
+    private static Vec3 vec(Vetor v) {
+        return new Vec3(v.x(), v.y(), v.z());
+    }
+
+    /** Onde o dono do visual está agora, relativo à câmera (ou {@code reserva} se ele não estiver no mundo). */
+    private static Vec3 pes(Vec3 camera, float parcial, VisuaisAtivos.Visual v, Vec3 reserva) {
+        Entity e = Minecraft.getInstance().level == null ? null : Minecraft.getInstance().level.getEntity(v.dono);
+        return e == null ? reserva : e.getPosition(parcial).subtract(camera);
+    }
+
+    private static boolean euEmPrimeiraPessoa(VisuaisAtivos.Visual v) {
+        Minecraft mc = Minecraft.getInstance();
+        return mc.player != null && mc.player.getId() == v.dono && mc.options.getCameraType().isFirstPerson();
+    }
+
+    // ---------------------------------------------------------------- Z: Redemoinho de Ébano
+
+    /** Três cortes em volta dele: a espada de slime esticada varre um arco preto, com o fio de magia na ponta. */
+    private static void redemoinho(Vec3 camera, float parcial, VisuaisAtivos.Visual v, Vec3 o, double t) {
+        Vec3 c = pes(camera, parcial, v, o.add(0, -1.62, 0)).add(0, 1.0, 0);
+        Vec3 d = vec(v.direcao);
+        double frente = Math.atan2(d.z, d.x), raio = v.forca;
+        int n = 26;
+        for (int corte = 0; corte < FormasCid.CORTES; corte++) {
+            double idade = t - corte * FormasCid.ENTRE_CORTES;
+            float vida = (float) FormasCid.corte(idade);
+            if (vida <= .01f) continue;
+            // Cada corte gira para um lado e vem num plano um pouco tombado.
+            double sentido = corte % 2 == 0 ? 1 : -1, tombo = FormasCid.TOMBO * sentido;
+            double cabeca = frente + sentido * FormasCid.angulo(idade) + corte * 2.1;
+            Vec3[] fora = new Vec3[n + 1], dentro = new Vec3[n + 1];
+            float[] alpha = new float[n + 1];
+            for (int i = 0; i <= n; i++) {
+                double u = i / (double) n, a = cabeca - sentido * FormasCid.CAUDA * u;
+                Vec3 rumo = new Vec3(Math.cos(a), Math.sin(a - frente) * tombo, Math.sin(a));
+                fora[i] = c.add(rumo.scale(raio));
+                dentro[i] = c.add(rumo.scale(raio * (.5 + .3 * u)));
+                alpha[i] = vida * (float) Math.pow(1 - u, 1.4);
+            }
+            abrir(false);
+            for (int i = 0; i < n; i++) {
+                ponto(dentro[i], TINTA, 0);
+                ponto(fora[i], TINTA, alpha[i] * .92f);
+                ponto(fora[i + 1], TINTA, alpha[i + 1] * .92f);
+                ponto(dentro[i + 1], TINTA, 0);
+            }
+            fechar();
+            abrir(true);
+            for (int i = 0; i < n; i++) {
+                fita(fora[i], fora[i + 1], .09, CLARO, alpha[i], alpha[i + 1]);
+                fita(fora[i], fora[i + 1], .5, MAGIA, alpha[i] * .4f, alpha[i + 1] * .4f);
+            }
+            halo(fora[0], .7, MAGIA, vida * .6f);
+            fechar();
+        }
+        // A poeira de magia que o giro levanta no chão.
+        float chao = (float) Math.max(0, 1 - t / (FormasCid.CORTES * FormasCid.ENTRE_CORTES + 4.0));
+        abrir(true);
+        Vec3 solo = c.add(0, -.95, 0);
+        anel(solo, raio * .25, raio * (.5 + .5 * (1 - chao)), ROXO, 0, chao * .35f);
+        fechar();
+    }
+
+    // ---------------------------------------------------------------- X: Pós-imagem
+
+    /** O vulto que fica onde ele estava, tremendo e se desfazendo, e os riscos da partida. */
+    private static void posImagem(VisuaisAtivos.Visual v, Vec3 o, double t) {
+        float vulto = (float) FormasCid.vulto(t, v.duracao);
+        Vec3 d = vec(v.direcao);
+        Vec3 lado = d.cross(CIMA);
+        lado = lado.lengthSqr() < 1e-6 ? new Vec3(1, 0, 0) : lado.normalize();
+        if (vulto > .01f) {
+            // O corpo em três caixas (pernas, tronco com o sobretudo, cabeça com o capuz), que tremem de lado.
+            double treme = (acaso(Math.floor(t / 2)) - .5) * .06 * (1 + t / v.duracao);
+            Vec3 base = o.add(lado.scale(treme)).add(0, -1.62, 0);
+            abrir(false);
+            caixa(base.add(0, .4, 0), .24, .4, .2, TINTA, vulto * .85f);
+            caixa(base.add(0, 1.1, 0), .32, .36, .22, EBANO, vulto * .85f);
+            caixa(base.add(0, 1.72, 0), .26, .26, .26, TINTA, vulto * .85f);
+            fechar();
+            abrir(true);
+            // A magia escorre do vulto para cima enquanto ele se desfaz.
+            for (int k = 0; k < 9; k++) {
+                double fase = (t * .05 + acaso(k)) % 1, a = Math.PI * 2 * acaso(k + 9);
+                Vec3 p = base.add(Math.cos(a) * .34, .2 + fase * 1.9, Math.sin(a) * .34);
+                fita(p, p.add(0, .28, 0), .05, MAGIA, 0, vulto * (float) Math.sin(Math.PI * fase) * .9f);
+            }
+            halo(base.add(0, 1.1, 0), 1.1, MAGIA, vulto * .22f);
+            fechar();
+        }
+        // Os riscos da partida, nos primeiros ticks.
+        float risco = (float) Math.max(0, 1 - t / FormasCid.RISCOS);
+        if (risco <= .01f) return;
+        double cabeca = Math.min(1, t / 2), cauda = Mth.clamp((t - 2) / 5, 0, 1);
+        abrir(false);
+        riscos(o, d, lado, cabeca, cauda, .12, TINTA, risco * .8f);
+        fechar();
+        abrir(true);
+        riscos(o, d, lado, cabeca, cauda, .05, MAGIA, risco * .85f);
+        fechar();
+    }
+
+    private static void riscos(Vec3 o, Vec3 d, Vec3 lado, double cabeca, double cauda, double largura, int cor, float alpha) {
+        Vec3 caminho = d.scale(FormasCid.CAMINHO);
+        for (int k = 0; k < 14; k++) {
+            double x = (acaso(k) - .5) * 1.1, y = -1.5 + acaso(k + 20) * 1.8;
+            double s0 = Math.min(1, cauda + .15 * acaso(k + 40)), s1 = Math.max(s0, cabeca - .1 * acaso(k + 50));
+            Vec3 base = o.add(lado.scale(x)).add(0, y, 0);
+            fita(base.add(caminho.scale(s0)), base.add(caminho.scale(s1)), largura, cor, 0, alpha);
+        }
+    }
+
+    // ---------------------------------------------------------------- C: Prisão de Correntes Negras
+
+    /** O pedaço de slime que voa: um miolo preto que ondula, gotas ficando para trás e o respingo onde bate. */
+    private static void slime(Vec3 camera, VisuaisAtivos.Visual v, Vec3 o, double t, float sai) {
+        Vec3 d = vec(v.direcao);
+        if (d.lengthSqr() < 1e-8) return;
+        d = d.normalize();
+        Vec3 p = o.add(d.scale(FormasCid.voo(t)));
+        boolean bateu = v.pontoFim != null;
+        if (bateu) p = new Vec3(v.pontoFim.x() - camera.x, v.pontoFim.y() - camera.y, v.pontoFim.z() - camera.z);
+        if (bateu) {
+            // O respingo: gotas que abrem em volta do ponto e caem.
+            double e = 1 - sai;
+            abrir(false);
+            for (int k = 0; k < 12; k++) {
+                double a = Math.PI * 2 * acaso(k), b = (acaso(k + 5) - .3) * 1.4, r = e * (.5 + acaso(k + 11));
+                double lado = .09 * sai + .02;
+                caixa(p.add(Math.cos(a) * r, b * e - e * e * .5, Math.sin(a) * r), lado, lado, lado, TINTA, sai);
+            }
+            fechar();
+            abrir(true);
+            halo(p, .9 + e, MAGIA, sai * .5f);
+            fechar();
+            return;
+        }
+        // Não bateu em nada: some no fim do alcance.
+        float voa = (float) FormasCid.slime(t);
+        if (voa <= .01f) return;
+        abrir(false);
+        double pulso = .04 * Math.sin(t * 1.9);
+        caixa(p, .26 + pulso, .26 - pulso, .26 + pulso, TINTA, voa);
+        for (int k = 1; k <= 6; k++) {
+            // As gotas da cauda: mais para trás, menores e um pouco fora do eixo.
+            double atras = k * .34, lado = .2 * (1 - k / 7.0);
+            Vec3 q = p.subtract(d.scale(atras)).add((acaso(k + Math.floor(t)) - .5) * .22, (acaso(k + 3) - .5) * .22 - k * .012, 0);
+            if (q.subtract(o).dot(d) < 0) continue;
+            caixa(q, lado, lado, lado, k % 2 == 0 ? EBANO : TINTA, voa * (1 - k / 8f));
+        }
+        fechar();
+        abrir(true);
+        halo(p, .7, MAGIA, voa * .45f);
+        fita(p.subtract(d.scale(2.2)), p, .1, MAGIA, 0, voa * .6f);
+        fechar();
+    }
+
+    /** As correntes: sobem do chão em volta do alvo, cruzam nele e o seguram até soltarem. */
+    private static void correntes(VisuaisAtivos.Visual v, Vec3 o, double t) {
+        // O servidor manda o meio do corpo do alvo.
+        Vec3 chao = o.add(0, -FormasCid.MEIO_DO_ALVO, 0);
+        float vida = (float) FormasCid.correntes(t, v.duracao);
+        if (vida <= .01f) return;
+        double cresce = Mth.clamp(t / FormasCid.FECHAR, 0, 1);
+        abrir(false);
+        // A poça de slime de onde elas saem.
+        anel(chao.add(0, .04, 0), 0, FormasCid.RAIO_DA_PRISAO * (.4 + .6 * cresce), TINTA, vida * .7f, vida * .25f);
+        for (int k = 0; k < FormasCid.CORRENTES; k++) {
+            double a = Math.PI * 2 * k / FormasCid.CORRENTES + .4;
+            Vec3 pe = chao.add(Math.cos(a) * FormasCid.RAIO_DA_PRISAO, .05, Math.sin(a) * FormasCid.RAIO_DA_PRISAO);
+            // Cada uma passa pelo corpo e prende do outro lado, numa altura diferente.
+            Vec3 ponta = chao.add(-Math.cos(a) * .45, .45 + 1.25 * k / (FormasCid.CORRENTES - 1.0), -Math.sin(a) * .45);
+            elos(pe, pe.add(ponta.subtract(pe).scale(cresce)), vida, t + k);
+        }
+        fechar();
+        abrir(true);
+        for (int k = 0; k < FormasCid.CORRENTES; k++) {
+            double a = Math.PI * 2 * k / FormasCid.CORRENTES + .4;
+            Vec3 pe = chao.add(Math.cos(a) * FormasCid.RAIO_DA_PRISAO, .05, Math.sin(a) * FormasCid.RAIO_DA_PRISAO);
+            Vec3 ponta = chao.add(-Math.cos(a) * .45, .45 + 1.25 * k / (FormasCid.CORRENTES - 1.0), -Math.sin(a) * .45);
+            fita(pe, pe.add(ponta.subtract(pe).scale(cresce)), .16, MAGIA, vida * .1f, vida * .3f);
+        }
+        // O estalo de quando elas fecham.
+        float estalo = (float) Math.max(0, 1 - Math.abs(t - FormasCid.FECHAR) / 3);
+        halo(o, 1.6, CLARO, estalo * .7f);
+        fechar();
+    }
+
+    /** Uma corrente de {@code a} a {@code b}: elos pretos, um deitado e um de pé, que tremem esticados. */
+    private static void elos(Vec3 a, Vec3 b, float alpha, double semente) {
+        Vec3 d = b.subtract(a);
+        int n = Math.max(1, (int) (d.length() / .22));
+        for (int i = 0; i < n; i++) {
+            Vec3 p = a.add(d.scale((i + .5) / n)).add(0, Math.sin(semente * 1.7 + i * .9) * .012, 0);
+            if (i % 2 == 0) caixa(p, .085, .04, .085, TINTA, alpha);
+            else caixa(p, .04, .085, .04, EBANO, alpha);
+        }
+    }
+
+    // ---------------------------------------------------------------- Passiva: o traje de slime
+
+    /** O traje amortece um golpe forte: o slime salta do corpo em gotas e um clarão de magia marca o momento. */
+    private static void traje(Vec3 camera, float parcial, VisuaisAtivos.Visual v, Vec3 o, double t) {
+        float vida = (float) Math.max(0, 1 - t / FormasCid.TRAJE);
+        if (vida <= .01f || euEmPrimeiraPessoa(v)) return;
+        Vec3 meio = pes(camera, parcial, v, o.add(0, -1.62, 0)).add(0, 1.0, 0);
+        double e = 1 - vida;
+        abrir(false);
+        for (int k = 0; k < 14; k++) {
+            double a = Math.PI * 2 * acaso(k), sobe = (acaso(k + 5) - .5) * 1.4, r = .45 + e * (.5 + .6 * acaso(k + 11));
+            double lado = .07 * vida + .015;
+            caixa(meio.add(Math.cos(a) * r, sobe - e * e * .5, Math.sin(a) * r), lado, lado, lado, TINTA, vida);
+        }
+        fechar();
+        abrir(true);
+        halo(meio, 1.2 + e, MAGIA, vida * .4f);
+        fechar();
+    }
+
+    // ---------------------------------------------------------------- G: Overdrive
+
+    /** A magia transbordando: o estouro ao ligar, fios azul-violeta subindo em volta do corpo e o anel nos pés. */
+    private static void overdrive(Vec3 camera, float parcial, VisuaisAtivos.Visual v, Vec3 o, double t, float sai) {
+        Vec3 pes = pes(camera, parcial, v, o.add(0, -1.62, 0));
+        float vida = sai * (float) FormasCid.aura(t, v.duracao);
+        if (vida <= .01f) return;
+        boolean fios = !euEmPrimeiraPessoa(v);
+        // Por baixo da luz, os mesmos fios em roxo opaco: de dia a luz sozinha some contra o céu.
+        if (fios) {
+            abrir(false);
+            for (int k = 0; k < FormasCid.FIOS; k++) fio(pes, k, t, .11, ROXO, vida * .75f);
+            fechar();
+        }
+        abrir(true);
+        // O estouro: um anel que abre no chão nos primeiros ticks.
+        float estouro = (float) Math.max(0, 1 - t / FormasCid.ESTOURO);
+        if (estouro > 0) {
+            double r = FormasCid.raioDoEstouro(t);
+            anel(pes.add(0, .06, 0), r * .7, r, MAGIA, 0, estouro * .8f);
+            halo(pes.add(0, 1, 0), 2.2, CLARO, estouro * .5f);
+        }
+        double pulso = .5 + .5 * Math.sin(t * .35);
+        anel(pes.add(0, .05, 0), .35, .85 + .1 * pulso, MAGIA, 0, vida * (.35f + .2f * (float) pulso));
+        // Em primeira pessoa os fios passariam na frente da câmera: fica só o anel.
+        if (fios) {
+            for (int k = 0; k < FormasCid.FIOS; k++) fio(pes, k, t, .06, k % 3 == 0 ? CLARO : MAGIA, vida);
+            halo(pes.add(0, 1.0, 0), 1.4, MAGIA, vida * .22f);
+        }
+        fechar();
+    }
+
+    /** Um fio da aura: sobe em espiral em volta do corpo, some no alto e recomeça. */
+    private static void fio(Vec3 pes, int k, double t, double largura, int cor, float alpha) {
+        double fase = FormasCid.fio(k, t), a = Math.PI * 2 * acaso(k) + t * .04, r = .42 + .2 * acaso(k + 7);
+        Vec3 p = pes.add(Math.cos(a) * r, fase * 2.1, Math.sin(a) * r);
+        Vec3 q = pes.add(Math.cos(a + .25) * r * .9, fase * 2.1 + .6, Math.sin(a + .25) * r * .9);
+        fita(p, q, largura, cor, 0, alpha * (float) Math.sin(Math.PI * fase));
+    }
+}

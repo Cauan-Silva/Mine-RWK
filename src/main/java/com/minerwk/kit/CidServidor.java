@@ -39,6 +39,6 @@ public final class CidServidor {
         evento.setNewDamage(Cid.amortecer(dano, true));
         kit.recargas().iniciar(Cid.TRAJE, agora, Cid.RECARGA_DO_TRAJE);
         ContextoServidor contexto = new ContextoServidor(jogador);
-        contexto.visual(Cid.TRAJE, contexto.olhos(), new Vetor(0, 1, 0), 0f, VISUAL);
+        contexto.visual(Cid.TRAJE, contexto.olhos(), new Vetor(0, 1, 0), 0f, com.minerwk.core.vfx.FormasCid.TRAJE);
     }
 }

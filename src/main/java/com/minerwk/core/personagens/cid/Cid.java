@@ -10,6 +10,7 @@ import com.minerwk.core.kit.Passiva;
 import com.minerwk.core.kit.Personagem;
 import com.minerwk.core.kit.Tecla;
 import com.minerwk.core.kit.Vetor;
+import com.minerwk.core.vfx.FormasCid;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -127,7 +128,8 @@ public final class Cid {
 
         @Override
         public void aoDisparar(Contexto ctx, float forca) {
-            ctx.visual(VISUAL, ctx.olhos(), ctx.olhar(), (float) RAIO, DURACAO);
+            // O visual dura mais que o golpe: o arco do terceiro corte ainda está sumindo quando ele acaba.
+            ctx.visual(VISUAL, ctx.olhos(), ctx.olhar(), (float) RAIO, FormasCid.REDEMOINHO);
             ctx.criarEfeito(new Giro());
         }
     }
@@ -145,12 +147,6 @@ public final class Cid {
             // só passam por cima da proteção do corte anterior.
             if (t == 0) ctx.danoEmArea(Redemoinho.RAIO, dano(ctx, Redemoinho.DANO));
             else ctx.danoSeguidoEmArea(Redemoinho.RAIO, dano(ctx, Redemoinho.DANO));
-            // Provisório, até os VFX da parte 3: o arco do corte em volta dele.
-            Vetor corpo = ctx.olhos().mais(new Vetor(0, -.6, 0));
-            for (int i = 0; i < 8; i++) {
-                double a = Math.PI / 4 * i + t;
-                ctx.particulas("sweep_attack", corpo.mais(new Vetor(Math.cos(a) * 3, 0, Math.sin(a) * 3)), 1);
-            }
         }
     }
 
@@ -172,9 +168,6 @@ public final class Cid {
             ctx.deslocar(rumo, ALCANCE, null);
             ctx.chamariz(de.mais(ATE_OS_PES), IMAGEM);
             ctx.visual(VISUAL, de, rumo, 0f, IMAGEM);
-            // Provisório, até os VFX da parte 3: a imagem que fica e o ponto de chegada.
-            ctx.particulas("large_smoke", de.mais(new Vetor(0, -.7, 0)), 14);
-            ctx.particulas("witch", ctx.olhos().mais(new Vetor(0, -.7, 0)), 10);
         }
     }
 
@@ -226,7 +219,6 @@ public final class Cid {
                 parar(ctx, ponto);
                 return;
             }
-            ctx.particulas("squid_ink", ponto, 3);
             // Dois pontos por tick, o do meio primeiro: o passo é maior que o slime, e ele para no primeiro.
             Vetor meio = ponto.mais(direcao.vezes(p / 2));
             for (Vetor v : List.of(meio, proximo)) {
@@ -272,7 +264,6 @@ public final class Cid {
             if (onde == null) return;
             ctx.paralisarAlvo(alvo, Prisao.PRESO);
             ctx.visual(Prisao.CORRENTES, onde, new Vetor(0, 1, 0), 0f, Prisao.PRESO);
-            ctx.particulas("enchanted_hit", onde, 24);
         }
     }
 
@@ -320,7 +311,6 @@ public final class Cid {
             ultimo = t;
             if (t % RENOVAR != 0) return;
             ctx.velocidade(2, RENOVAR * 2);
-            ctx.particulas("witch", ctx.olhos().mais(new Vetor(0, -.9, 0)), 3);
         }
 
         @Override
@@ -338,6 +328,7 @@ public final class Cid {
         public void aoDescartar(Contexto ctx) {
             ctx.sinalAoRecurso(Magia.SEM_GANHO, 0);
             ctx.recarga(OVERDRIVE, Overdrive.RECARGA);
+            ctx.visualFim(OVERDRIVE, ctx.olhos());
         }
     }
 
