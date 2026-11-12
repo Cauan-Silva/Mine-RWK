@@ -50,24 +50,25 @@ Recurso: **Magia**, máximo 100, regenera sozinha; os golpes pequenos gastam pou
 | C | **Prisão de Correntes Negras** | Lança slime até 16 blocos (6 de dano); o alvo fica marcado e, 1 s depois, as correntes o prendem por 2,5 s; recarga 12 s, custo 20 | Junta o projétil de slime e as correntes |
 | V | **Espada Atômica** (trancada) | 0,6 s de carga, um corte horizontal de 12 blocos em arco de 120°: 16 de dano; recarga 14 s, custo 30 | Depois do boss |
 | G | **Overdrive** | Por 8 s: +30% de dano, mais velocidade, e a Magia não regenera; se levar até o fim sem desligar (G de novo), sofre 4 de dano de recuo; recarga 25 s | O risco é o da obra |
-| R | **I Am Atomic** (trancado, com cutscene) | Crava a espada, 4 s de carga falando as três palavras, coluna de luz de raio 24: 40 de dano no estouro; gasta toda a Magia (precisa de 100); recarga 90 s | É a versão All-Range. A carga pode ser cancelada por um golpe forte, como o Mugetsu |
-| Agachado + R | **Recovery Atomic** (trancado) | A mesma carga e a mesma luz, mas cura por completo o Cid e os aliados no raio e tira efeitos ruins; divide a recarga com o R | Não fere ninguém |
+| R | **I Am Atomic final** (trancado, com cutscene) | Precisa de um alvo à frente, a até 6 blocos. Uma sequência de golpes (8 acertos de 2 de dano) que sobe com o alvo, cada golpe mais alto, até o espaço; lá em cima, as três palavras e o Atomic: 44 de dano no alvo. A luz desce e fere em raio 12 no chão onde começou (15 de dano). Gasta toda a Magia (precisa de 100); recarga 90 s | **Pedido do autor (12/11)**, pela luta final da 2ª temporada (ep. 12). O alvo e o Cid voltam ao lugar de onde saíram. Sem alvo à frente, o golpe não sai e nada é gasto |
+| Agachado + R | **Recovery Atomic** (trancado) | Crava a espada, 3 s de carga, coluna de luz de raio 16 que cura por completo o Cid e os aliados e tira efeitos ruins; divide a recarga com o R | Não fere ninguém |
 
 - **Passiva, traje de slime:** a cada 12 s, o próximo golpe de 8 ou mais de dano é reduzido à metade (o traje dissipa o ataque grande).
 - **Arma e traje:** a espada de slime aparece na mão e o traje do Shadow é vestido ao escolher o Cid, sem item, como nos outros.
 - **Despertar e Nêmesis:** vencer o boss libera a Espada Atômica, o I Am Atomic e o Recovery Atomic. **O boss ainda não foi escolhido** (ver "A decidir").
 
 ### A decidir pelo autor
-1. **O kit acima serve?** Em especial: o G como Overdrive (no Minezin o G era o Atomic) e o Atomic indo para o R, com cutscene, como o Mugetsu e o Roxo 200%.
+1. **O kit acima serve?** Em especial: o G como Overdrive (no Minezin o G era o Atomic) e o R como o **I Am Atomic final** que o autor pediu em 12/11: golpes em sequência que levam o alvo ao espaço e o Atomic lá em cima. A cutscene reaproveita o sistema de câmera do Roxo 200% do Gojo (que já tem corrida, uppercut e subida). **A conferir na cena** (2ª temporada, ep. 12; no vídeo "Cid Kagenou - Final I'm Atomic"): quantos golpes, se são socos ou cortes, as cores e a fala; escrevi a mecânica pelo pedido do autor, sem ter achado uma descrição da cena em texto.
 2. **O boss.** Candidatos, de memória da obra, a pesquisar com fontes quando chegar a parte dele:
    - **Beatrix**, a Deusa da Guerra (elfa espadachim; luta com o Shadow no fim da 1ª temporada, ep. 20). Um duelo de espadas, que reaproveita o que o Zangetsu ensinou. **É a minha sugestão.**
    - **Elisabeth**, a Rainha de Sangue (magia de sangue, a Torre Carmesim; é a luta em que nasce o Recovery Atomic, ep. 23).
    - **Aurora**, a Bruxa da Calamidade (o Santuário, LN vol. 2).
+   - **Ragnarok**, o demônio invocado pelo Mordred, que é o adversário da luta do ep. 12 da 2ª temporada: se o R vem dessa luta, ele é um candidato natural.
 3. **A espada:** a longa de guarda reta do anime (sugestão, é a mais conhecida) ou a katana da light novel.
 4. **O capuz:** com capuz e os olhos vermelhos brilhando, como na obra (sugestão). No Minezin o traje não tinha capuz.
 
 ## Diferenças em relação ao Minezin
-- O **I Am Atomic** sai do G para o **R**, com cutscene, e passa a depender do boss; a carga cai de 9 s para 4 s.
+- O **I Am Atomic** sai do G para o **R** e passa a depender do boss; deixa de ser a carga parada com o pilar em volta e vira a sequência de golpes que sobe ao espaço, num alvo só.
 - Entram **Overdrive** (G), **Espada Atômica** (V) e **Recovery Atomic**; sai a "Lâmina oculta", que não achei na obra com esse nome.
 - "Corte de Slime" vira o **Redemoinho de Ébano**; "Passo das Sombras" vira a **Pós-imagem**; os "Fios de Slime" viram a **Prisão de Correntes Negras** (os fios são do disfarce John Smith).
 - O traje ganha o capuz.
