@@ -1,6 +1,7 @@
 package com.minerwk.core.traje;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.minerwk.core.kit.Forma;
@@ -86,5 +87,44 @@ class TrajeIchigoTest {
         espada.tick(Double.NaN, 0, 0, 0, 0, 0, 0, true);
         MolaManto.Pose p = espada.pose("arma_cloth", 0);
         assertTrue(Double.isFinite(p.x() + p.y() + p.z()), "entrada inválida zera em vez de espalhar NaN");
+    }
+
+    // --- Parte 6: a forma final do Mugetsu e a máscara Hollow ---
+
+    @Test
+    void aFormaFinalTemModeloProprioSemEspada() throws Exception {
+        assertEquals("ichigo_mugetsu", TrajeIchigo.MUGETSU);
+        assertTrue(TrajeIchigo.eDoIchigo(TrajeIchigo.MUGETSU));
+        String geo = modelo(TrajeIchigo.MUGETSU);
+        for (String osso : new String[] {"armorHead", "armorBody", "armorLeftArm", "armorRightArm"}) assertTrue(tem(geo, osso), osso);
+        assertFalse(tem(geo, TrajeIchigo.OSSO_ARMA), "na forma final a lâmina é o próprio reiatsu: não há espada no modelo");
+        assertTrue(java.nio.file.Files.size(java.nio.file.Path.of("src/main/resources/assets/minerwk/textures/traje/ichigo_mugetsu.png")) > 500);
+        assertTrue(java.nio.file.Files.exists(java.nio.file.Path.of(
+                "src/main/resources/assets/minerwk/animations/traje/ichigo_mugetsu.animation.json")));
+    }
+
+    @Test
+    void aFormaFinalApareceNaTransformacaoEDuraAteOVeuSeDesfazer() {
+        int transforma = com.minerwk.core.vfx.MugetsuIchigo.TRANSFORMA;
+        assertFalse(TrajeIchigo.formaFinal("ichigo_mugetsu_carga", 0));
+        assertFalse(TrajeIchigo.formaFinal("ichigo_mugetsu_carga", transforma - 1), "antes da transformação ainda é o Bankai");
+        assertTrue(TrajeIchigo.formaFinal("ichigo_mugetsu_carga", transforma));
+        assertTrue(TrajeIchigo.formaFinal("ichigo_mugetsu_carga", 119));
+        assertTrue(TrajeIchigo.formaFinal("ichigo_mugetsu", 0), "no corte");
+        assertTrue(TrajeIchigo.formaFinal("ichigo_mugetsu", 49));
+        assertFalse(TrajeIchigo.formaFinal("ichigo_mugetsu", 50), "com o véu desfeito, os poderes já se foram");
+        assertFalse(TrajeIchigo.formaFinal("ichigo_bankai", 10));
+        assertFalse(TrajeIchigo.formaFinal("gojo_azul", 10));
+    }
+
+    @Test
+    void aMascaraFicaNoRostoDoFimDoGestoAteQuebrar() {
+        assertFalse(TrajeIchigo.mascaraNoRosto("ichigo_mascara", 0, 220), "ainda se formando");
+        assertFalse(TrajeIchigo.mascaraNoRosto("ichigo_mascara", TrajeIchigo.MASCARA_SE_FORMA - 1, 220));
+        assertTrue(TrajeIchigo.mascaraNoRosto("ichigo_mascara", TrajeIchigo.MASCARA_SE_FORMA, 220));
+        assertTrue(TrajeIchigo.mascaraNoRosto("ichigo_mascara", 219, 220));
+        assertFalse(TrajeIchigo.mascaraNoRosto("ichigo_mascara", 220, 220));
+        assertFalse(TrajeIchigo.mascaraNoRosto("ichigo_lamina", 50, 120));
+        assertTrue(java.nio.file.Files.exists(java.nio.file.Path.of("src/main/resources/assets/minerwk/textures/traje/ichigo_mascara.png")));
     }
 }

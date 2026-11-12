@@ -1,5 +1,11 @@
 package com.minerwk.client.traje;
 
+import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.model.geom.builders.MeshDefinition;
+import net.minecraft.client.model.geom.builders.LayerDefinition;
+import net.minecraft.client.model.geom.builders.CubeListBuilder;
+import net.minecraft.client.model.geom.PartPose;
+import net.minecraft.client.model.geom.ModelLayerLocation;
 import com.minerwk.MineRWK;
 import com.minerwk.client.ConfigCliente;
 import com.minerwk.client.kit.RecepcaoKit;
@@ -167,7 +173,81 @@ public final class CamadaTraje {
         boolean eu = jogador == Minecraft.getInstance().player;
         String personagem = eu ? RecepcaoKit.estado().personagem() : visto.personagem();
         String forma = eu ? RecepcaoKit.estado().forma() : visto.forma();
-        return Trajes.de(personagem, forma).orElse("");
+        String traje = Trajes.de(personagem, forma).orElse("");
+        // A forma final do Mugetsu vem dos visuais do golpe, não da forma do kit: dura só a cutscene e o corte.
+        if (TrajeIchigo.eDoIchigo(traje) && naFormaFinal(jogador)) return TrajeIchigo.MUGETSU;
+        return traje;
+    }
+
+    private static boolean naFormaFinal(AbstractClientPlayer jogador) {
+        long agora = jogador.level().getGameTime();
+        for (VisuaisAtivos.Visual v : VisuaisAtivos.ativos()) {
+            if (v.dono() == jogador.getId() && !v.encerrado() && TrajeIchigo.formaFinal(v.tipo(), v.idade(agora, 0))) return true;
+        }
+        return false;
+    }
+
+    /** Se a máscara Hollow está no rosto deste jogador (e ele não está na forma final, que não a usa). */
+    private static boolean comMascara(AbstractClientPlayer jogador, String traje) {
+        if (!TrajeIchigo.BANKAI.equals(traje)) return false;
+        long agora = jogador.level().getGameTime();
+        for (VisuaisAtivos.Visual v : VisuaisAtivos.ativos()) {
+            if (v.dono() == jogador.getId() && !v.encerrado()
+                    && TrajeIchigo.mascaraNoRosto(v.tipo(), v.idade(agora, 0), v.duracao())) return true;
+        }
+        return false;
+    }
+
+    // --- A máscara Hollow: uma peça presa à cabeça, desenhada por cima do traje ---
+
+    public static final ModelLayerLocation MASCARA = new ModelLayerLocation(MineRWK.id("mascara_hollow"), "main");
+    private static final ResourceLocation TEXTURA_DA_MASCARA = MineRWK.id("textures/traje/ichigo_mascara.png");
+    private static ModelPart mascara;
+
+    /**
+     * A forma da máscara (do Minezin, mesmo autor): uma placa abaulada que envolve as bochechas, olhos
+     * oblíquos, dentes serrilhados sobre a boca escura, uma listra vermelha no meio e outras abrindo em leque
+     * de um lado só.
+     */
+    public static void aoRegistrarCamadas(EntityRenderersEvent.RegisterLayerDefinitions evento) {
+        evento.registerLayerDefinition(MASCARA, () -> {
+            MeshDefinition malha = new MeshDefinition();
+            CubeListBuilder b = CubeListBuilder.create();
+            b.texOffs(0, 0).addBox(-4.2f, -8.3f, -4.75f, 8.4f, 5.9f, .7f).addBox(-3.6f, -2.45f, -4.7f, 7.2f, 2.7f, .6f)
+                    .addBox(-4.45f, -8f, -4.6f, .3f, 6.8f, 3.4f).addBox(4.15f, -8f, -4.6f, .3f, 6.8f, 3.4f)
+                    .addBox(-3.4f, -8.6f, -4.6f, 6.8f, .35f, 2.6f);
+            // Olhos oblíquos: fileiras finas subindo do canto de dentro até a ponta de fora.
+            float[][] linhas = {{2.7f, 3.75f, -5.75f}, {2.0f, 3.7f, -5.45f}, {1.35f, 3.35f, -5.15f}, {1.0f, 2.6f, -4.85f}, {.9f, 1.6f, -4.55f}};
+            for (int lado = -1; lado <= 1; lado += 2) {
+                for (float[] l : linhas) {
+                    b.texOffs(0, 16).addBox(lado > 0 ? l[0] : -l[1], l[2], -4.85f, l[1] - l[0], .32f, .2f);
+                }
+            }
+            b.texOffs(0, 16).addBox(-3.3f, -1.7f, -4.82f, 6.6f, .75f, .15f);
+            for (int k = 0; k < 8; k++) {
+                float x = -3.2f + k * .82f;
+                b.texOffs(0, 0).addBox(x, -2.0f, -4.9f, .6f, .45f, .15f).addBox(x + .15f, -1.55f, -4.9f, .3f, .3f, .15f)
+                        .addBox(x + .35f, -.95f, -4.9f, .6f, .4f, .15f).addBox(x + .5f, -1.2f, -4.9f, .3f, .25f, .15f);
+            }
+            b.texOffs(18, 16).addBox(-1f, -8.3f, -4.92f, .6f, 6.1f, .2f).addBox(-3.6f, -7.9f, -4.92f, 2.6f, .45f, .2f)
+                    .addBox(-4f, -7f, -4.92f, 2.8f, .45f, .2f).addBox(-4.2f, -6.1f, -4.92f, 2.8f, .4f, .2f)
+                    .addBox(-4.2f, -4.1f, -4.92f, 3.2f, .45f, .2f).addBox(-4f, -3.3f, -4.92f, 2.6f, .4f, .2f)
+                    .addBox(-3.4f, -.6f, -4.92f, 2.4f, .4f, .2f).addBox(-4.5f, -7.4f, -4.4f, .35f, .45f, 2.6f)
+                    .addBox(-4.5f, -4.1f, -4.4f, .35f, .45f, 2.6f);
+            malha.getRoot().addOrReplaceChild("mascara", b, PartPose.ZERO);
+            return LayerDefinition.create(malha, 64, 64);
+        });
+    }
+
+    private static void desenharMascara(PlayerModel<AbstractClientPlayer> modelo, PoseStack pose, MultiBufferSource buffer, int luz) {
+        if (mascara == null || !modelo.head.visible) return;
+        pose.pushPose();
+        try {
+            modelo.head.translateAndRotate(pose);
+            mascara.render(pose, buffer.getBuffer(RenderType.entityCutoutNoCull(TEXTURA_DA_MASCARA)), luz, OverlayTexture.NO_OVERLAY);
+        } finally {
+            pose.popPose();
+        }
     }
 
     private static Renderer renderer(String traje) {
@@ -185,6 +265,7 @@ public final class CamadaTraje {
 
     /** Troca a camada de armadura de todos os modelos de jogador pela que também desenha o traje. */
     public static void aoAdicionarCamadas(EntityRenderersEvent.AddLayers evento) {
+        mascara = evento.getEntityModels().bakeLayer(MASCARA).getChild("mascara");
         for (PlayerSkin.Model skin : evento.getSkins()) {
             if (!(evento.getSkin(skin) instanceof PlayerRenderer jogador)) continue;
             boolean fino = skin == PlayerSkin.Model.SLIM;
@@ -206,6 +287,7 @@ public final class CamadaTraje {
         return ITENS.computeIfAbsent(traje, n -> new ItemStack(switch (n) {
             case TrajeIchigo.SHIKAI -> Itens.TRAJE_ICHIGO.get();
             case TrajeIchigo.BANKAI -> Itens.TRAJE_ICHIGO_BANKAI.get();
+            case TrajeIchigo.MUGETSU -> Itens.TRAJE_ICHIGO_MUGETSU.get();
             default -> Itens.TRAJE_GOJO.get();
         }));
     }
@@ -224,6 +306,7 @@ public final class CamadaTraje {
         renderer.prepForRender(jogador, item(traje), EquipmentSlot.CHEST, modelo, buffer, parcial, passo, passada,
                 cabecaYaw, cabecaPitch);
         renderer.renderToBuffer(pose, null, luz, OverlayTexture.NO_OVERLAY, -1);
+        if (comMascara(jogador, traje)) desenharMascara(modelo, pose, buffer, luz);
     }
 
     /** Calcula o balanço da barra pela velocidade do jogador no referencial do corpo. */

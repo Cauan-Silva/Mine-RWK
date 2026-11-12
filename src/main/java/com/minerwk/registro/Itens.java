@@ -20,6 +20,9 @@ public final class Itens {
     public static final DeferredItem<Traje> TRAJE_ICHIGO = REGISTRO.register("traje_ichigo", () -> new Traje("ichigo"));
     public static final DeferredItem<Traje> TRAJE_ICHIGO_BANKAI =
             REGISTRO.register("traje_ichigo_bankai", () -> new Traje("ichigo_bankai"));
+    /** A forma final do Mugetsu, vestida só durante a cutscene e o corte. */
+    public static final DeferredItem<Traje> TRAJE_ICHIGO_MUGETSU =
+            REGISTRO.register("traje_ichigo_mugetsu", () -> new Traje("ichigo_mugetsu"));
     /** Invoca o Toji; feito na bancada com papel, lingote de ouro e espada de ferro. */
     public static final DeferredItem<com.minerwk.boss.ContratoToji> CONTRATO_TOJI =
             REGISTRO.register("contrato_toji", com.minerwk.boss.ContratoToji::new);

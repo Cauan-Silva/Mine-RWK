@@ -4,6 +4,8 @@ Rodar: python ferramentas/gerar_traje_ichigo.py
 Lê de ferramentas/traje (cópias do Minezin, mesmo autor):
   ichigo_base.geo.json, ichigo_base.png                  geo/armaduras/ichigo.geo.json e a textura
   ichigo_bankai_base.geo.json, ichigo_bankai_base.png    geo/armaduras/ichigo_bankai.geo.json e a textura
+  ichigo_mugetsu_base.geo.json, ichigo_mugetsu_base.png  geo/armaduras/ichigo_mugetsu.geo.json e a textura (a forma final)
+  ichigo_mascara_base.png                                textures/ichigo/mascara.png (copiada como está)
   zangetsu_base.geo.json, tensa_zangetsu_base.geo.json   geo/ichigo/*.geo.json (as espadas)
 e escreve em assets/minerwk:
   geo/traje/ichigo.geo.json, textures/traje/ichigo.png
@@ -95,7 +97,8 @@ def gerar(traje, arma):
     assert textura.size == (geo['description']['texture_width'], geo['description']['texture_height'])
     geo['description']['identifier'] = f'geometry.{traje}'
     nomes = {o['name'] for o in geo['bones']}
-    novos = espada(arma, textura)
+    # A forma final do Mugetsu não tem espada: a lâmina é o próprio reiatsu.
+    novos = espada(arma, textura) if arma else []
     assert not nomes & {o['name'] for o in novos}
     geo['bones'] += novos
     (ASSETS / 'geo/traje').mkdir(parents=True, exist_ok=True)
@@ -108,3 +111,4 @@ def gerar(traje, arma):
 if __name__ == '__main__':
     gerar('ichigo', 'zangetsu')
     gerar('ichigo_bankai', 'tensa_zangetsu')
+    gerar('ichigo_mugetsu', None)

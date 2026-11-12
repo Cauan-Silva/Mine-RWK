@@ -1,5 +1,6 @@
 package com.minerwk.core.traje;
 
+import com.minerwk.core.vfx.MugetsuIchigo;
 import java.util.List;
 
 /**
@@ -11,6 +12,10 @@ public final class TrajeIchigo {
     public static final String SHIKAI = "ichigo";
     /** O casaco longo com a Tensa Zangetsu. */
     public static final String BANKAI = "ichigo_bankai";
+    /** A forma final do Mugetsu: cabelo longo, faixas e o corpo coberto de reiatsu preto. Sem espada. */
+    public static final String MUGETSU = "ichigo_mugetsu";
+    /** A máscara Hollow leva esses ticks para se fechar sobre o rosto (o gesto do golpe). */
+    public static final int MASCARA_SE_FORMA = 6;
     /** A espada inteira: some enquanto ela está fora da mão (o arremesso). */
     public static final String OSSO_ARMA = "arma";
     /** As mangas largas do shihakushō: uma peça só de cada lado. */
@@ -20,6 +25,20 @@ public final class TrajeIchigo {
     }
 
     public static boolean eDoIchigo(String traje) {
-        return SHIKAI.equals(traje) || BANKAI.equals(traje);
+        return SHIKAI.equals(traje) || BANKAI.equals(traje) || MUGETSU.equals(traje);
+    }
+
+    /**
+     * Se o visual {@code tipo}, com {@code idade} ticks, põe o dono na forma final: da transformação, no
+     * meio da carga do Mugetsu, até o véu se desfazer depois do corte.
+     */
+    public static boolean formaFinal(String tipo, double idade) {
+        if ("ichigo_mugetsu_carga".equals(tipo)) return idade >= MugetsuIchigo.TRANSFORMA;
+        return "ichigo_mugetsu".equals(tipo) && idade < MugetsuIchigo.TICKS + MugetsuIchigo.RESTO;
+    }
+
+    /** Se o visual {@code tipo} põe a máscara Hollow no rosto do dono: do fim do gesto até ela quebrar. */
+    public static boolean mascaraNoRosto(String tipo, double idade, int duracao) {
+        return "ichigo_mascara".equals(tipo) && idade >= MASCARA_SE_FORMA && idade < duracao;
     }
 }

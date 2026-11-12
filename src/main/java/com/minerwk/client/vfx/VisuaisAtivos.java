@@ -83,7 +83,7 @@ public final class VisuaisAtivos {
         }
 
         /** Ticks desde o começo, com a fração do quadro. */
-        double idade(long agora, float parcial) {
+        public double idade(long agora, float parcial) {
             return Math.max(0, agora - inicio + parcial);
         }
 
