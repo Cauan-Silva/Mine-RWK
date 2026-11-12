@@ -15,6 +15,14 @@ public interface Contexto {
     default void danoEmArea(double raio, float dano) {
     }
 
+    /**
+     * Como {@link #danoEmArea}, para cortes em sequência: o corte anterior não protege o alvo deste (no
+     * Minecraft, quem acabou de apanhar fica meio segundo sem levar dano igual ou menor).
+     */
+    default void danoSeguidoEmArea(double raio, float dano) {
+        danoEmArea(raio, dano);
+    }
+
     /** Para a animação do kit no jogador (a carga foi cortada). */
     default void pararAnimacao() {
     }
@@ -169,6 +177,10 @@ public interface Contexto {
     default void paralisar(Vetor centro, double raio, int ticks) {
     }
 
+    /** Paralisa só o alvo marcado por {@code ticks} (as correntes do Cid); nada acontece se ele não existe mais. */
+    default void paralisarAlvo(Object alvo, int ticks) {
+    }
+
     /** Liga o Infinito do jogador por {@code ticks}: ataques corpo a corpo e projéteis não chegam. */
     default void infinito(int ticks) {
     }
@@ -257,6 +269,25 @@ public interface Contexto {
     /** Desfaz os projéteis dos outros dentro da esfera; devolve quantos. */
     default int desfazerProjeteis(Vetor centro, double raio) {
         return 0;
+    }
+
+    /**
+     * Deixa um chamariz em {@code posicao} (os pés da imagem) por {@code ticks}: os mobs que miravam o
+     * jogador largam dele e vão até lá. Não engana outros jogadores.
+     */
+    default void chamariz(Vetor posicao, int ticks) {
+    }
+
+    /** O jogador fica com Velocidade {@code nivel} (1 = I) por {@code ticks}; renova se já tinha. */
+    default void velocidade(int nivel, int ticks) {
+    }
+
+    /** O custo de um golpe no próprio corpo: tira {@code dano} de vida sem armadura no meio e sem matar (para em 1). */
+    default void recuo(float dano) {
+    }
+
+    /** Acaba na hora os efeitos desse tipo do jogador, com o {@code aoAcabar} deles. */
+    default void encerrarEfeito(Class<? extends Efeito> tipo) {
     }
 
     /** Começa um efeito solto no kit do jogador. */

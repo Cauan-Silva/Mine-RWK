@@ -122,7 +122,7 @@ public final class ServicoKits {
     /** Tecla apertada ou solta no cliente. Sem personagem, nada acontece. */
     public static void usarTecla(ServerPlayer jogador, Tecla tecla, boolean apertou) {
         kit(jogador).ifPresent(k -> {
-            if (apertou && podeAgir(jogador) && !ProtecoesServidor.paralisado(jogador)) k.apertar(tecla, jogador.level().getGameTime());
+            if (apertou && podeAgir(jogador) && !ProtecoesServidor.paralisado(jogador)) k.apertar(tecla, jogador.level().getGameTime(), jogador.isShiftKeyDown());
             else k.soltar(tecla);
         });
     }

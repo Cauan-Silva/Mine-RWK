@@ -100,6 +100,42 @@ public final class ContextoServidor implements Contexto {
     }
 
     @Override
+    public void danoSeguidoEmArea(double raio, float dano) {
+        var fonte = jogador.damageSources().playerAttack(jogador);
+        Vec3 centro = jogador.position();
+        ServicoKits.comoGolpeDoKit(jogador, () -> {
+            for (LivingEntity alvo : naEsfera(LivingEntity.class, centro, raio, e -> true)) {
+                alvo.invulnerableTime = 0;
+                alvo.hurt(fonte, dano);
+            }
+        });
+    }
+
+    @Override
+    public void chamariz(Vetor posicao, int ticks) {
+        ChamarizServidor.criar(jogador, vec(posicao), ticks);
+    }
+
+    @Override
+    public void velocidade(int nivel, int ticks) {
+        // Jogador sem conexão (GameTest): o efeito manda pacote ao próprio jogador e não tem para quem.
+        if (nivel < 1 || ticks <= 0 || jogador.connection == null) return;
+        jogador.addEffect(new MobEffectInstance(net.minecraft.world.effect.MobEffects.MOVEMENT_SPEED, ticks, nivel - 1,
+                false, false, true));
+    }
+
+    @Override
+    public void recuo(float dano) {
+        if (dano <= 0 || jogador.isCreative() || jogador.getHealth() <= 1) return;
+        jogador.setHealth(Math.max(1, jogador.getHealth() - dano));
+    }
+
+    @Override
+    public void encerrarEfeito(Class<? extends Efeito> tipo) {
+        kit().ifPresent(k -> k.encerrarEfeitos(tipo, this));
+    }
+
+    @Override
     public void apresentacao(String animacao, String efeito, String som) {
         // Outra animação por cima da pose de descida: ao pousar, ela não é cortada.
         if (!animacao.isEmpty()) BarreirasServidor.animacaoTrocada(jogador);
@@ -452,6 +488,15 @@ public final class ContextoServidor implements Contexto {
             alvo.setDeltaMovement(0, Math.min(0, alvo.getDeltaMovement().y), 0);
             alvo.hurtMarked = true;
         }
+    }
+
+    @Override
+    public void paralisarAlvo(Object alvo, int ticks) {
+        LivingEntity e = marcado(alvo);
+        if (e == null || !afetavel(e)) return;
+        e.addEffect(new MobEffectInstance(Efeitos.PARALISIA, ticks, 0, false, false, false), jogador);
+        e.setDeltaMovement(0, Math.min(0, e.getDeltaMovement().y), 0);
+        e.hurtMarked = true;
     }
 
     @Override
