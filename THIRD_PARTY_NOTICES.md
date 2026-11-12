@@ -4,7 +4,11 @@
 | Arquivo | Origem | Licença |
 | --- | --- | --- |
 | `assets/minerwk/sounds/teste/teste.ogg` (era `computerNoise_000.ogg`) | Sci-Fi Sounds 1.0, Kenney (www.kenney.nl) | CC0 1.0 |
-| `assets/minerwk/sounds/gojo/*.ogg` | Síntese própria por `ferramentas/gerar_sfx_gojo.py`, com o motor `ferramentas/sfx_motor.py` portado do Minezin (mesmo autor). Sem áudio de terceiros. | do projeto |
+| `art/audio/cc0/bigsoundbank/*.ogg` (trechos; fonte e trecho de cada um em `art/audio/cc0/fontes.json`) | BigSoundBank.com, Joseph Sardin (https://bigsoundbank.com) | CC0 1.0 |
+| `art/audio/cc0/kenney/impact*.ogg` | Impact Sounds 1.0, Kenney (www.kenney.nl) | CC0 1.0 |
+| `art/audio/cc0/kenney/knifeSlice*.ogg`, `chop.ogg`, `drawKnife*.ogg`, `cloth*.ogg` | RPG Audio 1.0, Kenney (www.kenney.nl) | CC0 1.0 |
+| `art/audio/cc0/kenney/explosionCrunch*`, `laserLarge*`, `laserSmall*`, `lowFrequency_explosion*`, `forceField*`, `thrusterFire*`, `spaceEngineLow*`, `slime*` | Sci-Fi Sounds 1.0, Kenney (www.kenney.nl) | CC0 1.0 |
+| `assets/minerwk/sounds/{cid,gojo,ichigo,toji,ragnarok}/*.ogg` | Gerados por `ferramentas/gerar_sfx_*.py` com o motor `ferramentas/sfx_motor.py` (portado do Minezin, mesmo autor): síntese própria com as gravações CC0 acima por cima, mudadas de tom, cortadas e mixadas (`ferramentas/gravacoes.py`) | do projeto, sobre CC0 |
 
 ## Animações
 | Arquivo | Origem |
@@ -29,7 +33,6 @@
 | `assets/minerwk/geo/traje/ichigo*.geo.json`, `assets/minerwk/textures/traje/ichigo*.png` | Gerados por `ferramentas/gerar_traje_ichigo.py` a partir das bases acima: a espada entra no traje, presa ao braço direito, com as cores dela pintadas num canto livre da textura (o atlas de cores do Minezin não é usado) |
 | `assets/minerwk/geo/boss/toji.geo.json`, `assets/minerwk/textures/boss/toji.png`, `toji_glowmask.png` | Minezin (mesmo autor): o modelo e a textura do Toji (`geo/nemesis/1.geo.json`, `textures/bosses/toji_skin*.png`), sem mudança |
 | `assets/minerwk/textures/item/contrato_toji.png` | Gerada por `ferramentas/gerar_item_contrato.py` |
-| `assets/minerwk/sounds/toji/*.ogg` | Sintetizados por `ferramentas/gerar_sfx_toji.py` (motor `sfx_motor.py`); sem áudio de terceiros |
 
 ## Código
 | Arquivo | Origem |

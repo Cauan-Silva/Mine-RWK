@@ -3,9 +3,9 @@
     "duration": 3.4,
     "sample_rate": 48000,
     "channels": 1,
-    "peak": 0.61808,
-    "rms": 0.1679,
-    "sha256": "7ec34f1caa464085caee0a254db75d9c3d4d8e366a837dffb487c4ecbf005759",
+    "peak": 0.61493,
+    "rms": 0.17879,
+    "sha256": "dff9d609e6252d2119604a360eeeff3ea97c0c5353c129aa88746b44a754c5fb",
     "ticks": 68,
     "marcos": {
       "fim": 60
@@ -15,25 +15,25 @@
     "duration": 3.2692,
     "sample_rate": 48000,
     "channels": 1,
-    "peak": 0.6174,
-    "rms": 0.18028,
-    "sha256": "5032c13d1a72a7c75cc5d3e6e4323994776c76120399988015784d57b881a1f2"
+    "peak": 0.63998,
+    "rms": 0.16081,
+    "sha256": "d0ac847df475fef04b62b419926977dd7e22a76569cf07271811fec5e5d4af19"
   },
   "gojo_azul_3": {
     "duration": 3.5416,
     "sample_rate": 48000,
     "channels": 1,
-    "peak": 0.58263,
-    "rms": 0.17376,
-    "sha256": "8f3fa4c36cfa01c6abe542b1d80e4644ac1d999d99692b1e2682218b13284c08"
+    "peak": 0.5974,
+    "rms": 0.17278,
+    "sha256": "7864d79821d209ed6691424d3d0d67b27c53fe33ba1391d4b586788940b7f19c"
   },
   "gojo_vermelho_carga": {
     "duration": 1.55,
     "sample_rate": 48000,
     "channels": 1,
-    "peak": 0.65506,
-    "rms": 0.12363,
-    "sha256": "7ed7b22a255269b1b319b230b241fe0aa52c23b77d3460ce4a6f92dcd5163f06",
+    "peak": 0.61046,
+    "rms": 0.11998,
+    "sha256": "2ba77ba5d455bf7e20ad2b126da97f6eddf8797c486f2c6642a6b92fcd67eec3",
     "ticks": 31,
     "marcos": {
       "cheia": 30
@@ -43,25 +43,25 @@
     "duration": 1.4904,
     "sample_rate": 48000,
     "channels": 1,
-    "peak": 0.647,
-    "rms": 0.13426,
-    "sha256": "fe2b3451a611c765d3243eb45443d2339f5aac8444d4afe12f7f4ac308faf9db"
+    "peak": 0.68196,
+    "rms": 0.13364,
+    "sha256": "8b35f190ca6b85c99d49a12e7731174d6fc6635da85917cc5055168a1f3435f2"
   },
   "gojo_vermelho_carga_3": {
     "duration": 1.6146,
     "sample_rate": 48000,
     "channels": 1,
-    "peak": 0.6962,
-    "rms": 0.13244,
-    "sha256": "f02c8a755811b8d815c9a9cbe1362e6accd3776ce62a46d225ef68554c91ce36"
+    "peak": 0.66429,
+    "rms": 0.13252,
+    "sha256": "5accc3ee44c1a7f112570055ccf7e43b9e3ff5d4108801ee6521ed1f3ad0e896"
   },
   "gojo_vermelho_disparo": {
     "duration": 0.6,
     "sample_rate": 48000,
     "channels": 1,
-    "peak": 0.59413,
-    "rms": 0.10948,
-    "sha256": "07336e6fc5a3feefe3ef3a24f738fb3e49e7ba87e5a8278bf1ed8f846aed2209",
+    "peak": 0.63686,
+    "rms": 0.12372,
+    "sha256": "585ed19cab856d2d9aaed52085e7afbf002090c3c2e3ff8fb3ee4851976dae91",
     "ticks": 12,
     "marcos": {}
   },
@@ -69,25 +69,25 @@
     "duration": 0.5769,
     "sample_rate": 48000,
     "channels": 1,
-    "peak": 0.56108,
-    "rms": 0.10636,
-    "sha256": "c0a793a0f6e6a870d3956b416477867772d3d1b97f577205e7469ce0feba8675"
+    "peak": 0.62219,
+    "rms": 0.11307,
+    "sha256": "45d9928d8d626527f30fda06d4eaad9a914090cd7162a1806f1ef897b0b40625"
   },
   "gojo_vermelho_disparo_3": {
     "duration": 0.625,
     "sample_rate": 48000,
     "channels": 1,
-    "peak": 0.66944,
-    "rms": 0.09707,
-    "sha256": "a98bca0490a13b57729eb00abcfc4424d0446e1e91ef84fa238a324426408a29"
+    "peak": 0.64617,
+    "rms": 0.12372,
+    "sha256": "b6d509aa383e90935983adc29f78a7144035afd07bc3368c97215f4f534044cb"
   },
   "gojo_vermelho_explosao": {
     "duration": 2.5,
     "sample_rate": 48000,
     "channels": 1,
-    "peak": 0.58766,
-    "rms": 0.12719,
-    "sha256": "1bdc59ea15ac7e39570c45a77a62303373fc5bb77f5f8d5fa581b64c3049443d",
+    "peak": 0.60806,
+    "rms": 0.1205,
+    "sha256": "6d0bbd847f1563f331f3239abbea5809458560ef2e97ccf99768d2d74fa73aab",
     "ticks": 50,
     "marcos": {}
   },
@@ -95,17 +95,17 @@
     "duration": 2.4038,
     "sample_rate": 48000,
     "channels": 1,
-    "peak": 0.63776,
-    "rms": 0.13437,
-    "sha256": "8ec87890917b2b19b6cfa2bf43c33de738e3239994181dbb3c2e643522da674b"
+    "peak": 0.60701,
+    "rms": 0.16161,
+    "sha256": "6c399f340b3e54e8af42448361b823cc843cd8c4a169b06ef4bb4481650f9195"
   },
   "gojo_vermelho_explosao_3": {
     "duration": 2.6041,
     "sample_rate": 48000,
     "channels": 1,
-    "peak": 0.61819,
-    "rms": 0.14258,
-    "sha256": "86373a9c756a6f7085b7072c9c5f5cea016a952bff962fa54cfc75201c69d791"
+    "peak": 0.58505,
+    "rms": 0.1521,
+    "sha256": "3338956825aaa20c7ea997f2c2cf7b0cb588416eb8332da443e49950fb2cf2d6"
   },
   "gojo_infinito_ativa": {
     "duration": 1.0,
@@ -113,7 +113,7 @@
     "channels": 1,
     "peak": 0.66827,
     "rms": 0.09312,
-    "sha256": "5b61416463ccb70bc3a00431ce021651527419c275c16e8ac303eba9ccf12b13",
+    "sha256": "86f3d649a093374f667d28fc32187b1ac0bd1a58456f5e0a9f0fd62068a034ac",
     "ticks": 20,
     "marcos": {}
   },
@@ -123,7 +123,7 @@
     "channels": 1,
     "peak": 0.59944,
     "rms": 0.08304,
-    "sha256": "fb4beb8f1a36bd9db26493f2e9127ddff86adb1c4655b26b004970ffdc8c091c"
+    "sha256": "49d500fefd7c7ff04f32b7648a82d8ea371e7b3e3502921d35511b8c44262d94"
   },
   "gojo_infinito_ativa_3": {
     "duration": 1.0416,
@@ -131,7 +131,7 @@
     "channels": 1,
     "peak": 0.61337,
     "rms": 0.07994,
-    "sha256": "7c40da32988ea6b9915997d10a710d4f861964ecf076f4a7152cd3c72b4e78cf"
+    "sha256": "e49bd46e199da29021e2a929cea625c64f064e274070dd23ce0dc1b84be2426a"
   },
   "gojo_infinito_desativa": {
     "duration": 0.7,
@@ -139,7 +139,7 @@
     "channels": 1,
     "peak": 0.63832,
     "rms": 0.09436,
-    "sha256": "8ce252ddf62de4cf773daf2b1e28e14b0fdfaf712665b26d72447a9ef2cae3c6",
+    "sha256": "51efa3c678829b76a48ae0d7fda547f3de50d51d5d3e1c6b0f61b33dc7cb3168",
     "ticks": 14,
     "marcos": {}
   },
@@ -149,7 +149,7 @@
     "channels": 1,
     "peak": 0.68836,
     "rms": 0.10316,
-    "sha256": "b3fe09b40d4eb5fd50dd306a5d955412057945ba4f18d5656db711265ccde286"
+    "sha256": "758bebf21a071314431036cfaa19065533edd8b517705b10a51588cdf8664af4"
   },
   "gojo_infinito_desativa_3": {
     "duration": 0.7291,
@@ -157,7 +157,7 @@
     "channels": 1,
     "peak": 0.66052,
     "rms": 0.09195,
-    "sha256": "33bf54cfa0890a4394ed6f7c6fc9cec87ded99ba040bf1386ccb93df79396131"
+    "sha256": "00eeffead7ead32924aeb676685e61c97ff6cff0045e9baf0f37fbafb3bb1aba"
   },
   "gojo_infinito_tic": {
     "duration": 0.45,
@@ -165,7 +165,7 @@
     "channels": 1,
     "peak": 0.64141,
     "rms": 0.05951,
-    "sha256": "e6838f84935be058c3e16b69eb4201270bed5d7ce9d5eb34e704d5c1ab8b45cf",
+    "sha256": "0ffbe860c189f908022b3e86a245229ba425ec5f9b06e82da7e233aa387b47b5",
     "ticks": 9,
     "marcos": {}
   },
@@ -175,7 +175,7 @@
     "channels": 1,
     "peak": 0.62204,
     "rms": 0.07797,
-    "sha256": "68fdd195bfaedb858a26feb97cc415754a0f1fa1fd3b73190282d212c90c3afb"
+    "sha256": "923d450fb28a48497cad3325a3fbda1c15d2fd84785c0d424744e7df9d5f62b9"
   },
   "gojo_infinito_tic_3": {
     "duration": 0.4687,
@@ -183,15 +183,15 @@
     "channels": 1,
     "peak": 0.58937,
     "rms": 0.06832,
-    "sha256": "c1042046e8e151f192e96bbd98a2a536493f866173e07507c64dca2f6502bbfe"
+    "sha256": "e9670b9a4a3674d27cd5c64145d13571f707abb831795fb8909d620c7accce2b"
   },
   "gojo_roxo_carga": {
     "duration": 1.55,
     "sample_rate": 48000,
     "channels": 1,
     "peak": 0.60926,
-    "rms": 0.16401,
-    "sha256": "1421367076eb42881afcb5a82f79cc5873804edbdc7b66d90ab763f0b337a873",
+    "rms": 0.1644,
+    "sha256": "dc09184723e86e3f9d2a0ea37c05a555c71cfc70edb2276a9070b31d8718bbc7",
     "ticks": 31,
     "marcos": {
       "dispara": 30
@@ -202,24 +202,24 @@
     "sample_rate": 48000,
     "channels": 1,
     "peak": 0.59429,
-    "rms": 0.18723,
-    "sha256": "8e2efbea9b5f410aacbfda4ac7a37d36d27a9551ffaf7926c22106b3796baa71"
+    "rms": 0.18817,
+    "sha256": "359469588e3eb6d718103388ba918bff50393f2b51e2588b2ad585fea007e349"
   },
   "gojo_roxo_carga_3": {
     "duration": 1.6146,
     "sample_rate": 48000,
     "channels": 1,
     "peak": 0.61133,
-    "rms": 0.17427,
-    "sha256": "4194bfd4b5df52bfa352ee4988ec7ce21f0b0eafc1382d7403ac8743b9fda7e7"
+    "rms": 0.17494,
+    "sha256": "9715b566959d1eeabe6da906137dbbb0fd97daf1dc737a08fdef8d6263b3da4a"
   },
   "gojo_roxo_disparo": {
     "duration": 5.0,
     "sample_rate": 48000,
     "channels": 1,
-    "peak": 0.63963,
-    "rms": 0.13,
-    "sha256": "03619165e3144e5e772a56183ffe5823e67f4e38c9ab3308597969d451f20d10",
+    "peak": 0.59634,
+    "rms": 0.12999,
+    "sha256": "1c8e1dd7caadc46ceae386ad9efba709056b31a5b8a332fbe043a5fd7084ce27",
     "ticks": 100,
     "marcos": {}
   },
@@ -227,25 +227,25 @@
     "duration": 4.8077,
     "sample_rate": 48000,
     "channels": 1,
-    "peak": 0.59817,
-    "rms": 0.15954,
-    "sha256": "f75e3eff0efb25562880c9e35cbfd078f1e279e3f0a8ec32ff395b1c115fc376"
+    "peak": 0.61346,
+    "rms": 0.1379,
+    "sha256": "f7f8db044fd3bd28f8d50cc5cc11636c3b804085860bafd1a258cd33226c6f76"
   },
   "gojo_roxo_disparo_3": {
     "duration": 5.2083,
     "sample_rate": 48000,
     "channels": 1,
-    "peak": 0.59853,
-    "rms": 0.16496,
-    "sha256": "8d9e50ec47bcb62f37dbafda88666cd015840d3013a81621a90dd0cb880d07fd"
+    "peak": 0.6096,
+    "rms": 0.1406,
+    "sha256": "267038eb67d8b9da3746e5177bebd1d7318291aa88544066bde207711aaa91be"
   },
   "gojo_dominio": {
     "duration": 6.0,
     "sample_rate": 48000,
     "channels": 1,
-    "peak": 0.59075,
-    "rms": 0.17904,
-    "sha256": "431ae50008e197b64429b40e9cbd1e0a7fa8b9d33cd93b669489c5ff9386a7cd",
+    "peak": 0.60718,
+    "rms": 0.15729,
+    "sha256": "ab322322ffbe8e26a6a6a8f16e8d7a1c8f8381e56d295440c345ea3a4add0010",
     "ticks": 120,
     "marcos": {
       "abertura": 10
@@ -255,25 +255,25 @@
     "duration": 5.7692,
     "sample_rate": 48000,
     "channels": 1,
-    "peak": 0.60827,
-    "rms": 0.19066,
-    "sha256": "dd0c14906a9a9c3e6e3a8e991e197e219a7f78741af902c5cce04430c41ca1c7"
+    "peak": 0.61015,
+    "rms": 0.17333,
+    "sha256": "361541a131df6262dd4a2231cb6f5838d915bb174744df137e13b434e37c3e4c"
   },
   "gojo_dominio_3": {
     "duration": 6.25,
     "sample_rate": 48000,
     "channels": 1,
-    "peak": 0.61085,
-    "rms": 0.19574,
-    "sha256": "84af7e3481ebbb213f26d743021aba3a56426bcadbc45512b7687e010765ff50"
+    "peak": 0.5979,
+    "rms": 0.15176,
+    "sha256": "1a679766059fe56b9c1e20918da2d3277fff5b33fc1759611eef901c4fbc3ad9"
   },
   "gojo_dominio_fim": {
     "duration": 1.6,
     "sample_rate": 48000,
     "channels": 1,
-    "peak": 0.6009,
-    "rms": 0.16117,
-    "sha256": "0ba2b333fc575068d80c4f3e2f751afa9c5c8792e22040965d4ca111cc1bb94a",
+    "peak": 0.6049,
+    "rms": 0.09016,
+    "sha256": "521646f3cd7fa7a466af33d6ad92197947660510e31993c6660d13fe435d53e5",
     "ticks": 32,
     "marcos": {
       "estilhaco": 8
@@ -283,25 +283,25 @@
     "duration": 1.5385,
     "sample_rate": 48000,
     "channels": 1,
-    "peak": 0.61881,
-    "rms": 0.16859,
-    "sha256": "e1424f4c67c81951615ed5712af6f74a213b481b71ac7055db7d272c175e2375"
+    "peak": 0.59346,
+    "rms": 0.08431,
+    "sha256": "0179ce5aeac4cf10f0b3be3a8ae7fecc1bd43f22db16135f73dd70ea54c0aff7"
   },
   "gojo_dominio_fim_3": {
     "duration": 1.6666,
     "sample_rate": 48000,
     "channels": 1,
-    "peak": 0.64076,
-    "rms": 0.17249,
-    "sha256": "f78f43b59e7128eac9793a932efb6bb89a2b5cf82bd99b54b70822148a448f36"
+    "peak": 0.60465,
+    "rms": 0.10314,
+    "sha256": "98e1dbeb9956ec24a03d68975b12fe49810ef2df57308bad3f6bf4ad1e9f0191"
   },
   "gojo_r_encantamento": {
     "duration": 4.1,
     "sample_rate": 48000,
     "channels": 1,
-    "peak": 0.59322,
-    "rms": 0.19426,
-    "sha256": "5f6fec66f8b9107b4d976431eff4e22bf6c474a24b33815208162fe95cd71215",
+    "peak": 0.61589,
+    "rms": 0.17101,
+    "sha256": "19227b1c123c2a7adeeadd6809cdf3b47a3ef4fbc5b8eddfe7c823ba165c1e44",
     "ticks": 82,
     "marcos": {
       "palavra1": 2,
@@ -315,25 +315,25 @@
     "duration": 3.9423,
     "sample_rate": 48000,
     "channels": 1,
-    "peak": 0.61247,
-    "rms": 0.19124,
-    "sha256": "2f10a805db8f3d4079ecbb477f86f1c8ff139069cb762a2b7ea7e90461da00d8"
+    "peak": 0.60873,
+    "rms": 0.17848,
+    "sha256": "2a2a8af25221fe1841964141a27d720803795830faac83a4b66dedab00cdb261"
   },
   "gojo_r_encantamento_3": {
     "duration": 4.2708,
     "sample_rate": 48000,
     "channels": 1,
-    "peak": 0.61758,
-    "rms": 0.19318,
-    "sha256": "34ae048e1b0404e550afc78a591a763c2bcd9df1aa84b79b30578993f617fd1a"
+    "peak": 0.58844,
+    "rms": 0.18587,
+    "sha256": "3ea351a41e1b67c38b4c1efa31fa33b4648bd5e5975a74986d8659adedc137d2"
   },
   "gojo_r_avanco": {
     "duration": 0.7,
     "sample_rate": 48000,
     "channels": 1,
-    "peak": 0.64367,
-    "rms": 0.18992,
-    "sha256": "4e787f2833305166662a882b624527c306bf920ba120af1c7b0358c0597eef01",
+    "peak": 0.69323,
+    "rms": 0.14429,
+    "sha256": "aba69a8d6946a57901f346f251c699adcba9183f766046b900ee220acad749eb",
     "ticks": 14,
     "marcos": {}
   },
@@ -341,25 +341,25 @@
     "duration": 0.6731,
     "sample_rate": 48000,
     "channels": 1,
-    "peak": 0.6689,
-    "rms": 0.16873,
-    "sha256": "f23b9f4ffbf4e4a3d0fad5e9484ad95bb806cbbe5fce692c4c96423c8e6d4c29"
+    "peak": 0.64656,
+    "rms": 0.15229,
+    "sha256": "637ef8768dd39ec78511a51510ee9c69fbfd407fa9780725c15d29b937d8ca34"
   },
   "gojo_r_avanco_3": {
     "duration": 0.7291,
     "sample_rate": 48000,
     "channels": 1,
-    "peak": 0.62493,
-    "rms": 0.15738,
-    "sha256": "09a37f15a152882e4f713e94f4cafe12f71241a4bf2c5df4bae2588a86402671"
+    "peak": 0.65062,
+    "rms": 0.15444,
+    "sha256": "ce6248c39b9bbe4ca734766386c605c156d149871f187595f3a27d29c3ed9469"
   },
   "gojo_r_uppercut": {
     "duration": 1.6,
     "sample_rate": 48000,
     "channels": 1,
-    "peak": 0.60398,
-    "rms": 0.11053,
-    "sha256": "13a0893894f48401691be1b485563166e17c668135f6bcb18f55beb9af811482",
+    "peak": 0.63654,
+    "rms": 0.14522,
+    "sha256": "55169492e99574286f7178dbb74af6de89c76325b555414253a24051ce10dfac",
     "ticks": 32,
     "marcos": {
       "impacto": 3
@@ -369,25 +369,25 @@
     "duration": 1.5385,
     "sample_rate": 48000,
     "channels": 1,
-    "peak": 0.64797,
-    "rms": 0.12916,
-    "sha256": "39ab8754e81a593076424a7161db837861fde01b1a0aeb3e2325775f9edaf590"
+    "peak": 0.61646,
+    "rms": 0.13729,
+    "sha256": "3b935aa0f7745587b6456832d032e43ea43d0d0be267fe023d5997450c51d569"
   },
   "gojo_r_uppercut_3": {
     "duration": 1.6666,
     "sample_rate": 48000,
     "channels": 1,
-    "peak": 0.63867,
-    "rms": 0.13188,
-    "sha256": "1f59a1dbb2fc3f5a489fba3ef1e62d155d767caee62c4366d9f2fdfd4f6815ff"
+    "peak": 0.65156,
+    "rms": 0.12837,
+    "sha256": "544fe853049ff893c1e78679585acd978ed6e28010b3d8a290716fde1e858380"
   },
   "gojo_r_subida": {
     "duration": 1.7,
     "sample_rate": 48000,
     "channels": 1,
-    "peak": 0.71511,
-    "rms": 0.13588,
-    "sha256": "c695f8d2145cb1442e8cdccc6471742930eeeea4290b155757546cdea4d65f2c",
+    "peak": 0.63262,
+    "rms": 0.14208,
+    "sha256": "c9e68b61d581c50b804cec7624e6c469518b3395f22c861a7fb9206052999813",
     "ticks": 34,
     "marcos": {
       "fim": 27
@@ -397,17 +397,17 @@
     "duration": 1.6346,
     "sample_rate": 48000,
     "channels": 1,
-    "peak": 0.60846,
-    "rms": 0.1221,
-    "sha256": "cd06091d5270ac0f5e9e1592713daa23d09ae63bd2e6f80f5f296c2728c391a8"
+    "peak": 0.63338,
+    "rms": 0.13548,
+    "sha256": "461dfa7362782f1c013f33fb1387293084ee6dddc966cbfb94f90967aec14da8"
   },
   "gojo_r_subida_3": {
     "duration": 1.7708,
     "sample_rate": 48000,
     "channels": 1,
-    "peak": 0.61752,
-    "rms": 0.14574,
-    "sha256": "8196c84ec5c1de07a2b7de334fa71a190d7342bf85250d7ff366ce3d52f58904"
+    "peak": 0.66868,
+    "rms": 0.15209,
+    "sha256": "b6101ac74f2cd6e3a9e1847fa2fc9acfafef923127c08d22064ffd5672361bcc"
   },
   "gojo_r_esferas": {
     "duration": 1.75,
@@ -415,7 +415,7 @@
     "channels": 1,
     "peak": 0.60228,
     "rms": 0.17017,
-    "sha256": "2051a4cc205b4c4aa97df61188f20c39ffd5e2b33fe8d6883bb035483be5128b",
+    "sha256": "ad191c9e0ae479fb270ada536ebd00181df6190e78c74bb5bf1ad107bb8bc348",
     "ticks": 35,
     "marcos": {
       "conjurou": 8,
@@ -429,7 +429,7 @@
     "channels": 1,
     "peak": 0.61219,
     "rms": 0.16122,
-    "sha256": "a83ec3d422922e15af4a328e2c42f7a636445d370c01f7f6059df21e2365d4bd"
+    "sha256": "7124b714eee9c7f219afd69a80e6005c67f388c281ff6b2c532c44fd180a9e5b"
   },
   "gojo_r_esferas_3": {
     "duration": 1.8229,
@@ -437,15 +437,15 @@
     "channels": 1,
     "peak": 0.62286,
     "rms": 0.1503,
-    "sha256": "7c6f678a72f3e80fdcb6b620f78557964248356813f872cb57e83de896b1bdb1"
+    "sha256": "9c0ac6283a69bcf772110b238152eb1b877d38403c0a4b5e9e004a0e1f2e8ba2"
   },
   "gojo_r_fusao": {
     "duration": 2.05,
     "sample_rate": 48000,
     "channels": 1,
-    "peak": 0.6259,
-    "rms": 0.18061,
-    "sha256": "74a9abc310c86d4a3e8a6cb40d5884f8d5a88d60df8851da60f43700d4f8dce5",
+    "peak": 0.64611,
+    "rms": 0.15952,
+    "sha256": "ebe7c6698b66f1feccbacf644d97f670e9cc6aeadda96895847efccb49836790",
     "ticks": 41,
     "marcos": {
       "silencio": 36,
@@ -456,25 +456,25 @@
     "duration": 1.9711,
     "sample_rate": 48000,
     "channels": 1,
-    "peak": 0.64965,
-    "rms": 0.18223,
-    "sha256": "9e60ef2299d31d179b05cff19ae7d0d6e6423aba9290007812d1454aaa02897e"
+    "peak": 0.63757,
+    "rms": 0.15585,
+    "sha256": "33ea89e5dce3adc3cb4c0e7e5eb4b80fd1c94ca6c103c3f8d3e971a35282fd6b"
   },
   "gojo_r_fusao_3": {
     "duration": 2.1354,
     "sample_rate": 48000,
     "channels": 1,
-    "peak": 0.64483,
-    "rms": 0.17165,
-    "sha256": "5f5f47547612b5147147b1a0822ae70f78cfa16ab5e9387db7892172b866bf0c"
+    "peak": 0.61797,
+    "rms": 0.13772,
+    "sha256": "a4a1931cb017e52a1cafe98a15206b306a1bf40458af99aaf6566be7813ffaf4"
   },
   "gojo_r_explosao": {
     "duration": 6.5,
     "sample_rate": 48000,
     "channels": 1,
-    "peak": 0.60631,
-    "rms": 0.15263,
-    "sha256": "8bf5560ae6aa59d4cc1d3a71b344f1f9398795834f41415e3f2298952518f8e1",
+    "peak": 0.60366,
+    "rms": 0.14075,
+    "sha256": "c7d9dcc97eb02211ac5259d73a142b3ad9eb304474ea535d508250f88f3eb369",
     "ticks": 130,
     "marcos": {
       "cresceu": 60,
@@ -485,16 +485,16 @@
     "duration": 6.25,
     "sample_rate": 48000,
     "channels": 1,
-    "peak": 0.59557,
-    "rms": 0.17263,
-    "sha256": "1cbf0675c4effad06323de9a4d6d5a74c996bcf1011b1e50c7a924a5e06519c9"
+    "peak": 0.60116,
+    "rms": 0.14698,
+    "sha256": "d88b5e8e391b5f6dd612c33ce253dd6976ae29a2c8738bfac7661524df66d49f"
   },
   "gojo_r_explosao_3": {
     "duration": 6.7708,
     "sample_rate": 48000,
     "channels": 1,
-    "peak": 0.61077,
-    "rms": 0.14746,
-    "sha256": "71371e7901c2ec55274617e8dfd000c9b39bb2b279e6f8503daf9841191572b9"
+    "peak": 0.61262,
+    "rms": 0.14726,
+    "sha256": "c996f5acc407997fbbbd4b53ef93cf367b2beee2d6cd3c0688f2c7f82088bdbf"
   }
 }

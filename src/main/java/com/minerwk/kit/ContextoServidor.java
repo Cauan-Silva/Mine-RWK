@@ -100,6 +100,42 @@ public final class ContextoServidor implements Contexto {
     }
 
     @Override
+    public void danoSeguidoEmArea(double raio, float dano) {
+        var fonte = jogador.damageSources().playerAttack(jogador);
+        Vec3 centro = jogador.position();
+        ServicoKits.comoGolpeDoKit(jogador, () -> {
+            for (LivingEntity alvo : naEsfera(LivingEntity.class, centro, raio, e -> true)) {
+                alvo.invulnerableTime = 0;
+                alvo.hurt(fonte, dano);
+            }
+        });
+    }
+
+    @Override
+    public void chamariz(Vetor posicao, int ticks) {
+        ChamarizServidor.criar(jogador, vec(posicao), ticks);
+    }
+
+    @Override
+    public void velocidade(int nivel, int ticks) {
+        // Jogador sem conexão (GameTest): o efeito manda pacote ao próprio jogador e não tem para quem.
+        if (nivel < 1 || ticks <= 0 || jogador.connection == null) return;
+        jogador.addEffect(new MobEffectInstance(net.minecraft.world.effect.MobEffects.MOVEMENT_SPEED, ticks, nivel - 1,
+                false, false, true));
+    }
+
+    @Override
+    public void recuo(float dano) {
+        if (dano <= 0 || jogador.isCreative() || jogador.getHealth() <= 1) return;
+        jogador.setHealth(Math.max(1, jogador.getHealth() - dano));
+    }
+
+    @Override
+    public void encerrarEfeito(Class<? extends Efeito> tipo) {
+        kit().ifPresent(k -> k.encerrarEfeitos(tipo, this));
+    }
+
+    @Override
     public void apresentacao(String animacao, String efeito, String som) {
         // Outra animação por cima da pose de descida: ao pousar, ela não é cortada.
         if (!animacao.isEmpty()) BarreirasServidor.animacaoTrocada(jogador);
@@ -124,6 +160,11 @@ public final class ContextoServidor implements Contexto {
     @Override
     public Vetor olhos() {
         return vetor(jogador.getEyePosition());
+    }
+
+    @Override
+    public Vetor pes() {
+        return vetor(jogador.position());
     }
 
     @Override
@@ -295,6 +336,15 @@ public final class ContextoServidor implements Contexto {
 
     @Override
     public Object marcarAlvo(double alcance, double largura) {
+        return marcar(alcance, largura, false);
+    }
+
+    @Override
+    public Object marcarAlvoOuChefe(double alcance, double largura) {
+        return marcar(alcance, largura, true);
+    }
+
+    private Object marcar(double alcance, double largura, boolean chefes) {
         Vec3 olhos = jogador.getEyePosition();
         Vec3 dir = jogador.getLookAngle();
         AABB caixa = new AABB(olhos, olhos.add(dir.scale(alcance))).inflate(largura);
@@ -302,7 +352,7 @@ public final class ContextoServidor implements Contexto {
         double melhorFora = Double.MAX_VALUE;
         double melhorLonge = Double.MAX_VALUE;
         for (LivingEntity e : nivel().getEntitiesOfClass(LivingEntity.class, caixa,
-                e -> afetavel(e) && !(e instanceof ArmorStand) && !(e instanceof EnderDragon) && !(e instanceof WitherBoss))) {
+                e -> afetavel(e) && !(e instanceof ArmorStand) && (chefes || !(e instanceof EnderDragon) && !(e instanceof WitherBoss)))) {
             Vec3 c = e.getBoundingBox().getCenter();
             Vec3 ate = c.subtract(olhos);
             double longe = ate.dot(dir);
@@ -353,9 +403,11 @@ public final class ContextoServidor implements Contexto {
         jogador.setHealth(Math.max(1, Math.min(vida, jogador.getMaxHealth())));
     }
 
-    /** O alvo marcado, se ainda está vivo neste mundo. */
+    /** O alvo marcado, se ainda está vivo neste mundo (o da viagem do R do Cid, no mundo em que estiver). */
     private LivingEntity marcado(Object alvo) {
         if (!(alvo instanceof java.util.UUID id)) return null;
+        LivingEntity daViagem = EspacoServidor.alvo(jogador, id);
+        if (daViagem != null) return daViagem;
         return nivel().getEntity(id) instanceof LivingEntity e && e.isAlive() ? e : null;
     }
 
@@ -374,7 +426,49 @@ public final class ContextoServidor implements Contexto {
     @Override
     public void ferir(Object alvo, float dano) {
         LivingEntity e = marcado(alvo);
-        if (e != null) ServicoKits.comoGolpeDoKit(jogador, () -> e.hurt(jogador.damageSources().playerAttack(jogador), dano));
+        if (e == null) return;
+        // Na viagem do R do Cid só este dano chega ao alvo, e um soco não o protege do seguinte.
+        if (EspacoServidor.alvo(jogador, e.getUUID()) != null) {
+            ServicoKits.comoGolpeDoKit(jogador, () -> EspacoServidor.ferir(jogador, e, dano));
+        } else {
+            ServicoKits.comoGolpeDoKit(jogador, () -> e.hurt(jogador.damageSources().playerAttack(jogador), dano));
+        }
+    }
+
+    @Override
+    public void devolverRecurso(double quantidade) {
+        kit().ifPresent(k -> k.recurso().carregar(k.recurso().atual() + quantidade));
+    }
+
+    @Override
+    public boolean alvoVivo(Object alvo) {
+        return marcado(alvo) != null;
+    }
+
+    @Override
+    public boolean viagem(Object alvo) {
+        LivingEntity e = marcado(alvo);
+        return e != null && EspacoServidor.comecar(jogador, e);
+    }
+
+    @Override
+    public void pontosDaViagem(Object alvo, Vetor pes, Vetor centroDoAlvo, Vetor encarar) {
+        EspacoServidor.pontos(jogador, vec(pes), vec(centroDoAlvo), encarar == null ? null : vec(encarar));
+    }
+
+    @Override
+    public Vetor aoEspaco(Object alvo) {
+        return vetor(EspacoServidor.subir(jogador));
+    }
+
+    @Override
+    public void fimDaViagem() {
+        EspacoServidor.terminar(jogador);
+    }
+
+    @Override
+    public void visualNaOrigem(String tipo, float forca, int duracao, double raio) {
+        EspacoServidor.visualNaOrigem(jogador, tipo, forca, duracao, raio);
     }
 
     @Override
@@ -455,6 +549,15 @@ public final class ContextoServidor implements Contexto {
     }
 
     @Override
+    public void paralisarAlvo(Object alvo, int ticks) {
+        LivingEntity e = marcado(alvo);
+        if (e == null || !afetavel(e)) return;
+        e.addEffect(new MobEffectInstance(Efeitos.PARALISIA, ticks, 0, false, false, false), jogador);
+        e.setDeltaMovement(0, Math.min(0, e.getDeltaMovement().y), 0);
+        e.hurtMarked = true;
+    }
+
+    @Override
     public void infinito(int ticks) {
         ProtecoesServidor.ligarInfinito(jogador, ticks);
         // Projéteis que chegam perto param no ar e caem.
@@ -470,6 +573,71 @@ public final class ContextoServidor implements Contexto {
     @Override
     public void curar(float vida) {
         jogador.heal(vida);
+    }
+
+    @Override
+    public int danoEmArco(Vetor origem, Vetor direcao, double alcance, double graus, double altura, float dano) {
+        var fonte = jogador.damageSources().playerAttack(jogador);
+        Vec3 centro = vec(origem);
+        int[] feridos = {0};
+        ServicoKits.comoGolpeDoKit(jogador, () -> {
+            for (LivingEntity alvo : nivel().getEntitiesOfClass(LivingEntity.class, new AABB(centro, centro).inflate(alcance, altura + 2, alcance),
+                    e -> afetavel(e) && com.minerwk.core.kit.Arco.contem(origem, direcao, vetor(e.getBoundingBox().getCenter()), alcance, graus, altura))) {
+                if (alvo.hurt(fonte, dano)) feridos[0]++;
+            }
+        });
+        return feridos[0];
+    }
+
+    /** O modificador que prende o jogador ao chão: zera a velocidade de andar e a força do pulo. */
+    private static final ResourceLocation FIRME = com.minerwk.MineRWK.id("firme");
+
+    /** Se o jogador está preso ao chão por {@link #firmar}. */
+    public static boolean firme(ServerPlayer jogador) {
+        var andar = jogador.getAttribute(net.minecraft.world.entity.ai.attributes.Attributes.MOVEMENT_SPEED);
+        return andar != null && andar.hasModifier(FIRME);
+    }
+
+    @Override
+    public void firmar(boolean preso) {
+        // Os atributos chegam sozinhos ao cliente, que é quem move o jogador. Não são salvos: quem sai no meio volta solto.
+        for (var atributo : List.of(net.minecraft.world.entity.ai.attributes.Attributes.MOVEMENT_SPEED,
+                net.minecraft.world.entity.ai.attributes.Attributes.JUMP_STRENGTH)) {
+            var instancia = jogador.getAttribute(atributo);
+            if (instancia == null) continue;
+            instancia.removeModifier(FIRME);
+            if (preso) {
+                instancia.addTransientModifier(new net.minecraft.world.entity.ai.attributes.AttributeModifier(FIRME, -1,
+                        net.minecraft.world.entity.ai.attributes.AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL));
+            }
+        }
+        if (preso) {
+            jogador.setDeltaMovement(0, Math.min(0, jogador.getDeltaMovement().y), 0);
+            jogador.hurtMarked = true;
+        }
+    }
+
+    @Override
+    public int restaurar(double raio) {
+        Vec3 centro = jogador.position();
+        // Aliados: os outros jogadores e os animais que têm dono. Nunca monstros, nem os bichos soltos.
+        List<LivingEntity> curados = new java.util.ArrayList<>(nivel().getEntitiesOfClass(LivingEntity.class,
+                new AABB(centro, centro).inflate(raio), e -> e != jogador && e.isAlive() && !e.isSpectator()
+                        && e.position().distanceToSqr(centro) <= raio * raio
+                        && (e instanceof Player || e instanceof OwnableEntity dono && dono.getOwnerUUID() != null)));
+        curados.add(jogador);
+        for (LivingEntity e : curados) {
+            e.setHealth(e.getMaxHealth());
+            // Jogador sem conexão (GameTest): tirar o efeito manda pacote a ele e não tem para quem.
+            if (e instanceof ServerPlayer p && p.connection == null) continue;
+            for (var efeito : List.copyOf(e.getActiveEffects())) {
+                if (efeito.getEffect().value().getCategory() == net.minecraft.world.effect.MobEffectCategory.HARMFUL) {
+                    e.removeEffect(efeito.getEffect());
+                }
+            }
+            e.clearFire();
+        }
+        return curados.size();
     }
 
     private Optional<KitDoJogador> kit() {

@@ -24,4 +24,11 @@ public interface Efeito {
     /** Roda uma vez quando acaba (pela duração ou por {@link #encerrado()}); não roda se o jogador morreu ou saiu. */
     default void aoAcabar(Contexto contexto) {
     }
+
+    /**
+     * Roda quando o efeito é jogado fora no meio (o jogador morreu, saiu, trocou de dimensão): só para deixar
+     * as contas em dia (uma recarga, um sinal ao recurso), nunca para agir no mundo.
+     */
+    default void aoDescartar(Contexto contexto) {
+    }
 }

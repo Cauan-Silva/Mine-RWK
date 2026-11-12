@@ -122,7 +122,7 @@ public final class ServicoKits {
     /** Tecla apertada ou solta no cliente. Sem personagem, nada acontece. */
     public static void usarTecla(ServerPlayer jogador, Tecla tecla, boolean apertou) {
         kit(jogador).ifPresent(k -> {
-            if (apertou && podeAgir(jogador) && !ProtecoesServidor.paralisado(jogador)) k.apertar(tecla, jogador.level().getGameTime());
+            if (apertou && podeAgir(jogador) && !ProtecoesServidor.paralisado(jogador)) k.apertar(tecla, jogador.level().getGameTime(), jogador.isShiftKeyDown());
             else k.soltar(tecla);
         });
     }
@@ -330,7 +330,8 @@ public final class ServicoKits {
      * A transformação continua: entrar na arena ou num portal não tira o jogador da forma.
      */
     private static void aoMudarDeDimensao(PlayerEvent.PlayerChangedDimensionEvent evento) {
-        if (evento.getEntity() instanceof ServerPlayer jogador) {
+        // A ida ao espaço e a volta fazem parte do R do Cid: o golpe continua.
+        if (evento.getEntity() instanceof ServerPlayer jogador && !EspacoServidor.emViagem(jogador)) {
             KitDoJogador kit = KITS.get(jogador.getUUID());
             if (kit != null) kit.descartarMantendoAForma(new ContextoServidor(jogador));
         }

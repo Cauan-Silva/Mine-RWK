@@ -24,7 +24,8 @@ Ver [[Modelo de Personagem]].
 | --- | --- | --- |
 | [[Gojo]] | feita (09/11) | aprovado (09/11) |
 | [[Toji]] (boss do despertar do Gojo) | feita em parte (10/11): falta conferir as armas na wiki da obra | decisões do autor registradas; spec ainda não escrito |
-| [[Ichigo]] | feita (11/11); três números de capítulo e episódio a conferir | proposto, aguardando o autor |
+| [[Ichigo]] | feita (11/11); três números de capítulo e episódio a conferir | aprovado (11/11) |
+| [[Cid]] | feita (12/11); a cena do I Am Atomic e o boss a conferir | proposto, aguardando o autor |
 | (demais) | pendente | pendente |
 
 Ordem sugerida em [[Roadmap]].

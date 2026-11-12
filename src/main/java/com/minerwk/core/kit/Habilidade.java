@@ -20,6 +20,14 @@ public interface Habilidade {
     default void aoInterromper(Contexto contexto) {
     }
 
+    /**
+     * A habilidade que a tecla dispara quando o jogador a aperta agachado (o Recovery Atomic do Cid no R).
+     * O padrão é ela mesma. Quem tem variação devolve sempre a mesma instância, com id e recarga próprios.
+     */
+    default Habilidade agachado() {
+        return this;
+    }
+
     /** Dano mínimo de um golpe recebido que cancela a carga; infinito (padrão) = nada cancela. */
     default float danoQueInterrompe() {
         return Float.POSITIVE_INFINITY;

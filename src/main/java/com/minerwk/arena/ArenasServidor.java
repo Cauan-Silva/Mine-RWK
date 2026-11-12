@@ -64,6 +64,9 @@ public final class ArenasServidor {
         long voltarNoTick;
         /** A tela do jogador já começou a escurecer para a volta. */
         boolean escureceu;
+        /** Chamado se a entrada for desfeita antes de a luta começar (quem pagou para entrar recebe de volta). */
+        Runnable aoDesistir = () -> {
+        };
 
         Arena(ServerPlayer pediu, int indice, BiConsumer<ServerPlayer, CaixaArena> aoChegar) {
             this.dono = pediu.getUUID();
@@ -153,9 +156,20 @@ public final class ArenasServidor {
     /** O mesmo, com o cenário de quem chama (cada boss tem o seu). */
     public static boolean entrar(ServerPlayer jogador, List<PlantaEscola.Bloco> cenario,
                                  BiConsumer<ServerPlayer, CaixaArena> aoChegar) {
+        return entrar(jogador, cenario, aoChegar, () -> {
+        });
+    }
+
+    /**
+     * O mesmo, com um aviso para quando a entrada é desfeita no meio da montagem (o jogador saiu do jogo,
+     * morreu ou foi parar em outra arena): {@code aoChegar} nunca é chamado nesse caso.
+     */
+    public static boolean entrar(ServerPlayer jogador, List<PlantaEscola.Bloco> cenario,
+                                 BiConsumer<ServerPlayer, CaixaArena> aoChegar, Runnable aoDesistir) {
         ServerLevel arena = nivel(jogador.server);
         if (arena == null || naArena(jogador) || ARENAS.containsKey(jogador.getUUID())) return false;
         Arena a = new Arena(jogador, VAGAS.reservar(), aoChegar);
+        a.aoDesistir = aoDesistir;
         ARENAS.put(a.dono, a);
         jogador.setData(Anexos.RETORNO_ARENA, PontoRetorno.de(jogador));
         jogador.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, TICKS_DE_ESPERA, 9, false, false, false));
@@ -176,6 +190,7 @@ public final class ArenasServidor {
                 clarear(jogador);
             }
             apagar(arena, a);
+            a.aoDesistir.run();
             return;
         }
         soltar(jogador);
@@ -319,7 +334,7 @@ public final class ArenasServidor {
     }
 
     /** O lugar onde o jogador renasceria (cama, âncora ou o início do mundo), sem gastar a âncora. */
-    static void paraORenascimento(ServerPlayer jogador) {
+    public static void paraORenascimento(ServerPlayer jogador) {
         jogador.changeDimension(jogador.findRespawnPositionAndUseSpawnBlock(true, DimensionTransition.DO_NOTHING));
         jogador.resetFallDistance();
     }

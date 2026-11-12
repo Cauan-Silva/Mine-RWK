@@ -1,6 +1,6 @@
 """Motor de SFX em camadas, portado do Minezin (mesmo autor) para o Mine-RWK.
 Layered SFX engine for the sound rework (user: sounds were synthetic/weak, out of sync, missing).
-Tools only: numpy, soundfile. Original procedural audio, no sampled media.
+Tools only: numpy, soundfile. Procedural layers, optionally mixed with CC0 recordings (Som.amostra).
 
 Each sound is built from layers, the way game SFX are designed:
   transiente  - the first 5-30 ms: a click/crack that tells the ear "something hit" (where sync is felt)

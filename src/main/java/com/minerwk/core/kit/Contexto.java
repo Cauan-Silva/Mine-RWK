@@ -15,6 +15,14 @@ public interface Contexto {
     default void danoEmArea(double raio, float dano) {
     }
 
+    /**
+     * Como {@link #danoEmArea}, para cortes em sequência: o corte anterior não protege o alvo deste (no
+     * Minecraft, quem acabou de apanhar fica meio segundo sem levar dano igual ou menor).
+     */
+    default void danoSeguidoEmArea(double raio, float dano) {
+        danoEmArea(raio, dano);
+    }
+
     /** Para a animação do kit no jogador (a carga foi cortada). */
     default void pararAnimacao() {
     }
@@ -35,6 +43,11 @@ public interface Contexto {
     /** Posição dos olhos do jogador. */
     default Vetor olhos() {
         return Vetor.ZERO;
+    }
+
+    /** Os pés do jogador. Não é o mesmo que descer dos olhos: agachado, os olhos ficam mais baixos. */
+    default Vetor pes() {
+        return olhos().mais(new Vetor(0, -1.62, 0));
     }
 
     /** Para onde o jogador olha, com comprimento 1. */
@@ -169,6 +182,10 @@ public interface Contexto {
     default void paralisar(Vetor centro, double raio, int ticks) {
     }
 
+    /** Paralisa só o alvo marcado por {@code ticks} (as correntes do Cid); nada acontece se ele não existe mais. */
+    default void paralisarAlvo(Object alvo, int ticks) {
+    }
+
     /** Liga o Infinito do jogador por {@code ticks}: ataques corpo a corpo e projéteis não chegam. */
     default void infinito(int ticks) {
     }
@@ -257,6 +274,92 @@ public interface Contexto {
     /** Desfaz os projéteis dos outros dentro da esfera; devolve quantos. */
     default int desfazerProjeteis(Vetor centro, double raio) {
         return 0;
+    }
+
+    /**
+     * Deixa um chamariz em {@code posicao} (os pés da imagem) por {@code ticks}: os mobs que miravam o
+     * jogador largam dele e vão até lá. Não engana outros jogadores.
+     */
+    default void chamariz(Vetor posicao, int ticks) {
+    }
+
+    /** O jogador fica com Velocidade {@code nivel} (1 = I) por {@code ticks}; renova se já tinha. */
+    default void velocidade(int nivel, int ticks) {
+    }
+
+    /** O custo de um golpe no próprio corpo: tira {@code dano} de vida sem armadura no meio e sem matar (para em 1). */
+    default void recuo(float dano) {
+    }
+
+    /**
+     * Um corte horizontal: fere quem está no arco de {@code graus} à frente de {@code direcao}, a até
+     * {@code alcance} blocos e a até {@code altura} acima ou abaixo de {@code origem} (ver {@link Arco}).
+     * Devolve quantos feriu.
+     */
+    default int danoEmArco(Vetor origem, Vetor direcao, double alcance, double graus, double altura, float dano) {
+        return 0;
+    }
+
+    /** Prende o jogador ao chão (não anda nem pula) ou solta. Quem prende é quem solta. */
+    default void firmar(boolean preso) {
+    }
+
+    /**
+     * Cura por completo e tira os efeitos ruins do jogador e dos aliados a até {@code raio} blocos: os outros
+     * jogadores e os animais domados. Não fere ninguém. Devolve quantos curou, contando o jogador.
+     */
+    default int restaurar(double raio) {
+        return 0;
+    }
+
+    /** Como {@link #marcarAlvo}, mas os chefes que o jogo não deixa mover (o Dragão, o Wither) também valem. */
+    default Object marcarAlvoOuChefe(double alcance, double largura) {
+        return marcarAlvo(alcance, largura);
+    }
+
+    /** Devolve ao recurso do jogador o que um golpe gastou à toa (não passa do máximo). */
+    default void devolverRecurso(double quantidade) {
+    }
+
+    /** Se o alvo marcado ainda vive, esteja onde estiver (numa viagem ele pode estar em outra dimensão). */
+    default boolean alvoVivo(Object alvo) {
+        return posicaoDe(alvo) != null;
+    }
+
+    /**
+     * Começa uma viagem com o alvo marcado (o R do Cid): os dois passam a ser levados de ponto em ponto, sem
+     * gravidade; o jogador não recebe dano e o alvo só recebe o de {@link #ferir}. Guarda de onde saíram.
+     * Devolve false se não dá (o jogador já está numa).
+     */
+    default boolean viagem(Object alvo) {
+        return true;
+    }
+
+    /**
+     * Põe e segura o jogador com os pés em {@code pes}, olhando para {@code encarar}, e o alvo com o centro
+     * em {@code centroDoAlvo}. Parede e teto não seguram: os dois são levados, não empurrados.
+     */
+    default void pontosDaViagem(Object alvo, Vetor pes, Vetor centroDoAlvo, Vetor encarar) {
+    }
+
+    /**
+     * Leva o jogador (e o alvo, se ele pode mudar de dimensão) para o espaço. Devolve onde os pés do jogador
+     * ficaram: é a base dos pontos seguintes. Quem não pode ir fica preso e intocável onde está.
+     */
+    default Vetor aoEspaco(Object alvo) {
+        return pes();
+    }
+
+    /** Acaba a viagem: os dois voltam à dimensão e aos pontos de partida, sem dano de queda. Pode ser chamado de novo. */
+    default void fimDaViagem() {
+    }
+
+    /** Um visual para todos a até {@code raio} blocos do ponto de onde a viagem saiu, no mundo de lá. */
+    default void visualNaOrigem(String tipo, float forca, int duracao, double raio) {
+    }
+
+    /** Acaba na hora os efeitos desse tipo do jogador, com o {@code aoAcabar} deles. */
+    default void encerrarEfeito(Class<? extends Efeito> tipo) {
     }
 
     /** Começa um efeito solto no kit do jogador. */

@@ -124,16 +124,22 @@ public final class KitDoJogador {
 
     /** Tenta começar a habilidade da tecla. Devolve se começou. */
     public boolean apertar(Tecla tecla, long agora) {
-        if (execucao != null || trancada(tecla)) return false;
-        Habilidade h = habilidade(tecla).orElse(null);
-        if (h == null || !recargas.pronta(h.id(), agora) || !recurso.pode(h.numeros().custo())) return false;
+        return apertar(tecla, agora, false);
+    }
+
+    /** Como {@link #apertar(Tecla, long)}; agachado, vale a variação da habilidade ({@link Habilidade#agachado()}). */
+    public boolean apertar(Tecla tecla, long agora, boolean agachado) {
+        if (execucao != null) return false;
+        Habilidade h = habilidade(tecla).map(b -> agachado ? b.agachado() : b).orElse(null);
+        if (h == null || trancada(h) || !recargas.pronta(h.id(), agora) || !recurso.pode(h.numeros().custo())) return false;
         execucao = new Execucao(h, numeros(h));
         pendenteIniciar = true;
         return true;
     }
 
     public void soltar(Tecla tecla) {
-        if (execucao != null && habilidade(tecla).orElse(null) == execucao.habilidade()) {
+        Habilidade h = habilidade(tecla).orElse(null);
+        if (execucao != null && h != null && (h == execucao.habilidade() || h.agachado() == execucao.habilidade())) {
             execucao.soltar();
         }
     }
@@ -185,6 +191,18 @@ public final class KitDoJogador {
         return anulou;
     }
 
+    /** Acaba na hora os efeitos desse tipo, com o {@code aoAcabar} deles (o Overdrive desligado). Devolve se havia algum. */
+    public boolean encerrarEfeitos(Class<? extends Efeito> tipo, Contexto contexto) {
+        boolean havia = false;
+        for (Ativo a : List.copyOf(efeitos)) {
+            if (tipo.isInstance(a.efeito) && efeitos.remove(a)) {
+                a.efeito.aoAcabar(contexto);
+                havia = true;
+            }
+        }
+        return havia;
+    }
+
     /**
      * Cancela sem cobrar nem punir, encerra os efeitos sem {@code aoAcabar} e volta à forma base (jogador
      * saiu ou morreu).
@@ -211,6 +229,7 @@ public final class KitDoJogador {
         // A animação cobre o golpe inteiro, não só a carga: havendo golpe ou efeito no ar, ela para.
         boolean emAndamento = execucao != null || !efeitos.isEmpty();
         limpar();
+        for (Ativo a : List.copyOf(efeitos)) a.efeito.aoDescartar(contexto);
         efeitos.clear();
         if (emCarga != null) emCarga.aoInterromper(contexto);
         else if (emAndamento) contexto.pararAnimacao();

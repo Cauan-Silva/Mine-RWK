@@ -1,0 +1,290 @@
+{
+  "ragnarok_entrada": {
+    "duration": 3.0,
+    "sample_rate": 48000,
+    "channels": 1,
+    "peak": 0.63797,
+    "rms": 0.21763,
+    "sha256": "1b123e772b2c242203c50e97200d806e0db4c4475a729d2e3080aa1f000618f2",
+    "ticks": 60,
+    "marcos": {}
+  },
+  "ragnarok_entrada_2": {
+    "duration": 2.8846,
+    "sample_rate": 48000,
+    "channels": 1,
+    "peak": 0.61168,
+    "rms": 0.18578,
+    "sha256": "7ed54caa15d41cf5e87e190fbbfbf554c2ddf4a67b40e2d653ec76476f683b8e"
+  },
+  "ragnarok_entrada_3": {
+    "duration": 3.125,
+    "sample_rate": 48000,
+    "channels": 1,
+    "peak": 0.59962,
+    "rms": 0.17737,
+    "sha256": "7c85e0ae37091fabb57c241e08821c0175df8fea28813394c768e45d91e693fd"
+  },
+  "ragnarok_soco": {
+    "duration": 1.4,
+    "sample_rate": 48000,
+    "channels": 1,
+    "peak": 0.60948,
+    "rms": 0.1648,
+    "sha256": "ea35ab3f7cdaa6e674e61661da547d4b1273b83d3438c66971031a422c97a403",
+    "ticks": 28,
+    "marcos": {}
+  },
+  "ragnarok_soco_2": {
+    "duration": 1.3461,
+    "sample_rate": 48000,
+    "channels": 1,
+    "peak": 0.61181,
+    "rms": 0.15216,
+    "sha256": "3e41e491be09d2cc76e951adaffb7e5868653b13871aab75a29bc0def7634711"
+  },
+  "ragnarok_soco_3": {
+    "duration": 1.4583,
+    "sample_rate": 48000,
+    "channels": 1,
+    "peak": 0.61545,
+    "rms": 0.15469,
+    "sha256": "bd6d6eaca167740db054b394afc0dcbec6f09b93412f99ce23e3275a94ef4cc8"
+  },
+  "ragnarok_rajada": {
+    "duration": 1.2,
+    "sample_rate": 48000,
+    "channels": 1,
+    "peak": 0.60372,
+    "rms": 0.14,
+    "sha256": "d0dd2a1065ab3dd7b920460ca76c4db2d1d79cb1366d22c9aaa2e8836ef8bbb1",
+    "ticks": 24,
+    "marcos": {}
+  },
+  "ragnarok_rajada_2": {
+    "duration": 1.1538,
+    "sample_rate": 48000,
+    "channels": 1,
+    "peak": 0.60124,
+    "rms": 0.13047,
+    "sha256": "c9ae31951f51790e3a7e6498c64199d03ae508c37efacc4d9b0ed87b9264c492"
+  },
+  "ragnarok_rajada_3": {
+    "duration": 1.25,
+    "sample_rate": 48000,
+    "channels": 1,
+    "peak": 0.61667,
+    "rms": 0.13477,
+    "sha256": "16ecfb387472c8db4e2b7550d2e1e4629d6f61264eaff1dbd2970ed201e3cac9"
+  },
+  "ragnarok_asas": {
+    "duration": 1.6,
+    "sample_rate": 48000,
+    "channels": 1,
+    "peak": 0.61431,
+    "rms": 0.10035,
+    "sha256": "be737724b0010df82e8d6981f8cc442fbfad188b71918da68ca3006a0cae4609",
+    "ticks": 32,
+    "marcos": {}
+  },
+  "ragnarok_asas_2": {
+    "duration": 1.5385,
+    "sample_rate": 48000,
+    "channels": 1,
+    "peak": 0.58289,
+    "rms": 0.13476,
+    "sha256": "605db854ea38063dae240e5689dfce3a14df4e2860ce249e374f55ae115781cd"
+  },
+  "ragnarok_asas_3": {
+    "duration": 1.6666,
+    "sample_rate": 48000,
+    "channels": 1,
+    "peak": 0.60522,
+    "rms": 0.10293,
+    "sha256": "afe3a621a97814dec254aed17ef054f48ccbb226ffca8f889f9ebaf5ce3dfc98"
+  },
+  "ragnarok_investida": {
+    "duration": 1.4,
+    "sample_rate": 48000,
+    "channels": 1,
+    "peak": 0.62326,
+    "rms": 0.1491,
+    "sha256": "8be2c98e1894807edfb103c07ad723511363c37a807dc30a589044fd76847460",
+    "ticks": 28,
+    "marcos": {}
+  },
+  "ragnarok_investida_2": {
+    "duration": 1.3461,
+    "sample_rate": 48000,
+    "channels": 1,
+    "peak": 0.58535,
+    "rms": 0.11442,
+    "sha256": "2e281804f484295753f831ad736e96679013eef7724511333ff896c3dc9e07c2"
+  },
+  "ragnarok_investida_3": {
+    "duration": 1.4583,
+    "sample_rate": 48000,
+    "channels": 1,
+    "peak": 0.61385,
+    "rms": 0.15461,
+    "sha256": "ee74a35a99e2db425742eda72dec0cc7d262f8426d073d7d077dcc3b8737e44d"
+  },
+  "ragnarok_sopro_carga": {
+    "duration": 2.1,
+    "sample_rate": 48000,
+    "channels": 1,
+    "peak": 0.62799,
+    "rms": 0.14485,
+    "sha256": "d7444ab595da3a73d6082f159e45363973589c3416ae54d6b93b922eb054a5b5",
+    "ticks": 42,
+    "marcos": {
+      "feixe": 40
+    }
+  },
+  "ragnarok_sopro_carga_2": {
+    "duration": 2.0192,
+    "sample_rate": 48000,
+    "channels": 1,
+    "peak": 0.60864,
+    "rms": 0.182,
+    "sha256": "d812d5c7f9e7d301edd81d87f6cb7db0a017b166b2af4e998ba96379633e118a"
+  },
+  "ragnarok_sopro_carga_3": {
+    "duration": 2.1875,
+    "sample_rate": 48000,
+    "channels": 1,
+    "peak": 0.60892,
+    "rms": 0.18129,
+    "sha256": "986b457712f93b3ce488bed49e6ea2309a5052649a830b830a550d0107b8b343"
+  },
+  "ragnarok_sopro": {
+    "duration": 2.6,
+    "sample_rate": 48000,
+    "channels": 1,
+    "peak": 0.60955,
+    "rms": 0.14398,
+    "sha256": "2f6191dde635006b9960a87d5aec8407c34d7dfabe6eb216ed51c0a2b23d000b",
+    "ticks": 52,
+    "marcos": {}
+  },
+  "ragnarok_sopro_2": {
+    "duration": 2.5,
+    "sample_rate": 48000,
+    "channels": 1,
+    "peak": 0.59598,
+    "rms": 0.14668,
+    "sha256": "711b79f74cbd08b87b7b7313dd8c196d865a35d7b0ebeffdccb90fee8cf66a14"
+  },
+  "ragnarok_sopro_3": {
+    "duration": 2.7083,
+    "sample_rate": 48000,
+    "channels": 1,
+    "peak": 0.60085,
+    "rms": 0.13863,
+    "sha256": "72d24dc34d6c4a56a16a1daac894d8fc9fc717fbe575028101f1b562907ed945"
+  },
+  "ragnarok_pisao": {
+    "duration": 1.6,
+    "sample_rate": 48000,
+    "channels": 1,
+    "peak": 0.60191,
+    "rms": 0.15421,
+    "sha256": "f6b035904b18978d7014c2bec6d34a305b86ee7ac3bf16b1b9f7be8467f1e98f",
+    "ticks": 32,
+    "marcos": {}
+  },
+  "ragnarok_pisao_2": {
+    "duration": 1.5385,
+    "sample_rate": 48000,
+    "channels": 1,
+    "peak": 0.61878,
+    "rms": 0.171,
+    "sha256": "1364b60587cdb74f6cc69f3a38763c0d85824b4d698b79fe11e0bf95b32fc8a8"
+  },
+  "ragnarok_pisao_3": {
+    "duration": 1.6666,
+    "sample_rate": 48000,
+    "channels": 1,
+    "peak": 0.60923,
+    "rms": 0.17927,
+    "sha256": "c1050e00c76532c635ae8cc09e12597eabfa1404960eb808eea0842b53b100d2"
+  },
+  "ragnarok_corte": {
+    "duration": 0.9,
+    "sample_rate": 48000,
+    "channels": 1,
+    "peak": 0.60546,
+    "rms": 0.13037,
+    "sha256": "feaeb623e62ca177750a2fccac344e7b63345770848f93570069091a40b72c61",
+    "ticks": 18,
+    "marcos": {}
+  },
+  "ragnarok_corte_2": {
+    "duration": 0.8654,
+    "sample_rate": 48000,
+    "channels": 1,
+    "peak": 0.58635,
+    "rms": 0.12588,
+    "sha256": "88a653616a8788a253050243355222ef09993a2cdf6b28bc15a23a9cba27b9b8"
+  },
+  "ragnarok_corte_3": {
+    "duration": 0.9375,
+    "sample_rate": 48000,
+    "channels": 1,
+    "peak": 0.59812,
+    "rms": 0.11841,
+    "sha256": "2bcfd3bf17dd9b670ff20c71369164c368c55eed0cebc53aa275b79a582026a2"
+  },
+  "ragnarok_rugido": {
+    "duration": 2.4,
+    "sample_rate": 48000,
+    "channels": 1,
+    "peak": 0.62651,
+    "rms": 0.17965,
+    "sha256": "95b4a0c8d05b50685c53c00145925e093af9c020a25abfcddcdaac8e449bf5b7",
+    "ticks": 48,
+    "marcos": {}
+  },
+  "ragnarok_rugido_2": {
+    "duration": 2.3077,
+    "sample_rate": 48000,
+    "channels": 1,
+    "peak": 0.62499,
+    "rms": 0.18417,
+    "sha256": "adb37691bc8473ca9e867ac47695c61213c3e3b7eac67891a7fa979d7826e10e"
+  },
+  "ragnarok_rugido_3": {
+    "duration": 2.5,
+    "sample_rate": 48000,
+    "channels": 1,
+    "peak": 0.60989,
+    "rms": 0.19499,
+    "sha256": "3382b35fef7f7c4100da28c59f60039a7c5ec939a4b79ebd278ef53e2663e5ad"
+  },
+  "ragnarok_morte": {
+    "duration": 3.2,
+    "sample_rate": 48000,
+    "channels": 1,
+    "peak": 0.58626,
+    "rms": 0.14256,
+    "sha256": "c362748c6306e2f30698fa1284c1114741ae16e032175c15cfdf557c72aace0b",
+    "ticks": 64,
+    "marcos": {}
+  },
+  "ragnarok_morte_2": {
+    "duration": 3.0769,
+    "sample_rate": 48000,
+    "channels": 1,
+    "peak": 0.61741,
+    "rms": 0.14781,
+    "sha256": "5dd6d79263a8585d1f297936138817919f705560039173d8e468b3dbcf790952"
+  },
+  "ragnarok_morte_3": {
+    "duration": 3.3333,
+    "sample_rate": 48000,
+    "channels": 1,
+    "peak": 0.61588,
+    "rms": 0.16156,
+    "sha256": "01d905227ab8f787b8806ba386964bea458d5eb960ddc913308665045b445bb4"
+  }
+}

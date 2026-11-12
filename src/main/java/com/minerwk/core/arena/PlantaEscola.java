@@ -20,7 +20,9 @@ public final class PlantaEscola {
         PEDRA, TIJOLO_PEDRA, LAJE_PEDRA, ANDESITO_POLIDO, ESCADA_PEDRA, MADEIRA_ESCURA, MADEIRA_VERMELHA, TRONCO,
         FOLHA, LANTERNA, MURO, GRAMA, PAREDE_BRANCA, PILAR, ASSOALHO, TELHA, LAJE_TELHA,
         /** Do mundo interior do Ichigo: as vigas, as janelas e o escuro por trás delas. */
-        CONCRETO_CLARO, VIDRO_AZUL, FUNDO_ESCURO
+        CONCRETO_CLARO, VIDRO_AZUL, FUNDO_ESCURO,
+        /** De Oriana: o miolo e a borda do portal da Rosa Negra. */
+        PORTAL_NEGRO, PORTAL_ROXO
     }
 
     public record Bloco(int dx, int dy, int dz, Material material) {

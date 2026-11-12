@@ -62,6 +62,10 @@ public record Personagem(String id, String nome, String obra, Supplier<Recurso> 
     public List<Habilidade> todasAsHabilidades() {
         List<Habilidade> todas = new java.util.ArrayList<>(habilidades.values());
         for (Forma f : transformacoes) todas.addAll(f.habilidades().values());
+        // As variações de quem aperta agachado, logo depois das de pé.
+        for (Habilidade h : List.copyOf(todas)) {
+            if (h.agachado() != h && !todas.contains(h.agachado())) todas.add(h.agachado());
+        }
         return todas;
     }
 }

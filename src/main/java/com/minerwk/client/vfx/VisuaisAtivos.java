@@ -122,11 +122,18 @@ public final class VisuaisAtivos {
     }
 
     public static void receber(MostrarVisual p) {
+        ClientLevel nivel = Minecraft.getInstance().level;
+        if (nivel != mundo) {
+            // Trocou de dimensão e este é o primeiro visual do mundo novo: limpa já, senão o tick o levaria junto.
+            SonsVisuais.limpar();
+            ATIVOS.clear();
+            mundo = nivel;
+        }
         if (ATIVOS.size() >= LIMITE) despejar();
         Visual novo = new Visual(p.dono(), p.tipo(), p.origem(), p.direcao(), p.forca(), p.duracao(), p.inicio());
         ATIVOS.add(novo);
         SonsVisuais.aoComecar(novo);
-        ClientLevel nivel = Minecraft.getInstance().level;
+        EspacoCliente.aoVisual(novo);
         if (p.tipo().equals("gojo_azul") && nivel != null) {
             // A marca no chão nasce junto com o campo e some devagar depois que ele acaba.
             Vetor chao = chao(nivel, p.origem());

@@ -48,7 +48,8 @@ Spec e plano: [[2026-11-09 Núcleo dos kits]] (em `Desenvolvimento/Specs` e `Des
 
 ### 1.4 Base visual e de som
 - [x] Pipeline de áudio: `ferramentas/sfx_motor.py` e `gerar_sfx_gojo.py`, portados do Minezin, e o `SonsGojoTest`, que confere os ticks do som contra o Java; ver [[2026-11-10 Som do Gojo parte 1]]
-- [ ] `THIRD_PARTY_NOTICES.md` para gravações CC0 e Sonniss
+- [x] `THIRD_PARTY_NOTICES.md` para gravações CC0: Kenney e BigSoundBank, com `art/audio/cc0/fontes.json` e o `GravacoesCc0Test` ([[2026-11-12 Sons híbridos]])
+- [x] Sons híbridos (gravação CC0 + síntese) em todos os personagens ([[2026-11-12 Sons híbridos nos personagens]]); falta o autor ouvir
 - [x] Configuração do cliente (`minerwk-client.toml`: tremor, VFX reduzido, sons, HUD)
 - [x] Tremor de tela próprio (`core/camera/Tremor`, pacote `Tremer`)
 - [x] HUD de recargas e recurso (os ícones vêm com o Gojo)
@@ -83,7 +84,8 @@ Um por vez, sempre: pesquisa canônica → kit aprovado → código → VFX → 
 | # | Personagem | Por que nessa posição |
 | --- | --- | --- |
 | 1 | [[Ichigo]] | Espada + forma (Bankai/Mugetsu). Kit e spec ([[2026-11-11 Ichigo]]) aprovados em 11/11. As 8 partes feitas (falta o teste do autor no jogo): formas no núcleo e Reiatsu ([[2026-11-11 Ichigo parte 1]]); kit do Shikai e do Bankai ([[2026-11-11 Ichigo parte 2]]); arma e traje com pano ([[2026-11-11 Ichigo parte 3]]); VFX e animações ([[2026-11-11 Ichigo parte 4]]); som (parte 5); máscara e Mugetsu (parte 6); árvore, boss Zangetsu interior e mundo interior ([[2026-11-12 Ichigo parte 7]]); forma Hollow completa ([[2026-11-12 Ichigo parte 8]]) |
-| 2 | Tanjiro | Espada + respirações, efeitos de água/fogo |
+| 2 | [[Cid]] | Espada + ultimate de área. Passou à frente a pedido do autor (12/11). Spec [[2026-11-12 Cid]] aprovado em 12/11, em sete partes. **As sete partes feitas** (núcleo e kit base, [[2026-11-12 Cid parte 1]]; arma e traje, [[2026-11-12 Cid parte 2]]; VFX e animações dos golpes base, [[2026-11-12 Cid parte 3]]; som, [[2026-11-12 Cid parte 4]]; Espada Atômica e Recovery Atomic, [[2026-11-12 Cid parte 5]]; o I Am Atomic final, com a dimensão do espaço e a cutscene, [[2026-11-12 Cid parte 6]]; a árvore, o Anel da Sucessão, o Ragnarok e a arena de Oriana, [[2026-11-12 Cid parte 7]]; os sons, os efeitos e a cena da asa do Ragnarok, [[2026-11-12 Cid parte 7b]]). **Spec completo** |
+| 3 | Tanjiro | Espada + respirações, efeitos de água/fogo |
 | 3 | Asta | Espadas + forma demônio |
 | 4 | Killua | Rápido, elétrico, sem invocações |
 | 5 | Douma | Gelo, área |
@@ -91,7 +93,6 @@ Um por vez, sempre: pesquisa canônica → kit aprovado → código → VFX → 
 | 7 | Rudeus | Magias elementais |
 | 8 | Homura | Tempo parado (sistema de tempo) |
 | 9 | Dio | Stand + tempo parado (reaproveita a Homura) |
-| 10 | Cid | Espada + ultimate de área |
 | 11 | Guts | Arma enorme + armadura berserker (forma) |
 | 12 | Jin-Woo | Invocações (Igris, Beru) com GeckoLib |
 | 13 | Subaru e Beatrice | Contrato, forma e magias da Beatrice |

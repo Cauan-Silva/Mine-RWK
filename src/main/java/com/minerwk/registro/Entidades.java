@@ -28,11 +28,21 @@ public final class Entidades {
                     .clientTrackingRange(10)
                     .build("zangetsu"));
 
+    /** O Ragnarok, Nêmesis do Cid: sete blocos de altura. */
+    public static final DeferredHolder<EntityType<?>, EntityType<com.minerwk.boss.RagnarokEntity>> RAGNAROK =
+            REGISTRO.register("ragnarok", () -> EntityType.Builder
+                    .<com.minerwk.boss.RagnarokEntity>of(com.minerwk.boss.RagnarokEntity::new, MobCategory.MONSTER)
+                    .sized(com.minerwk.core.boss.RagnarokBoss.LARGURA, com.minerwk.core.boss.RagnarokBoss.ALTURA)
+                    .fireImmune()
+                    .clientTrackingRange(10)
+                    .build("ragnarok"));
+
     private Entidades() {
     }
 
     public static void atributos(EntityAttributeCreationEvent evento) {
         evento.put(TOJI.get(), TojiEntity.atributos().build());
         evento.put(ZANGETSU.get(), com.minerwk.boss.ZangetsuEntity.atributos().build());
+        evento.put(RAGNAROK.get(), com.minerwk.boss.RagnarokEntity.atributos().build());
     }
 }

@@ -45,3 +45,15 @@ Voltar para [[00 Início]].
 - [[2026-11-12 Mugetsu fino e longo]]: o véu do Mugetsu passa a ter 3 de largura, 40 de altura e 150 de alcance, a pedido do autor
 - [[2026-11-12 Ichigo parte 7]]: árvore do Ichigo com o nó Despertar, boss Zangetsu interior, Máscara Rachada e a arena do mundo interior
 - [[2026-11-12 Ichigo parte 8]]: a forma Hollow completa (modelo de chifres, garra, Sonído e Cero sozinhos, sons e animações); o Ichigo fecha as 8 partes
+- [[2026-11-12 Cid parte 1]]: o Cid começa: Magia, Redemoinho de Ébano, Pós-imagem, Prisão de Correntes Negras, Overdrive e o traje de slime no servidor, com apresentação provisória
+- [[2026-11-12 Cid parte 2]]: o traje do Shadow (sobretudo, capuz aberto com o rosto da skin, barra de pano) e a espada preta em cruz, gerados por script e refeitos pelas referências do autor
+- [[2026-11-12 Cid parte 3]]: os visuais e as animações dos golpes base do Cid (Redemoinho, Pós-imagem, Prisão de Correntes e Overdrive)
+- [[2026-11-12 Cid parte 4]]: os sons dos golpes base do Cid, sintetizados (lâmina fina, slime, correntes e o zumbido da magia)
+- [[2026-11-12 Cid parte 5]]: a Espada Atômica (V) e o Recovery Atomic (agachado + R) do Cid: mecânica, visuais, animações e sons
+- [[2026-11-12 Cid parte 6]]: o I Am Atomic final (R) do Cid: a dimensão do espaço e o céu dela, a subida a socos, a ida e a volta, a cutscene, os visuais e os sons
+- [[2026-11-12 Cid parte 7]]: a árvore do Cid, o Anel da Sucessão, o boss Ragnarok (cinco golpes, a asa cortada, o pisão) e a arena de Oriana; sons e efeitos do boss ainda provisórios
+- [[2026-11-12 Sons híbridos nos personagens]]: Cid, Ichigo, Gojo e Toji com gravações CC0 por cima da síntese; módulo comum `gravacoes.py`
+- [[2026-11-12 Sons híbridos]]: gravações CC0 (Kenney e BigSoundBank) misturadas à síntese; piloto nos onze sons do Ragnarok
+- [[2026-11-12 Buraco do Hollow]]: o buraco no peito da forma Hollow atravessa o corpo; a camada de brilho do GeckoLib não pinta mais de preto os trajes sem máscara
+- [[2026-11-12 Cid parte 7b]]: os onze sons próprios do Ragnarok, os efeitos dos golpes (cratera, projéteis, feixe, onda) e a cena da asa com o corte do Shadow
+- [[2026-11-12 Cid parte 6 ritmo e impacto]]: o R do Cid refeito a pedido do autor: de 7,7 s para 17 s, parada de impacto nos socos, a carga antes do Atomic, a esfera maior e a onda de choque no chão
