@@ -66,4 +66,44 @@ class LogicaHudTest {
         assertEquals(0, LogicaHud.semPoderes(0, java.util.List.of()), "sem golpes na forma não há o que avisar");
         assertEquals(0, LogicaHud.semPoderes(0, java.util.List.of(30L, 40L)), "recargas curtas ao mesmo tempo não são o custo do Mugetsu");
     }
+
+    private static double area(float[] p) {
+        double a = 0;
+        int n = p.length / 2;
+        for (int i = 0; i < n; i++) {
+            int j = (i + 1) % n;
+            a += p[2 * i] * p[2 * j + 1] - p[2 * j] * p[2 * i + 1];
+        }
+        return Math.abs(a) / 2;
+    }
+
+    @Test
+    void varreduraVaziaSemRecarga() {
+        assertEquals(0, LogicaHud.varredura(0, 20).length);
+    }
+
+    @Test
+    void varreduraCheia() {
+        assertEquals(400, area(LogicaHud.varredura(1, 20)), .5);
+    }
+
+    @Test
+    void varreduraMetade() {
+        float[] p = LogicaHud.varredura(.5f, 20);
+        assertEquals(200, area(p), .5);
+        for (int i = 0; i < p.length; i += 2) assertTrue(p[i] <= 10.001f, "x=" + p[i]);
+    }
+
+    @Test
+    void varreduraLimitada() {
+        assertEquals(area(LogicaHud.varredura(1, 20)), area(LogicaHud.varredura(1.7f, 20)), 1e-6);
+    }
+
+    @Test
+    void brilho() {
+        assertEquals(1, LogicaHud.brilho(0), 1e-6);
+        assertEquals(.5, LogicaHud.brilho(4), 1e-6);
+        assertEquals(0, LogicaHud.brilho(8), 1e-6);
+        assertEquals(0, LogicaHud.brilho(-1), 1e-6);
+    }
 }

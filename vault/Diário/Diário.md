@@ -54,6 +54,8 @@ Voltar para [[00 Início]].
 - [[2026-11-12 Cid parte 7]]: a árvore do Cid, o Anel da Sucessão, o boss Ragnarok (cinco golpes, a asa cortada, o pisão) e a arena de Oriana; sons e efeitos do boss ainda provisórios
 - [[2026-11-12 Sons híbridos nos personagens]]: Cid, Ichigo, Gojo e Toji com gravações CC0 por cima da síntese; módulo comum `gravacoes.py`
 - [[2026-11-12 Sons híbridos]]: gravações CC0 (Kenney e BigSoundBank) misturadas à síntese; piloto nos onze sons do Ragnarok
+- [[2026-11-12 UI parte 2]]: a árvore de habilidades com galhos no tema de cada personagem, o emblema na raiz, o Despertar no tronco e o painel de detalhe ao lado
+- [[2026-11-12 UI parte 1]]: a HUD com o tema de cada personagem, ícones gerados em Python, a recarga em varredura de relógio e o brilho quando fica pronta
 - [[2026-11-12 Buraco do Hollow]]: o buraco no peito da forma Hollow atravessa o corpo; a camada de brilho do GeckoLib não pinta mais de preto os trajes sem máscara
 - [[2026-11-12 Cid parte 7b]]: os onze sons próprios do Ragnarok, os efeitos dos golpes (cratera, projéteis, feixe, onda) e a cena da asa com o corte do Shadow
 - [[2026-11-12 Cid parte 6 ritmo e impacto]]: o R do Cid refeito a pedido do autor: de 7,7 s para 17 s, parada de impacto nos socos, a carga antes do Atomic, a esfera maior e a onda de choque no chão

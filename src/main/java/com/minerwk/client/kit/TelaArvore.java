@@ -1,68 +1,84 @@
 package com.minerwk.client.kit;
 
+import com.minerwk.MineRWK;
+import com.minerwk.core.hud.FormaArvore;
+import com.minerwk.core.hud.FormaArvore.Galho;
+import com.minerwk.core.hud.FormasArvore;
 import com.minerwk.core.hud.LayoutArvore;
+import com.minerwk.core.hud.LayoutArvore.Alvo;
+import com.minerwk.core.hud.LayoutArvore.Linha;
 import com.minerwk.core.hud.LayoutEscolha.Retangulo;
 import com.minerwk.core.hud.LogicaHud;
+import com.minerwk.core.hud.TemaUi;
+import com.minerwk.core.hud.Temas;
 import com.minerwk.core.kit.Personagem;
 import com.minerwk.core.kit.Personagens;
 import com.minerwk.core.maestria.Arvore;
 import com.minerwk.core.maestria.No;
 import com.minerwk.rede.ComprarNo;
 import com.minerwk.rede.SincronizarKit;
+import com.mojang.blaze3d.systems.RenderSystem;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.Mth;
 import net.neoforged.neoforge.network.PacketDistributor;
 
 /**
- * Tela da árvore de habilidades do personagem atual: os nós de antes do despertar em cima, o Despertar no meio
- * e os de depois embaixo. Clicar num nó pede a compra ao servidor, que é quem decide; a tela só mostra o estado
- * que o servidor mandou.
+ * Tela da árvore de habilidades do personagem atual, no tema dele (spec [[2026-11-12 UI dos personagens]]): o
+ * emblema na raiz, os galhos de antes do Despertar, o Despertar no tronco e os galhos de depois em cima. Clicar
+ * num nó pede a compra ao servidor, que é quem decide; a tela só mostra o estado que o servidor mandou.
  */
 public final class TelaArvore extends Screen {
-    private static final int FUNDO = 0xC0101018;
-    private static final int FUNDO_TRANCADO = 0xC0080808;
     private static final int COR_PODE = 0xFFE8B84A;
-    private static final int COR_CHEIO = 0xFF5AD27A;
+    private static final int COR_PODE_APAGADA = 0xFF7A5A20;
     private static final int COR_APAGADO = 0xFF4A4A55;
-    private static final int COR_DESPERTAR = 0xFF9A6BFF;
+    private static final int VEU_TRANCADO = 0xA0000000;
     private static final int TEXTO = 0xFFFFFFFF;
-    private static final int TEXTO_APAGADO = 0xFF8A8A95;
+    private static final int LINHA = 2;
 
     private final Personagem personagem;
-    private final List<No> nos = new ArrayList<>();
+    private final List<Galho> galhos = new ArrayList<>();
+    private final Map<String, No> porId = new HashMap<>();
+    private final FormaArvore forma;
+    private final No despertar;
     private LayoutArvore layout;
-    private int rolagem;
+    /** -1 até o primeiro {@link #init()}, que começa a tela embaixo, na raiz. */
+    private int rolagem = -1;
 
-    public TelaArvore(Personagem personagem) {
+    public TelaArvore(Personagem personagem, FormaArvore forma) {
         super(Component.translatable("tela.minerwk.arvore"));
         this.personagem = personagem;
-        // Na ordem do layout: antes do despertar, o Despertar e depois.
-        List<No> todos = personagem.arvore().nos();
-        todos.stream().filter(n -> !n.depoisDoDespertar() && n.tipo() != No.Tipo.DESPERTAR).forEach(nos::add);
-        todos.stream().filter(n -> n.tipo() == No.Tipo.DESPERTAR).findFirst().ifPresent(nos::add);
-        todos.stream().filter(No::depoisDoDespertar).forEach(nos::add);
+        this.forma = forma;
+        galhos.addAll(forma.antes());
+        galhos.addAll(forma.depois());
+        personagem.arvore().nos().forEach(n -> porId.put(n.id(), n));
+        despertar = personagem.arvore().nos().stream().filter(n -> n.tipo() == No.Tipo.DESPERTAR).findFirst().orElseThrow();
     }
 
-    /** Abre a árvore do personagem atual, se ele tem uma. */
+    /** Abre a árvore do personagem atual, se ele tem uma (com o Despertar e a forma desenhada). */
     public static void abrir() {
         Personagens.porId(RecepcaoKit.estado().personagem())
                 .filter(p -> p.arvore().nos().stream().anyMatch(n -> n.tipo() == No.Tipo.DESPERTAR))
-                .ifPresent(p -> Minecraft.getInstance().setScreen(new TelaArvore(p)));
+                .ifPresent(p -> FormasArvore.de(p.id())
+                        .ifPresent(f -> Minecraft.getInstance().setScreen(new TelaArvore(p, f))));
     }
 
     @Override
     protected void init() {
-        int antes = (int) nos.stream().filter(n -> !n.depoisDoDespertar() && n.tipo() != No.Tipo.DESPERTAR).count();
-        layout = new LayoutArvore(width, height, antes, nos.size() - antes - 1);
-        rolagem = Mth.clamp(rolagem, 0, layout.rolagemMaxima());
+        layout = new LayoutArvore(width, height, forma.antes().stream().map(g -> g.nos().size()).toList(),
+                forma.depois().stream().map(g -> g.nos().size()).toList());
+        rolagem = rolagem < 0 ? layout.rolagemMaxima() : Mth.clamp(rolagem, 0, layout.rolagemMaxima());
     }
 
     private static int nivelDe(SincronizarKit s, No no) {
@@ -71,6 +87,14 @@ public final class TelaArvore extends Screen {
 
     private Arvore.Resultado estadoDe(SincronizarKit s, No no) {
         return personagem.arvore().podeComprar(s.nos(), no.id(), s.nivel(), s.despertou());
+    }
+
+    /** O nó sob o alvo: o Despertar ou um nó de galho; null na ponta e no vazio. */
+    private No noDe(Alvo alvo) {
+        if (alvo == null) return null;
+        if (alvo.galho() == LayoutArvore.DESPERTAR) return despertar;
+        if (alvo.no() < 0) return null;
+        return porId.get(galhos.get(alvo.galho()).nos().get(alvo.no()));
     }
 
     @Override
@@ -82,8 +106,27 @@ public final class TelaArvore extends Screen {
             onClose();
             return;
         }
+        TemaUi tema = Temas.tema(s.personagem(), s.forma());
+        desenharFundo(g, tema);
         g.enableScissor(0, LayoutArvore.TOPO - 2, width, height);
-        for (int i = 0; i < nos.size(); i++) desenharNo(g, s, nos.get(i), layout.celula(i), i == layout.indiceDoDespertar());
+        List<Linha> linhas = layout.linhas();
+        for (int i = 0; i < linhas.size(); i++) desenharLinha(g, s, tema, linhas.get(i), i);
+        desenharRaiz(g, tema);
+        desenharNo(g, s, tema, despertar, layout.despertar(), despertar.id(), null);
+        for (int i = 0; i < galhos.size(); i++) {
+            Galho galho = galhos.get(i);
+            Retangulo p = layout.ponta(i);
+            int y = p.y() - rolagem;
+            Molduras.desenhar(g, p.x(), y, p.largura(), tema, tema.corBorda());
+            g.fill(p.x(), y, p.x() + p.largura(), y + p.altura(), 0xC0000000);
+            if (Molduras.temIcone(galho.icone())) Molduras.icone(g, galho.icone(), p.x(), y, p.largura());
+            if (galho.depoisDoDespertar() && !s.despertou()) g.fill(p.x(), y, p.x() + p.largura(), y + p.altura(), VEU_TRANCADO);
+            for (int n = 0; n < galho.nos().size(); n++) {
+                No no = porId.get(galho.nos().get(n));
+                String selo = "selo_" + forma.selo(no).name().toLowerCase(Locale.ROOT);
+                desenharNo(g, s, tema, no, layout.no(i, n), galho.icone(), selo);
+            }
+        }
         g.disableScissor();
         if (layout.rolagemMaxima() > 0) {
             // Barra de rolagem à direita, só quando a árvore não cabe na altura.
@@ -94,8 +137,86 @@ public final class TelaArvore extends Screen {
             g.fill(width - 5, y, width - 3, y + barra, 0xC0FFFFFF);
         }
         desenharCabecalho(g, s);
-        int sob = layout.indiceEm(mouseX, mouseY, rolagem);
-        if (sob >= 0) g.renderComponentTooltip(font, dica(s, nos.get(sob)), mouseX, mouseY);
+        No sob = noDe(layout.alvoEm(mouseX, mouseY, rolagem));
+        if (layout.painel().isPresent()) {
+            desenharPainel(g, s, tema, layout.painel().get(), sob);
+        } else if (sob != null) {
+            g.renderComponentTooltip(font, dica(s, sob), mouseX, mouseY);
+        }
+    }
+
+    /** O fundo do tema repetido pela tela, escurecido pela cor de fundo do tema. */
+    private void desenharFundo(GuiGraphics g, TemaUi tema) {
+        ResourceLocation fundo = MineRWK.id("textures/gui/fundos/" + tema.fundoArvore() + ".png");
+        for (int x = 0; x < width; x += 256) {
+            for (int y = 0; y < height; y += 256) g.blit(fundo, x, y, 0, 0, 256, 256, 256, 256);
+        }
+        g.fill(0, 0, width, height, 0x60000000 | (tema.corFundo() & 0xFFFFFF));
+    }
+
+    /** Uma ligação de 2 px: acesa na cor do tema quando o nó de destino tem nível; o tronco acima do Despertar só depois de despertar. */
+    private void desenharLinha(GuiGraphics g, SincronizarKit s, TemaUi tema, Linha l, int indice) {
+        boolean acesa;
+        if (l.galho() < 0) {
+            acesa = indice == 0 || s.despertou();
+        } else {
+            Galho galho = galhos.get(l.galho());
+            acesa = l.no() < 0 ? galho.nos().stream().anyMatch(id -> nivelDe(s, porId.get(id)) > 0)
+                    : nivelDe(s, porId.get(galho.nos().get(l.no()))) > 0;
+        }
+        int cor = acesa ? tema.corPrincipal() : COR_APAGADO;
+        int x0 = Math.min(l.x1(), l.x2()), x1 = Math.max(l.x1(), l.x2());
+        int y0 = Math.min(l.y1(), l.y2()) - rolagem, y1 = Math.max(l.y1(), l.y2()) - rolagem;
+        g.fill(x0 - LINHA / 2, y0 - LINHA / 2, x1 + LINHA / 2, y1 + LINHA / 2, cor);
+    }
+
+    private void desenharRaiz(GuiGraphics g, TemaUi tema) {
+        Retangulo r = layout.raiz();
+        int y = r.y() - rolagem;
+        Molduras.desenhar(g, r.x(), y, r.largura(), tema, tema.corPrincipal());
+        g.fill(r.x(), y, r.x() + r.largura(), y + r.altura(), 0xC0000000);
+        RenderSystem.enableBlend();
+        // O emblema da tela de escolha (96x128), de pé dentro do quadro.
+        g.blit(MineRWK.id("textures/gui/personagens/" + personagem.id() + ".png"), r.x() + 3, y, 18, 24, 0, 0, 96, 128, 96, 128);
+    }
+
+    /** Um nó: o ícone (com o selo), a moldura no estado dele e os pontos de nível embaixo. */
+    private void desenharNo(GuiGraphics g, SincronizarKit s, TemaUi tema, No no, Retangulo r, String icone, String selo) {
+        int y = r.y() - rolagem;
+        int nivel = nivelDe(s, no);
+        Arvore.Resultado estado = estadoDe(s, no);
+        boolean trancado = estado == Arvore.Resultado.NAO_DESPERTOU || estado == Arvore.Resultado.MAESTRIA_BAIXA;
+        boolean pisca = (System.currentTimeMillis() / 400) % 2 == 0;
+        int borda = estado == Arvore.Resultado.OK ? (pisca ? COR_PODE : COR_PODE_APAGADA)
+                : nivel > 0 ? tema.corPrincipal() : COR_APAGADO;
+        Molduras.desenhar(g, r.x(), y, r.largura(), tema, borda);
+        g.fill(r.x(), y, r.x() + r.largura(), y + r.altura(), 0xC0000000);
+        if (Molduras.temIcone(icone)) Molduras.icone(g, icone, r.x(), y, r.largura());
+        if (selo != null && Molduras.temIcone(selo)) Molduras.icone(g, selo, r.x(), y, r.largura());
+        if (trancado && nivel == 0) g.fill(r.x(), y, r.x() + r.largura(), y + r.altura(), VEU_TRANCADO);
+        if (no.tipo() == No.Tipo.DESPERTAR) return;
+        // Os pontos de nível: um por nível, cheios na cor do tema.
+        int total = no.niveis(), largura = total * 4 - 2;
+        int x0 = r.x() + (r.largura() - largura) / 2;
+        for (int i = 0; i < total; i++) {
+            g.fill(x0 + i * 4, y + r.altura() + 3, x0 + i * 4 + 2, y + r.altura() + 5, i < nivel ? tema.corPrincipal() : COR_APAGADO);
+        }
+    }
+
+    /** O painel ao lado da árvore: o detalhe do nó sob o mouse. */
+    private void desenharPainel(GuiGraphics g, SincronizarKit s, TemaUi tema, Retangulo p, No sob) {
+        g.fill(p.x() - 1, p.y() - 1, p.x() + p.largura() + 1, p.y() + p.altura() + 1, tema.corBorda());
+        g.fill(p.x(), p.y(), p.x() + p.largura(), p.y() + p.altura(), 0xD0000000 | (tema.corFundo() & 0xFFFFFF));
+        if (sob == null) return;
+        int y = p.y() + 4;
+        for (Component linha : dica(s, sob)) {
+            for (var parte : font.split(linha, p.largura() - 8)) {
+                if (y + 9 > p.y() + p.altura()) return;
+                g.drawString(font, parte, p.x() + 4, y, TEXTO, true);
+                y += 10;
+            }
+            y += 2;
+        }
     }
 
     private void desenharCabecalho(GuiGraphics g, SincronizarKit s) {
@@ -108,24 +229,6 @@ public final class TelaArvore extends Screen {
         int cheio = (int) Math.round(l * LogicaHud.fracaoXp(s.xpNoNivel(), s.xpProximo()));
         g.fill(x - 1, 32, x + l + 1, 36, 0xAA000000);
         g.fill(x, 33, x + cheio, 35, COR_PODE);
-    }
-
-    private void desenharNo(GuiGraphics g, SincronizarKit s, No no, Retangulo r, boolean despertar) {
-        int y = r.y() - rolagem;
-        int nivel = nivelDe(s, no);
-        Arvore.Resultado estado = estadoDe(s, no);
-        boolean cheio = estado == Arvore.Resultado.NIVEL_MAXIMO;
-        boolean trancado = estado == Arvore.Resultado.NAO_DESPERTOU || estado == Arvore.Resultado.MAESTRIA_BAIXA;
-        int borda = cheio ? COR_CHEIO : estado == Arvore.Resultado.OK ? (despertar ? COR_DESPERTAR : COR_PODE) : COR_APAGADO;
-        g.fill(r.x() - 1, y - 1, r.x() + r.largura() + 1, y + r.altura() + 1, borda);
-        g.fill(r.x(), y, r.x() + r.largura(), y + r.altura(), trancado ? FUNDO_TRANCADO : FUNDO);
-        int corTexto = trancado && nivel == 0 ? TEXTO_APAGADO : TEXTO;
-        String nome = cortar(Component.translatable("no.minerwk." + no.id()).getString(), r.largura() - 6);
-        g.drawString(font, nome, r.x() + 3, y + 3, corTexto, false);
-        String direita = despertar ? "" : nivel + "/" + no.niveis();
-        g.drawString(font, direita, r.x() + r.largura() - 3 - font.width(direita), y + 15, cheio ? COR_CHEIO : corTexto, false);
-        g.drawString(font, cortar(rodape(s, no, estado).getString(), r.largura() - 8 - font.width(direita)),
-                r.x() + 3, y + 15, estado == Arvore.Resultado.OK ? COR_PODE : TEXTO_APAGADO, false);
     }
 
     /** A linha de baixo do nó: o custo, o motivo de não dar para comprar ou o que ele já liberou. */
@@ -181,9 +284,8 @@ public final class TelaArvore extends Screen {
 
     @Override
     public boolean mouseClicked(double x, double y, int botao) {
-        int i = botao == 0 ? layout.indiceEm(x, y, rolagem) : -1;
-        if (i >= 0) {
-            No no = nos.get(i);
+        No no = botao == 0 ? noDe(layout.alvoEm(x, y, rolagem)) : null;
+        if (no != null) {
             boolean pode = estadoDe(RecepcaoKit.estado(), no) == Arvore.Resultado.OK;
             if (pode) PacketDistributor.sendToServer(new ComprarNo(no.id()));
             Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(

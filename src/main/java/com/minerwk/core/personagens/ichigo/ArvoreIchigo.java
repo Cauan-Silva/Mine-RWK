@@ -1,8 +1,12 @@
 package com.minerwk.core.personagens.ichigo;
 
+import com.minerwk.core.hud.FormaArvore;
+import com.minerwk.core.hud.FormaArvore.Galho;
+import com.minerwk.core.hud.FormaArvore.Selo;
 import com.minerwk.core.maestria.Arvore;
 import com.minerwk.core.maestria.No;
 import java.util.List;
+import java.util.Map;
 
 /**
  * A árvore de habilidades do Ichigo. Antes do Despertar ela melhora o Shikai, o reiatsu e o fôlego do
@@ -37,6 +41,16 @@ public final class ArvoreIchigo {
             No.recarga(MASCARA_RECARGA, true, Ichigo.MASCARA, .08),
             No.recarga(MUGETSU_RECARGA, true, Ichigo.MUGETSU, .08),
             No.melhoria(PODERES_VOLTA, true, .10)));
+
+    /** Como a árvore é desenhada (spec [[2026-11-12 UI dos personagens]]). */
+    public static final FormaArvore FORMA = new FormaArvore(List.of(
+            Galho.antes("getsuga", "ichigo_getsuga", List.of(GETSUGA_FORCA, GETSUGA_RECARGA), Map.of()),
+            Galho.antes("shunpo", "ichigo_shunpo", List.of(SHUNPO_RECARGA), Map.of()),
+            Galho.antes("reiatsu", "ichigo_recurso", List.of(REIATSU_RESERVA, REIATSU_FLUXO, BANKAI_FOLEGO),
+                    Map.of(REIATSU_RESERVA, Selo.RECURSO, REIATSU_FLUXO, Selo.RECURSO, BANKAI_FOLEGO, Selo.RECURSO)),
+            Galho.depois("getsuga_negro", "ichigo_getsuga_negro", List.of(NEGRO_FORCA, LAMINA_DURACAO), Map.of(LAMINA_DURACAO, Selo.DURACAO)),
+            Galho.depois("mascara", "ichigo_mascara", List.of(MASCARA_DURACAO, MASCARA_RECARGA), Map.of(MASCARA_DURACAO, Selo.DURACAO)),
+            Galho.depois("mugetsu", "ichigo_mugetsu", List.of(MUGETSU_RECARGA, PODERES_VOLTA), Map.of())));
 
     private ArvoreIchigo() {
     }

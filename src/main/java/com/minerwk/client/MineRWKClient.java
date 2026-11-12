@@ -34,6 +34,7 @@ public final class MineRWKClient {
         container.registerConfig(ModConfig.Type.CLIENT, ConfigCliente.SPEC);
         container.registerExtensionPoint(IConfigScreenFactory.class, ConfigurationScreen::new);
         modBus.addListener(HudKit::registrar);
+        modBus.addListener(com.minerwk.client.kit.Molduras::aoRegistrarRecarga);
         NeoForge.EVENT_BUS.addListener(HudKit::aoTick);
         NeoForge.EVENT_BUS.addListener(TremorCamera::aoTick);
         NeoForge.EVENT_BUS.addListener(TremorCamera::aoCalcularCamera);
