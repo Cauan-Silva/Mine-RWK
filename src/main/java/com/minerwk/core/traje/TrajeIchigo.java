@@ -14,7 +14,7 @@ public final class TrajeIchigo {
     public static final String BANKAI = "ichigo_bankai";
     /** A forma final do Mugetsu: cabelo longo, faixas e o corpo coberto de reiatsu preto. Sem espada. */
     public static final String MUGETSU = "ichigo_mugetsu";
-    /** A forma Hollow completa: pele branca, cabelo longo, a máscara de chifres. Sem espada. */
+    /** A forma Hollow completa (o Vasto Lorde): pele branca, a máscara de chifres, a gola vermelha e a Tensa Zangetsu na mão. */
     public static final String HOLLOW = "ichigo_hollow";
     /** A máscara Hollow leva esses ticks para se fechar sobre o rosto (o gesto do golpe). */
     public static final int MASCARA_SE_FORMA = 6;

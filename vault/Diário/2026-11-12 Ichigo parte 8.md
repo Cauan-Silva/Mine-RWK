@@ -19,7 +19,7 @@ A forma Hollow completa: a passiva trancada que salva o Ichigo do golpe que mata
 - Três GameTests novos (88 no total).
 
 ### Apresentação
-- **Modelo** (`ferramentas/gerar_traje_hollow.py`): 30 cubos nos ossos de armadura, textura 64×64 pintada no script: máscara com os dois chifres para a frente, cabelo laranja até a cintura, o buraco no peito, tufos vermelhos, garras e o hakama rasgado. Nenhum asset de terceiros.
+- **Modelo** (`ferramentas/gerar_traje_hollow.py`): cubos nos ossos de armadura, textura pintada no script (refeito no mesmo dia, ver abaixo). Nenhum asset de terceiros.
 - **VFX** (`RenderVisuaisIchigo`): o reiatsu preto e vermelho em volta do corpo com o estouro inicial, os três riscos da garra, o Sonído e o Cero violeta (o do Zangetsu interior continua vermelho).
 - **Animações do jogador:** a transformação, a garra e o Cero. **Sons** (sintetizados): rugido, garra, carga do Cero e Cero; o Cero do boss passou a usá-los.
 - Prévia: `previas/ichigo_parte8_hollow.mp4` (`./gradlew runClientDemo -Pdemo=hollow`).
@@ -38,5 +38,10 @@ A forma Hollow completa: a passiva trancada que salva o Ichigo do golpe que mata
 - A forma vem antes do Totem da Imortalidade.
 - Não há aviso na tela da recarga de 5 minutos.
 
+## Modelo refeito pelas referências do autor (mesmo dia)
+O autor mandou três imagens do Vasto Lorde e pediu **sem o cabelo longo**. O `gerar_traje_hollow.py` foi reescrito: textura 128×128, 97 cubos. Mudou: chifres que saem para os lados e dobram para a frente e para baixo; listras pretas na máscara; gola de pelo vermelho; marcas do buraco até os ombros; manga preta rasgada só no braço direito; chamas menores nos pulsos e tornozelos; faixa branca com laço; hakama mais curto na perna esquerda; pés com garras; e a **Tensa Zangetsu na mão direita** (a mesma do traje do Bankai, no osso `arma`). As imagens serviram só de referência; nada delas entrou no mod.
+
+Ferramenta nova: `ferramentas/previa_traje.py <traje>` desenha qualquer traje fora do jogo em quatro vistas (`previas/traje_<nome>.png`), com a conta de giros do GeckoLib. Serve para os próximos modelos.
+
 ## Estado
-`./gradlew build` e os 88 GameTests passam. A prévia foi gravada antes da regra nova de alvos (nela a forma ataca golens e slimes); o modo `hollow` já usa husks, sem regravar. O que testar no jogo está em [[Pendências]].
+`./gradlew build` e os 88 GameTests passam. A prévia `previas/ichigo_parte8_hollow.mp4` foi regravada com o modelo novo e os husks. O que testar no jogo está em [[Pendências]].

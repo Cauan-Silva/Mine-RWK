@@ -104,7 +104,7 @@ class TrajeIchigoTest {
     }
 
     @Test
-    void aFormaHollowTemModeloProprioComChifresESemEspada() throws Exception {
+    void aFormaHollowTemModeloProprioComChifresEAEspadaNaMao() throws Exception {
         assertEquals("ichigo_hollow", TrajeIchigo.HOLLOW);
         assertTrue(TrajeIchigo.eDoIchigo(TrajeIchigo.HOLLOW));
         assertEquals(TrajeIchigo.HOLLOW, Trajes.de("ichigo", com.minerwk.core.personagens.ichigo.Reiatsu.HOLLOW).orElseThrow());
@@ -112,7 +112,7 @@ class TrajeIchigoTest {
         String geo = modelo(TrajeIchigo.HOLLOW);
         for (String osso : new String[] {"armorHead", "armorBody", "armorLeftArm", "armorRightArm", "armorLeftLeg", "armorRightLeg",
                 "armorLeftBoot", "armorRightBoot"}) assertTrue(tem(geo, osso), osso);
-        assertFalse(tem(geo, TrajeIchigo.OSSO_ARMA), "o Hollow ataca com as garras");
+        assertTrue(tem(geo, TrajeIchigo.OSSO_ARMA), "o Vasto Lorde segura a Tensa Zangetsu, mesmo atacando com as garras");
         assertTrue(java.nio.file.Files.size(java.nio.file.Path.of("src/main/resources/assets/minerwk/textures/traje/ichigo_hollow.png")) > 300);
         assertTrue(java.nio.file.Files.exists(java.nio.file.Path.of(
                 "src/main/resources/assets/minerwk/animations/traje/ichigo_hollow.animation.json")));
