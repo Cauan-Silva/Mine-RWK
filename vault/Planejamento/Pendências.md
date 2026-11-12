@@ -25,7 +25,7 @@ Voltar para [[00 Início]].
 
 ## Para testar no jogo
 - Cid, parte 2, o traje do Shadow e a espada (12/11): **ver primeiro** `previas/cid_traje_perto.mp4` e `previas/cid_traje_quadros.jpg` (no jogo). Refeito pelas referências do autor (capuz aberto, rosto da skin, espada preta em cruz).
-  - **O capuz:** aberto na frente, com o rosto e o cabelo da skin. Ainda está quadrado demais? A ponta do teto e a gola aberta lembram a obra? Com skins de cabelo alto (segunda camada), algo atravessa o teto?
+  - **O capuz:** aberto na frente, com o rosto e o cabelo da skin. A ponta e as lapelas da gola lembram a obra? Com skins de cabelo alto (segunda camada), algo atravessa o teto?
   - **O conjunto:** friso dourado na abertura, colete roxo-escuro, linhas da cintura, losango na coxa, botas de cano roxo. Some à noite?
   - **Pano:** a barra rasgada andando, correndo, pulando e no avanço da Pós-imagem. A perna atravessa?
   - **A espada:** comprimento, a guarda em cruz com os losangos, o pomo. Em primeira pessoa ela aparece bem? Virar a cabeça faz o capuz atravessar a gola?

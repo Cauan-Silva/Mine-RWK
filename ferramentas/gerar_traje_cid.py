@@ -16,6 +16,7 @@ Os utilitários de cubo, haste e tira vêm de gerar_traje_hollow.py.
 O nome do traje repete core/traje/TrajeCid.SHADOW; o TrajeCidTest confere os ossos.
 """
 import json
+import math
 import sys
 from pathlib import Path
 from PIL import Image
@@ -143,40 +144,55 @@ def textura():
 cubo = h.cubo
 
 
+# O capuz: onde as laterais acabam e o telhado começa, a altura da cumeeira e o quanto ele passa da testa.
+BEIRAL, CUME, MEIA, FRENTE, FUNDO = 32.4, 35.7, 5.1, -5.3, 4.5
+
+
 def capuz():
-    """O capuz: teto, nuca e laterais em volta da cabeça, mais comprido que ela na frente e sem nada sobre o rosto,
-    que é o da skin do jogador. O avesso é roxo, a beirada da frente dourada, e o teto sobe em ponta."""
+    """O capuz em ponta: duas águas que sobem das laterais até a cumeeira, as laterais abrindo um pouco para baixo
+    e a nuca fechada. Aberto na frente, sem nada sobre o rosto, que é o da skin do jogador. Avesso roxo e um filete
+    dourado na beirada da abertura."""
     roxo = uv_de(COR_ROXO_ESCURO)
-    cubos = [
-        cubo([-5.2, 23.4, 4.5], [10.4, 9.1, .5], COR_EBANO, south=NUCA, north=roxo),
-        cubo([-5.2, 32.5, -5.0], [10.4, .5, 10.0], COR_EBANO, up=TOPO, down=roxo),
-        cubo([-5.2, 23.4, -5.0], [.5, 9.1, 9.5], COR_EBANO, west=TEMPORA, east=roxo),
-        cubo([4.7, 23.4, -5.0], [.5, 9.1, 9.5], COR_EBANO, east=TEMPORA, west=roxo),
-        # A beirada dourada da abertura.
-        cubo([-5.24, 32.7, -5.12], [10.48, .34, .2], COR_OURO),
-        cubo([-5.24, 23.4, -5.12], [.3, 9.3, .2], COR_OURO),
-        cubo([4.94, 23.4, -5.12], [.3, 9.3, .2], COR_OURO),
-    ]
-    # A ponta do teto, em degraus, cada um com a beirada dourada na frente.
-    for meia, y, z0, fundo in ((3.6, 33.0, -5.0, 9.6), (2.3, 33.55, -5.0, 8.6), (1.2, 34.1, -5.0, 7.0), (.45, 34.65, -5.0, 4.6)):
-        cubos.append(cubo([-meia, y, z0], [2 * meia, .55, fundo], COR_EBANO if meia > 1 else COR_EBANO_CLARO))
-        cubos.append(cubo([-meia, y + .3, z0 - .12], [2 * meia, .28, .2], COR_OURO))
+    comprido = FUNDO + .5 - FRENTE
+    agua = math.hypot(MEIA, CUME - BEIRAL)
+    tombo = math.degrees(math.atan2(MEIA, CUME - BEIRAL))
+    cubos = []
+    for lado in (-1, 1):
+        x = MEIA if lado > 0 else -MEIA - .5
+        dentro, fora = ('west', 'east') if lado > 0 else ('east', 'west')
+        pivo = [MEIA * lado, BEIRAL, 0]
+        # A lateral, do beiral até o ombro, abrindo para baixo.
+        abre = [0, 0, -6 * lado]
+        cubos.append(cubo([x, BEIRAL - 7.8, FRENTE], [.5, 7.8, comprido], COR_EBANO, giro=abre, pivo=pivo,
+                          **{fora: TEMPORA, dentro: roxo}))
+        cubos.append(cubo([x - .03, BEIRAL - 7.8, FRENTE - .1], [.56, 7.8, .16], COR_OURO, giro=abre, pivo=pivo))
+        # A água do telhado, da lateral até a cumeeira.
+        sobe = [0, 0, -tombo * lado]
+        cubos.append(cubo([x, BEIRAL, FRENTE], [.5, agua, comprido], COR_EBANO, giro=sobe, pivo=pivo,
+                          **{fora: TOPO, dentro: roxo}))
+        cubos.append(cubo([x - .03, BEIRAL, FRENTE - .1], [.56, agua, .16], COR_OURO, giro=sobe, pivo=pivo))
+    # A cumeeira fecha o encontro das duas águas.
+    cubos.append(cubo([-.4, CUME - .25, FRENTE - .05], [.8, .6, comprido + .05], COR_EBANO_CLARO))
+    # A nuca: a placa de trás e o triângulo sob o telhado, em degraus.
+    cubos.append(cubo([-MEIA - .3, BEIRAL - 7.8, FUNDO], [2 * MEIA + .6, 7.8, .5], COR_EBANO, south=NUCA, north=roxo))
+    degraus = 5
+    for i in range(degraus):
+        meia = MEIA * (1 - (i + .5) / degraus) + .2
+        alto = (CUME - BEIRAL) / degraus
+        cubos.append(cubo([-meia, BEIRAL + i * alto, FUNDO], [2 * meia, alto, .5], COR_EBANO, north=roxo))
     return cubos
 
 
 def gola():
-    """A gola alta do sobretudo: duas abas que abrem para os lados e uma atrás, de avesso roxo e beirada dourada."""
+    """A gola aberta do sobretudo: duas lapelas largas deitadas sobre os ombros, subindo um pouco para fora, com o
+    avesso roxo virado para cima e um filete dourado na beirada."""
     cubos = []
     for lado in (-1, 1):
-        x = 4.9 if lado > 0 else -5.4
-        giro, pivo = [0, 0, 24 * lado], [5.15 * lado, 22.8, 0]
-        cubos.append(cubo([x, 22.8, -2.7], [.5, 5.4, 5.6], COR_EBANO, giro=giro, pivo=pivo,
-                          **{'west' if lado > 0 else 'east': uv_de(COR_ROXO)}))
-        cubos.append(cubo([x - .04, 28.2, -2.74], [.58, .25, 5.68], COR_OURO, giro=giro, pivo=pivo))
-        cubos.append(cubo([x - .04, 22.8, -2.86], [.58, 5.4, .2], COR_OURO, giro=giro, pivo=pivo))
-    giro, pivo = [-14, 0, 0], [0, 23.2, 2.6]
-    cubos.append(cubo([-5.2, 23.2, 2.4], [10.4, 3.6, .5], COR_EBANO, giro=giro, pivo=pivo, north=uv_de(COR_ROXO)))
-    cubos.append(cubo([-5.24, 26.8, 2.36], [10.48, .25, .58], COR_OURO, giro=giro, pivo=pivo))
+        x = 1.2 if lado > 0 else -6.6
+        giro, pivo = [0, 0, -9 * lado], [1.2 * lado, 23.75, 0]
+        cubos.append(cubo([x, 23.75, -3.1], [5.4, .3, 4.6], COR_EBANO, giro=giro, pivo=pivo, up=uv_de(COR_ROXO)))
+        cubos.append(cubo([x, 23.72, -3.22], [5.4, .36, .14], COR_OURO, giro=giro, pivo=pivo))
+        cubos.append(cubo([6.5 if lado > 0 else -6.64, 23.72, -3.22], [.14, .36, 4.72], COR_OURO, giro=giro, pivo=pivo))
     return cubos
 
 
