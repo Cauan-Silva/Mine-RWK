@@ -53,7 +53,7 @@ Spec e plano: [[2026-11-09 Núcleo dos kits]] (em `Desenvolvimento/Specs` e `Des
 - [x] Configuração do cliente (`minerwk-client.toml`: tremor, VFX reduzido, sons, HUD)
 - [x] Tremor de tela próprio (`core/camera/Tremor`, pacote `Tremer`)
 - [x] HUD de recargas e recurso (os ícones vêm com o Gojo)
-- [ ] UI dos personagens, spec [[2026-11-12 UI dos personagens]] (aprovado), antes do próximo personagem: parte 1 (ícones, temas e HUD) feita, [[2026-11-12 UI parte 1]] (falta o teste no jogo); parte 2 (árvore com galhos) a fazer
+- [x] UI dos personagens, spec [[2026-11-12 UI dos personagens]] (aprovado), antes do próximo personagem. **Spec completo:** parte 1 (ícones, temas e HUD, [[2026-11-12 UI parte 1]]) e parte 2 (árvore com galhos, [[2026-11-12 UI parte 2]]); falta o teste no jogo
 - [x] Tela de seleção de personagem: grade de emblemas com rolagem e painel com golpes (`core/hud/LayoutEscolha`, `client/kit/TelaEscolha`)
 
 ## Fase 2: Gojo completo (primeiro personagem, vira o modelo dos outros)
