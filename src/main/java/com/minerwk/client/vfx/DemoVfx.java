@@ -65,7 +65,9 @@ public final class DemoVfx {
     private static final boolean CID = MODO.equals("cid");
     /** {@code cid_atomico}: a Espada Atômica de lado e, depois, o Recovery Atomic visto de longe e do alto. */
     private static final boolean CID_ATOMICO = MODO.equals("cid_atomico");
-    private static final int FIM_PREVIA = CID ? 250 : CID_ATOMICO ? 215 : HOLLOW_PERTO || CID_PERTO ? 272 : HOLLOW ? 330 : ZANGETSU ? 2400 : TOJI ? 520 : ARVORE ? 100 : TRAJE ? 260 : TRAJE_ICHIGO ? 300 : ICHIGO ? 350 : MUGETSU ? 360 : R_COMPLETO ? 360
+    /** {@code cid_final}: o R inteiro num alvo parado, com a cutscene: a subida, o espaço, o Atomic e a volta. */
+    private static final boolean CID_FINAL = MODO.equals("cid_final");
+    private static final int FIM_PREVIA = CID ? 250 : CID_FINAL ? 230 : CID_ATOMICO ? 215 : HOLLOW_PERTO || CID_PERTO ? 272 : HOLLOW ? 330 : ZANGETSU ? 2400 : TOJI ? 520 : ARVORE ? 100 : TRAJE ? 260 : TRAJE_ICHIGO ? 300 : ICHIGO ? 350 : MUGETSU ? 360 : R_COMPLETO ? 360
             : ENCANTAMENTO ? CARGA + 90 : ESTOURO + RoxoMaximo.TICKS_EXPLOSAO + 110;
     private static int ticks;
     private static int quadro;
@@ -91,7 +93,7 @@ public final class DemoVfx {
             mc.setScreen(null);
         }
         if (DEMO && ticks == 40) {
-            jogador.connection.sendCommand(ENCANTAMENTO || R_COMPLETO || TRAJE || TRAJE_ICHIGO || ICHIGO || MUGETSU || TOJI || ZANGETSU || HOLLOW || CID_PERTO || CID || CID_ATOMICO ? "time set noon" : "time set midnight");
+            jogador.connection.sendCommand(ENCANTAMENTO || R_COMPLETO || TRAJE || TRAJE_ICHIGO || ICHIGO || MUGETSU || TOJI || ZANGETSU || HOLLOW || CID_PERTO || CID || CID_ATOMICO || CID_FINAL ? "time set noon" : "time set midnight");
             if (ARVORE) jogador.connection.sendCommand("rwk trocar @s gojo");
             if (TOJI) {
                 jogador.connection.sendCommand("rwk trocar @s gojo");
@@ -99,9 +101,9 @@ public final class DemoVfx {
                 jogador.connection.sendCommand("tp @s ~150 ~12 ~");
             }
             if (ZANGETSU) jogador.connection.sendCommand("rwk despertar @s nao");
-            if (CID_PERTO || CID || CID_ATOMICO) {
+            if (CID_PERTO || CID || CID_ATOMICO || CID_FINAL) {
                 jogador.connection.sendCommand("rwk trocar @s cid");
-                if (CID_ATOMICO) jogador.connection.sendCommand("rwk despertar @s sim");
+                if (CID_ATOMICO || CID_FINAL) jogador.connection.sendCommand("rwk despertar @s sim");
                 jogador.connection.sendCommand("tp @s ~150 ~12 ~");
             }
             if (TRAJE_ICHIGO || ICHIGO || MUGETSU || ZANGETSU || HOLLOW) {
@@ -174,6 +176,10 @@ public final class DemoVfx {
         }
         if (CID_ATOMICO) {
             previaDoAtomico(mc, jogador, t);
+            return;
+        }
+        if (CID_FINAL) {
+            previaDoFinal(mc, jogador, t);
             return;
         }
         if (CID) {
@@ -556,6 +562,34 @@ public final class DemoVfx {
         if (t >= FIM_PREVIA) {
             mc.options.hideGui = false;
             mc.setCameraEntity(jogador);
+            mc.options.setCameraType(net.minecraft.client.CameraType.FIRST_PERSON);
+            previa = -1;
+        }
+    }
+
+    /** O R do Cid num alvo parado a 4 blocos. A câmera é a da cutscene do golpe; depois dela, de trás. */
+    private static void previaDoFinal(Minecraft mc, LocalPlayer jogador, int t) {
+        mc.gui.getChat().clearMessages(false);
+        if (t == 0) {
+            jogador.setYRot(0);
+            jogador.setXRot(2);
+            mc.options.setCameraType(net.minecraft.client.CameraType.THIRD_PERSON_BACK);
+            jogador.connection.sendCommand("gamerule sendCommandFeedback false");
+            jogador.connection.sendCommand("gamemode survival");
+            jogador.connection.sendCommand("kill @e[type=minecraft:husk,distance=..60]");
+            jogador.connection.sendCommand("execute at @s run summon minecraft:husk ~ ~ ~4 {NoAI:1b,Rotation:[180f,0f]}");
+            jogador.connection.sendCommand("rwk recarregar");
+        }
+        if (t == 30) tecla(com.minerwk.core.kit.Tecla.R, true);
+        if (t == 32) tecla(com.minerwk.core.kit.Tecla.R, false);
+        if (t == FIM_PREVIA - 3) {
+            jogador.connection.sendCommand("kill @e[type=minecraft:husk,distance=..60]");
+            jogador.connection.sendCommand("gamemode creative");
+            jogador.connection.sendCommand("gamerule sendCommandFeedback true");
+            jogador.connection.sendCommand("rwk despertar @s nao");
+            jogador.connection.sendCommand("tp @s ~-150 ~ ~-30");
+        }
+        if (t >= FIM_PREVIA) {
             mc.options.setCameraType(net.minecraft.client.CameraType.FIRST_PERSON);
             previa = -1;
         }

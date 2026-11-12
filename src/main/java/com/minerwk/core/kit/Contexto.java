@@ -312,6 +312,52 @@ public interface Contexto {
         return 0;
     }
 
+    /** Como {@link #marcarAlvo}, mas os chefes que o jogo não deixa mover (o Dragão, o Wither) também valem. */
+    default Object marcarAlvoOuChefe(double alcance, double largura) {
+        return marcarAlvo(alcance, largura);
+    }
+
+    /** Devolve ao recurso do jogador o que um golpe gastou à toa (não passa do máximo). */
+    default void devolverRecurso(double quantidade) {
+    }
+
+    /** Se o alvo marcado ainda vive, esteja onde estiver (numa viagem ele pode estar em outra dimensão). */
+    default boolean alvoVivo(Object alvo) {
+        return posicaoDe(alvo) != null;
+    }
+
+    /**
+     * Começa uma viagem com o alvo marcado (o R do Cid): os dois passam a ser levados de ponto em ponto, sem
+     * gravidade; o jogador não recebe dano e o alvo só recebe o de {@link #ferir}. Guarda de onde saíram.
+     * Devolve false se não dá (o jogador já está numa).
+     */
+    default boolean viagem(Object alvo) {
+        return true;
+    }
+
+    /**
+     * Põe e segura o jogador com os pés em {@code pes}, olhando para {@code encarar}, e o alvo com o centro
+     * em {@code centroDoAlvo}. Parede e teto não seguram: os dois são levados, não empurrados.
+     */
+    default void pontosDaViagem(Object alvo, Vetor pes, Vetor centroDoAlvo, Vetor encarar) {
+    }
+
+    /**
+     * Leva o jogador (e o alvo, se ele pode mudar de dimensão) para o espaço. Devolve onde os pés do jogador
+     * ficaram: é a base dos pontos seguintes. Quem não pode ir fica preso e intocável onde está.
+     */
+    default Vetor aoEspaco(Object alvo) {
+        return pes();
+    }
+
+    /** Acaba a viagem: os dois voltam à dimensão e aos pontos de partida, sem dano de queda. Pode ser chamado de novo. */
+    default void fimDaViagem() {
+    }
+
+    /** Um visual para todos a até {@code raio} blocos do ponto de onde a viagem saiu, no mundo de lá. */
+    default void visualNaOrigem(String tipo, float forca, int duracao, double raio) {
+    }
+
     /** Acaba na hora os efeitos desse tipo do jogador, com o {@code aoAcabar} deles. */
     default void encerrarEfeito(Class<? extends Efeito> tipo) {
     }

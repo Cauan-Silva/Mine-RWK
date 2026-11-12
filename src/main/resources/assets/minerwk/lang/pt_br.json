@@ -57,7 +57,13 @@
   "habilidade.minerwk.cid_espada_atomica": "Espada Atômica",
   "habilidade.minerwk.cid_espada_atomica.desc": "Um corte horizontal de luz: fere quem está a até 12 blocos à sua frente.",
   "habilidade.minerwk.cid_atomic": "I Am Atomic",
-  "habilidade.minerwk.cid_atomic.desc": "Agachado: Recovery Atomic. Crava a espada por 3 s e cura você e os aliados em volta.",
+  "habilidade.minerwk.cid_atomic.desc": "Com um alvo a até 6 blocos: leva-o a socos até o espaço e o apaga com o Atomic. Gasta toda a Magia. Agachado: Recovery Atomic, que crava a espada por 3 s e cura você e os aliados em volta.",
+  "cutscene.minerwk.cid_atomic.1": "Eu...",
+  "cutscene.minerwk.cid_atomic.1.jp": "I",
+  "cutscene.minerwk.cid_atomic.2": "sou...",
+  "cutscene.minerwk.cid_atomic.2.jp": "AM",
+  "cutscene.minerwk.cid_atomic.3": "atômico.",
+  "cutscene.minerwk.cid_atomic.3.jp": "ATOMIC",
   "habilidade.minerwk.cid_recovery": "Recovery Atomic",
   "habilidade.minerwk.cid_recovery.desc": "Crava a espada por 3 s e cura por completo você e os aliados a até 16 blocos.",
   "forma.minerwk.bankai": "Bankai",
@@ -265,5 +271,10 @@
   "subtitles.minerwk.cid_espada_carga": "A magia se junta na lâmina",
   "subtitles.minerwk.cid_espada_atomica": "A Espada Atômica corta",
   "subtitles.minerwk.cid_recovery_carga": "Shadow crava a espada no chão",
-  "subtitles.minerwk.cid_recovery": "Uma coluna de luz cura"
+  "subtitles.minerwk.cid_recovery": "Uma coluna de luz cura",
+  "subtitles.minerwk.cid_atomic_soco": "Um soco de Shadow",
+  "subtitles.minerwk.cid_atomic_risco": "Shadow some céu acima",
+  "subtitles.minerwk.cid_atomic_aura": "A magia cresce em silêncio",
+  "subtitles.minerwk.cid_atomic": "I am atomic",
+  "subtitles.minerwk.cid_atomic_luz": "Um estouro distante no céu"
 }

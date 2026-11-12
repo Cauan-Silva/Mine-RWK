@@ -319,7 +319,7 @@ public final class ArenasServidor {
     }
 
     /** O lugar onde o jogador renasceria (cama, âncora ou o início do mundo), sem gastar a âncora. */
-    static void paraORenascimento(ServerPlayer jogador) {
+    public static void paraORenascimento(ServerPlayer jogador) {
         jogador.changeDimension(jogador.findRespawnPositionAndUseSpawnBlock(true, DimensionTransition.DO_NOTHING));
         jogador.resetFallDistance();
     }

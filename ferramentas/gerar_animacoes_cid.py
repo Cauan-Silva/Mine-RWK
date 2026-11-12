@@ -82,6 +82,36 @@ A["cid_recovery"] = anim(4.0, {
     "head": [(0, N), (0.18, [-12, 0, 0], OUTC), (0.34, [24, 0, 0], EXPO), (3.0, [22, 0, 0]), (3.12, [-30, 0, 0], OUTC), (3.5, [-28, 0, 0]), (4.0, N, C)],
 })
 
+# R, o I Am Atomic final. Os socos: um a cada 0,3 s, alternando os braços, o tronco girando com cada um. A
+# animação começa no primeiro soco e recomeça na chegada ao espaço (o quinto soco é o da passagem).
+def socos():
+    d, e, tr = [(0, N)], [(0, N)], [(0, N)]
+    for k in range(5):
+        t = 0.3 * k
+        bate, guarda = [-92, -8 if k % 2 == 0 else 8, 0], [-38, 0, 0]
+        direito = k % 2 == 0
+        (d if direito else e).append((t + 0.04, bate, EXPO))
+        (e if direito else d).append((t + 0.04, guarda, OUTC))
+        (d if direito else e).append((t + 0.22, [-80, 0, 0]))
+        tr.append((t + 0.04, [4, -24 if direito else 24, 0], EXPO))
+    d += [(1.5, N, C)]
+    e += [(1.5, N, C)]
+    tr += [(1.5, N, C)]
+    return anim(1.5, {"right_arm": d, "left_arm": e, "torso": tr,
+                      "head": [(0, N), (0.04, [4, 0, 0], OUTC), (1.3, [4, 0, 0]), (1.5, N, C)]})
+
+
+A["cid_atomic"] = socos()
+
+# As três palavras: ele para, baixa os braços abertos ao lado do corpo, o rosto erguido, e a magia cresce 2 s.
+# No Atomic os braços abrem de uma vez; meio segundo assim e volta.
+A["cid_atomic_fala"] = anim(3.0, {
+    "right_arm": [(0, N), (0.5, [8, 0, 16], OUTC), (2.0, [14, 0, 30]), (2.08, [10, 0, 78], EXPO), (2.6, [10, 0, 72]), (3.0, N, C)],
+    "left_arm": [(0, N), (0.5, [8, 0, -16], OUTC), (2.0, [14, 0, -30]), (2.08, [10, 0, -78], EXPO), (2.6, [10, 0, -72]), (3.0, N, C)],
+    "torso": [(0, N), (0.5, [-3, 0, 0], OUTC), (2.0, [-6, 0, 0]), (2.08, [-12, 0, 0], EXPO), (2.6, [-10, 0, 0]), (3.0, N, C)],
+    "head": [(0, N), (0.5, [6, 0, 0], OUTC), (1.3, [0, 0, 0]), (2.0, [-10, 0, 0]), (2.08, [-24, 0, 0], EXPO), (2.6, [-20, 0, 0]), (3.0, N, C)],
+})
+
 saida = {"format_version": "1.8.0", "geckolib_format_version": 2, "animations": A}
 p = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "src/main/resources/assets/minerwk/player_animations/cid.json")
 with open(p, "w", encoding="utf-8") as f:

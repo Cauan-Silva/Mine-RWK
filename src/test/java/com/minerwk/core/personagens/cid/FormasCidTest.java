@@ -104,8 +104,11 @@ class FormasCidTest {
         JsonObject anim = JsonParser.parseString(Files.readString(
                 Path.of("src/main/resources/assets/minerwk/player_animations/cid.json"))).getAsJsonObject().getAsJsonObject("animations");
         int[][] tempos = {{2, Cid.Redemoinho.DURACAO}, {1, 1}, {3, 2}, {2, 1},
-                {FormasCid.CARGA_DA_ESPADA, 6}, {FormasCid.CARGA_DO_RECOVERY, 10}};
-        String[] ids = {"cid_redemoinho", "cid_pos_imagem", "cid_prisao", Cid.OVERDRIVE, Cid.ESPADA_ATOMICA, Cid.RECOVERY};
+                {FormasCid.CARGA_DA_ESPADA, 6}, {FormasCid.CARGA_DO_RECOVERY, 10},
+                // O R: os socos (a animação recomeça no espaço) e as três palavras até depois do Atomic.
+                {AtomicFinal.PASSAGEM, AtomicFinal.ENTRE_SOCOS}, {AtomicFinal.TICKS_DA_FALA, 10}};
+        String[] ids = {"cid_redemoinho", "cid_pos_imagem", "cid_prisao", Cid.OVERDRIVE, Cid.ESPADA_ATOMICA, Cid.RECOVERY,
+                Cid.Atomic.ANIM_DOS_SOCOS, Cid.Atomic.ANIM_DA_FALA};
         for (int i = 0; i < ids.length; i++) {
             assertTrue(anim.has(ids[i]), "falta a animação " + ids[i]);
             double minimo = (tempos[i][0] + tempos[i][1]) / 20.0;

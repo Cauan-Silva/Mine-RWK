@@ -9,8 +9,8 @@ O som do Cid é de slime e de magia contida: a lâmina é fina e molhada (um sil
 Ichigo), o slime é um estalo úmido e grave, as correntes são elos secos que correm e travam, e a magia é
 um zumbido grave, com dois tons quase juntos batendo um no outro. Nada de vidro (Gojo) nem de rugido (Hollow).
 O atômico é a mesma magia, só que limpa: um tom que sobe e some, e um acorde claro quando ela se solta.
-Partes 4 e 5: os golpes base, a Espada Atômica e o Recovery Atomic. O I Am Atomic final e o Ragnarok ganham
-os seus sons nas partes deles.
+Partes 4 a 6: os golpes base, a Espada Atômica, o Recovery Atomic e o I Am Atomic final (os socos secos, o
+tom que sobe nas três palavras, o instante de silêncio do espaço e o estouro). O Ragnarok ganha os seus na parte dele.
 """
 import argparse
 import numpy as np
@@ -25,6 +25,9 @@ ESTOURO, OVERDRIVE = 8 * T, 160 * T    # FormasCid.ESTOURO e Cid.Overdrive.DURAC
 TRAJE = 12 * T            # FormasCid.TRAJE
 CARGA_DA_ESPADA, VOO_DO_CORTE, CORTE_ATOMICO = 12 * T, 4 * T, 10 * T   # FormasCid, os mesmos nomes
 CARGA_DO_RECOVERY, ONDA, COLUNA = 60 * T, 10 * T, 40 * T               # FormasCid, os mesmos nomes
+# AtomicFinal: ENTRE_SOCOS, TICKS_DO_RISCO, TICKS_DA_FALA, TICKS_DO_CLARAO e TICKS_DA_LUZ
+SOCO, RISCO, FALA, CLARAO, LUZ = 6 * T, 14 * T, 40 * T, 40 * T, 60 * T
+SILENCIO = .22            # o instante sem som antes do estouro, no espaço
 
 # nome -> (duração em s, alcance em blocos, legenda pt, legenda en)
 SONS = {
@@ -38,6 +41,11 @@ SONS = {
     'cid_espada_atomica': (CORTE_ATOMICO + .9, 48, 'A Espada Atômica corta', 'The Atomic Sword cuts'),
     'cid_recovery_carga': (CARGA_DO_RECOVERY + .1, 32, 'Shadow crava a espada no chão', 'Shadow plants the sword in the ground'),
     'cid_recovery': (COLUNA + 1.2, 64, 'Uma coluna de luz cura', 'A pillar of light heals'),
+    'cid_atomic_soco': (SOCO + .15, 48, 'Um soco de Shadow', 'Shadow lands a punch'),
+    'cid_atomic_risco': (RISCO + .5, 96, 'Shadow some céu acima', 'Shadow vanishes into the sky'),
+    'cid_atomic_aura': (FALA + .1, 48, 'A magia cresce em silêncio', 'Magic swells in silence'),
+    'cid_atomic': (CLARAO + 1.6, 96, 'I am atomic', 'I am atomic'),
+    'cid_atomic_luz': (LUZ + 1.5, 160, 'Um estouro distante no céu', 'A distant burst in the sky'),
 }
 
 
@@ -58,6 +66,11 @@ MARCOS = {
     'cid_espada_atomica': {'voo': ticks(VOO_DO_CORTE), 'fim': ticks(CORTE_ATOMICO)},
     'cid_recovery_carga': {'fim': ticks(CARGA_DO_RECOVERY)},
     'cid_recovery': {'onda': ticks(ONDA), 'fim': ticks(COLUNA)},
+    'cid_atomic_soco': {'fim': ticks(SOCO)},
+    'cid_atomic_risco': {'fim': ticks(RISCO)},
+    'cid_atomic_aura': {'fim': ticks(FALA)},
+    'cid_atomic': {'clarao': ticks(CLARAO)},
+    'cid_atomic_luz': {'fim': ticks(LUZ)},
 }
 
 
@@ -172,6 +185,43 @@ def sintese(nome, s):
         sinos = .25 * sum(s.tom(1568 * (1 + .25 * k), harmonicos=(1, 2.76)) * s.env(.08 + .11 * k, .002, 7) for k in range(6))
         ar = .2 * s.girar(s.ruido(2500, 12000, .25), hz=6, prof=.5) * s.janela(0, COLUNA, .5)
         return abre + s.reverb(acorde + sinos + ar, 2.0, .35, 7000)
+    if nome == 'cid_atomic_soco':
+        # Um soco seco: o estalo, o baque curto e o ar cortado. Sem cauda: o seguinte vem em 6 ticks.
+        bate = 1.2 * s.transiente(0, 3800, .006) + 1.3 * s.sub(0, 150, 60, 16, 3)
+        ar = .5 * silvo(s, 0, SOCO * .6, 700, 7000, .8)
+        fio = .2 * s.tom(880, 440, .5, 0, SOCO * .8, (1, 2.01)) * s.env(0, .003, 22)
+        return s.reverb(bate + ar + fio, .35, .12, 5000)
+    if nome == 'cid_atomic_risco':
+        # Os dois somem para cima: o ar rasgado que sobe e vai embora, com um fio de magia junto.
+        sobe = 1.0 * s.ruido(500, 11000, .3) * s.janela(0, RISCO, .04) * (1 - .7 * s.crescer(0, RISCO, .8))
+        tomq = .4 * s.tom(300, 2400, 1.8, 0, RISCO, (1, 2.01)) * s.janela(0, RISCO, .03) * (1 - s.crescer(0, RISCO, 1.))
+        parte = 1.0 * s.sub(0, 120, 40, 6, 3) + .6 * s.transiente(0, 5000, .008)
+        return s.reverb(sobe + tomq + parte, 1.4, .3, 6500)
+    if nome == 'cid_atomic_aura':
+        # As três palavras: quase nada no começo, e um tom limpo que sobe devagar e fica cada vez mais fino,
+        # até sumir no instante do Atomic (o estouro é outro som).
+        sobe = .45 * s.tom(180, 1760, 2.2, 0, FALA, (1, 2.005, 3.01)) * s.crescer(0, FALA, 1.6)
+        zumbe = .35 * s.passa_baixa(magia(s, 58, 2.2), 700) * s.crescer(0, FALA, 1.2)
+        ar = .2 * s.ruido(4000, 13000, .2) * s.crescer(FALA * .4, FALA, 2.5)
+        return s.reverb((sobe + zumbe + ar) * s.janela(0, FALA + .04, .03), .8, .25, 8000)
+    if nome == 'cid_atomic':
+        # O espaço fica mudo um instante (só um fio agudo), e a magia se solta: o grave que abre devagar, o
+        # acorde atômico largo e a luz chiando por cima, tudo crescendo com o clarão e sumindo com ele.
+        fio = .12 * s.tom(3520, 3520, 1., 0, SILENCIO, (1,)) * s.janela(0, SILENCIO, .04)
+        abre = 1.5 * s.sub(SILENCIO, 70, 26, 1.1, 4) + 1.0 * s.transiente(SILENCIO, 4500, .014)
+        acorde = sum(a * s.tom(f, harmonicos=(1, 2.005, 3.01), vibrato=.004, vib_hz=5)
+                     for f, a in ((110, .6), (165, .45), (220, .5), (330, .4), (440, .32), (660, .2), (880, .12)))
+        acorde = .5 * acorde * s.env(SILENCIO, .05, 1.1, .3) * s.janela(SILENCIO, CLARAO + 1.2, .7)
+        luz = .3 * s.girar(s.ruido(1500, 13000, .25), hz=5, prof=.5) * s.env(SILENCIO, .04, 1.4, .2) * s.janela(SILENCIO, CLARAO + .8, .6)
+        ronco = .45 * s.passa_baixa(s.ruido(30, 400, .9), 180) * s.env(SILENCIO, .08, .9, .3) * s.janela(SILENCIO, CLARAO + 1.2, .8)
+        return fio + abre + s.reverb(acorde + luz + ronco, 2.4, .4, 6000)
+    if nome == 'cid_atomic_luz':
+        # Do chão: o estouro vem de muito longe e de cima, abafado, um trovão comprido que rola e some.
+        ronco = s.passa_baixa(s.ruido(25, 500, 1.), 220) * s.env(.12, .25, .7, .25) * s.janela(.1, LUZ + 1.3, 1.)
+        rola = .5 * s.girar(s.passa_baixa(s.ruido(40, 900, .8), 380), hz=3.3, prof=.6) * s.env(.2, .3, 1.0, .2) * s.janela(.15, LUZ + 1.2, .9)
+        grave = 1.0 * s.sub(.12, 55, 24, .9, 3)
+        acorde = .12 * sum(s.tom(f, harmonicos=(1, 2.005)) for f in (110, 165, 220)) * s.env(.2, .3, .8, .2) * s.janela(.2, LUZ + 1., .8)
+        return s.reverb(ronco + rola + grave + acorde, 3.0, .5, 2200)
     raise ValueError(nome)
 
 

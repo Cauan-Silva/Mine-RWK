@@ -57,7 +57,13 @@
   "habilidade.minerwk.cid_espada_atomica": "Atomic Sword",
   "habilidade.minerwk.cid_espada_atomica.desc": "A horizontal cut of light: hits everyone up to 12 blocks in front of you.",
   "habilidade.minerwk.cid_atomic": "I Am Atomic",
-  "habilidade.minerwk.cid_atomic.desc": "Crouching: Recovery Atomic. Plant the sword for 3 s and heal yourself and allies around you.",
+  "habilidade.minerwk.cid_atomic.desc": "With a target within 6 blocks: punch it all the way to space and erase it with the Atomic. Spends all your Magic. Crouching: Recovery Atomic, which plants the sword for 3 s and heals you and allies around you.",
+  "cutscene.minerwk.cid_atomic.1": "アイ",
+  "cutscene.minerwk.cid_atomic.1.jp": "I",
+  "cutscene.minerwk.cid_atomic.2": "アム",
+  "cutscene.minerwk.cid_atomic.2.jp": "AM",
+  "cutscene.minerwk.cid_atomic.3": "アトミック",
+  "cutscene.minerwk.cid_atomic.3.jp": "ATOMIC",
   "habilidade.minerwk.cid_recovery": "Recovery Atomic",
   "habilidade.minerwk.cid_recovery.desc": "Plant the sword for 3 s and fully heal yourself and allies within 16 blocks.",
   "forma.minerwk.bankai": "Bankai",
@@ -265,5 +271,10 @@
   "subtitles.minerwk.cid_espada_carga": "Magic gathers on the blade",
   "subtitles.minerwk.cid_espada_atomica": "The Atomic Sword cuts",
   "subtitles.minerwk.cid_recovery_carga": "Shadow plants the sword in the ground",
-  "subtitles.minerwk.cid_recovery": "A pillar of light heals"
+  "subtitles.minerwk.cid_recovery": "A pillar of light heals",
+  "subtitles.minerwk.cid_atomic_soco": "Shadow lands a punch",
+  "subtitles.minerwk.cid_atomic_risco": "Shadow vanishes into the sky",
+  "subtitles.minerwk.cid_atomic_aura": "Magic swells in silence",
+  "subtitles.minerwk.cid_atomic": "I am atomic",
+  "subtitles.minerwk.cid_atomic_luz": "A distant burst in the sky"
 }

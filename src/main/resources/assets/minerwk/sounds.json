@@ -1095,5 +1095,90 @@
         "attenuation_distance": 64
       }
     ]
+  },
+  "cid_atomic_soco": {
+    "subtitle": "subtitles.minerwk.cid_atomic_soco",
+    "sounds": [
+      {
+        "name": "minerwk:cid/cid_atomic_soco",
+        "attenuation_distance": 48
+      },
+      {
+        "name": "minerwk:cid/cid_atomic_soco_2",
+        "attenuation_distance": 48
+      },
+      {
+        "name": "minerwk:cid/cid_atomic_soco_3",
+        "attenuation_distance": 48
+      }
+    ]
+  },
+  "cid_atomic_risco": {
+    "subtitle": "subtitles.minerwk.cid_atomic_risco",
+    "sounds": [
+      {
+        "name": "minerwk:cid/cid_atomic_risco",
+        "attenuation_distance": 96
+      },
+      {
+        "name": "minerwk:cid/cid_atomic_risco_2",
+        "attenuation_distance": 96
+      },
+      {
+        "name": "minerwk:cid/cid_atomic_risco_3",
+        "attenuation_distance": 96
+      }
+    ]
+  },
+  "cid_atomic_aura": {
+    "subtitle": "subtitles.minerwk.cid_atomic_aura",
+    "sounds": [
+      {
+        "name": "minerwk:cid/cid_atomic_aura",
+        "attenuation_distance": 48
+      },
+      {
+        "name": "minerwk:cid/cid_atomic_aura_2",
+        "attenuation_distance": 48
+      },
+      {
+        "name": "minerwk:cid/cid_atomic_aura_3",
+        "attenuation_distance": 48
+      }
+    ]
+  },
+  "cid_atomic": {
+    "subtitle": "subtitles.minerwk.cid_atomic",
+    "sounds": [
+      {
+        "name": "minerwk:cid/cid_atomic",
+        "attenuation_distance": 96
+      },
+      {
+        "name": "minerwk:cid/cid_atomic_2",
+        "attenuation_distance": 96
+      },
+      {
+        "name": "minerwk:cid/cid_atomic_3",
+        "attenuation_distance": 96
+      }
+    ]
+  },
+  "cid_atomic_luz": {
+    "subtitle": "subtitles.minerwk.cid_atomic_luz",
+    "sounds": [
+      {
+        "name": "minerwk:cid/cid_atomic_luz",
+        "attenuation_distance": 160
+      },
+      {
+        "name": "minerwk:cid/cid_atomic_luz_2",
+        "attenuation_distance": 160
+      },
+      {
+        "name": "minerwk:cid/cid_atomic_luz_3",
+        "attenuation_distance": 160
+      }
+    ]
   }
 }

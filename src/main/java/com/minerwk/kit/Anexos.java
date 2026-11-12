@@ -24,6 +24,15 @@ public final class Anexos {
                             net.minecraft.world.level.Level.OVERWORLD.location(), 0, 0, 0, 0, 0))
                     .serialize(com.minerwk.arena.PontoRetorno.CODEC).copyOnDeath().build());
 
+    /**
+     * De onde o jogador saiu para o espaço, no R do Cid. Só existe enquanto ele está lá. Salvo no disco (o
+     * servidor pode cair no meio), mas não segue na morte: quem morre renasce no lugar normal.
+     */
+    public static final Supplier<AttachmentType<com.minerwk.arena.PontoRetorno>> RETORNO_ESPACO = REGISTRO.register("retorno_espaco",
+            () -> AttachmentType.builder(() -> new com.minerwk.arena.PontoRetorno(
+                            net.minecraft.world.level.Level.OVERWORLD.location(), 0, 0, 0, 0, 0))
+                    .serialize(com.minerwk.arena.PontoRetorno.CODEC).build());
+
     private Anexos() {
     }
 }

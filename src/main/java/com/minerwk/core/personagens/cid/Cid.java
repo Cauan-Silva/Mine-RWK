@@ -20,8 +20,8 @@ import java.util.Set;
 
 /**
  * Cid Kagenou, o Shadow (The Eminence in Shadow). Uma forma só: a espada de slime e a Magia. Cada golpe toca
- * a animação de mesmo id e manda os visuais {@code cid_*}, que o cliente desenha. A Espada Atômica (V) e o
- * Recovery Atomic (agachado + R) só valem depois do despertar; o I Am Atomic final (R de pé) entra na parte 6.
+ * a animação de mesmo id e manda os visuais {@code cid_*}, que o cliente desenha. A Espada Atômica (V), o
+ * I Am Atomic final (R) e o Recovery Atomic (agachado + R) só valem depois do despertar.
  */
 public final class Cid {
     public static final String ID = "cid";
@@ -381,19 +381,163 @@ public final class Cid {
     }
 
     /**
-     * R de pé: o I Am Atomic final, que entra na parte 6. Por ora a tecla só existe para o Recovery Atomic
-     * (agachado) e para a recarga que os dois dividem: o custo acima do máximo da Magia impede que comece.
+     * R de pé: o I Am Atomic final ({@link AtomicFinal}). Precisa de um alvo vivo à frente, a até 6 blocos:
+     * sem ele nada acontece, e a Magia e a recarga voltam. Com ele, a sequência corre sozinha.
      */
     static final class Atomic extends Golpe {
+        static final String SOCO = "cid_atomic_soco", RISCO = "cid_atomic_risco", AURA = "cid_atomic_aura", LUZ = "cid_atomic_luz";
+        static final String ANIM_DOS_SOCOS = "cid_atomic", ANIM_DA_FALA = "cid_atomic_fala";
+        static final double CUSTO = 100;
         private final Habilidade recovery = new RecoveryAtomic();
 
         Atomic() {
-            super(ATOMIC, Numeros.instantanea(1, 1, 1, Magia.MAXIMO + 1, RECARGA_DO_ATOMIC));
+            super(ATOMIC, Numeros.instantanea(2, 1, 2, CUSTO, RECARGA_DO_ATOMIC));
         }
 
         @Override
         public Habilidade agachado() {
             return recovery;
+        }
+
+        /** A animação é a dos socos e só começa se houver alvo. */
+        @Override
+        public void aoIniciarCarga(Contexto ctx) {
+        }
+
+        @Override
+        public void aoDisparar(Contexto ctx, float forca) {
+            Object alvo = ctx.marcarAlvoOuChefe(AtomicFinal.ALCANCE, AtomicFinal.LARGURA);
+            Vetor centro = alvo == null ? null : ctx.posicaoDe(alvo);
+            if (centro == null || !ctx.viagem(alvo)) {
+                // Sem alvo (ou já no meio de outra viagem): o disparo já cobrou; tudo volta.
+                ctx.devolverRecurso(CUSTO);
+                ctx.recarga(ATOMIC, 0);
+                return;
+            }
+            // Se um dia a árvore encurtar a recarga do R, a do Recovery tem de acompanhar aqui.
+            ctx.recarga(RECOVERY, RECARGA_DO_ATOMIC);
+            Vetor rumo = noChao(centro.menos(ctx.olhos()));
+            if (Math.abs(rumo.y()) > 1e-6) rumo = noChao(ctx.olhar());
+            if (Math.abs(rumo.y()) > 1e-6) rumo = new Vetor(0, 0, 1);
+            ctx.criarEfeito(new Sequencia(alvo, ctx.pes(), centro, rumo));
+        }
+    }
+
+    /** A sequência do R, tick a tick. Se o alvo morre antes do Atomic, ela pula para ele. */
+    static final class Sequencia implements Efeito {
+        private static final Vetor CIMA = new Vetor(0, 1, 0);
+        private final Object alvo;
+        private final Vetor pes, centro, rumo;
+        /** Os pés do Cid na chegada ao espaço; null enquanto estão no mundo. */
+        private Vetor chegada;
+        /** Quantos ticks a sequência pulou (o alvo morreu no meio). */
+        private int pulo;
+        private boolean atomic, voltou;
+        private int ultimo;
+
+        Sequencia(Object alvo, Vetor pes, Vetor centro, Vetor rumo) {
+            this.alvo = alvo;
+            this.pes = pes;
+            this.centro = centro;
+            this.rumo = rumo;
+        }
+
+        @Override
+        public int duracao() {
+            return AtomicFinal.FIM + 1;
+        }
+
+        @Override
+        public boolean encerrado() {
+            return ultimo + pulo >= AtomicFinal.FIM;
+        }
+
+        @Override
+        public void tick(Contexto ctx, int t) {
+            ultimo = t;
+            int tempo = t + pulo;
+            if (!atomic && tempo < AtomicFinal.ATOMIC && !ctx.alvoVivo(alvo)) {
+                pulo += AtomicFinal.ATOMIC - tempo;
+                tempo = AtomicFinal.ATOMIC;
+            }
+            if (tempo < AtomicFinal.PASSAGEM) {
+                subir(ctx, tempo);
+                return;
+            }
+            if (chegada == null) passar(ctx, tempo);
+            if (tempo < AtomicFinal.ATOMIC) noEspaco(ctx, tempo);
+            if (tempo == AtomicFinal.ATOMIC) atomic(ctx);
+            if (tempo == AtomicFinal.VOLTA) voltar(ctx, true);
+        }
+
+        private void subir(Contexto ctx, int tempo) {
+            Vetor alvoAgora = AtomicFinal.alvoNaSubida(centro, tempo);
+            if (tempo == 0) {
+                ctx.apresentacao(Atomic.ANIM_DOS_SOCOS, "", "");
+                ctx.cutscene(CutsceneAtomic.SUBIDA, ctx.olhos(), rumo);
+            }
+            if (AtomicFinal.soco(tempo)) socar(ctx, alvoAgora);
+            // O alvo já vai para o ponto do tick seguinte: ele sobe enquanto o soco ainda soa.
+            ctx.pontosDaViagem(alvo, AtomicFinal.cidNaSubida(pes, centro, rumo, tempo), AtomicFinal.alvoNaSubida(centro, tempo + 1),
+                    alvoAgora);
+        }
+
+        /** O quinto soco: os dois saem do mundo. Quem ficou embaixo vê o risco roxo subir. */
+        private void passar(Contexto ctx, int tempo) {
+            Vetor deOnde = AtomicFinal.cidNaSubida(pes, centro, rumo, Math.min(tempo, AtomicFinal.PASSAGEM));
+            ctx.visual(Atomic.RISCO, deOnde, CIMA, 0f, AtomicFinal.TICKS_DO_RISCO);
+            chegada = ctx.aoEspaco(alvo);
+            if (tempo < AtomicFinal.ATOMIC) {
+                ctx.cutscene(CutsceneAtomic.ESPACO, chegada.mais(new Vetor(0, 1.62, 0)), rumo);
+                ctx.apresentacao(Atomic.ANIM_DOS_SOCOS, "", "");
+            }
+        }
+
+        private void noEspaco(Contexto ctx, int tempo) {
+            Vetor alvoAgora = AtomicFinal.alvoNoEspaco(chegada, rumo, tempo);
+            if (AtomicFinal.soco(tempo)) socar(ctx, alvoAgora);
+            if (tempo == AtomicFinal.FALA) {
+                ctx.apresentacao(Atomic.ANIM_DA_FALA, "", "");
+                ctx.visual(Atomic.AURA, AtomicFinal.cidNoEspaco(chegada, rumo, tempo), CIMA, 0f, AtomicFinal.TICKS_DA_FALA + 2);
+            }
+            ctx.pontosDaViagem(alvo, AtomicFinal.cidNoEspaco(chegada, rumo, tempo), AtomicFinal.alvoNoEspaco(chegada, rumo, tempo + 1),
+                    alvoAgora);
+        }
+
+        private void socar(Contexto ctx, Vetor onde) {
+            ctx.ferir(alvo, dano(ctx, AtomicFinal.DANO_DO_SOCO));
+            ctx.visual(Atomic.SOCO, onde, rumo, 0f, AtomicFinal.ENTRE_SOCOS);
+            ctx.acertou(.5f);
+        }
+
+        private void atomic(Contexto ctx) {
+            atomic = true;
+            Vetor cid = AtomicFinal.cidNoEspaco(chegada, rumo, AtomicFinal.ATOMIC);
+            Vetor meio = cid.mais(rumo.vezes(AtomicFinal.AO_LADO / 2)).mais(new Vetor(0, .9, 0));
+            ctx.visualFim(Atomic.AURA, cid);
+            ctx.ferir(alvo, dano(ctx, AtomicFinal.DANO));
+            ctx.visual(ATOMIC, meio, rumo, 0f, AtomicFinal.TICKS_DO_CLARAO + 10);
+            ctx.visualNaOrigem(Atomic.LUZ, 0f, AtomicFinal.TICKS_DA_LUZ, AtomicFinal.RAIO_DA_LUZ);
+            ctx.cutscene(CutsceneAtomic.CLARAO, cid.mais(new Vetor(0, 1.62, 0)), rumo);
+        }
+
+        private void voltar(Contexto ctx, boolean comCena) {
+            if (voltou) return;
+            voltou = true;
+            ctx.fimDaViagem();
+            if (comCena) ctx.cutscene(CutsceneAtomic.CEU, ctx.olhos(), rumo);
+        }
+
+        @Override
+        public void aoAcabar(Contexto ctx) {
+            voltar(ctx, false);
+        }
+
+        /** Morreu, saiu ou trocou de dimensão no meio: os dois voltam na hora. */
+        @Override
+        public void aoDescartar(Contexto ctx) {
+            voltar(ctx, false);
+            ctx.encerrarCutscene();
         }
     }
 

@@ -434,10 +434,4 @@ class CidTest {
         kit.descartar(ctx);
         assertEquals(List.of(true, false), ctx.firmes);
     }
-
-    @Test
-    void oRDePeAindaNaoComeca() {
-        kit.definirDesperto(true);
-        assertFalse(kit.apertar(Tecla.R, agora), "o I Am Atomic final entra na parte 6");
-    }
 }

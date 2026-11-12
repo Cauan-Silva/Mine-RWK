@@ -50,3 +50,4 @@ Voltar para [[00 Início]].
 - [[2026-11-12 Cid parte 3]]: os visuais e as animações dos golpes base do Cid (Redemoinho, Pós-imagem, Prisão de Correntes e Overdrive)
 - [[2026-11-12 Cid parte 4]]: os sons dos golpes base do Cid, sintetizados (lâmina fina, slime, correntes e o zumbido da magia)
 - [[2026-11-12 Cid parte 5]]: a Espada Atômica (V) e o Recovery Atomic (agachado + R) do Cid: mecânica, visuais, animações e sons
+- [[2026-11-12 Cid parte 6]]: o I Am Atomic final (R) do Cid: a dimensão do espaço e o céu dela, a subida a socos, a ida e a volta, a cutscene, os visuais e os sons

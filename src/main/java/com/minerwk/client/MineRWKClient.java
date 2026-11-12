@@ -74,6 +74,13 @@ public final class MineRWKClient {
         NeoForge.EVENT_BUS.addListener(CutsceneCliente::aoNome);
         NeoForge.EVENT_BUS.addListener((ClientPlayerNetworkEvent.LoggingOut e) -> CutsceneCliente.encerrar());
         modBus.addListener((RegisterGuiLayersEvent e) -> e.registerAboveAll(CutsceneCliente.CAMADA, CutsceneCliente::desenhar));
+        // O espaço do R do Cid: o céu, sem neblina, e os clarões que cobrem as trocas de dimensão (por baixo das barras).
+        modBus.addListener(com.minerwk.client.vfx.EspacoCliente::registrar);
+        modBus.addListener((RegisterGuiLayersEvent e) -> e.registerBelow(CutsceneCliente.CAMADA,
+                com.minerwk.client.vfx.EspacoCliente.CAMADA, com.minerwk.client.vfx.EspacoCliente::desenhar));
+        NeoForge.EVENT_BUS.addListener(com.minerwk.client.vfx.EspacoCliente::aoAbrirTela);
+        NeoForge.EVENT_BUS.addListener(com.minerwk.client.vfx.EspacoCliente::aoNeblina);
+        NeoForge.EVENT_BUS.addListener((ClientPlayerNetworkEvent.LoggingOut e) -> com.minerwk.client.vfx.EspacoCliente.limpar());
         modBus.addListener((RegisterGuiLayersEvent e) -> e.registerAbove(VanillaGuiLayers.CAMERA_OVERLAYS,
                 com.minerwk.MineRWK.id("clarao_gojo"), ImpactoCamera::desenharClarao));
         NeoForge.EVENT_BUS.addListener((ClientPlayerNetworkEvent.LoggingOut e) -> VisuaisAtivos.limpar());

@@ -321,4 +321,108 @@ public final class TestesCid {
         helper.assertTrue(!ContextoServidor.firme(jogador), "morto, o modificador sai");
         helper.succeed();
     }
+
+    // --- O R: I Am Atomic final ---
+
+    /**
+     * O alvo do R, a 3 blocos à frente. Os testes ficam colados uns nos outros, e um zumbi de um teste vizinho
+     * pode ter sobrado bem na linha da mira: os que estão por perto somem antes.
+     */
+    private static Zombie alvoSozinho(GameTestHelper helper, ServerPlayer jogador) {
+        for (net.minecraft.world.entity.LivingEntity e : jogador.level().getEntitiesOfClass(net.minecraft.world.entity.LivingEntity.class,
+                jogador.getBoundingBox().inflate(8))) {
+            if (e != jogador) e.discard();
+        }
+        return zumbi(helper, 4, 1);
+    }
+
+    @GameTest(template = "vazio")
+    public static void oAtomicSemAlvoNaoGastaNada(GameTestHelper helper) {
+        ServerPlayer jogador = cidDesperto(helper);
+        KitDoJogador kit = ServicoKits.kit(jogador).orElseThrow();
+        double magia = kit.recurso().atual();
+        ServicoKits.usarTecla(jogador, Tecla.R, true);
+        ticks(jogador, 6);
+        helper.assertTrue(!EspacoServidor.emViagem(jogador), "sem alvo não há viagem");
+        helper.assertTrue(kit.recurso().atual() >= magia - 1e-6, "a Magia volta, tem " + kit.recurso().atual());
+        helper.assertTrue(kit.recargas().pronta(Cid.ATOMIC, jogador.level().getGameTime()), "e a recarga também");
+        helper.assertTrue(kit.recargas().pronta(Cid.RECOVERY, jogador.level().getGameTime()), "a do Recovery nem começa");
+        helper.succeed();
+    }
+
+    @GameTest(template = "vazio")
+    public static void oAtomicSobeOAlvoASocosEDevolveOsDois(GameTestHelper helper) {
+        ServerPlayer jogador = cidDesperto(helper);
+        KitDoJogador kit = ServicoKits.kit(jogador).orElseThrow();
+        Zombie zumbi = alvoSozinho(helper, jogador);
+        zumbi.getAttribute(Attributes.MAX_HEALTH).setBaseValue(100);
+        zumbi.setHealth(100);
+        net.minecraft.world.phys.Vec3 cidAntes = jogador.position(), zumbiAntes = zumbi.position();
+        ServicoKits.usarTecla(jogador, Tecla.R, true);
+        ticks(jogador, 4);
+        helper.assertTrue(EspacoServidor.emViagem(jogador) && EspacoServidor.emViagem(zumbi), "os dois estão na viagem");
+        helper.assertTrue(perto(zumbi.getHealth(), 98), "o primeiro soco tira 2, vida " + zumbi.getHealth());
+        helper.assertTrue(kit.recurso().atual() < 1, "gastou os 100 de Magia, tem " + kit.recurso().atual());
+        // Só o golpe fere o alvo, e nada fere o Cid.
+        zumbi.invulnerableTime = 0;
+        zumbi.hurt(zumbi.damageSources().cactus(), 10);
+        helper.assertTrue(perto(zumbi.getHealth(), 98), "outro dano não chega ao alvo, vida " + zumbi.getHealth());
+        float vida = jogador.getHealth();
+        jogador.hurt(jogador.damageSources().cactus(), 10);
+        helper.assertTrue(perto(jogador.getHealth(), vida), "o Cid não recebe dano");
+        ticks(jogador, 22);
+        helper.assertTrue(perto(zumbi.getHealth(), 92), "quatro socos no mundo, vida " + zumbi.getHealth());
+        helper.assertTrue(zumbi.getY() - zumbiAntes.y > 40, "o alvo subiu, " + (zumbi.getY() - zumbiAntes.y));
+        helper.assertTrue(jogador.getY() - cidAntes.y > 40 && jogador.isNoGravity(), "e o Cid surge ao lado, sem cair");
+        ticks(jogador, 70);
+        helper.assertTrue(perto(zumbi.getHealth(), 84), "mais quatro socos lá em cima, vida " + zumbi.getHealth());
+        ticks(jogador, 8);
+        helper.assertTrue(perto(zumbi.getHealth(), 40), "o Atomic tira 44, vida " + zumbi.getHealth());
+        helper.assertTrue(EspacoServidor.emViagem(jogador), "o clarão ainda dura");
+        ticks(jogador, 42);
+        helper.assertTrue(!EspacoServidor.emViagem(jogador) && !EspacoServidor.emViagem(zumbi), "a viagem acabou");
+        helper.assertTrue(jogador.position().distanceTo(cidAntes) < .01 && !jogador.isNoGravity(), "o Cid volta ao ponto de partida");
+        helper.assertTrue(zumbi.position().distanceTo(zumbiAntes) < .01 && !zumbi.isNoGravity() && zumbi.isNoAi(),
+                "o alvo também, como era antes");
+        helper.assertTrue(!ContextoServidor.firme(jogador), "e o Cid anda de novo");
+        long agora = jogador.level().getGameTime();
+        helper.assertTrue(kit.recargas().restante(Cid.ATOMIC, agora) > 1600 && kit.recargas().restante(Cid.RECOVERY, agora) > 1600,
+                "recarga de 90 s, dividida com o Recovery");
+        zumbi.invulnerableTime = 0;
+        zumbi.hurt(zumbi.damageSources().cactus(), 5);
+        helper.assertTrue(perto(zumbi.getHealth(), 35), "depois da viagem o alvo volta a apanhar de tudo, vida " + zumbi.getHealth());
+        helper.succeed();
+    }
+
+    @GameTest(template = "vazio")
+    public static void oAlvoQueMorreNoMeioDoAtomicEncurtaAViagem(GameTestHelper helper) {
+        ServerPlayer jogador = cidDesperto(helper);
+        Zombie zumbi = alvoSozinho(helper, jogador);
+        zumbi.setHealth(3);
+        net.minecraft.world.phys.Vec3 cidAntes = jogador.position();
+        ServicoKits.usarTecla(jogador, Tecla.R, true);
+        ticks(jogador, 12);
+        helper.assertTrue(!zumbi.isAlive(), "o segundo soco mata");
+        helper.assertTrue(EspacoServidor.emViagem(jogador), "o Cid segue para o Atomic");
+        ticks(jogador, 45);
+        helper.assertTrue(!EspacoServidor.emViagem(jogador), "e volta sem esperar os socos que faltavam");
+        helper.assertTrue(jogador.position().distanceTo(cidAntes) < .01 && !jogador.isNoGravity(), "ao ponto de partida");
+        helper.succeed();
+    }
+
+    @GameTest(template = "vazio")
+    public static void morrerNoMeioDoAtomicSoltaOAlvo(GameTestHelper helper) {
+        ServerPlayer jogador = cidDesperto(helper);
+        Zombie zumbi = alvoSozinho(helper, jogador);
+        net.minecraft.world.phys.Vec3 zumbiAntes = zumbi.position();
+        ServicoKits.usarTecla(jogador, Tecla.R, true);
+        ticks(jogador, 15);
+        helper.assertTrue(zumbi.getY() - zumbiAntes.y > 10, "o alvo já subiu");
+        jogador.setHealth(0);
+        ticks(jogador, 1);
+        helper.assertTrue(!EspacoServidor.emViagem(zumbi) && !zumbi.isNoGravity(), "o alvo é solto");
+        helper.assertTrue(zumbi.position().distanceTo(zumbiAntes) < .01, "no ponto de onde saiu");
+        helper.assertTrue(!jogador.isNoGravity() && !ContextoServidor.firme(jogador), "e o Cid não fica preso");
+        helper.succeed();
+    }
 }

@@ -78,7 +78,8 @@ class SonsCidTest {
         // (cada um com a carga e o golpe).
         Set<String> usados = new HashSet<>();
         for (String tipo : new String[] {Cid.Redemoinho.VISUAL, Cid.PosImagem.VISUAL, Cid.Prisao.VISUAL, Cid.Prisao.CORRENTES,
-                Cid.OVERDRIVE, Cid.TRAJE, Cid.EspadaAtomica.CARGA, Cid.ESPADA_ATOMICA, Cid.RecoveryAtomic.CARGA, Cid.RECOVERY}) {
+                Cid.OVERDRIVE, Cid.TRAJE, Cid.EspadaAtomica.CARGA, Cid.ESPADA_ATOMICA, Cid.RecoveryAtomic.CARGA, Cid.RECOVERY,
+                Cid.Atomic.SOCO, Cid.Atomic.RISCO, Cid.Atomic.AURA, Cid.ATOMIC, Cid.Atomic.LUZ}) {
             usados.add(SonsCid.doVisual(tipo).orElseThrow());
             assertEquals(SonsCid.doVisual(tipo), SonsDosVisuais.doVisual(tipo), tipo);
         }
@@ -128,6 +129,11 @@ class SonsCidTest {
         assertEquals(FormasCid.CORTE_ATOMICO, marco(m, SonsCid.ESPADA_ATOMICA, "fim"));
         assertEquals(FormasCid.CARGA_DO_RECOVERY, marco(m, SonsCid.RECOVERY_CARGA, "fim"), "o acorde cresce os 3 s");
         assertEquals(FormasCid.ONDA, marco(m, SonsCid.RECOVERY, "onda"));
+        assertEquals(AtomicFinal.ENTRE_SOCOS, marco(m, SonsCid.ATOMIC_SOCO, "fim"), "um soco acaba antes do seguinte");
+        assertEquals(AtomicFinal.TICKS_DO_RISCO, marco(m, SonsCid.ATOMIC_RISCO, "fim"));
+        assertEquals(AtomicFinal.TICKS_DA_FALA, marco(m, SonsCid.ATOMIC_AURA, "fim"), "o tom sobe as três palavras inteiras");
+        assertEquals(AtomicFinal.TICKS_DO_CLARAO, marco(m, SonsCid.ATOMIC, "clarao"));
+        assertEquals(AtomicFinal.TICKS_DA_LUZ, marco(m, SonsCid.ATOMIC_LUZ, "fim"), "o estouro distante dura a luz no céu");
         assertEquals(FormasCid.COLUNA, marco(m, SonsCid.RECOVERY, "fim"));
         for (String som : SonsCid.TODOS) {
             JsonObject s = m.getAsJsonObject(som);

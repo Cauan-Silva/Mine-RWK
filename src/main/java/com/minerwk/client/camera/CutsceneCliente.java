@@ -5,6 +5,7 @@ import com.minerwk.client.ConfigCliente;
 import com.minerwk.core.boss.CutsceneDespertar;
 import com.minerwk.core.camera.Coreografia;
 import com.minerwk.core.kit.Vetor;
+import com.minerwk.core.personagens.cid.CutsceneAtomic;
 import com.minerwk.core.personagens.gojo.CutsceneRoxo200;
 import com.minerwk.core.personagens.gojo.CutsceneRoxoMaximo;
 import com.minerwk.rede.Cutscene;
@@ -44,7 +45,26 @@ public final class CutsceneCliente {
      * tick a partir do qual a base para de seguir o dono (plano aberto parado; -1: sempre segue).
      */
     record Roteiro(Coreografia coreografia, List<CutsceneRoxo200.Palavra> palavras, String cargaQueCorta,
-                   boolean espectador, boolean continua, int congelarDesde) {
+                   boolean espectador, boolean continua, int congelarDesde, double seguir) {
+        /** A base presa aos olhos do dono, sem atraso. */
+        Roteiro(Coreografia coreografia, List<CutsceneRoxo200.Palavra> palavras, String cargaQueCorta,
+                boolean espectador, boolean continua, int congelarDesde) {
+            this(coreografia, palavras, cargaQueCorta, espectador, continua, congelarDesde, 1);
+        }
+    }
+
+    /**
+     * O R do Cid, em quatro trechos. Na subida ele some e surge de ponto em ponto, 12 blocos acima: a base da
+     * câmera o segue com atraso ({@code seguir} é a fração do caminho por tick), e é ele quem salta no quadro.
+     */
+    private static Roteiro doAtomic(String id) {
+        return switch (id) {
+            case CutsceneAtomic.SUBIDA -> new Roteiro(CutsceneAtomic.daSubida(), List.of(), "", false, true, -1, .4);
+            case CutsceneAtomic.ESPACO -> new Roteiro(CutsceneAtomic.doEspaco(), CutsceneAtomic.PALAVRAS, "", false, true, -1, 1);
+            case CutsceneAtomic.CLARAO -> new Roteiro(CutsceneAtomic.doClarao(), List.of(), "", false, true, 0, 1);
+            case CutsceneAtomic.CEU -> new Roteiro(CutsceneAtomic.doCeu(), List.of(), "", false, false, -1, 1);
+            default -> null;
+        };
     }
 
     private static final Map<String, Roteiro> ROTEIROS = Map.of(
@@ -64,6 +84,7 @@ public final class CutsceneCliente {
 
     private static Roteiro roteiroDe(String id) {
         Roteiro r = ROTEIROS.get(id);
+        if (r == null) r = doAtomic(id);
         if (r != null) return r;
         return CutsceneRoxoMaximo.deId(id)
                 .map(c -> new Roteiro(c, CutsceneRoxo200.PALAVRAS_DISPARO, "", true, false,
@@ -86,6 +107,11 @@ public final class CutsceneCliente {
     private static boolean emendada;
     /** Base parada do plano aberto (o dono desce devagar; a explosão não). */
     private static Vetor origemCongelada;
+    /** A base que segue o dono com atraso, e o tempo da cutscene em que foi calculada. */
+    private static Vetor origemSuave;
+    private static double tSuave;
+    /** Relógio do computador da última vez que uma cutscene acabou por troca de dimensão. */
+    private static long trocouDeMundoEm;
 
     private CutsceneCliente() {
     }
@@ -103,15 +129,23 @@ public final class CutsceneCliente {
         Roteiro r = roteiroDe(pacote.id());
         if (mc.level == null || mc.player == null || r == null) return;
         if (pacote.dono() != mc.player.getId() && !r.espectador()) return;
+        // O trecho anterior acabou agora mesmo numa troca de dimensão (o R do Cid): as barras continuam na tela.
+        boolean barras = System.currentTimeMillis() - trocouDeMundoEm < 1500;
         if (atual != null && atual.dono() == pacote.dono() && (!comCamera || camera != null)) {
-            // Continuação (a parte 2 do R): troca o roteiro sem soltar a câmera.
-            roteiro = r;
-            atual = pacote;
-            emendada = true;
-            origemCongelada = null;
-            return;
+            if (mc.level == mundo) {
+                // Continuação (a parte 2 do R): troca o roteiro sem soltar a câmera.
+                roteiro = r;
+                atual = pacote;
+                emendada = true;
+                origemCongelada = null;
+                tSuave = 0;
+                return;
+            }
+            // A câmera ficou na dimensão de antes: recomeça nesta, com as barras como estavam.
+            barras = true;
         }
         encerrar();
+        emendada = barras;
         roteiro = r;
         atual = pacote;
         mundo = mc.level;
@@ -148,6 +182,8 @@ public final class CutsceneCliente {
         comCamera = false;
         emendada = false;
         origemCongelada = null;
+        origemSuave = null;
+        tSuave = 0;
         mundo = null;
     }
 
@@ -175,6 +211,7 @@ public final class CutsceneCliente {
         prenderOlhar();
         Minecraft mc = Minecraft.getInstance();
         Entity dono = mc.level == null ? null : mc.level.getEntity(atual.dono());
+        if (mc.level != mundo) trocouDeMundoEm = System.currentTimeMillis();
         if (mc.level != mundo || mc.player == null || !mc.player.isAlive() || (dono != null && !dono.isAlive())
                 || idade(0) > roteiro.coreografia().duracao()) encerrar();
     }
@@ -203,6 +240,18 @@ public final class CutsceneCliente {
         if (dono != null) {
             var olhos = dono.getEyePosition(parcial);
             origem = new Vetor(olhos.x, olhos.y, olhos.z);
+        }
+        if (roteiro.seguir() < 1) {
+            if (origemSuave == null) {
+                origemSuave = origem;
+            } else {
+                double passo = 1 - Math.pow(1 - roteiro.seguir(), Math.max(0, t - tSuave));
+                origemSuave = origemSuave.mais(origem.menos(origemSuave).vezes(passo));
+            }
+            tSuave = t;
+            origem = origemSuave;
+        } else {
+            origemSuave = null;
         }
         if (roteiro.congelarDesde() >= 0 && t >= roteiro.congelarDesde()) {
             if (origemCongelada == null) origemCongelada = origem;
@@ -250,6 +299,7 @@ public final class CutsceneCliente {
     /** Com a câmera de cinema, só a camada da cutscene e o chat aparecem. */
     public static void aoCamadaGui(RenderGuiLayerEvent.Pre evento) {
         if (atual != null && comCamera && !evento.getName().equals(CAMADA)
+                && !evento.getName().equals(com.minerwk.client.vfx.EspacoCliente.CAMADA)
                 && !evento.getName().equals(VanillaGuiLayers.CHAT)) evento.setCanceled(true);
     }
 

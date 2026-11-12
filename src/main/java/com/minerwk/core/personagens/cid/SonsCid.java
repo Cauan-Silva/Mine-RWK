@@ -19,8 +19,15 @@ public final class SonsCid {
     public static final String ESPADA_CARGA = "cid_espada_carga", ESPADA_ATOMICA = "cid_espada_atomica";
     public static final String RECOVERY_CARGA = "cid_recovery_carga", RECOVERY = "cid_recovery";
 
+    /**
+     * O I Am Atomic final: cada soco, o risco da passagem, o tom que sobe nas três palavras, o estouro no
+     * espaço (depois de um instante de silêncio) e o estouro distante, ouvido do chão.
+     */
+    public static final String ATOMIC_SOCO = "cid_atomic_soco", ATOMIC_RISCO = "cid_atomic_risco", ATOMIC_AURA = "cid_atomic_aura";
+    public static final String ATOMIC = "cid_atomic", ATOMIC_LUZ = "cid_atomic_luz";
+
     public static final List<String> TODOS = List.of(REDEMOINHO, POS_IMAGEM, SLIME, CORRENTES, OVERDRIVE, TRAJE,
-            ESPADA_CARGA, ESPADA_ATOMICA, RECOVERY_CARGA, RECOVERY);
+            ESPADA_CARGA, ESPADA_ATOMICA, RECOVERY_CARGA, RECOVERY, ATOMIC_SOCO, ATOMIC_RISCO, ATOMIC_AURA, ATOMIC, ATOMIC_LUZ);
 
     private SonsCid() {
     }
@@ -37,6 +44,7 @@ public final class SonsCid {
      * acabaram). O slime que bate cedo ainda soa o arremesso, que é curto.
      */
     public static boolean cortaComOVisual(String tipo) {
-        return tipo.equals(OVERDRIVE) || tipo.equals(ESPADA_CARGA) || tipo.equals(RECOVERY_CARGA);
+        // O tom das três palavras também: se o alvo morre no meio delas, o Atomic vem antes e o tom para.
+        return tipo.equals(OVERDRIVE) || tipo.equals(ESPADA_CARGA) || tipo.equals(RECOVERY_CARGA) || tipo.equals(ATOMIC_AURA);
     }
 }
