@@ -1027,5 +1027,73 @@
         "attenuation_distance": 24
       }
     ]
+  },
+  "cid_espada_carga": {
+    "subtitle": "subtitles.minerwk.cid_espada_carga",
+    "sounds": [
+      {
+        "name": "minerwk:cid/cid_espada_carga",
+        "attenuation_distance": 32
+      },
+      {
+        "name": "minerwk:cid/cid_espada_carga_2",
+        "attenuation_distance": 32
+      },
+      {
+        "name": "minerwk:cid/cid_espada_carga_3",
+        "attenuation_distance": 32
+      }
+    ]
+  },
+  "cid_espada_atomica": {
+    "subtitle": "subtitles.minerwk.cid_espada_atomica",
+    "sounds": [
+      {
+        "name": "minerwk:cid/cid_espada_atomica",
+        "attenuation_distance": 48
+      },
+      {
+        "name": "minerwk:cid/cid_espada_atomica_2",
+        "attenuation_distance": 48
+      },
+      {
+        "name": "minerwk:cid/cid_espada_atomica_3",
+        "attenuation_distance": 48
+      }
+    ]
+  },
+  "cid_recovery_carga": {
+    "subtitle": "subtitles.minerwk.cid_recovery_carga",
+    "sounds": [
+      {
+        "name": "minerwk:cid/cid_recovery_carga",
+        "attenuation_distance": 32
+      },
+      {
+        "name": "minerwk:cid/cid_recovery_carga_2",
+        "attenuation_distance": 32
+      },
+      {
+        "name": "minerwk:cid/cid_recovery_carga_3",
+        "attenuation_distance": 32
+      }
+    ]
+  },
+  "cid_recovery": {
+    "subtitle": "subtitles.minerwk.cid_recovery",
+    "sounds": [
+      {
+        "name": "minerwk:cid/cid_recovery",
+        "attenuation_distance": 64
+      },
+      {
+        "name": "minerwk:cid/cid_recovery_2",
+        "attenuation_distance": 64
+      },
+      {
+        "name": "minerwk:cid/cid_recovery_3",
+        "attenuation_distance": 64
+      }
+    ]
   }
 }

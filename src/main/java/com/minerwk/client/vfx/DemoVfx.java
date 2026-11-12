@@ -63,7 +63,9 @@ public final class DemoVfx {
     private static final boolean CID_PERTO = MODO.equals("cid_perto");
     /** {@code cid}: os golpes base do Cid (G, Z, C e X) em alvos parados, vistos de lado. */
     private static final boolean CID = MODO.equals("cid");
-    private static final int FIM_PREVIA = CID ? 250 : HOLLOW_PERTO || CID_PERTO ? 272 : HOLLOW ? 330 : ZANGETSU ? 2400 : TOJI ? 520 : ARVORE ? 100 : TRAJE ? 260 : TRAJE_ICHIGO ? 300 : ICHIGO ? 350 : MUGETSU ? 360 : R_COMPLETO ? 360
+    /** {@code cid_atomico}: a Espada Atômica de lado e, depois, o Recovery Atomic visto de longe e do alto. */
+    private static final boolean CID_ATOMICO = MODO.equals("cid_atomico");
+    private static final int FIM_PREVIA = CID ? 250 : CID_ATOMICO ? 215 : HOLLOW_PERTO || CID_PERTO ? 272 : HOLLOW ? 330 : ZANGETSU ? 2400 : TOJI ? 520 : ARVORE ? 100 : TRAJE ? 260 : TRAJE_ICHIGO ? 300 : ICHIGO ? 350 : MUGETSU ? 360 : R_COMPLETO ? 360
             : ENCANTAMENTO ? CARGA + 90 : ESTOURO + RoxoMaximo.TICKS_EXPLOSAO + 110;
     private static int ticks;
     private static int quadro;
@@ -89,7 +91,7 @@ public final class DemoVfx {
             mc.setScreen(null);
         }
         if (DEMO && ticks == 40) {
-            jogador.connection.sendCommand(ENCANTAMENTO || R_COMPLETO || TRAJE || TRAJE_ICHIGO || ICHIGO || MUGETSU || TOJI || ZANGETSU || HOLLOW || CID_PERTO || CID ? "time set noon" : "time set midnight");
+            jogador.connection.sendCommand(ENCANTAMENTO || R_COMPLETO || TRAJE || TRAJE_ICHIGO || ICHIGO || MUGETSU || TOJI || ZANGETSU || HOLLOW || CID_PERTO || CID || CID_ATOMICO ? "time set noon" : "time set midnight");
             if (ARVORE) jogador.connection.sendCommand("rwk trocar @s gojo");
             if (TOJI) {
                 jogador.connection.sendCommand("rwk trocar @s gojo");
@@ -97,8 +99,9 @@ public final class DemoVfx {
                 jogador.connection.sendCommand("tp @s ~150 ~12 ~");
             }
             if (ZANGETSU) jogador.connection.sendCommand("rwk despertar @s nao");
-            if (CID_PERTO || CID) {
+            if (CID_PERTO || CID || CID_ATOMICO) {
                 jogador.connection.sendCommand("rwk trocar @s cid");
+                if (CID_ATOMICO) jogador.connection.sendCommand("rwk despertar @s sim");
                 jogador.connection.sendCommand("tp @s ~150 ~12 ~");
             }
             if (TRAJE_ICHIGO || ICHIGO || MUGETSU || ZANGETSU || HOLLOW) {
@@ -167,6 +170,10 @@ public final class DemoVfx {
         }
         if (HOLLOW_PERTO || CID_PERTO) {
             previaDoHollowDePerto(mc, jogador, t);
+            return;
+        }
+        if (CID_ATOMICO) {
+            previaDoAtomico(mc, jogador, t);
             return;
         }
         if (CID) {
@@ -500,6 +507,60 @@ public final class DemoVfx {
      * A forma Hollow: entra no Bankai, leva um golpe fatal e a forma ataca sozinha dois golens (um perto, para
      * as garras, e um longe, para o Sonído). De frente no começo (a máscara e os chifres), depois de lado.
      */
+    /**
+     * A Espada Atômica, de lado, em quatro alvos no arco; depois a câmera vai para longe e para o alto e ele
+     * crava a espada: os 3 s de carga do Recovery Atomic e a coluna de luz.
+     */
+    private static void previaDoAtomico(Minecraft mc, LocalPlayer jogador, int t) {
+        mc.gui.getChat().clearMessages(false);
+        net.minecraft.world.entity.Entity camera = jogador;
+        for (net.minecraft.world.entity.Entity e : mc.level.entitiesForRendering()) {
+            if (e instanceof net.minecraft.world.entity.decoration.ArmorStand && e.distanceToSqr(jogador) < 60 * 60) camera = e;
+        }
+        if (mc.getCameraEntity() != camera) mc.setCameraEntity(camera);
+        mc.options.setCameraType(net.minecraft.client.CameraType.THIRD_PERSON_BACK);
+        mc.options.hideGui = true;
+        jogador.setXRot(2);
+        if (t == 0) {
+            jogador.setYRot(0);
+            jogador.connection.sendCommand("gamerule sendCommandFeedback false");
+            jogador.connection.sendCommand("kill @e[type=minecraft:armor_stand,distance=..60]");
+            jogador.connection.sendCommand("execute at @s run summon minecraft:armor_stand ~-7 ~2.5 ~-3 "
+                    + "{Invisible:1b,NoGravity:1b,Marker:0b,Rotation:[-52f,14f]}");
+            jogador.connection.sendCommand("kill @e[type=minecraft:husk,distance=..60]");
+            for (String onde : new String[] {"~ ~ ~5", "~ ~ ~10", "~4 ~ ~5", "~-4 ~ ~6"}) {
+                jogador.connection.sendCommand("execute at @s run summon minecraft:husk " + onde + " {NoAI:1b,Rotation:[180f,0f]}");
+            }
+            jogador.connection.sendCommand("rwk recarregar");
+        }
+        if (t == 20) tecla(com.minerwk.core.kit.Tecla.V, true);
+        if (t == 22) tecla(com.minerwk.core.kit.Tecla.V, false);
+        if (t == 66) {
+            // A segunda câmera: longe e do alto, para o círculo de raio 16 caber.
+            jogador.connection.sendCommand("kill @e[type=minecraft:armor_stand,distance=..60]");
+            jogador.connection.sendCommand("execute at @s run summon minecraft:armor_stand ~-12 ~8 ~-12 "
+                    + "{Invisible:1b,NoGravity:1b,Marker:0b,Rotation:[-45f,28f]}");
+        }
+        // Agachado + R: o agachar tem de chegar ao servidor antes da tecla.
+        if (t >= 78 && t < 150) mc.options.keyShift.setDown(true);
+        if (t == 150) mc.options.keyShift.setDown(false);
+        if (t == 86) tecla(com.minerwk.core.kit.Tecla.R, true);
+        if (t == 88) tecla(com.minerwk.core.kit.Tecla.R, false);
+        if (t == FIM_PREVIA - 3) {
+            jogador.connection.sendCommand("kill @e[type=minecraft:husk,distance=..60]");
+            jogador.connection.sendCommand("kill @e[type=minecraft:armor_stand,distance=..60]");
+            jogador.connection.sendCommand("gamerule sendCommandFeedback true");
+            jogador.connection.sendCommand("rwk despertar @s nao");
+            jogador.connection.sendCommand("tp @s ~-150 ~ ~-30");
+        }
+        if (t >= FIM_PREVIA) {
+            mc.options.hideGui = false;
+            mc.setCameraEntity(jogador);
+            mc.options.setCameraType(net.minecraft.client.CameraType.FIRST_PERSON);
+            previa = -1;
+        }
+    }
+
     /** Os golpes base do Cid, de lado, por uma câmera fixa: o Overdrive, o Redemoinho, a Prisão e a Pós-imagem. */
     private static void previaDoCid(Minecraft mc, LocalPlayer jogador, int t) {
         mc.gui.getChat().clearMessages(false);

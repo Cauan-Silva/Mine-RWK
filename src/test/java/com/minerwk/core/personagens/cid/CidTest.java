@@ -20,7 +20,10 @@ import java.util.Set;
 import java.util.function.Predicate;
 import org.junit.jupiter.api.Test;
 
-/** O kit base do Cid: Redemoinho de Ébano, Pós-imagem, Prisão de Correntes Negras, Overdrive e o traje de slime. */
+/**
+ * O kit do Cid: Redemoinho de Ébano, Pós-imagem, Prisão de Correntes Negras, Overdrive e o traje de slime; e,
+ * depois do despertar, a Espada Atômica e o Recovery Atomic.
+ */
 class CidTest {
     private static final EstadoDoJogador PARADO = new EstadoDoJogador(true, false, false);
 
@@ -45,6 +48,13 @@ class CidTest {
         final List<int[]> velocidades = new ArrayList<>();
         final List<Float> recuos = new ArrayList<>();
         final List<String> visuais = new ArrayList<>(), fins = new ArrayList<>(), animacoes = new ArrayList<>();
+        /** Cada corte em arco: {alcance, graus, altura, dano}. */
+        final List<double[]> arcos = new ArrayList<>();
+        /** Cada vez que o jogador foi preso ao chão (true) ou solto (false). */
+        final List<Boolean> firmes = new ArrayList<>();
+        /** Cada cura em volta: o raio. */
+        final List<Double> restauros = new ArrayList<>();
+        int paradas;
 
         public Vetor olhos() { return Vetor.ZERO; }
         public Vetor olhar() { return new Vetor(1, 0, 0); }
@@ -78,6 +88,13 @@ class CidTest {
             assertTrue(duracao > 0, tipo);
         }
         public void visualFim(String tipo, Vetor ponto) { fins.add(tipo); }
+        public int danoEmArco(Vetor origem, Vetor direcao, double alcance, double graus, double altura, float dano) {
+            arcos.add(new double[] {alcance, graus, altura, dano});
+            return inimigoEm == null ? 0 : 1;
+        }
+        public void firmar(boolean preso) { firmes.add(preso); }
+        public int restaurar(double raio) { restauros.add(raio); return 1; }
+        public void pararAnimacao() { paradas++; }
     }
 
     private final Personagem cid = Cid.criar();
@@ -94,9 +111,10 @@ class CidTest {
     }
 
     @Test
-    void oKitBaseTemQuatroGolpesEAMagia() {
+    void oKitTemSeisTeclasEAMagia() {
         assertEquals("cid", cid.id());
-        assertEquals(Set.of(Tecla.Z, Tecla.X, Tecla.C, Tecla.G), cid.habilidades().keySet());
+        assertEquals(Set.of(Tecla.Z, Tecla.X, Tecla.C, Tecla.G, Tecla.V, Tecla.R), cid.habilidades().keySet());
+        assertEquals(7, cid.todasAsHabilidades().size(), "as seis teclas e o Recovery Atomic, a variação agachada do R");
         Set<String> ids = new HashSet<>();
         for (Habilidade h : cid.todasAsHabilidades()) assertTrue(ids.add(h.id()) && h.id().startsWith("cid_"), h.id());
         assertTrue(kit.recurso() instanceof Magia);
@@ -302,5 +320,124 @@ class CidTest {
         assertFalse(Cid.gastaOTraje(7.9f, true));
         assertFalse(Cid.gastaOTraje(20f, false));
         assertEquals(240, Cid.RECARGA_DO_TRAJE);
+    }
+
+    @Test
+    void aEspadaAtomicaEOsAtomicSoValemDepoisDoDespertar() {
+        assertEquals(Set.of(Cid.ESPADA_ATOMICA, Cid.RECOVERY, Cid.ATOMIC), cid.trancas().habilidades());
+        assertFalse(cid.trancas().passivas(), "a espada e o traje de slime valem desde o começo");
+        assertFalse(kit.apertar(Tecla.V, agora));
+        assertFalse(kit.apertar(Tecla.R, agora, true));
+        kit.definirDesperto(true);
+        assertTrue(kit.apertar(Tecla.V, agora));
+    }
+
+    @Test
+    void espadaAtomicaCarregaDozeTicksECortaEmArco() {
+        kit.definirDesperto(true);
+        ctx.inimigoEm = new Vetor(6, 0, 0);
+        usar(Tecla.V);
+        ticks(11);
+        assertTrue(ctx.arcos.isEmpty(), "12 ticks de carga: dispara no décimo segundo");
+        assertTrue(ctx.visuais.contains("cid_espada_carga"));
+        assertTrue(ctx.animacoes.contains("cid_espada_atomica"));
+        ticks(1);
+        long disparo = agora - 1;
+        assertEquals(1, ctx.arcos.size(), "um corte só");
+        double[] a = ctx.arcos.get(0);
+        assertEquals(12, a[0], "até 12 blocos");
+        assertEquals(120, a[1], "num arco de 120 graus");
+        assertEquals(16, a[3], 1e-6);
+        assertTrue(ctx.visuais.contains("cid_espada_atomica"));
+        assertEquals(70, kit.recurso().atual(), 4, "custa 30");
+        ticks(30);
+        assertEquals(1, ctx.arcos.size());
+        assertFalse(kit.recargas().pronta(Cid.ESPADA_ATOMICA, disparo + 279));
+        assertTrue(kit.recargas().pronta(Cid.ESPADA_ATOMICA, disparo + 280), "recarga de 14 s");
+    }
+
+    @Test
+    void espadaAtomicaInterrompidaDesfazACarga() {
+        kit.definirDesperto(true);
+        usar(Tecla.V);
+        ticks(5);
+        kit.atordoar(agora, ctx);
+        assertTrue(ctx.fins.contains("cid_espada_carga"));
+        ticks(20);
+        assertTrue(ctx.arcos.isEmpty());
+    }
+
+    @Test
+    void noOverdriveAEspadaAtomicaTambemFereMais() {
+        kit.definirDesperto(true);
+        usar(Tecla.G);
+        ticks(10);
+        usar(Tecla.V);
+        ticks(16);
+        assertEquals(20.8, ctx.arcos.get(0)[3], 1e-5);
+    }
+
+    @Test
+    void recoveryAtomicCarregaTresSegundosParadoECuraEmRaioDezesseis() {
+        kit.definirDesperto(true);
+        assertTrue(kit.apertar(Tecla.R, agora, true));
+        ticks(1);
+        assertEquals(List.of(true), ctx.firmes, "cravou a espada: fica preso ao chão");
+        assertTrue(ctx.visuais.contains("cid_recovery_carga"));
+        assertTrue(ctx.animacoes.contains(Cid.RECOVERY));
+        ticks(58);
+        assertTrue(ctx.restauros.isEmpty(), "3 s de carga: dispara no tick 60");
+        ticks(2);
+        assertEquals(List.of(16.0), ctx.restauros);
+        assertEquals(List.of(true, false), ctx.firmes, "solta no disparo");
+        assertTrue(ctx.visuais.contains(Cid.RECOVERY));
+        assertEquals(40, kit.recurso().atual(), 2, "custa 60");
+        assertTrue(ctx.arcos.isEmpty() && ctx.areas.isEmpty() && ctx.danos.isEmpty(), "não fere ninguém");
+    }
+
+    @Test
+    void recoveryDivideARecargaDeNoventaSegundosComOR() {
+        kit.definirDesperto(true);
+        assertTrue(kit.apertar(Tecla.R, agora, true));
+        while (ctx.restauros.isEmpty()) ticks(1);
+        long disparo = agora - 1;
+        assertFalse(kit.recargas().pronta(Cid.RECOVERY, disparo + 1799));
+        assertTrue(kit.recargas().pronta(Cid.RECOVERY, disparo + 1800));
+        // O contexto falso já está um tick adiante quando o golpe põe a recarga do R.
+        assertFalse(kit.recargas().pronta(Cid.ATOMIC, disparo + 1799));
+        assertTrue(kit.recargas().pronta(Cid.ATOMIC, disparo + 1801));
+    }
+
+    @Test
+    void golpeDeOitoOuMaisCancelaORecovery() {
+        kit.definirDesperto(true);
+        assertTrue(kit.apertar(Tecla.R, agora, true));
+        ticks(20);
+        kit.levouDano(7.9f, agora, ctx);
+        assertTrue(kit.execucao().isPresent(), "golpe fraco não cancela");
+        kit.levouDano(8f, agora, ctx);
+        assertTrue(kit.execucao().isEmpty());
+        assertEquals(List.of(true, false), ctx.firmes, "cancelado: ele se solta");
+        assertTrue(ctx.fins.contains("cid_recovery_carga"));
+        assertTrue(ctx.paradas > 0);
+        ticks(60);
+        assertTrue(ctx.restauros.isEmpty());
+        assertEquals(100, kit.recurso().atual(), 1e-6, "cancelado não custa nada");
+        assertTrue(kit.recargas().pronta(Cid.ATOMIC, agora), "e a recarga do R não corre");
+    }
+
+    @Test
+    void morrerCarregandoORecoverySoltaOJogador() {
+        kit.definirDesperto(true);
+        assertTrue(kit.apertar(Tecla.R, agora, true));
+        ticks(20);
+        kit.descartar(ctx);
+        assertEquals(List.of(true, false), ctx.firmes);
+    }
+
+    @Test
+    void oRDePeAindaNaoComeca() {
+        kit.definirDesperto(true);
+        assertFalse(kit.apertar(Tecla.R, agora), "o I Am Atomic final entra na parte 6");
     }
 }

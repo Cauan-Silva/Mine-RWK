@@ -45,6 +45,11 @@ public interface Contexto {
         return Vetor.ZERO;
     }
 
+    /** Os pés do jogador. Não é o mesmo que descer dos olhos: agachado, os olhos ficam mais baixos. */
+    default Vetor pes() {
+        return olhos().mais(new Vetor(0, -1.62, 0));
+    }
+
     /** Para onde o jogador olha, com comprimento 1. */
     default Vetor olhar() {
         return new Vetor(0, 0, 1);
@@ -284,6 +289,27 @@ public interface Contexto {
 
     /** O custo de um golpe no próprio corpo: tira {@code dano} de vida sem armadura no meio e sem matar (para em 1). */
     default void recuo(float dano) {
+    }
+
+    /**
+     * Um corte horizontal: fere quem está no arco de {@code graus} à frente de {@code direcao}, a até
+     * {@code alcance} blocos e a até {@code altura} acima ou abaixo de {@code origem} (ver {@link Arco}).
+     * Devolve quantos feriu.
+     */
+    default int danoEmArco(Vetor origem, Vetor direcao, double alcance, double graus, double altura, float dano) {
+        return 0;
+    }
+
+    /** Prende o jogador ao chão (não anda nem pula) ou solta. Quem prende é quem solta. */
+    default void firmar(boolean preso) {
+    }
+
+    /**
+     * Cura por completo e tira os efeitos ruins do jogador e dos aliados a até {@code raio} blocos: os outros
+     * jogadores e os animais domados. Não fere ninguém. Devolve quantos curou, contando o jogador.
+     */
+    default int restaurar(double raio) {
+        return 0;
     }
 
     /** Acaba na hora os efeitos desse tipo do jogador, com o {@code aoAcabar} deles. */

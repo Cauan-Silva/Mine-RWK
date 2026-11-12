@@ -163,6 +163,11 @@ public final class ContextoServidor implements Contexto {
     }
 
     @Override
+    public Vetor pes() {
+        return vetor(jogador.position());
+    }
+
+    @Override
     public Vetor olhar() {
         return vetor(jogador.getLookAngle());
     }
@@ -515,6 +520,71 @@ public final class ContextoServidor implements Contexto {
     @Override
     public void curar(float vida) {
         jogador.heal(vida);
+    }
+
+    @Override
+    public int danoEmArco(Vetor origem, Vetor direcao, double alcance, double graus, double altura, float dano) {
+        var fonte = jogador.damageSources().playerAttack(jogador);
+        Vec3 centro = vec(origem);
+        int[] feridos = {0};
+        ServicoKits.comoGolpeDoKit(jogador, () -> {
+            for (LivingEntity alvo : nivel().getEntitiesOfClass(LivingEntity.class, new AABB(centro, centro).inflate(alcance, altura + 2, alcance),
+                    e -> afetavel(e) && com.minerwk.core.kit.Arco.contem(origem, direcao, vetor(e.getBoundingBox().getCenter()), alcance, graus, altura))) {
+                if (alvo.hurt(fonte, dano)) feridos[0]++;
+            }
+        });
+        return feridos[0];
+    }
+
+    /** O modificador que prende o jogador ao chão: zera a velocidade de andar e a força do pulo. */
+    private static final ResourceLocation FIRME = com.minerwk.MineRWK.id("firme");
+
+    /** Se o jogador está preso ao chão por {@link #firmar}. */
+    public static boolean firme(ServerPlayer jogador) {
+        var andar = jogador.getAttribute(net.minecraft.world.entity.ai.attributes.Attributes.MOVEMENT_SPEED);
+        return andar != null && andar.hasModifier(FIRME);
+    }
+
+    @Override
+    public void firmar(boolean preso) {
+        // Os atributos chegam sozinhos ao cliente, que é quem move o jogador. Não são salvos: quem sai no meio volta solto.
+        for (var atributo : List.of(net.minecraft.world.entity.ai.attributes.Attributes.MOVEMENT_SPEED,
+                net.minecraft.world.entity.ai.attributes.Attributes.JUMP_STRENGTH)) {
+            var instancia = jogador.getAttribute(atributo);
+            if (instancia == null) continue;
+            instancia.removeModifier(FIRME);
+            if (preso) {
+                instancia.addTransientModifier(new net.minecraft.world.entity.ai.attributes.AttributeModifier(FIRME, -1,
+                        net.minecraft.world.entity.ai.attributes.AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL));
+            }
+        }
+        if (preso) {
+            jogador.setDeltaMovement(0, Math.min(0, jogador.getDeltaMovement().y), 0);
+            jogador.hurtMarked = true;
+        }
+    }
+
+    @Override
+    public int restaurar(double raio) {
+        Vec3 centro = jogador.position();
+        // Aliados: os outros jogadores e os animais que têm dono. Nunca monstros, nem os bichos soltos.
+        List<LivingEntity> curados = new java.util.ArrayList<>(nivel().getEntitiesOfClass(LivingEntity.class,
+                new AABB(centro, centro).inflate(raio), e -> e != jogador && e.isAlive() && !e.isSpectator()
+                        && e.position().distanceToSqr(centro) <= raio * raio
+                        && (e instanceof Player || e instanceof OwnableEntity dono && dono.getOwnerUUID() != null)));
+        curados.add(jogador);
+        for (LivingEntity e : curados) {
+            e.setHealth(e.getMaxHealth());
+            // Jogador sem conexão (GameTest): tirar o efeito manda pacote a ele e não tem para quem.
+            if (e instanceof ServerPlayer p && p.connection == null) continue;
+            for (var efeito : List.copyOf(e.getActiveEffects())) {
+                if (efeito.getEffect().value().getCategory() == net.minecraft.world.effect.MobEffectCategory.HARMFUL) {
+                    e.removeEffect(efeito.getEffect());
+                }
+            }
+            e.clearFire();
+        }
+        return curados.size();
     }
 
     private Optional<KitDoJogador> kit() {

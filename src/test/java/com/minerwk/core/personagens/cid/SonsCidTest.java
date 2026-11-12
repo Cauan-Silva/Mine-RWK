@@ -74,10 +74,11 @@ class SonsCidTest {
 
     @Test
     void cadaVisualDoKitTemOSeuSomEOClienteOAcha() {
-        // Os visuais que o kit manda: os quatro golpes (a Prisão manda dois) e o traje.
+        // Os visuais que o kit manda: os quatro golpes base (a Prisão manda dois), o traje e os dois atômicos
+        // (cada um com a carga e o golpe).
         Set<String> usados = new HashSet<>();
         for (String tipo : new String[] {Cid.Redemoinho.VISUAL, Cid.PosImagem.VISUAL, Cid.Prisao.VISUAL, Cid.Prisao.CORRENTES,
-                Cid.OVERDRIVE, Cid.TRAJE}) {
+                Cid.OVERDRIVE, Cid.TRAJE, Cid.EspadaAtomica.CARGA, Cid.ESPADA_ATOMICA, Cid.RecoveryAtomic.CARGA, Cid.RECOVERY}) {
             usados.add(SonsCid.doVisual(tipo).orElseThrow());
             assertEquals(SonsCid.doVisual(tipo), SonsDosVisuais.doVisual(tipo), tipo);
         }
@@ -90,7 +91,15 @@ class SonsCidTest {
     }
 
     @Test
-    void soOZumbidoDoOverdriveParaComOVisual() {
+    void asCargasAtomicasParamQuandoSaoInterrompidas() {
+        assertTrue(SonsCid.cortaComOVisual(Cid.EspadaAtomica.CARGA));
+        assertTrue(SonsCid.cortaComOVisual(Cid.RecoveryAtomic.CARGA), "um golpe forte cancelou: o acorde para");
+        assertFalse(SonsCid.cortaComOVisual(Cid.ESPADA_ATOMICA));
+        assertFalse(SonsCid.cortaComOVisual(Cid.RECOVERY));
+    }
+
+    @Test
+    void oZumbidoDoOverdriveParaComOVisualEOsGolpesBaseNao() {
         assertTrue(SonsCid.cortaComOVisual(Cid.OVERDRIVE), "desligou com G: o zumbido para");
         assertTrue(SonsDosVisuais.cortaComOVisual(Cid.OVERDRIVE));
         assertFalse(SonsCid.cortaComOVisual(Cid.Prisao.VISUAL), "o slime que bate cedo ainda soa o arremesso");
@@ -114,6 +123,12 @@ class SonsCidTest {
         assertEquals(FormasCid.ESTOURO, marco(m, SonsCid.OVERDRIVE, "estouro"));
         assertEquals(Cid.Overdrive.DURACAO, marco(m, SonsCid.OVERDRIVE, "fim"), "o zumbido dura o Overdrive");
         assertEquals(FormasCid.TRAJE, marco(m, SonsCid.TRAJE, "fim"));
+        assertEquals(FormasCid.CARGA_DA_ESPADA, marco(m, SonsCid.ESPADA_CARGA, "fim"), "o tom sobe até o corte");
+        assertEquals(FormasCid.VOO_DO_CORTE, marco(m, SonsCid.ESPADA_ATOMICA, "voo"));
+        assertEquals(FormasCid.CORTE_ATOMICO, marco(m, SonsCid.ESPADA_ATOMICA, "fim"));
+        assertEquals(FormasCid.CARGA_DO_RECOVERY, marco(m, SonsCid.RECOVERY_CARGA, "fim"), "o acorde cresce os 3 s");
+        assertEquals(FormasCid.ONDA, marco(m, SonsCid.RECOVERY, "onda"));
+        assertEquals(FormasCid.COLUNA, marco(m, SonsCid.RECOVERY, "fim"));
         for (String som : SonsCid.TODOS) {
             JsonObject s = m.getAsJsonObject(som);
             assertFalse(s.getAsJsonObject("marcos").isEmpty(), som + " tem ao menos um marco conferido");

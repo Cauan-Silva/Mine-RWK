@@ -8,7 +8,9 @@ SonsCidTest confere os MARCOS contra o kit. Mudou um tempo no Java, mudar aqui e
 O som do Cid é de slime e de magia contida: a lâmina é fina e molhada (um silvo curto, sem o aço cheio do
 Ichigo), o slime é um estalo úmido e grave, as correntes são elos secos que correm e travam, e a magia é
 um zumbido grave, com dois tons quase juntos batendo um no outro. Nada de vidro (Gojo) nem de rugido (Hollow).
-Esta é a parte 4: os golpes base. O Atomic e o Ragnarok ganham os seus sons nas partes deles.
+O atômico é a mesma magia, só que limpa: um tom que sobe e some, e um acorde claro quando ela se solta.
+Partes 4 e 5: os golpes base, a Espada Atômica e o Recovery Atomic. O I Am Atomic final e o Ragnarok ganham
+os seus sons nas partes deles.
 """
 import argparse
 import numpy as np
@@ -21,6 +23,8 @@ VOO = 10 * T              # Cid.Prisao: ALCANCE / PASSO, o voo inteiro do slime
 FECHAR, SOLTAR, PRESO = 4 * T, 6 * T, 50 * T   # FormasCid.FECHAR e SOLTAR, e Cid.Prisao.PRESO
 ESTOURO, OVERDRIVE = 8 * T, 160 * T    # FormasCid.ESTOURO e Cid.Overdrive.DURACAO
 TRAJE = 12 * T            # FormasCid.TRAJE
+CARGA_DA_ESPADA, VOO_DO_CORTE, CORTE_ATOMICO = 12 * T, 4 * T, 10 * T   # FormasCid, os mesmos nomes
+CARGA_DO_RECOVERY, ONDA, COLUNA = 60 * T, 10 * T, 40 * T               # FormasCid, os mesmos nomes
 
 # nome -> (duração em s, alcance em blocos, legenda pt, legenda en)
 SONS = {
@@ -30,6 +34,10 @@ SONS = {
     'cid_correntes': (PRESO + .4, 32, 'Correntes negras se fecham', 'Black chains snap shut'),
     'cid_overdrive': (OVERDRIVE + .3, 32, 'A magia transborda', 'Magic overflows'),
     'cid_traje': (TRAJE + .3, 24, 'O traje de slime absorve o golpe', 'The slime suit absorbs the blow'),
+    'cid_espada_carga': (CARGA_DA_ESPADA + .1, 32, 'A magia se junta na lâmina', 'Magic gathers on the blade'),
+    'cid_espada_atomica': (CORTE_ATOMICO + .9, 48, 'A Espada Atômica corta', 'The Atomic Sword cuts'),
+    'cid_recovery_carga': (CARGA_DO_RECOVERY + .1, 32, 'Shadow crava a espada no chão', 'Shadow plants the sword in the ground'),
+    'cid_recovery': (COLUNA + 1.2, 64, 'Uma coluna de luz cura', 'A pillar of light heals'),
 }
 
 
@@ -46,6 +54,10 @@ MARCOS = {
     'cid_correntes': {'fecha': ticks(FECHAR), 'soltar': ticks(SOLTAR), 'solta': ticks(PRESO)},
     'cid_overdrive': {'estouro': ticks(ESTOURO), 'fim': ticks(OVERDRIVE)},
     'cid_traje': {'fim': ticks(TRAJE)},
+    'cid_espada_carga': {'fim': ticks(CARGA_DA_ESPADA)},
+    'cid_espada_atomica': {'voo': ticks(VOO_DO_CORTE), 'fim': ticks(CORTE_ATOMICO)},
+    'cid_recovery_carga': {'fim': ticks(CARGA_DO_RECOVERY)},
+    'cid_recovery': {'onda': ticks(ONDA), 'fim': ticks(COLUNA)},
 }
 
 
@@ -125,6 +137,41 @@ def sintese(nome, s):
         espirra = .5 * s.passa_baixa(s.ruido(400, 5000, .4), 3000) * s.env(.01, .01, 12)
         volta = .3 * sum(s.tom(240 + 70 * k, 420 + 90 * k, .6, .12 + .07 * k, .18 + .07 * k) * s.env(.12 + .07 * k, .004, 40) for k in range(4))
         return s.reverb(engole + espirra + volta, .5, .15, 3500)
+    if nome == 'cid_espada_carga':
+        # A magia corre para a lâmina: o zumbido cresce e um tom limpo sobe até o corte (que é outro som).
+        sobe = .5 * s.tom(220, 1320, 1.6, 0, CARGA_DA_ESPADA, (1, 2.01, 3.02)) * s.crescer(0, CARGA_DA_ESPADA, 1.3)
+        zumbe = .5 * s.passa_baixa(magia(s, 70, 5), 1200) * s.crescer(0, CARGA_DA_ESPADA, 1.)
+        puxa = .3 * s.ruido(900, 9000, .3) * s.crescer(0, CARGA_DA_ESPADA, 2.2)
+        return s.reverb((sobe + zumbe + puxa) * s.janela(0, CARGA_DA_ESPADA + .05, .03), .4, .15, 7000)
+    if nome == 'cid_espada_atomica':
+        # O corte: um estalo seco, o silvo largo que voa os 4 ticks até o alcance, o grave por baixo e o
+        # tom atômico descendo e sumindo na cauda.
+        corta = 1.3 * s.transiente(0, 8000, .008) + 1.1 * silvo(s, 0, VOO_DO_CORTE + .12, 600, 14000, .7)
+        peso = 1.2 * s.sub(0, 120, 36, 4, 3.5)
+        tomq = .4 * s.tom(1320, 440, .6, 0, CORTE_ATOMICO + .5, (1, 2.01, 3.02)) * s.env(0, .004, 5)
+        brilho = .25 * s.girar(s.ruido(4000, 14000, .2), hz=17, prof=.7) * s.env(.02, .01, 6)
+        rastro = .3 * s.passa_baixa(magia(s, 82, 4), 1500) * s.env(0, .02, 4.5)
+        return s.reverb(corta + peso + tomq + brilho + rastro, 1.3, .28, 7500)
+    if nome == 'cid_recovery_carga':
+        # A espada entra no chão (um baque e o aço), e a luz sobe devagar os 3 s: um acorde claro que cresce,
+        # com o zumbido da magia por baixo, até a coluna (que é outro som).
+        crava = 1.0 * s.sub(0, 110, 45, 9, 3) + .8 * s.transiente(0, 5500, .008) + .35 * elos(s, 0, .05, 80, 2600)
+        acorde = sum(a * s.tom(f, f * 1.012, 1., 0, CARGA_DO_RECOVERY, (1, 2.005), vibrato=.004, vib_hz=4.5)
+                     for f, a in ((262, .5), (392, .4), (523, .35), (784, .22)))
+        acorde = .4 * s.girar(acorde, hz=.8, prof=.3) * s.crescer(.15, CARGA_DO_RECOVERY, 1.5)
+        zumbe = .28 * s.passa_baixa(magia(s, 65, 2.4), 800) * s.crescer(.1, CARGA_DO_RECOVERY, 1.)
+        ar = .16 * s.ruido(3000, 12000, .2) * s.crescer(.5, CARGA_DO_RECOVERY, 2.5)
+        return crava + s.reverb((acorde + zumbe + ar) * s.janela(0, CARGA_DO_RECOVERY + .05, .04), 1.2, .3, 6500)
+    if nome == 'cid_recovery':
+        # A coluna sobe: o acorde abre de uma vez, largo e claro, a onda corre pelo chão (10 ticks) e tudo
+        # fica soando e some com a luz.
+        abre = 1.0 * s.sub(0, 90, 40, 2.2, 3) + .7 * s.transiente(0, 5000, .012) + .7 * silvo(s, 0, ONDA, 500, 10000, .6)
+        acorde = sum(a * s.tom(f, harmonicos=(1, 2.005, 3.01), vibrato=.004, vib_hz=5)
+                     for f, a in ((262, .5), (330, .35), (392, .45), (523, .4), (784, .28), (1047, .16)))
+        acorde = .5 * acorde * s.env(0, .03, 1.6, .25) * s.janela(0, COLUNA + .9, .6)
+        sinos = .25 * sum(s.tom(1568 * (1 + .25 * k), harmonicos=(1, 2.76)) * s.env(.08 + .11 * k, .002, 7) for k in range(6))
+        ar = .2 * s.girar(s.ruido(2500, 12000, .25), hz=6, prof=.5) * s.janela(0, COLUNA, .5)
+        return abre + s.reverb(acorde + sinos + ar, 2.0, .35, 7000)
     raise ValueError(nome)
 
 

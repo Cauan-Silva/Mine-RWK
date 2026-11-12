@@ -23,6 +23,8 @@ import net.minecraft.world.phys.Vec3;
  */
 final class RenderVisuaisCid {
     private static final int TINTA = 0x0B0912, EBANO = 0x1B1626, MAGIA = 0x7A5CFF, CLARO = 0xCBBEFF, ROXO = 0x5B2FA8;
+    /** O miolo da luz atômica, quase branco. */
+    private static final int BRANCO = 0xF4F0FF;
     private static final Vec3 CIMA = new Vec3(0, 1, 0);
     private static final double ALCANCE = 128;
 
@@ -49,6 +51,10 @@ final class RenderVisuaisCid {
                 case "cid_correntes" -> correntes(v, o, t);
                 case "cid_overdrive" -> overdrive(camera, parcial, v, o, t, sai);
                 case "cid_traje" -> traje(camera, parcial, v, o, t);
+                case "cid_espada_carga" -> cargaDaEspada(camera, parcial, v, o, t, sai);
+                case "cid_espada_atomica" -> corteAtomico(v, o, t);
+                case "cid_recovery_carga" -> cargaDoRecovery(v, o, t, sai);
+                case "cid_recovery" -> recovery(v, o, t);
                 default -> {
                 }
             }
@@ -152,6 +158,19 @@ final class RenderVisuaisCid {
         quad(e, d, h, i, cor, alpha);
         quad(a, e, i, f, luz(cor, .8), alpha);
         quad(b, d, h, g, luz(cor, .8), alpha);
+    }
+
+    /** Parede de cilindro em pé, de {@code y0} a {@code y1}, com a opacidade de cada beirada. */
+    private static void parede(Vec3 c, double raio, double y0, double y1, int cor, float embaixo, float emCima) {
+        int n = 32;
+        for (int i = 0; i < n; i++) {
+            double a0 = Math.PI * 2 * i / n, a1 = Math.PI * 2 * (i + 1) / n;
+            Vec3 u0 = new Vec3(Math.cos(a0) * raio, 0, Math.sin(a0) * raio), u1 = new Vec3(Math.cos(a1) * raio, 0, Math.sin(a1) * raio);
+            ponto(c.add(u0).add(0, y0, 0), cor, embaixo);
+            ponto(c.add(u0).add(0, y1, 0), cor, emCima);
+            ponto(c.add(u1).add(0, y1, 0), cor, emCima);
+            ponto(c.add(u1).add(0, y0, 0), cor, embaixo);
+        }
     }
 
     private static double acaso(double n) {
@@ -416,5 +435,172 @@ final class RenderVisuaisCid {
         Vec3 p = pes.add(Math.cos(a) * r, fase * 2.1, Math.sin(a) * r);
         Vec3 q = pes.add(Math.cos(a + .25) * r * .9, fase * 2.1 + .6, Math.sin(a + .25) * r * .9);
         fita(p, q, largura, cor, 0, alpha * (float) Math.sin(Math.PI * fase));
+    }
+
+    // ---------------------------------------------------------------- V: Espada Atômica
+
+    /** A carga: a magia corre do chão e do ar para a lâmina, que acende. */
+    private static void cargaDaEspada(Vec3 camera, float parcial, VisuaisAtivos.Visual v, Vec3 o, double t, float sai) {
+        Vec3 pes = pes(camera, parcial, v, o.add(0, -1.62, 0));
+        float junta = sai * (float) FormasCid.cargaDaEspada(t);
+        float vida = sai * (float) Math.min(1, t / 2);
+        if (vida <= .01f) return;
+        Vec3 d = vec(v.direcao);
+        Vec3 frente = new Vec3(d.x, 0, d.z);
+        frente = frente.lengthSqr() < 1e-6 ? new Vec3(0, 0, 1) : frente.normalize();
+        // A lâmina, erguida ao lado do corpo.
+        Vec3 lamina = pes.add(frente.scale(.35)).add(frente.cross(CIMA).scale(.45)).add(0, 1.5, 0);
+        abrir(true);
+        // O anel no chão fecha em direção aos pés conforme a carga junta.
+        double r = 3.2 - 2.4 * junta;
+        anel(pes.add(0, .05, 0), r * .8, r, MAGIA, 0, vida * .6f);
+        if (!euEmPrimeiraPessoa(v)) {
+            for (int k = 0; k < 16; k++) {
+                // Cada risco nasce longe e corre para a lâmina.
+                double fase = (t / 7 + acaso(k)) % 1, a = Math.PI * 2 * acaso(k + 30), sobe = acaso(k + 60) * 2.2;
+                Vec3 longe = pes.add(Math.cos(a) * 3, sobe, Math.sin(a) * 3);
+                Vec3 p0 = longe.add(lamina.subtract(longe).scale(fase)), p1 = longe.add(lamina.subtract(longe).scale(Math.min(1, fase + .22)));
+                fita(p0, p1, .05, k % 3 == 0 ? CLARO : MAGIA, 0, vida * (float) Math.sin(Math.PI * fase));
+            }
+            fita(lamina.add(0, -.5, 0), lamina.add(0, .9, 0), .1 + .1 * junta, BRANCO, vida * .3f, junta);
+            halo(lamina.add(0, .3, 0), .5 + 1.1 * junta, MAGIA, .25f * vida + .55f * junta);
+            halo(lamina.add(0, .3, 0), .25 + .4 * junta, BRANCO, junta * .8f);
+        }
+        fechar();
+    }
+
+    /** O corte: uma meia-lua de luz que sai da lâmina e voa deitada até o alcance, com tinta por baixo. */
+    private static void corteAtomico(VisuaisAtivos.Visual v, Vec3 o, double t) {
+        float vida = (float) FormasCid.corteAtomico(t);
+        if (vida <= .01f) return;
+        Vec3 d = vec(v.direcao);
+        // Olhando reto para cima ou para baixo não há frente: o corte (e o dano) dá a volta toda.
+        boolean semFrente = d.x * d.x + d.z * d.z < 1e-8;
+        double frente = Math.atan2(d.z, d.x), meio = semFrente ? Math.PI : Math.toRadians(FormasCid.ARCO_DO_CORTE / 2);
+        double raio = FormasCid.raioDoCorte(t), cauda = Math.max(.6, raio * .55);
+        // Um pouco abaixo dos olhos: na altura do peito, onde a espada passa.
+        Vec3 c = o.add(0, -.45, 0);
+        int n = 28;
+        Vec3[] fora = new Vec3[n + 1], dentro = new Vec3[n + 1];
+        float[] alpha = new float[n + 1];
+        for (int i = 0; i <= n; i++) {
+            double u = i / (double) n, a = frente - meio + 2 * meio * u;
+            Vec3 rumo = new Vec3(Math.cos(a), 0, Math.sin(a));
+            // A meia-lua é mais grossa no meio e afina nas pontas.
+            double gordo = Math.sin(Math.PI * u);
+            fora[i] = c.add(rumo.scale(raio));
+            dentro[i] = c.add(rumo.scale(raio - cauda * (.25 + .75 * gordo)));
+            alpha[i] = vida * (float) (.35 + .65 * gordo);
+        }
+        abrir(false);
+        for (int i = 0; i < n; i++) {
+            ponto(dentro[i], TINTA, 0);
+            ponto(fora[i], TINTA, alpha[i] * .55f);
+            ponto(fora[i + 1], TINTA, alpha[i + 1] * .55f);
+            ponto(dentro[i + 1], TINTA, 0);
+            // Por baixo da luz, o fio em roxo opaco: de dia a luz sozinha some contra o céu e a grama.
+            fita(fora[i], fora[i + 1], .7, ROXO, alpha[i] * .8f, alpha[i + 1] * .8f);
+        }
+        fechar();
+        abrir(true);
+        for (int i = 0; i < n; i++) {
+            ponto(dentro[i], MAGIA, 0);
+            ponto(fora[i], MAGIA, alpha[i] * .75f);
+            ponto(fora[i + 1], MAGIA, alpha[i + 1] * .75f);
+            ponto(dentro[i + 1], MAGIA, 0);
+            fita(fora[i], fora[i + 1], 1.5, MAGIA, alpha[i] * .5f, alpha[i + 1] * .5f);
+            fita(fora[i], fora[i + 1], .32, BRANCO, alpha[i], alpha[i + 1]);
+        }
+        // O clarão na lâmina, no instante do corte.
+        float clarao = (float) Math.max(0, 1 - t / 3);
+        halo(c.add(new Vec3(d.x, 0, d.z).scale(1.2)), 2.4, CLARO, clarao * .8f);
+        // Faíscas que ficam para trás da frente do corte.
+        for (int k = 0; k < 18; k++) {
+            double a = frente - meio + 2 * meio * acaso(k), r = raio * (.35 + .6 * acaso(k + 20));
+            Vec3 p = c.add(Math.cos(a) * r, (acaso(k + 40) - .5) * .5, Math.sin(a) * r);
+            fita(p, p.add(Math.cos(a) * .7, 0, Math.sin(a) * .7), .05, CLARO, 0, vida * .8f);
+        }
+        fechar();
+    }
+
+    // ---------------------------------------------------------------- Agachado + R: Recovery Atomic
+
+    /** A carga: a espada cravada acende, o círculo abre no chão até o raio da cura e a luz sobe devagar. */
+    private static void cargaDoRecovery(VisuaisAtivos.Visual v, Vec3 o, double t, float sai) {
+        float vida = sai * (float) Math.min(1, t / 4);
+        if (vida <= .01f) return;
+        double u = Mth.clamp(t / FormasCid.CARGA_DO_RECOVERY, 0, 1), r = FormasCid.circulo(t);
+        Vec3 chao = o.add(0, .06, 0);
+        boolean primeira = euEmPrimeiraPessoa(v);
+        // Por baixo da luz, o círculo em roxo opaco: de dia a luz sozinha some contra a grama.
+        abrir(false);
+        anel(chao, r - .5, r, ROXO, vida * .25f, vida * .85f);
+        anel(chao, 0, r - .5, ROXO, vida * .1f, vida * (.1f + .15f * (float) u));
+        anel(chao, 1.2, 1.6, ROXO, vida * .8f, vida * .8f);
+        fechar();
+        abrir(true);
+        // O círculo que cresce, e dois anéis fixos em volta da espada.
+        anel(chao, r - .35, r, MAGIA, 0, vida * .8f);
+        anel(chao, r - .08, r, BRANCO, vida * .6f, vida * .6f);
+        anel(chao, 0, r, MAGIA, vida * .04f, vida * (.05f + .1f * (float) u));
+        anel(chao, 1.3, 1.5, CLARO, vida * .7f, vida * .7f);
+        for (int k = 0; k < 8; k++) {
+            // Os raios do selo, girando devagar.
+            double a = Math.PI * 2 * k / 8 + t * .02;
+            Vec3 p0 = chao.add(Math.cos(a) * 1.5, 0, Math.sin(a) * 1.5), p1 = chao.add(Math.cos(a) * Math.min(r, 3.2), 0, Math.sin(a) * Math.min(r, 3.2));
+            ponto(p0.add(Math.cos(a + 1.57) * .04, 0, Math.sin(a + 1.57) * .04), CLARO, vida * .6f);
+            ponto(p0.subtract(Math.cos(a + 1.57) * .04, 0, Math.sin(a + 1.57) * .04), CLARO, vida * .6f);
+            ponto(p1.subtract(Math.cos(a + 1.57) * .04, 0, Math.sin(a + 1.57) * .04), CLARO, 0);
+            ponto(p1.add(Math.cos(a + 1.57) * .04, 0, Math.sin(a + 1.57) * .04), CLARO, 0);
+        }
+        // A luz que sobe do chão dentro do círculo, mais densa perto do fim.
+        for (int k = 0; k < 60; k++) {
+            double raioK = Math.sqrt(acaso(k)) * FormasCid.RAIO_DO_RECOVERY;
+            if (raioK > r) continue;
+            double a = Math.PI * 2 * acaso(k + 100), fase = (t / (26 + 20 * acaso(k + 200)) + acaso(k + 300)) % 1;
+            Vec3 p = chao.add(Math.cos(a) * raioK, fase * (1.5 + 2.5 * u), Math.sin(a) * raioK);
+            fita(p, p.add(0, .5 + .7 * u, 0), .1, k % 4 == 0 ? BRANCO : CLARO, 0, vida * (float) Math.sin(Math.PI * fase));
+        }
+        if (!primeira) {
+            // A espada cravada à frente dele: um fio de luz que cresce para cima.
+            fita(chao, chao.add(0, 1.2 + 5 * u * u, 0), .12 + .2 * u, BRANCO, vida, 0);
+            halo(chao.add(0, .9, 0), 1 + 1.6 * u, MAGIA, vida * (.25f + .35f * (float) u));
+        }
+        fechar();
+    }
+
+    /** A coluna de luz: o pilar no Cid, a onda que corre pelo chão até o raio da cura e a luz subindo em tudo. */
+    private static void recovery(VisuaisAtivos.Visual v, Vec3 o, double t) {
+        float vida = (float) FormasCid.coluna(t);
+        if (vida <= .01f) return;
+        double raio = FormasCid.RAIO_DO_RECOVERY, onda = FormasCid.onda(t), u = t / FormasCid.COLUNA;
+        Vec3 chao = o.add(0, .06, 0);
+        boolean primeira = euEmPrimeiraPessoa(v);
+        abrir(true);
+        // O chão inteiro do círculo aceso, e a borda.
+        anel(chao, 0, raio, MAGIA, vida * .1f, vida * .16f);
+        anel(chao, raio - .3, raio, CLARO, 0, vida * .8f);
+        // A onda de cura.
+        float frente = (float) Math.max(0, 1 - t / (FormasCid.ONDA + 4.0));
+        anel(chao, onda * .75, onda, BRANCO, 0, frente);
+        parede(chao, onda, 0, 1.6, CLARO, frente * .5f, 0);
+        // A parede de luz na borda: baixa, para não tapar quem está dentro.
+        parede(chao, raio, 0, 5 + 3 * u, MAGIA, vida * .3f, 0);
+        // O pilar no meio. Em primeira pessoa ele taparia a tela: fica só o resto.
+        if (!primeira) {
+            double grosso = 1.5 * (1 - .5 * u);
+            parede(chao, grosso, 0, 40, MAGIA, vida * .55f, 0);
+            parede(chao, grosso * .55, 0, 40, BRANCO, vida * .7f, 0);
+            halo(chao.add(0, 1.2, 0), 4.5, CLARO, vida * .5f);
+        }
+        // A luz subindo por todo o círculo.
+        for (int k = 0; k < 110; k++) {
+            double raioK = Math.sqrt(acaso(k)) * raio, a = Math.PI * 2 * acaso(k + 100);
+            if (raioK > onda + .5 || (primeira && raioK < 1.2)) continue;
+            double fase = (t / (14 + 12 * acaso(k + 200)) + acaso(k + 300)) % 1;
+            Vec3 p = chao.add(Math.cos(a) * raioK, fase * 6, Math.sin(a) * raioK);
+            fita(p, p.add(0, 1.1, 0), .07, k % 3 == 0 ? BRANCO : CLARO, 0, vida * (float) Math.sin(Math.PI * fase));
+        }
+        fechar();
     }
 }

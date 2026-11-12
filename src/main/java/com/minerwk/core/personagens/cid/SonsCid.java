@@ -15,8 +15,12 @@ public final class SonsCid {
     public static final String CORRENTES = "cid_correntes";
     public static final String OVERDRIVE = "cid_overdrive";
     public static final String TRAJE = "cid_traje";
+    /** A Espada Atômica e o Recovery Atomic: a carga é um som e o golpe é outro. */
+    public static final String ESPADA_CARGA = "cid_espada_carga", ESPADA_ATOMICA = "cid_espada_atomica";
+    public static final String RECOVERY_CARGA = "cid_recovery_carga", RECOVERY = "cid_recovery";
 
-    public static final List<String> TODOS = List.of(REDEMOINHO, POS_IMAGEM, SLIME, CORRENTES, OVERDRIVE, TRAJE);
+    public static final List<String> TODOS = List.of(REDEMOINHO, POS_IMAGEM, SLIME, CORRENTES, OVERDRIVE, TRAJE,
+            ESPADA_CARGA, ESPADA_ATOMICA, RECOVERY_CARGA, RECOVERY);
 
     private SonsCid() {
     }
@@ -28,10 +32,11 @@ public final class SonsCid {
     }
 
     /**
-     * Se o som do visual {@code tipo} para quando o visual é encerrado antes da hora: só o zumbido do
-     * Overdrive (desligado com G, ou quem o usa morreu). O slime que bate cedo ainda soa o arremesso, que é curto.
+     * Se o som do visual {@code tipo} para quando o visual é encerrado antes da hora: o zumbido do Overdrive
+     * (desligado com G, ou quem o usa morreu) e as duas cargas atômicas (interrompidas; no disparo elas já
+     * acabaram). O slime que bate cedo ainda soa o arremesso, que é curto.
      */
     public static boolean cortaComOVisual(String tipo) {
-        return tipo.equals(OVERDRIVE);
+        return tipo.equals(OVERDRIVE) || tipo.equals(ESPADA_CARGA) || tipo.equals(RECOVERY_CARGA);
     }
 }

@@ -64,6 +64,24 @@ A["cid_overdrive"] = anim(0.7, {
     "head": [(0, N), (0.10, [14, 0, 0], OUTC), (0.18, [-22, 0, 0], EXPO), (0.45, [-18, 0, 0]), (0.7, N, C)],
 })
 
+# V, a Espada Atômica: 0,6 s de carga com a espada armada para trás, à direita, o tronco torcido; o corte
+# atravessa na horizontal de uma vez, e 0,4 s de saída.
+A["cid_espada_atomica"] = anim(1.3, {
+    "right_arm": [(0, N), (0.45, [-78, 0, 96], OUTC), (0.60, [-84, 0, 104]), (0.68, [-86, 0, -48], EXPO), (0.95, [-80, 0, -42]), (1.3, N, C)],
+    "left_arm": [(0, N), (0.45, [-30, 0, -8], OUTC), (0.60, [-34, 0, -8]), (0.68, [30, 0, -38], EXPO), (0.95, [26, 0, -32]), (1.3, N, C)],
+    "torso": [(0, N), (0.45, [0, -38, 0], OUTC), (0.60, [0, -44, 0]), (0.68, [5, 46, 0], EXPO), (0.95, [4, 40, 0]), (1.3, N, C)],
+    "head": [(0, N), (0.45, [0, 30, 0], OUTC), (0.60, [0, 34, 0]), (0.68, [2, -30, 0], EXPO), (0.95, [2, -26, 0]), (1.3, N, C)],
+})
+
+# Agachado + R, o Recovery Atomic: ele crava a espada à frente com as duas mãos e fica 3 s de cabeça baixa;
+# quando a coluna sobe, ergue o rosto. 0,5 s de disparo e 0,5 s de saída.
+A["cid_recovery"] = anim(4.0, {
+    "right_arm": [(0, N), (0.18, [-150, -10, 0], OUTC), (0.34, [-52, -24, 0], EXPO), (3.0, [-50, -24, 0]), (3.5, [-46, -22, 0]), (4.0, N, C)],
+    "left_arm": [(0, N), (0.18, [-150, 10, 0], OUTC), (0.34, [-52, 24, 0], EXPO), (3.0, [-50, 24, 0]), (3.5, [-46, 22, 0]), (4.0, N, C)],
+    "torso": [(0, N), (0.18, [-8, 0, 0], OUTC), (0.34, [16, 0, 0], EXPO), (3.0, [14, 0, 0]), (3.12, [-4, 0, 0], OUTC), (3.5, [-4, 0, 0]), (4.0, N, C)],
+    "head": [(0, N), (0.18, [-12, 0, 0], OUTC), (0.34, [24, 0, 0], EXPO), (3.0, [22, 0, 0]), (3.12, [-30, 0, 0], OUTC), (3.5, [-28, 0, 0]), (4.0, N, C)],
+})
+
 saida = {"format_version": "1.8.0", "geckolib_format_version": 2, "animations": A}
 p = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "src/main/resources/assets/minerwk/player_animations/cid.json")
 with open(p, "w", encoding="utf-8") as f:

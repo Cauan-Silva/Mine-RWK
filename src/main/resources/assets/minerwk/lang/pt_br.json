@@ -54,6 +54,12 @@
   "habilidade.minerwk.cid_prisao.desc": "Lança slime; 1 s depois, correntes prendem quem foi acertado.",
   "habilidade.minerwk.cid_overdrive": "Overdrive",
   "habilidade.minerwk.cid_overdrive.desc": "8 s com +30% de dano e velocidade, sem regenerar Magia. Aperte de novo para desligar.",
+  "habilidade.minerwk.cid_espada_atomica": "Espada Atômica",
+  "habilidade.minerwk.cid_espada_atomica.desc": "Um corte horizontal de luz: fere quem está a até 12 blocos à sua frente.",
+  "habilidade.minerwk.cid_atomic": "I Am Atomic",
+  "habilidade.minerwk.cid_atomic.desc": "Agachado: Recovery Atomic. Crava a espada por 3 s e cura você e os aliados em volta.",
+  "habilidade.minerwk.cid_recovery": "Recovery Atomic",
+  "habilidade.minerwk.cid_recovery.desc": "Crava a espada por 3 s e cura por completo você e os aliados a até 16 blocos.",
   "forma.minerwk.bankai": "Bankai",
   "forma.minerwk.hollow": "Forma Hollow",
   "habilidade.minerwk.gojo_azul": "Azul",
@@ -255,5 +261,9 @@
   "subtitles.minerwk.cid_slime": "Um pedaço de slime é lançado",
   "subtitles.minerwk.cid_correntes": "Correntes negras se fecham",
   "subtitles.minerwk.cid_overdrive": "A magia transborda",
-  "subtitles.minerwk.cid_traje": "O traje de slime absorve o golpe"
+  "subtitles.minerwk.cid_traje": "O traje de slime absorve o golpe",
+  "subtitles.minerwk.cid_espada_carga": "A magia se junta na lâmina",
+  "subtitles.minerwk.cid_espada_atomica": "A Espada Atômica corta",
+  "subtitles.minerwk.cid_recovery_carga": "Shadow crava a espada no chão",
+  "subtitles.minerwk.cid_recovery": "Uma coluna de luz cura"
 }

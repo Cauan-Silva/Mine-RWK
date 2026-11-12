@@ -24,6 +24,15 @@ Voltar para [[00 Início]].
 - Gojo (revisão 09/11, menores que ficaram): o Roxo pode derrubar plantas vizinhas (o `BreakEvent` para mods de proteção entrou em 09/11, no Gojo peso); o Vermelho atravessa parede fina encostada no rosto; bola de fogo e crânio de Wither voltam a acelerar no Infinito (o dano é cancelado mesmo assim); TNT sem dono passa pelo Infinito; sobram até 2 ticks de Infinito e 5 de Paralisia depois de morrer. Corrigidos na revisão: efeitos acabam ao mudar de dimensão; golpes não atingem pets, montaria nem projéteis do próprio Gojo; Paralisia não cancela Espinhos nem dano em si mesmo; ícone da Paralisia escondido (falta textura).
 
 ## Para testar no jogo
+- Cid, parte 5, a Espada Atômica e o Recovery Atomic (12/11): **ver primeiro** `previas/cid_parte5_atomico.mp4` e ouvir `previas/sfx_cid_parte5.wav` (os dez sons do Cid; os quatro novos são os últimos). No jogo: `/rwk trocar <jogador> cid` e `/rwk despertar <jogador> sim` (os dois golpes são trancados).
+  - **V (Espada Atômica):** 0,6 s de carga com a magia correndo para a lâmina, e a meia-lua de luz voa deitada até 12 blocos. O arco de 120° pega quem se espera? O corte atravessa parede (como o Redemoinho): incomoda? Em primeira pessoa a carga mostra só o anel no chão.
+  - **Agachado + R (Recovery Atomic):** ele fica preso ao chão os 3 s (não anda nem pula). **Conferir:** a tela dá zoom enquanto ele está preso? (a velocidade zerada mexe no campo de visão; se incomodar, troca-se o jeito de prender). O círculo no chão cresce até o raio 16 e mostra até onde a cura vai; a coluna sobe, a onda corre pelo chão.
+  - **A cura:** cura o Cid, os outros jogadores e os animais com dono (de qualquer jogador) e tira os efeitos ruins. **Não foi testado com dois jogadores de verdade** (o GameTest prova pelo lobo de outro jogador). Em PvP ela cura o adversário que estiver no círculo: é o que o spec diz ("os aliados: jogadores"), mas vale decidir se fica assim.
+  - **Cancelar:** um golpe de 8 ou mais, **já descontados a armadura e o traje de slime**, cancela a carga. Com o traje pronto, o primeiro golpe forte vem pela metade e pode não cancelar (10 vira 5). Fica assim ou o traje não devia proteger a carga?
+  - **O R de pé** ainda não faz nada (parte 6); no HUD ele aparece com a recarga que divide com o Recovery (90 s).
+  - **Miúdos:** a cura é uma esfera de 16 a partir dos pés (quem está alto na coluna pode ficar de fora); dá para começar o Recovery no ar; não conferi se o Salto (poção) ainda deixa pular preso.
+  - **Para a parte 6:** o R de pé só não começa porque custa mais que o máximo da Magia (101); se a árvore aumentar a Magia, rever.
+  - Os sons novos ninguém ouviu ainda: o tom que sobe na carga da espada, o corte, o acorde que cresce os 3 s e o da coluna.
 - Cid, parte 4, os sons dos golpes base (12/11): **ouvir primeiro** `previas/sfx_cid.wav` (os seis sons, três variações de cada, em sequência). No jogo: `/rwk trocar <jogador> cid`.
   - Ninguém ouviu ainda: foram conferidos só por duração, pico e volume médio. O volume de cada um está parelho com os do Ichigo?
   - **Z:** três silvos finos, o terceiro mais forte. Dá para contar os três cortes de ouvido?

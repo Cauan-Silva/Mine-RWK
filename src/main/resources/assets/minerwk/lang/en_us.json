@@ -54,6 +54,12 @@
   "habilidade.minerwk.cid_prisao.desc": "Throws slime; 1 s later, chains bind whoever was hit.",
   "habilidade.minerwk.cid_overdrive": "Overdrive",
   "habilidade.minerwk.cid_overdrive.desc": "8 s of +30% damage and speed, with no Magic regen. Press again to turn it off.",
+  "habilidade.minerwk.cid_espada_atomica": "Atomic Sword",
+  "habilidade.minerwk.cid_espada_atomica.desc": "A horizontal cut of light: hits everyone up to 12 blocks in front of you.",
+  "habilidade.minerwk.cid_atomic": "I Am Atomic",
+  "habilidade.minerwk.cid_atomic.desc": "Crouching: Recovery Atomic. Plant the sword for 3 s and heal yourself and allies around you.",
+  "habilidade.minerwk.cid_recovery": "Recovery Atomic",
+  "habilidade.minerwk.cid_recovery.desc": "Plant the sword for 3 s and fully heal yourself and allies within 16 blocks.",
   "forma.minerwk.bankai": "Bankai",
   "forma.minerwk.hollow": "Hollow Form",
   "habilidade.minerwk.gojo_azul": "Blue",
@@ -255,5 +261,9 @@
   "subtitles.minerwk.cid_slime": "A lump of slime is thrown",
   "subtitles.minerwk.cid_correntes": "Black chains snap shut",
   "subtitles.minerwk.cid_overdrive": "Magic overflows",
-  "subtitles.minerwk.cid_traje": "The slime suit absorbs the blow"
+  "subtitles.minerwk.cid_traje": "The slime suit absorbs the blow",
+  "subtitles.minerwk.cid_espada_carga": "Magic gathers on the blade",
+  "subtitles.minerwk.cid_espada_atomica": "The Atomic Sword cuts",
+  "subtitles.minerwk.cid_recovery_carga": "Shadow plants the sword in the ground",
+  "subtitles.minerwk.cid_recovery": "A pillar of light heals"
 }

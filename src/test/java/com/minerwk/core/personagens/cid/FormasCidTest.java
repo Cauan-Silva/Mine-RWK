@@ -72,11 +72,40 @@ class FormasCidTest {
     }
 
     @Test
+    void oCorteAtomicoDesenhadoChegaAondeODanoChega() {
+        assertEquals(Cid.EspadaAtomica.ALCANCE, FormasCid.ALCANCE_DO_CORTE);
+        assertEquals(Cid.EspadaAtomica.ARCO, FormasCid.ARCO_DO_CORTE);
+        assertEquals(FormasCid.CARGA_DA_ESPADA, Cid.criar().habilidades().get(com.minerwk.core.kit.Tecla.V).numeros().cargaMax());
+        assertEquals(0, FormasCid.cargaDaEspada(0));
+        assertEquals(1, FormasCid.cargaDaEspada(FormasCid.CARGA_DA_ESPADA));
+        assertTrue(FormasCid.raioDoCorte(0) < 2, "sai da lâmina");
+        assertEquals(FormasCid.ALCANCE_DO_CORTE, FormasCid.raioDoCorte(FormasCid.VOO_DO_CORTE), 1e-9);
+        assertEquals(FormasCid.ALCANCE_DO_CORTE, FormasCid.raioDoCorte(40), 1e-9, "não passa do alcance");
+        assertEquals(1, FormasCid.corteAtomico(FormasCid.VOO_DO_CORTE));
+        assertEquals(0, FormasCid.corteAtomico(FormasCid.CORTE_ATOMICO));
+        assertTrue(FormasCid.VOO_DO_CORTE < FormasCid.CORTE_ATOMICO);
+    }
+
+    @Test
+    void oCirculoEAColunaDoRecoveryTemORaioDaCura() {
+        assertEquals(Cid.RecoveryAtomic.RAIO, FormasCid.RAIO_DO_RECOVERY);
+        assertEquals(FormasCid.CARGA_DO_RECOVERY, Cid.criar().habilidades().get(com.minerwk.core.kit.Tecla.R).agachado().numeros().cargaMax());
+        assertTrue(FormasCid.circulo(0) < 1);
+        assertEquals(FormasCid.RAIO_DO_RECOVERY, FormasCid.circulo(FormasCid.CARGA_DO_RECOVERY), 1e-9, "a carga mostra até onde a cura vai");
+        assertEquals(FormasCid.RAIO_DO_RECOVERY, FormasCid.onda(FormasCid.ONDA), 1e-9);
+        assertEquals(0, FormasCid.onda(0));
+        assertEquals(1, FormasCid.coluna(FormasCid.COLUNA / 2.0));
+        assertEquals(0, FormasCid.coluna(FormasCid.COLUNA));
+        assertTrue(FormasCid.ONDA < FormasCid.COLUNA);
+    }
+
+    @Test
     void cadaGolpeTemAnimacaoQueCobreACargaEODisparo() throws Exception {
         JsonObject anim = JsonParser.parseString(Files.readString(
                 Path.of("src/main/resources/assets/minerwk/player_animations/cid.json"))).getAsJsonObject().getAsJsonObject("animations");
-        int[][] tempos = {{2, Cid.Redemoinho.DURACAO}, {1, 1}, {3, 2}, {2, 1}};
-        String[] ids = {"cid_redemoinho", "cid_pos_imagem", "cid_prisao", Cid.OVERDRIVE};
+        int[][] tempos = {{2, Cid.Redemoinho.DURACAO}, {1, 1}, {3, 2}, {2, 1},
+                {FormasCid.CARGA_DA_ESPADA, 6}, {FormasCid.CARGA_DO_RECOVERY, 10}};
+        String[] ids = {"cid_redemoinho", "cid_pos_imagem", "cid_prisao", Cid.OVERDRIVE, Cid.ESPADA_ATOMICA, Cid.RECOVERY};
         for (int i = 0; i < ids.length; i++) {
             assertTrue(anim.has(ids[i]), "falta a animação " + ids[i]);
             double minimo = (tempos[i][0] + tempos[i][1]) / 20.0;

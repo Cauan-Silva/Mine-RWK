@@ -9,7 +9,9 @@ import com.minerwk.core.kit.Numeros;
 import com.minerwk.core.kit.Passiva;
 import com.minerwk.core.kit.Personagem;
 import com.minerwk.core.kit.Tecla;
+import com.minerwk.core.kit.Trancas;
 import com.minerwk.core.kit.Vetor;
+import com.minerwk.core.maestria.Arvore;
 import com.minerwk.core.vfx.FormasCid;
 import java.util.HashSet;
 import java.util.List;
@@ -18,13 +20,17 @@ import java.util.Set;
 
 /**
  * Cid Kagenou, o Shadow (The Eminence in Shadow). Uma forma só: a espada de slime e a Magia. Cada golpe toca
- * a animação de mesmo id e manda os visuais {@code cid_*}, que o cliente desenha. Este é o kit base (parte 1
- * do spec): a Espada Atômica, o Recovery Atomic e o I Am Atomic final entram nas partes 5 e 6.
+ * a animação de mesmo id e manda os visuais {@code cid_*}, que o cliente desenha. A Espada Atômica (V) e o
+ * Recovery Atomic (agachado + R) só valem depois do despertar; o I Am Atomic final (R de pé) entra na parte 6.
  */
 public final class Cid {
     public static final String ID = "cid";
     /** Id do G: a recarga dele começa quando o Overdrive acaba, não quando liga. */
     public static final String OVERDRIVE = "cid_overdrive";
+    /** Os três golpes que só o despertar libera: o V, o R e o R agachado. */
+    public static final String ESPADA_ATOMICA = "cid_espada_atomica", ATOMIC = "cid_atomic", RECOVERY = "cid_recovery";
+    /** O R e o Recovery Atomic dividem a recarga de 90 s: usar um põe o outro em recarga também. */
+    public static final int RECARGA_DO_ATOMIC = 1800;
     /** A recarga do traje de slime (a passiva não tem tecla: a recarga tem id próprio). */
     public static final String TRAJE = "cid_traje";
     /** O traje segura um golpe forte a cada 12 s. */
@@ -46,8 +52,9 @@ public final class Cid {
 
     public static Personagem criar() {
         Map<Tecla, Habilidade> kit = Map.of(Tecla.Z, new Redemoinho(), Tecla.X, new PosImagem(),
-                Tecla.C, new Prisao(), Tecla.G, new Overdrive());
-        return new Personagem(ID, "Cid Kagenou", "The Eminence in Shadow", Magia::new, kit, List.of(EspadaDeSlime::new));
+                Tecla.C, new Prisao(), Tecla.G, new Overdrive(), Tecla.V, new EspadaAtomica(), Tecla.R, new Atomic());
+        return new Personagem(ID, "Cid Kagenou", "The Eminence in Shadow", Magia::new, kit, List.of(EspadaDeSlime::new),
+                Arvore.VAZIA, new Trancas(Set.of(ESPADA_ATOMICA, ATOMIC, RECOVERY), false));
     }
 
     /** O dano que passa pelo traje de slime: o golpe forte, com a passiva pronta, vem pela metade. */
@@ -329,6 +336,106 @@ public final class Cid {
             ctx.sinalAoRecurso(Magia.SEM_GANHO, 0);
             ctx.recarga(OVERDRIVE, Overdrive.RECARGA);
             ctx.visualFim(OVERDRIVE, ctx.olhos());
+        }
+    }
+
+    /** V: a Espada Atômica. A magia se junta na lâmina e sai num corte horizontal largo. */
+    static final class EspadaAtomica extends Golpe {
+        static final String CARGA = "cid_espada_carga";
+        static final double ALCANCE = FormasCid.ALCANCE_DO_CORTE, ARCO = FormasCid.ARCO_DO_CORTE;
+        /** O corte é horizontal: pega quem está até 3 blocos acima ou abaixo dos olhos. */
+        static final double ALTURA = 3;
+        static final float DANO = 16;
+
+        EspadaAtomica() {
+            super(ESPADA_ATOMICA, Numeros.instantanea(FormasCid.CARGA_DA_ESPADA, 6, 8, 30, 280));
+        }
+
+        @Override
+        public void aoIniciarCarga(Contexto ctx) {
+            super.aoIniciarCarga(ctx);
+            ctx.visual(CARGA, ctx.olhos(), ctx.olhar(), 0f, FormasCid.CARGA_DA_ESPADA + 2);
+        }
+
+        @Override
+        public void aoInterromper(Contexto ctx) {
+            super.aoInterromper(ctx);
+            ctx.visualFim(CARGA, ctx.olhos());
+        }
+
+        @Override
+        public void aoDisparar(Contexto ctx, float forca) {
+            // O arco fica deitado: a direção é a do olhar no chão.
+            Vetor rumo = noChao(ctx.olhar());
+            ctx.visualFim(CARGA, ctx.olhos());
+            ctx.visual(ESPADA_ATOMICA, ctx.olhos(), rumo, (float) ALCANCE, FormasCid.CORTE_ATOMICO);
+            ctx.tremor(.35f, 8, 16);
+            if (ctx.danoEmArco(ctx.olhos(), rumo, ALCANCE, ARCO, ALTURA, dano(ctx, DANO)) > 0) ctx.acertou(.8f);
+        }
+    }
+
+    /** O olhar deitado no chão, com comprimento 1; olhando reto para cima ou para baixo, o próprio olhar. */
+    private static Vetor noChao(Vetor olhar) {
+        Vetor v = new Vetor(olhar.x(), 0, olhar.z());
+        return v.comprimento() < 1e-6 ? olhar : v.normalizado();
+    }
+
+    /**
+     * R de pé: o I Am Atomic final, que entra na parte 6. Por ora a tecla só existe para o Recovery Atomic
+     * (agachado) e para a recarga que os dois dividem: o custo acima do máximo da Magia impede que comece.
+     */
+    static final class Atomic extends Golpe {
+        private final Habilidade recovery = new RecoveryAtomic();
+
+        Atomic() {
+            super(ATOMIC, Numeros.instantanea(1, 1, 1, Magia.MAXIMO + 1, RECARGA_DO_ATOMIC));
+        }
+
+        @Override
+        public Habilidade agachado() {
+            return recovery;
+        }
+    }
+
+    /** Agachado + R: o Recovery Atomic. Crava a espada, carrega 3 s parado e cura todos em volta. */
+    static final class RecoveryAtomic extends Golpe {
+        static final String CARGA = "cid_recovery_carga";
+        static final double RAIO = FormasCid.RAIO_DO_RECOVERY;
+
+        RecoveryAtomic() {
+            super(RECOVERY, Numeros.instantanea(FormasCid.CARGA_DO_RECOVERY, 10, 10, 60, RECARGA_DO_ATOMIC));
+        }
+
+        /** Um golpe forte (o mesmo limite do traje de slime) arranca a espada do chão. */
+        @Override
+        public float danoQueInterrompe() {
+            return GOLPE_FORTE;
+        }
+
+        @Override
+        public void aoIniciarCarga(Contexto ctx) {
+            super.aoIniciarCarga(ctx);
+            ctx.firmar(true);
+            // Os pés de verdade: ele está agachado, e descer dos olhos poria o círculo debaixo do chão.
+            ctx.visual(CARGA, ctx.pes(), new Vetor(0, 1, 0), (float) RAIO, FormasCid.CARGA_DO_RECOVERY + 2);
+        }
+
+        @Override
+        public void aoInterromper(Contexto ctx) {
+            super.aoInterromper(ctx);
+            ctx.firmar(false);
+            ctx.visualFim(CARGA, ctx.pes());
+        }
+
+        @Override
+        public void aoDisparar(Contexto ctx, float forca) {
+            Vetor pes = ctx.pes();
+            ctx.firmar(false);
+            ctx.visualFim(CARGA, pes);
+            ctx.visual(RECOVERY, pes, new Vetor(0, 1, 0), (float) RAIO, FormasCid.COLUNA);
+            ctx.restaurar(RAIO);
+            // Se um dia a árvore encurtar a recarga do Recovery, a do R tem de acompanhar aqui.
+            ctx.recarga(ATOMIC, RECARGA_DO_ATOMIC);
         }
     }
 
