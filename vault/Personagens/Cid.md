@@ -1,6 +1,6 @@
 ---
 tags: [personagem]
-estado: pesquisa feita em 12/11; kit proposto, aguardando o autor
+estado: pesquisa feita em 12/11; R e boss escolhidos pelo autor; spec [[2026-11-12 Cid]] proposto, aguardando aprovação
 ---
 # Cid Kagenou (Shadow)
 
@@ -55,7 +55,7 @@ Recurso: **Magia**, máximo 100, regenera sozinha; os golpes pequenos gastam pou
 
 - **Passiva, traje de slime:** a cada 12 s, o próximo golpe de 8 ou mais de dano é reduzido à metade (o traje dissipa o ataque grande).
 - **Arma e traje:** a espada de slime aparece na mão e o traje do Shadow é vestido ao escolher o Cid, sem item, como nos outros.
-- **Despertar e Nêmesis:** vencer o boss libera a Espada Atômica, o I Am Atomic e o Recovery Atomic. **O boss ainda não foi escolhido** (ver "A decidir").
+- **Despertar e Nêmesis:** o boss é o **Ragnarok** (escolha do autor, 12/11), o demônio do 4º Reino invocado pelo Mordred: colossal, preto-azulado, de asas e em chamas na light novel e no mangá; meio mecânico e com jeito de dragão no anime (LN vol. 4, cap. 3; mangá cap. 46; Fandom, "Ragnarok"). Vencê-lo libera a Espada Atômica, o I Am Atomic final e o Recovery Atomic. Detalhes no spec [[2026-11-12 Cid]].
 
 ### A decidir pelo autor
 1. **O kit acima serve?** Em especial: o G como Overdrive (no Minezin o G era o Atomic) e o R como o **I Am Atomic final** que o autor pediu em 12/11: golpes em sequência que levam o alvo ao espaço e o Atomic lá em cima. A cutscene reaproveita o sistema de câmera do Roxo 200% do Gojo (que já tem corrida, uppercut e subida). **A conferir na cena** (2ª temporada, ep. 12; no vídeo "Cid Kagenou - Final I'm Atomic"): quantos golpes, se são socos ou cortes, as cores e a fala; escrevi a mecânica pelo pedido do autor, sem ter achado uma descrição da cena em texto.
@@ -74,6 +74,7 @@ Recurso: **Magia**, máximo 100, regenera sozinha; os golpes pequenos gastam pou
 - O traje ganha o capuz.
 
 ## Fontes
+- Fandom, The Eminence in Shadow Wiki, "Ragnarok", lida em 12/11/2026: https://the-eminence-in-shadow.fandom.com/wiki/Ragnarok
 - Fandom, The Eminence in Shadow Wiki, "Cid Kagenou" (Appearance; Powers & Abilities), lida em 12/11/2026: https://the-eminence-in-shadow.fandom.com/wiki/Cid_Kagenou. As indicações de volume, capítulo e episódio são as referências dessa página.
 - Kit do Minezin: `vault/Personagens/Cid.md` e `core/cid/PoderesCid.java` do repositório Minezin.
 - **A conferir:** a descrição visual do I Am Atomic e os dados dos três candidatos a boss foram escritos de memória; os números de episódio 20 e 23 seguem a contagem corrida da wiki (2ª temporada somada à 1ª).
