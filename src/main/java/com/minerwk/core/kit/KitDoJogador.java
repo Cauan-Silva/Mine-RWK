@@ -9,7 +9,8 @@ import java.util.Optional;
  * O kit de um jogador: personagem, recurso, recargas e a habilidade em uso.
  * Regras: uma habilidade por vez; custo cobrado no disparo; recarga começa no disparo;
  * interrupção durante a carga dá recarga de punição de 1/4. Efeitos soltos e passivas rodam todo tick,
- * independentes da habilidade em uso.
+ * independentes da habilidade em uso. O jogador está sempre numa forma do personagem, e as teclas valem
+ * para as habilidades dela; a forma não é salva.
  */
 public final class KitDoJogador {
     private final Personagem personagem;
@@ -21,6 +22,7 @@ public final class KitDoJogador {
     private Melhorias melhorias = Melhorias.NENHUMA;
     /** Se o jogador já despertou (de vez ou só nesta luta): libera o que o personagem tranca. */
     private boolean desperto;
+    private String forma = Forma.BASE;
 
     private static final class Ativo {
         final Efeito efeito;
@@ -64,9 +66,39 @@ public final class KitDoJogador {
         this.desperto = desperto;
     }
 
-    /** Se a habilidade da tecla ainda exige o despertar. */
+    public String forma() {
+        return forma;
+    }
+
+    /** A habilidade da tecla na forma atual. */
+    public Optional<Habilidade> habilidade(Tecla tecla) {
+        return personagem.naTecla(forma, tecla);
+    }
+
+    /**
+     * Passa para outra forma do personagem. Um golpe ainda em carga é interrompido, sem recarga de punição;
+     * um que já disparou segue até o fim (é o caso do golpe que faz a troca). Devolve se mudou.
+     */
+    public boolean mudarForma(String nova, Contexto contexto) {
+        if (forma.equals(nova) || !personagem.temForma(nova)) return false;
+        if (execucao != null && execucao.fase() == Execucao.Fase.CARGA) {
+            Habilidade h = execucao.habilidade();
+            limpar();
+            h.aoInterromper(contexto);
+        }
+        forma = nova;
+        recurso.forma(nova);
+        return true;
+    }
+
+    /** Se a habilidade da tecla, na forma atual, ainda exige o despertar. */
     public boolean trancada(Tecla tecla) {
-        return !desperto && personagem.trancas().teclas().contains(tecla);
+        return habilidade(tecla).map(this::trancada).orElse(false);
+    }
+
+    /** Se a habilidade ainda exige o despertar. */
+    public boolean trancada(Habilidade h) {
+        return !desperto && personagem.trancas().habilidades().contains(h.id());
     }
 
     /** As melhorias da árvore do jogador: valem para o próximo golpe e, no recurso, na hora. */
@@ -93,7 +125,7 @@ public final class KitDoJogador {
     /** Tenta começar a habilidade da tecla. Devolve se começou. */
     public boolean apertar(Tecla tecla, long agora) {
         if (execucao != null || trancada(tecla)) return false;
-        Habilidade h = personagem.naTecla(tecla).orElse(null);
+        Habilidade h = habilidade(tecla).orElse(null);
         if (h == null || !recargas.pronta(h.id(), agora) || !recurso.pode(h.numeros().custo())) return false;
         execucao = new Execucao(h, numeros(h));
         pendenteIniciar = true;
@@ -101,7 +133,7 @@ public final class KitDoJogador {
     }
 
     public void soltar(Tecla tecla) {
-        if (execucao != null && personagem.naTecla(tecla).orElse(null) == execucao.habilidade()) {
+        if (execucao != null && habilidade(tecla).orElse(null) == execucao.habilidade()) {
             execucao.soltar();
         }
     }
@@ -153,13 +185,28 @@ public final class KitDoJogador {
         return anulou;
     }
 
-    /** Cancela sem cobrar nem punir e encerra os efeitos sem {@code aoAcabar} (jogador saiu ou morreu). */
+    /**
+     * Cancela sem cobrar nem punir, encerra os efeitos sem {@code aoAcabar} e volta à forma base (jogador
+     * saiu ou morreu).
+     */
     public void descartar() {
         descartar(Contexto.NULO);
     }
 
     /** Como {@link #descartar()}, avisando a habilidade em carga para desfazer o visual. */
     public void descartar(Contexto contexto) {
+        descartar(contexto, false);
+    }
+
+    /**
+     * Como {@link #descartar(Contexto)}, mas o jogador continua na forma em que está: é o caso de mudar de
+     * dimensão (entrar na arena, um portal), em que só o golpe e os efeitos acabam.
+     */
+    public void descartarMantendoAForma(Contexto contexto) {
+        descartar(contexto, true);
+    }
+
+    private void descartar(Contexto contexto, boolean manterForma) {
         Habilidade emCarga = execucao != null && execucao.fase() == Execucao.Fase.CARGA ? execucao.habilidade() : null;
         // A animação cobre o golpe inteiro, não só a carga: havendo golpe ou efeito no ar, ela para.
         boolean emAndamento = execucao != null || !efeitos.isEmpty();
@@ -169,6 +216,11 @@ public final class KitDoJogador {
         else if (emAndamento) contexto.pararAnimacao();
         // Uma cutscene no meio do golpe (a parte 2 do R) acaba junto.
         if (emAndamento) contexto.encerrarCutscene();
+        // Quem morre ou sai volta à forma base.
+        if (!manterForma && !Forma.BASE.equals(forma)) {
+            forma = Forma.BASE;
+            recurso.forma(forma);
+        }
     }
 
     public List<Execucao.Evento> tick(long agora, EstadoDoJogador estado, Contexto contexto) {

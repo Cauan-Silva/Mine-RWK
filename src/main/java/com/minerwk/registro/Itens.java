@@ -16,12 +16,29 @@ public final class Itens {
     /** O traje do Gojo. O jogador não veste o item: o cliente desenha o modelo em quem escolheu o Gojo. */
     public static final DeferredItem<Traje> TRAJE_GOJO = REGISTRO.register("traje_gojo", () -> new Traje("gojo"));
 
+    /** Os trajes do Ichigo: o shihakushō com a Zangetsu e o casaco do Bankai com a Tensa Zangetsu. */
+    public static final DeferredItem<Traje> TRAJE_ICHIGO = REGISTRO.register("traje_ichigo", () -> new Traje("ichigo"));
+    public static final DeferredItem<Traje> TRAJE_ICHIGO_BANKAI =
+            REGISTRO.register("traje_ichigo_bankai", () -> new Traje("ichigo_bankai"));
+    /** A forma final do Mugetsu, vestida só durante a cutscene e o corte. */
+    public static final DeferredItem<Traje> TRAJE_ICHIGO_MUGETSU =
+            REGISTRO.register("traje_ichigo_mugetsu", () -> new Traje("ichigo_mugetsu"));
+    /** A forma Hollow completa, vestida nos 10 s em que o Hollow toma o corpo. */
+    public static final DeferredItem<Traje> TRAJE_ICHIGO_HOLLOW =
+            REGISTRO.register("traje_ichigo_hollow", () -> new Traje("ichigo_hollow"));
     /** Invoca o Toji; feito na bancada com papel, lingote de ouro e espada de ferro. */
     public static final DeferredItem<com.minerwk.boss.ContratoToji> CONTRATO_TOJI =
             REGISTRO.register("contrato_toji", com.minerwk.boss.ContratoToji::new);
 
+    /** Leva ao Zangetsu interior; feita na bancada com osso, pérola do Ender e espada de ferro. */
+    public static final DeferredItem<com.minerwk.boss.MascaraRachada> MASCARA_RACHADA =
+            REGISTRO.register("mascara_rachada", com.minerwk.boss.MascaraRachada::new);
+
     public static void naAbaCriativa(net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent evento) {
-        if (evento.getTabKey() == net.minecraft.world.item.CreativeModeTabs.COMBAT) evento.accept(CONTRATO_TOJI.get());
+        if (evento.getTabKey() == net.minecraft.world.item.CreativeModeTabs.COMBAT) {
+            evento.accept(CONTRATO_TOJI.get());
+            evento.accept(MASCARA_RACHADA.get());
+        }
     }
 
     private Itens() {

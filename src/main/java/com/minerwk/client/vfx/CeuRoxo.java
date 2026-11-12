@@ -1,5 +1,6 @@
 package com.minerwk.client.vfx;
 
+import com.minerwk.core.vfx.MugetsuIchigo;
 import com.minerwk.core.personagens.gojo.RoxoMaximo;
 import com.minerwk.core.vfx.EncantamentoGojo;
 import com.minerwk.core.vfx.FusaoRoxoGojo;
@@ -57,6 +58,9 @@ public final class CeuRoxo {
                 case "gojo_roxo_maximo" -> EncantamentoGojo.CEU_CARGA * EncantamentoGojo.perto(d / LONGE);
                 case "gojo_roxo_maximo_esferas" -> (t < v.forca ? .8 : 1) * EncantamentoGojo.perto(d / LONGE);
                 case "gojo_roxo_explosao" -> t < v.duracao - RoxoMaximo.TICKS_RESTO ? EncantamentoGojo.perto(d / LONGE) : 0;
+                // O Mugetsu do Ichigo: meio escuro desde a transformação, todo escuro no corte.
+                case "ichigo_mugetsu_carga" -> MugetsuIchigo.ceuDaCarga(t, MugetsuIchigo.TRANSFORMA) * EncantamentoGojo.perto(d);
+                case "ichigo_mugetsu" -> MugetsuIchigo.ceu(t) * EncantamentoGojo.perto(d / LONGE);
                 default -> 0;
             };
             alvo = Math.max(alvo, pede);

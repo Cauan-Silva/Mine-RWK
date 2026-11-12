@@ -27,6 +27,8 @@ Tudo em `core/personagens/<nome>/`, sem classes do Minecraft.
 | Passivas | `TecnicaReversa`, que implementa `Passiva` |
 | Golpe com muitas fases e constantes de tempo | uma classe só de números e contas, como `RoxoMaximo` |
 
+**Personagem de transformação** (o [[Ichigo]]): cada transformação é uma `Forma` (id e golpes por tecla) na lista `transformacoes` do `Personagem`; a forma base são as habilidades de sempre. O golpe que transforma chama `ctx.mudarForma(id)`. Recargas e trancas valem por id de golpe, então a mesma tecla pode estar livre numa forma e trancada em outra. O recurso fica sabendo da troca por `Recurso.forma(id)`. Morrer volta à base, e a forma não é salva. O nome da transformação na tela de escolha vem da tradução `forma.minerwk.<id>`. Ver [[2026-11-11 Ichigo parte 1]].
+
 Pontos que custaram caro no Gojo:
 - **`Numeros`** guarda carga mínima e máxima, disparo, fim, se segura a tecla, custo e recarga. Golpe que dispara sozinho usa `Numeros.instantanea`.
 - **O golpe só fala com o mundo pelo `Contexto`** (`ferir`, `danoUmaVez`, `puxar`, `arremessar`, `suspender`, `apagarCasca`, `visual`, `apresentacao`, `tremor`, `cutscene`...). Se faltar uma ação, ela entra em `Contexto` com corpo vazio e é implementada em `kit/ContextoServidor`.
@@ -65,13 +67,41 @@ Dividido em duas metades, como no Gojo:
 - Corte seco usa o `corte` do quadro. Entre dois planos em lados opostos do alvo, sempre corte: o deslize atravessa o alvo.
 - Teste obrigatório: a câmera nunca chega a menos de 2 blocos do alvo. Foi isso que bugava o rosto do alvo no R.
 
-## 6. Som (a completar)
-O Gojo ainda não tem os SFX. Hoje existem `registro/Sons` e `assets/minerwk/sounds.json`, e o golpe toca som pelo terceiro argumento de `ctx.apresentacao`. Assets de terceiros só com licença compatível, com crédito em `THIRD_PARTY_NOTICES.md`.
+## 6. Som
+Tudo sintetizado aqui, sem áudio de terceiros. Ver [[2026-11-10 Som do Gojo parte 1]].
+- **Ids no núcleo:** uma classe `Sons<Personagem>` em `core/` com os ids e a lista `TODOS` (`SonsGojo`, `SonsToji`). `registro/Sons` registra a lista.
+- **Gerador:** um `ferramentas/gerar_sfx_<personagem>.py` por personagem, sobre o motor `ferramentas/sfx_motor.py`. Cada som é montado em camadas (transiente, corpo, sub, cauda) e sai em 3 variações. O gerador escreve os `.ogg` em `assets/minerwk/sounds/<personagem>/`, as entradas do `sounds.json`, as legendas em português e inglês e o manifesto `ferramentas/sfx_<personagem>_manifesto.json`. `--preview arquivo.wav` grava todos em sequência para ouvir.
+- **Tempos:** os marcos dentro de um som (a batida em cada palavra, o estouro) repetem os ticks do Java e ficam em `MARCOS`. Um teste JUnit (`SonsGojoTest`, `SonsTojiTest`) confere o manifesto contra o kit e contra a lista de ids. Mudou um tempo no Java, mudar no gerador e gerar de novo.
+- **Quem toca:**
+  - Som de gesto (o disparo) sai pelo terceiro argumento de `ctx.apresentacao`.
+  - Som que acompanha um visual (carga, campo, explosão) é tocado no cliente por `SonsVisuais`, no ponto do visual. Assim ele é cortado se o visual for encerrado antes da hora, e o som de fim cai na hora certa. Qual som vai com qual visual fica no núcleo (`SonsGojo.doVisual`), com JUnit.
+  - Entidade (boss) toca pelo servidor, com `level().playSound`.
+- **Caráter:** combinar com o personagem. Os do Gojo têm tom e zumbido de energia; os do Toji, que não tem energia amaldiçoada, são secos (impacto, metal, ar).
+- Créditos em `THIRD_PARTY_NOTICES.md`, mesmo sendo sintetizado (a linha diz qual gerador fez).
+- **Ligação com os visuais:** cada personagem tem um `Sons<Personagem>` em `core/personagens/<id>/` com `doVisual` e `cortaComOVisual`, e entra em `core/personagens/SonsDosVisuais`, que é a quem o cliente pergunta. O Ichigo ([[2026-11-11 Ichigo parte 5]]) tira todos os sons dos visuais, sem nada pela apresentação.
 
-## 7. Traje (a completar)
-GeckoLib, previsto no [[Roadmap]]. Ainda não feito no Gojo.
 
-## 8. Fechar cada parte
+## 7. Traje
+GeckoLib, automático ao escolher o personagem, sem item no inventário. Ver [[2026-11-10 Traje do Gojo]].
+- **Modelo e textura:** os arquivos base ficam em `ferramentas/traje/` e um gerador (`gerar_traje_gojo.py`) aplica as mudanças e escreve os assets. Se vier do Minezin, registrar em `THIRD_PARTY_NOTICES.md`.
+- **Como é desenhado:** pelo renderer de armadura do GeckoLib com um item escondido (`traje_gojo`), dentro de uma subclasse da camada de armadura do jogador. Tem de ser essa camada: em primeira pessoa a Player Animation Library só deixa passar a camada de armadura e a do item na mão.
+- **Visibilidade das peças:** o renderer do GeckoLib mostra só o espaço de armadura pedido; o traje sobrescreve isso para seguir as partes do modelo do jogador.
+- **Primeira pessoa:** a manga aparece na mão parada (`RenderArmEvent`) e nos braços animados.
+- **Peças que mudam com o golpe** (a venda do Gojo): a regra fica no núcleo (`TrajeGojo.vendaFora`) e olha os visuais ativos do jogador. Brilho por máscara (`*_glowmask.png`).
+- **Outros jogadores:** o servidor manda o personagem de cada jogador a quem o vê (`PersonagemDe`); sem isso só o dono veria o traje.
+- **Cuidado com os ossos:** no modelo do Minezin "left" e "right" são de quem olha de frente.
+- Prévia: um modo novo em `DemoVfx` (`./gradlew runClientDemo -Pdemo=traje`).
+
+## 8. Maestria, árvore e Nêmesis
+Só para personagem que tem despertar. Ver [[2026-11-10 Maestria e árvore de habilidades]] e [[2026-11-10 Toji e o despertar do Gojo]].
+- **Árvore:** os nós do personagem ficam no núcleo (`ArvoreGojo`); a tela (tecla H) e a compra são genéricas.
+- **Golpes trancados:** o kit diz quais golpes exigem o despertar; o HUD mostra o cadeado. `/rwk despertar <jogador> sim|nao` para testar.
+- **Boss:** os golpes são dados (`core/boss/Golpe`: aviso, janela, pausa, recarga, alcance, peso) e o `MotorBoss` escolhe e marca o tempo; a entidade só faz o que cada golpe causa no mundo. As regras e os números ficam numa classe do núcleo (`TojiBoss`), com JUnit.
+- **Todo golpe de boss avisa:** marca no chão mandada como `MostrarVisual` e desenhada no cliente (`RenderVisuaisToji`), que enche enquanto o aviso corre.
+- **Teleporte de boss:** sempre conferir chão, parede e líquido antes (`cabeEm`); morte por queda no vazio contaria como vitória.
+- **GameTests de boss:** um lote por teste (`batch`), chunks vizinhos forçados, jogador com conexão de mentira e no chão, esperas "até acontecer". Detalhes em [[2026-11-10 Toji parte 2]].
+
+## 9. Fechar cada parte
 1. `./gradlew build` verde.
 2. Revisão final por um subagente barato.
 3. Marcar no [[Roadmap]], escrever o diário em `vault/Diário/` e o índice [[Diário]], e listar em [[Pendências]] o que precisa ser visto no jogo.

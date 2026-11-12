@@ -168,7 +168,7 @@ class EfeitosEPassivasTest {
         Passiva passiva = (c, e) -> curas.add("tick");
         List<java.util.function.Supplier<Passiva>> passivas = List.of(() -> passiva);
         KitDoJogador k = new KitDoJogador(new Personagem("p", "P", "Obra", () -> r, Map.of(Tecla.Z, z, Tecla.X, x),
-                passivas, com.minerwk.core.maestria.Arvore.VAZIA, new Trancas(java.util.Set.of(Tecla.X), true)));
+                passivas, com.minerwk.core.maestria.Arvore.VAZIA, new Trancas(java.util.Set.of("x"), true)));
         assertFalse(k.desperto());
         assertTrue(k.trancada(Tecla.X));
         assertFalse(k.trancada(Tecla.Z));

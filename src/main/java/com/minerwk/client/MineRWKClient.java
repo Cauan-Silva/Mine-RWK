@@ -38,13 +38,19 @@ public final class MineRWKClient {
         NeoForge.EVENT_BUS.addListener(TremorCamera::aoTick);
         NeoForge.EVENT_BUS.addListener(TremorCamera::aoCalcularCamera);
         modBus.addListener((net.neoforged.neoforge.client.event.EntityRenderersEvent.RegisterRenderers e) ->
-                e.registerEntityRenderer(com.minerwk.registro.Entidades.TOJI.get(), com.minerwk.client.boss.RenderToji::new));
+                {
+                    e.registerEntityRenderer(com.minerwk.registro.Entidades.TOJI.get(), com.minerwk.client.boss.RenderToji::new);
+                    e.registerEntityRenderer(com.minerwk.registro.Entidades.ZANGETSU.get(), com.minerwk.client.boss.RenderZangetsu::new);
+                });
         modBus.addListener(this::clientSetup);
         modBus.addListener(TeclasKit::registrar);
         RecepcaoKit.ligar();
         modBus.addListener(Pincel::registrarShaders);
+        modBus.addListener(com.minerwk.client.traje.CamadaTraje::aoRegistrarCamadas);
         modBus.addListener(com.minerwk.client.traje.CamadaTraje::aoAdicionarCamadas);
         NeoForge.EVENT_BUS.addListener(com.minerwk.client.traje.CamadaTraje::aoDesenharBraco);
+        NeoForge.EVENT_BUS.addListener(com.minerwk.client.traje.TecidoCliente::aoTick);
+        NeoForge.EVENT_BUS.addListener((ClientPlayerNetworkEvent.LoggingOut e) -> com.minerwk.client.traje.TecidoCliente.limpar());
         com.minerwk.rede.Pacotes.aoPersonagemDe = com.minerwk.client.traje.PersonagensVistos::receber;
         NeoForge.EVENT_BUS.addListener((ClientPlayerNetworkEvent.LoggingOut e) -> com.minerwk.client.traje.PersonagensVistos.limpar());
         NeoForge.EVENT_BUS.addListener(RenderVisuaisGojo::aoTick);
@@ -65,6 +71,7 @@ public final class MineRWKClient {
         NeoForge.EVENT_BUS.addListener(CutsceneCliente::aoEntrada);
         NeoForge.EVENT_BUS.addListener(CutsceneCliente::aoCamadaGui);
         NeoForge.EVENT_BUS.addListener(CutsceneCliente::aoMao);
+        NeoForge.EVENT_BUS.addListener(CutsceneCliente::aoNome);
         NeoForge.EVENT_BUS.addListener((ClientPlayerNetworkEvent.LoggingOut e) -> CutsceneCliente.encerrar());
         modBus.addListener((RegisterGuiLayersEvent e) -> e.registerAboveAll(CutsceneCliente.CAMADA, CutsceneCliente::desenhar));
         modBus.addListener((RegisterGuiLayersEvent e) -> e.registerAbove(VanillaGuiLayers.CAMERA_OVERLAYS,

@@ -36,15 +36,30 @@ public final class DemoVfx {
     /** {@code traje}: o jogador como Gojo de frente, de costas, num golpe, com armadura vestida e em 1ª pessoa. */
     private static final boolean TRAJE = MODO.equals("traje");
     private static boolean vestiuPeitoral;
+    /** {@code ichigo_traje}: o Ichigo no Shikai e no Bankai, de frente, correndo de costas e em 1ª pessoa. */
+    private static final boolean TRAJE_ICHIGO = MODO.equals("ichigo_traje");
+    /** {@code ichigo}: os golpes do Shikai (Z, X, C, V), a entrada do Bankai e os golpes dele, num alvo parado. */
+    private static final boolean ICHIGO = MODO.equals("ichigo");
+    /** {@code ichigo_mugetsu}: o Bankai, a máscara Hollow de frente, e o Mugetsu inteiro com a perda dos poderes. */
+    private static final boolean MUGETSU = MODO.equals("ichigo_mugetsu");
     /** {@code arvore}: a tela da árvore do Gojo em três momentos (sem pontos, com compras e desperto). */
     private static final boolean ARVORE = MODO.equals("arvore");
     /** {@code toji}: a luta contra o Toji: a entrada, a Nuvem, a investida, a queda com a cutscene, o Desaparecer e a fase 3. */
     private static final boolean TOJI = MODO.equals("toji");
+    /** {@code zangetsu}: a luta contra o Zangetsu interior, do mundo interior à vitória, com a queda e a máscara. */
+    private static final boolean ZANGETSU = MODO.equals("zangetsu");
+    /** O tick da prévia em que o Zangetsu apareceu (a arena leva um tempo para ficar pronta). */
+    private static int zangetsuEm = -1;
+    private static boolean fimDaDemo;
+    /** {@code hollow}: o golpe fatal no Bankai, a forma Hollow de frente e de lado, as garras, o Sonído e o Cero. */
+    private static final boolean HOLLOW = MODO.equals("hollow") || MODO.equals("hollow_perto");
+    /** {@code hollow_perto}: só o modelo do Vasto Lorde, de perto: de frente, andando, de costas, de lado e num pulo. */
+    private static final boolean HOLLOW_PERTO = MODO.equals("hollow_perto");
     private static final int CARGA = 100;
     private static final Path PASTA = Path.of("demo");
     private static final int ESFERAS = RoxoMaximo.TICKS_ESFERAS;
     private static final int ESTOURO = ESFERAS + RoxoMaximo.TICKS_FUSAO;
-    private static final int FIM_PREVIA = TOJI ? 520 : ARVORE ? 100 : TRAJE ? 260 : R_COMPLETO ? 360
+    private static final int FIM_PREVIA = HOLLOW_PERTO ? 272 : HOLLOW ? 330 : ZANGETSU ? 2400 : TOJI ? 520 : ARVORE ? 100 : TRAJE ? 260 : TRAJE_ICHIGO ? 300 : ICHIGO ? 350 : MUGETSU ? 360 : R_COMPLETO ? 360
             : ENCANTAMENTO ? CARGA + 90 : ESTOURO + RoxoMaximo.TICKS_EXPLOSAO + 110;
     private static int ticks;
     private static int quadro;
@@ -70,11 +85,16 @@ public final class DemoVfx {
             mc.setScreen(null);
         }
         if (DEMO && ticks == 40) {
-            jogador.connection.sendCommand(ENCANTAMENTO || R_COMPLETO || TRAJE || TOJI ? "time set noon" : "time set midnight");
+            jogador.connection.sendCommand(ENCANTAMENTO || R_COMPLETO || TRAJE || TRAJE_ICHIGO || ICHIGO || MUGETSU || TOJI || ZANGETSU || HOLLOW ? "time set noon" : "time set midnight");
             if (ARVORE) jogador.connection.sendCommand("rwk trocar @s gojo");
             if (TOJI) {
                 jogador.connection.sendCommand("rwk trocar @s gojo");
                 jogador.connection.sendCommand("rwk despertar @s nao");
+                jogador.connection.sendCommand("tp @s ~150 ~12 ~");
+            }
+            if (ZANGETSU) jogador.connection.sendCommand("rwk despertar @s nao");
+            if (TRAJE_ICHIGO || ICHIGO || MUGETSU || ZANGETSU || HOLLOW) {
+                jogador.connection.sendCommand("rwk trocar @s ichigo");
                 jogador.connection.sendCommand("tp @s ~150 ~12 ~");
             }
             if (TRAJE) {
@@ -108,7 +128,7 @@ public final class DemoVfx {
         if (DEMO) {
             gravarQuadro(mc);
             // A prévia zera a si mesma no último tick: a parada usa o t guardado antes.
-            if (t >= FIM_PREVIA) mc.stop();
+            if (t >= FIM_PREVIA || fimDaDemo) mc.stop();
         }
     }
 
@@ -131,6 +151,18 @@ public final class DemoVfx {
             if (t == FIM_PREVIA - 4) jogador.connection.sendCommand("rwk maestria @s zerar");
             if (t == FIM_PREVIA - 3) jogador.connection.sendCommand("rwk despertar @s nao");
             if (t >= FIM_PREVIA) previa = -1;
+            return;
+        }
+        if (ZANGETSU) {
+            previaDoZangetsu(mc, jogador, t);
+            return;
+        }
+        if (HOLLOW_PERTO) {
+            previaDoHollowDePerto(mc, jogador, t);
+            return;
+        }
+        if (HOLLOW) {
+            previaDoHollow(mc, jogador, t);
             return;
         }
         if (TOJI) {
@@ -168,6 +200,140 @@ public final class DemoVfx {
                 jogador.connection.sendCommand("gamemode creative");
                 jogador.connection.sendCommand("tp @s ~-150 ~ ~-10");
             }
+            if (t >= FIM_PREVIA) {
+                mc.options.setCameraType(net.minecraft.client.CameraType.FIRST_PERSON);
+                previa = -1;
+            }
+            return;
+        }
+        if (ICHIGO) {
+            mc.gui.getChat().clearMessages(false);
+            // De lado, por uma câmera fixa (de costas o golpe some atrás do corpo): Getsuga carregado, Shunpo,
+            // a onda no chão e o arremesso. De frente: a entrada do Bankai. De lado de novo: dois Getsugas
+            // negros e o Shunpo; de frente: o Getsuga na lâmina; e a saída.
+            boolean frente = t >= 136 && t < 212 || t >= 278 && t < 312;
+            net.minecraft.world.entity.Entity camera = jogador;
+            if (!frente) {
+                for (net.minecraft.world.entity.Entity e : mc.level.entitiesForRendering()) {
+                    if (e instanceof net.minecraft.world.entity.decoration.ArmorStand && e.distanceToSqr(jogador) < 60 * 60) camera = e;
+                }
+            }
+            if (mc.getCameraEntity() != camera) mc.setCameraEntity(camera);
+            mc.options.setCameraType(frente ? net.minecraft.client.CameraType.THIRD_PERSON_FRONT
+                    : net.minecraft.client.CameraType.THIRD_PERSON_BACK);
+            jogador.setXRot(frente ? 6 : 2);
+            if (t == 0) {
+                jogador.setYRot(0);
+                jogador.connection.sendCommand("kill @e[type=minecraft:armor_stand,distance=..60]");
+                jogador.connection.sendCommand("execute at @s run summon minecraft:armor_stand ~-3.5 ~0.6 ~7 "
+                        + "{Invisible:1b,NoGravity:1b,Marker:0b,Rotation:[-90f,6f]}");
+                jogador.connection.sendCommand("kill @e[type=minecraft:husk,distance=..60]");
+                jogador.connection.sendCommand("execute at @s run summon minecraft:husk ~ ~ ~15 {NoAI:1b}");
+            }
+            if (t == 2 || t == 100 || t == 136 || t == 213 || t == 270 || t == 312) jogador.connection.sendCommand("rwk recarregar");
+            int[][] teclas = {{10, 22, 0}, {52, 54, 1}, {76, 78, 2}, {104, 106, 3}, {140, 142, 4},
+                    {220, 222, 0}, {238, 240, 0}, {256, 258, 1}, {276, 278, 2}, {318, 320, 4}};
+            com.minerwk.core.kit.Tecla[] qual = {com.minerwk.core.kit.Tecla.Z, com.minerwk.core.kit.Tecla.X,
+                    com.minerwk.core.kit.Tecla.C, com.minerwk.core.kit.Tecla.V, com.minerwk.core.kit.Tecla.G};
+            for (int[] k : teclas) {
+                if (t == k[0]) tecla(qual[k[2]], true);
+                if (t == k[1]) tecla(qual[k[2]], false);
+            }
+            // Cliques da espada: dois no Shikai, um no Bankai e dois com o Getsuga na lâmina.
+            if (t == 36 || t == 44 || t == 248 || t == 292 || t == 302) jogador.swing(net.minecraft.world.InteractionHand.MAIN_HAND);
+            if (t == FIM_PREVIA - 3) {
+                jogador.connection.sendCommand("kill @e[type=minecraft:husk,distance=..60]");
+                jogador.connection.sendCommand("kill @e[type=minecraft:armor_stand,distance=..60]");
+                jogador.connection.sendCommand("tp @s ~-150 ~ ~-30");
+            }
+            if (t >= FIM_PREVIA) {
+                mc.setCameraEntity(jogador);
+                mc.options.setCameraType(net.minecraft.client.CameraType.FIRST_PERSON);
+                previa = -1;
+            }
+            return;
+        }
+        if (MUGETSU) {
+            mc.gui.getChat().clearMessages(false);
+            // De lado, por uma câmera fixa: a entrada do Bankai. De frente: a máscara se formando. De lado de
+            // novo: a carga do Mugetsu (a cutscene toma a câmera quando existe), o corte, o véu e os poderes indo.
+            boolean frente = t >= 52 && t < 118;
+            net.minecraft.world.entity.Entity camera = jogador;
+            if (!frente) {
+                for (net.minecraft.world.entity.Entity e : mc.level.entitiesForRendering()) {
+                    if (e instanceof net.minecraft.world.entity.decoration.ArmorStand && e.distanceToSqr(jogador) < 60 * 60) camera = e;
+                }
+            }
+            // Durante uma cutscene a câmera é dela.
+            if (!com.minerwk.client.camera.CutsceneCliente.ativa()) {
+                if (mc.getCameraEntity() != camera) mc.setCameraEntity(camera);
+                mc.options.setCameraType(frente ? net.minecraft.client.CameraType.THIRD_PERSON_FRONT
+                        : net.minecraft.client.CameraType.THIRD_PERSON_BACK);
+            }
+            jogador.setXRot(frente ? 6 : 2);
+            if (t == 0) {
+                jogador.setYRot(0);
+                jogador.connection.sendCommand("rwk despertar @s sim");
+                jogador.connection.sendCommand("kill @e[type=minecraft:armor_stand,distance=..60]");
+                jogador.connection.sendCommand("execute at @s run summon minecraft:armor_stand ~-5 ~0.8 ~9 "
+                        + "{Invisible:1b,NoGravity:1b,Marker:0b,Rotation:[-100f,4f]}");
+                jogador.connection.sendCommand("kill @e[type=minecraft:husk,distance=..80]");
+                jogador.connection.sendCommand("execute at @s run summon minecraft:husk ~ ~ ~18 {NoAI:1b}");
+            }
+            if (t == 2 || t == 48 || t == 122) jogador.connection.sendCommand("rwk recarregar");
+            // G: Bankai. V: a máscara. R: o Mugetsu.
+            if (t == 6) tecla(com.minerwk.core.kit.Tecla.G, true);
+            if (t == 8) tecla(com.minerwk.core.kit.Tecla.G, false);
+            if (t == 56) tecla(com.minerwk.core.kit.Tecla.V, true);
+            if (t == 58) tecla(com.minerwk.core.kit.Tecla.V, false);
+            if (t == 128) tecla(com.minerwk.core.kit.Tecla.R, true);
+            if (t == 130) tecla(com.minerwk.core.kit.Tecla.R, false);
+            curarJogador();
+            if (t == FIM_PREVIA - 3) {
+                jogador.connection.sendCommand("kill @e[type=minecraft:husk,distance=..80]");
+                jogador.connection.sendCommand("kill @e[type=minecraft:armor_stand,distance=..60]");
+                jogador.connection.sendCommand("tp @s ~-150 ~ ~-30");
+            }
+            if (t >= FIM_PREVIA) {
+                mc.setCameraEntity(jogador);
+                mc.options.setCameraType(net.minecraft.client.CameraType.FIRST_PERSON);
+                previa = -1;
+            }
+            return;
+        }
+        if (TRAJE_ICHIGO) {
+            mc.gui.getChat().clearMessages(false);
+            // Shikai de frente (um Getsuga), corrida de costas, 1ª pessoa com um ataque; depois o Bankai: a
+            // entrada de frente, corrida de costas (o casaco), de lado girando, e 1ª pessoa.
+            var tipo = net.minecraft.client.CameraType.THIRD_PERSON_FRONT;
+            if (t >= 45 && t < 85 || t >= 170 && t < 240) tipo = net.minecraft.client.CameraType.THIRD_PERSON_BACK;
+            boolean primeira = t >= 85 && t < 115 || t >= 260 && t < 290;
+            if (primeira) tipo = net.minecraft.client.CameraType.FIRST_PERSON;
+            mc.options.setCameraType(tipo);
+            jogador.setXRot(primeira ? 10 : 8);
+            if (t == 2 || t == 118) jogador.connection.sendCommand("rwk recarregar");
+            if (t == 1) {
+                for (int espaco = 0; espaco < 9; espaco++) {
+                    if (jogador.getInventory().getItem(espaco).isEmpty()) {
+                        jogador.getInventory().selected = espaco;
+                        jogador.connection.send(new net.minecraft.network.protocol.game.ServerboundSetCarriedItemPacket(espaco));
+                        break;
+                    }
+                }
+            }
+            if (t == 15) tecla(com.minerwk.core.kit.Tecla.Z, true);
+            if (t == 27) tecla(com.minerwk.core.kit.Tecla.Z, false);
+            if (t == 95 || t == 270) jogador.swing(net.minecraft.world.InteractionHand.MAIN_HAND);
+            if (t == 120) tecla(com.minerwk.core.kit.Tecla.G, true);
+            if (t == 122) tecla(com.minerwk.core.kit.Tecla.G, false);
+            boolean corre = t >= 50 && t < 82 || t >= 175 && t < 215;
+            if (corre) {
+                Vec3 frente = new Vec3(jogador.getLookAngle().x, 0, jogador.getLookAngle().z).normalize();
+                jogador.setDeltaMovement(frente.scale(.28).add(0, jogador.getDeltaMovement().y, 0));
+            }
+            // Um giro parado, visto de costas e depois de frente: o casaco e a corrente acompanham.
+            if (t >= 220 && t < 256) jogador.setYRot(jogador.getYRot() + 9);
+            if (t == FIM_PREVIA - 3) jogador.connection.sendCommand("tp @s ~-150 ~ ~-10");
             if (t >= FIM_PREVIA) {
                 mc.options.setCameraType(net.minecraft.client.CameraType.FIRST_PERSON);
                 previa = -1;
@@ -258,6 +424,198 @@ public final class DemoVfx {
                     (float) RoxoMaximo.RAIO_EXPLOSAO, RoxoMaximo.TICKS_EXPLOSAO + RoxoMaximo.TICKS_RESTO, agora));
         }
         if (t >= FIM_PREVIA) previa = -1;
+    }
+
+    /**
+     * A luta inteira contra o Zangetsu interior. Os tempos contam de quando ele aparece, porque a arena do
+     * mundo interior leva um tempo para ficar pronta.
+     */
+    private static void previaDoZangetsu(Minecraft mc, LocalPlayer jogador, int t) {
+        if (t == 0) {
+            jogador.connection.sendCommand("gamerule sendCommandFeedback false");
+            jogador.connection.sendCommand("gamemode survival");
+        }
+        if (t <= 2) mc.gui.getChat().clearMessages(false);
+        if (t == 2) jogador.connection.sendCommand("rwk zangetsu @s");
+        net.minecraft.world.entity.Entity zangetsu = null;
+        for (net.minecraft.world.entity.Entity e : mc.level.entitiesForRendering()) {
+            if (e instanceof com.minerwk.boss.ZangetsuEntity) zangetsu = e;
+        }
+        if (zangetsuEm < 0) {
+            if (zangetsu == null) return;
+            zangetsuEm = t;
+        }
+        int z = t - zangetsuEm;
+        // Até a queda, o jogador não pode cair por um golpe fora do roteiro.
+        if (z < 250 && z % 10 == 0) vidaDoJogador(20);
+        if (z == 60) golpeDoZangetsu(com.minerwk.core.boss.ZangetsuBoss.GETSUGA);
+        if (z == 110) golpeDoZangetsu(com.minerwk.core.boss.ZangetsuBoss.ARREMESSO);
+        if (z == 160) golpeDoZangetsu(com.minerwk.core.boss.ZangetsuBoss.CERO);
+        if (z == 215) golpeDoZangetsu(com.minerwk.core.boss.ZangetsuBoss.SHUNPO);
+        // O golpe que mataria: o jogador cai e se levanta de máscara.
+        if (z == 262) golpeDoZangetsu(com.minerwk.core.boss.ZangetsuBoss.GETSUGA);
+        if (z >= 270 && z < 300 && z % 2 == 0 && !com.minerwk.client.camera.CutsceneCliente.ativa()) vidaDoJogador(1);
+        if (z >= 380 && z % 10 == 0) vidaDoJogador(20);
+        // Abaixo de 40% da vida ele veste a máscara e o Getsuga vem em três.
+        if (z == 400) jogador.connection.sendCommand("damage @e[type=minerwk:zangetsu,limit=1,sort=nearest] 170");
+        if (z == 460) golpeDoZangetsu(com.minerwk.core.boss.ZangetsuBoss.GETSUGA_3);
+        if (z == 540) jogador.connection.sendCommand("kill @e[type=minerwk:zangetsu]");
+        boolean deFora = (z >= 55 && z < 262) || z >= 440;
+        if (!com.minerwk.client.camera.CutsceneCliente.ativa()) {
+            mc.options.setCameraType(deFora ? net.minecraft.client.CameraType.THIRD_PERSON_BACK
+                    : net.minecraft.client.CameraType.FIRST_PERSON);
+            if (zangetsu != null && !zangetsu.isInvisible()) {
+                jogador.lookAt(net.minecraft.commands.arguments.EntityAnchorArgument.Anchor.EYES, zangetsu.position().add(0, 1.2, 0));
+                // De fora, um pouco de lado: senão o jogador tapa o Zangetsu.
+                if (deFora) jogador.setYRot(jogador.getYRot() + 28);
+            }
+        }
+        // A vitória devolve o jogador ao mundo; depois o mundo de testes volta a ficar sem o despertar da demonstração.
+        int volta = 540 + com.minerwk.arena.ArenasServidor.TICKS_DEPOIS_DA_VITORIA + 30;
+        if (z == volta) {
+            jogador.connection.sendCommand("rwk despertar @s nao");
+            jogador.connection.sendCommand("rwk maestria @s zerar");
+            jogador.connection.sendCommand("gamerule sendCommandFeedback true");
+            jogador.connection.sendCommand("gamemode creative");
+        }
+        if (z >= volta + 10) {
+            mc.options.setCameraType(net.minecraft.client.CameraType.FIRST_PERSON);
+            fimDaDemo = true;
+        }
+    }
+
+    /**
+     * A forma Hollow: entra no Bankai, leva um golpe fatal e a forma ataca sozinha dois golens (um perto, para
+     * as garras, e um longe, para o Sonído). De frente no começo (a máscara e os chifres), depois de lado.
+     */
+    /**
+     * O modelo do Vasto Lorde de perto, sem inimigo por perto (a forma fica parada): a câmera do jogo com o
+     * campo de visão fechado em 30 graus faz o papel da lente. De frente parado, de frente andando, de costas
+     * andando, e de lado parado com um pulo, para o pano aparecer.
+     */
+    private static void previaDoHollowDePerto(Minecraft mc, LocalPlayer jogador, int t) {
+        mc.gui.getChat().clearMessages(false);
+        mc.options.hideGui = true;
+        net.minecraft.world.entity.Entity camera = jogador;
+        boolean deLado = t >= 206 && t < 262;
+        if (deLado) {
+            for (net.minecraft.world.entity.Entity e : mc.level.entitiesForRendering()) {
+                if (e instanceof net.minecraft.world.entity.decoration.ArmorStand && e.distanceToSqr(jogador) < 30 * 30) camera = e;
+            }
+        }
+        if (mc.getCameraEntity() != camera) mc.setCameraEntity(camera);
+        mc.options.setCameraType(camera != jogador ? net.minecraft.client.CameraType.FIRST_PERSON
+                : t < 160 ? net.minecraft.client.CameraType.THIRD_PERSON_FRONT : net.minecraft.client.CameraType.THIRD_PERSON_BACK);
+        mc.options.keyUp.setDown(t >= 112 && t < 200);
+        mc.options.keyJump.setDown(t >= 226 && t < 229);
+        jogador.setYRot(0);
+        jogador.setXRot(0);
+        if (t == 0) {
+            mc.options.fov().set(30);
+            jogador.connection.sendCommand("gamerule sendCommandFeedback false");
+            jogador.connection.sendCommand("gamerule doMobSpawning false");
+            jogador.connection.sendCommand("rwk despertar @s sim");
+            jogador.connection.sendCommand("rwk recarregar");
+        }
+        // Ninguém por perto, senão a forma vai atrás (várias vezes: slime morto se divide em menores).
+        if (t < 60 && t % 8 == 0) jogador.connection.sendCommand("kill @e[type=!minecraft:player,distance=..120]");
+        if (t == 6) tecla(com.minerwk.core.kit.Tecla.G, true);
+        if (t == 8) tecla(com.minerwk.core.kit.Tecla.G, false);
+        if (t == 56) jogador.connection.sendCommand("gamemode survival");
+        if (t == 60) jogador.connection.sendCommand("damage @s 1000 minecraft:generic");
+        // A câmera de lado: um suporte invisível à direita dele, na altura do peito, olhando para ele.
+        if (t == 202) {
+            jogador.connection.sendCommand("execute at @s run summon minecraft:armor_stand ~-4.6 ~1.15 ~ "
+                    + "{Invisible:1b,NoGravity:1b,Marker:1b,Rotation:[-90f,0f]}");
+        }
+        if (t == FIM_PREVIA - 4) {
+            jogador.connection.sendCommand("kill @e[type=minecraft:armor_stand,distance=..60]");
+            jogador.connection.sendCommand("gamerule sendCommandFeedback true");
+            jogador.connection.sendCommand("gamerule doMobSpawning true");
+            jogador.connection.sendCommand("gamemode creative");
+            jogador.connection.sendCommand("rwk despertar @s nao");
+            jogador.connection.sendCommand("rwk recarregar");
+            jogador.connection.sendCommand("tp @s ~-150 ~ ~-30");
+        }
+        if (t >= FIM_PREVIA) {
+            mc.options.fov().set(70);
+            mc.options.hideGui = false;
+            mc.setCameraEntity(jogador);
+            mc.options.setCameraType(net.minecraft.client.CameraType.FIRST_PERSON);
+            previa = -1;
+        }
+    }
+
+    private static void previaDoHollow(Minecraft mc, LocalPlayer jogador, int t) {
+        mc.gui.getChat().clearMessages(false);
+        // Uma câmera fixa perto, de lado: na de frente do jogo o golem taparia a vista.
+        boolean frente = false;
+        net.minecraft.world.entity.Entity camera = jogador;
+        // Depois do golem de perto, o Sonído leva o jogador embora: a câmera passa a ser a de trás dele.
+        if (t >= 4 && t < 112) {
+            for (net.minecraft.world.entity.Entity e : mc.level.entitiesForRendering()) {
+                if (e instanceof net.minecraft.world.entity.decoration.ArmorStand && e.distanceToSqr(jogador) < 60 * 60) camera = e;
+            }
+        }
+        if (mc.getCameraEntity() != camera) mc.setCameraEntity(camera);
+        mc.options.setCameraType(frente ? net.minecraft.client.CameraType.THIRD_PERSON_FRONT
+                : net.minecraft.client.CameraType.THIRD_PERSON_BACK);
+        if (t == 0) {
+            jogador.setYRot(0);
+            jogador.setXRot(4);
+            jogador.connection.sendCommand("gamerule sendCommandFeedback false");
+            jogador.connection.sendCommand("rwk despertar @s sim");
+            jogador.connection.sendCommand("rwk recarregar");
+            jogador.connection.sendCommand("kill @e[type=minecraft:armor_stand,distance=..60]");
+            jogador.connection.sendCommand("execute at @s run summon minecraft:armor_stand ~-0.85 ~1.3 ~1.9 "
+                    + "{Invisible:1b,NoGravity:1b,Marker:1b,Rotation:[-114f,4f]}");
+            jogador.connection.sendCommand("kill @e[type=minecraft:husk,distance=..80]");
+            jogador.connection.sendCommand("execute at @s run summon minecraft:husk ~ ~ ~3 {NoAI:1b,Health:60f,attributes:[{id:\"minecraft:generic.max_health\",base:60.0d}]}");
+        }
+        if (t == 6) tecla(com.minerwk.core.kit.Tecla.G, true);
+        if (t == 8) tecla(com.minerwk.core.kit.Tecla.G, false);
+        // No sobrevivência, para o golpe fatal valer.
+        if (t == 56) jogador.connection.sendCommand("gamemode survival");
+        if (t == 60) jogador.connection.sendCommand("damage @s 1000 minecraft:generic");
+        // O husk de perto morre com as garras; o de longe chama o Sonído e leva o Cero.
+        if (t == 110) {
+            jogador.connection.sendCommand("kill @e[type=minecraft:husk,distance=..80]");
+            jogador.connection.sendCommand("execute at @s run summon minecraft:husk ~ ~ ~13 {NoAI:1b,Health:200f,attributes:[{id:\"minecraft:generic.max_health\",base:200.0d}]}");
+        }
+        if (t == FIM_PREVIA - 4) {
+            jogador.connection.sendCommand("kill @e[type=minecraft:husk,distance=..80]");
+            jogador.connection.sendCommand("kill @e[type=minecraft:armor_stand,distance=..60]");
+            jogador.connection.sendCommand("gamerule sendCommandFeedback true");
+            jogador.connection.sendCommand("gamemode creative");
+            jogador.connection.sendCommand("rwk despertar @s nao");
+            jogador.connection.sendCommand("rwk recarregar");
+            jogador.connection.sendCommand("tp @s ~-150 ~ ~-30");
+        }
+        if (t >= FIM_PREVIA) {
+            mc.setCameraEntity(jogador);
+            mc.options.setCameraType(net.minecraft.client.CameraType.FIRST_PERSON);
+            previa = -1;
+        }
+    }
+
+    private static void golpeDoZangetsu(com.minerwk.core.boss.Golpe golpe) {
+        net.minecraft.server.MinecraftServer servidor = Minecraft.getInstance().getSingleplayerServer();
+        if (servidor == null) return;
+        servidor.execute(() -> {
+            for (net.minecraft.server.level.ServerLevel nivel : servidor.getAllLevels()) {
+                for (net.minecraft.world.entity.Entity e : nivel.getAllEntities()) {
+                    if (e instanceof com.minerwk.boss.ZangetsuEntity zangetsu) zangetsu.forcar(golpe);
+                }
+            }
+        });
+    }
+
+    private static void vidaDoJogador(float vida) {
+        net.minecraft.server.MinecraftServer servidor = Minecraft.getInstance().getSingleplayerServer();
+        if (servidor == null) return;
+        servidor.execute(() -> servidor.getPlayerList().getPlayers().forEach(p -> {
+            if (p.isAlive()) p.setHealth(Math.min(vida, p.getMaxHealth()));
+        }));
     }
 
     /** Manda o Toji da demonstração começar um golpe (o servidor é o do próprio jogo). */

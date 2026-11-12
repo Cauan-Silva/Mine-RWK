@@ -12,7 +12,7 @@ class KitDoJogadorTest {
     private static final Contexto CTX = new Contexto() {};
 
     /** Recurso falso: não regenera. */
-    static final class RecursoFixo implements Recurso {
+    static class RecursoFixo implements Recurso {
         double atual;
         RecursoFixo(double v) { atual = v; }
         public String nome() { return "Fixo"; }

@@ -30,6 +30,8 @@ public final class VisuaisAtivos {
         final int duracao;
         final long inicio;
         long fimEm = -1;
+        /** Onde o servidor disse que o golpe parou (null se não foi encerrado antes da hora). */
+        Vetor pontoFim;
         /** Se já deixou o rastro (túnel do Roxo, marca do Azul). */
         boolean deixouRastro;
         /** Se o som de fim (o domínio rachando) já tocou. */
@@ -81,7 +83,7 @@ public final class VisuaisAtivos {
         }
 
         /** Ticks desde o começo, com a fração do quadro. */
-        double idade(long agora, float parcial) {
+        public double idade(long agora, float parcial) {
             return Math.max(0, agora - inicio + parcial);
         }
 
@@ -138,11 +140,33 @@ public final class VisuaisAtivos {
         DetritosGojo.aoComecar(p.tipo(), p.origem(), p.forca());
     }
 
+    /** Um visual que nasce neste cliente, sem aviso do servidor (o rastro do clique da espada). */
+    public static void local(int dono, String tipo, Vetor origem, Vetor direcao, float forca, int duracao) {
+        ClientLevel nivel = Minecraft.getInstance().level;
+        if (nivel == null) return;
+        if (ATIVOS.size() >= LIMITE) despejar();
+        Visual novo = new Visual(dono, tipo, origem, direcao, forca, duracao, nivel.getGameTime());
+        ATIVOS.add(novo);
+        // O visual criado no cliente (o rastro do clique da espada) também tem som.
+        SonsVisuais.aoComecar(novo);
+    }
+
+    /** Se o dono tem um visual desse tipo em andamento (não encerrado). */
+    public static boolean tem(int dono, String tipo) {
+        for (Visual v : ATIVOS) {
+            if (v.dono == dono && v.fimEm < 0 && v.tipo.equals(tipo)) return true;
+        }
+        return false;
+    }
+
     public static void encerrar(EncerrarVisual p) {
         ClientLevel nivel = Minecraft.getInstance().level;
         if (nivel == null) return;
         long agora = nivel.getGameTime();
-        for (int i = ATIVOS.size() - 1; i >= 0; i--) {
+        // Dois Getsugas do mesmo dono no ar: quem bate primeiro é o que saiu primeiro.
+        boolean maisAntigo = p.tipo().startsWith("ichigo_getsuga");
+        for (int k = 0; k < ATIVOS.size(); k++) {
+            int i = maisAntigo ? k : ATIVOS.size() - 1 - k;
             Visual v = ATIVOS.get(i);
             if (v.dono != p.dono() || !v.tipo.equals(p.tipo()) || v.fimEm >= 0) continue;
             if (p.tipo().equals("gojo_vermelho")) {
@@ -162,6 +186,7 @@ public final class VisuaisAtivos {
                         PerfilVfxGojo.RASTRO_ROXO, agora));
             } else {
                 v.fimEm = agora;
+                v.pontoFim = p.ponto();
             }
             return;
         }

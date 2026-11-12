@@ -77,6 +77,23 @@ public final class ComandoTrocar {
                 }))));
     }
 
+    /** {@code /rwk zangetsu <jogador>}: leva o jogador ao Zangetsu interior sem a Máscara Rachada e sem exigir o nó (teste). */
+    public static void registrarZangetsu(CommandDispatcher<CommandSourceStack> d) {
+        d.register(Commands.literal("rwk").then(Commands.literal("zangetsu")
+                .requires(s -> s.hasPermission(2))
+                .then(Commands.argument("jogador", EntityArgument.player()).executes(c -> {
+                    ServerPlayer jogador = EntityArgument.getPlayer(c, "jogador");
+                    var resposta = com.minerwk.boss.LutasZangetsu.invocar(jogador, false);
+                    Component texto = Component.translatable(com.minerwk.boss.MascaraRachada.chave(resposta));
+                    if (resposta != com.minerwk.core.boss.TojiBoss.Invocacao.OK) {
+                        c.getSource().sendFailure(texto);
+                        return 0;
+                    }
+                    c.getSource().sendSuccess(() -> texto, true);
+                    return 1;
+                }))));
+    }
+
     public static void registrarDespertar(CommandDispatcher<CommandSourceStack> d) {
         d.register(Commands.literal("rwk").then(Commands.literal("despertar")
                 .requires(s -> s.hasPermission(2))

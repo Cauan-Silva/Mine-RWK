@@ -116,6 +116,17 @@ public final class HudKit {
             }
         }
 
+        // Sem poderes (depois do Mugetsu): o aviso em cima dos quadros, com o tempo que falta.
+        List<Long> restantes = new java.util.ArrayList<>();
+        for (HabilidadeHud h : habilidades) {
+            if (!h.trancada()) restantes.add(h.prontaNoTick() - agora);
+        }
+        long semPoderes = LogicaHud.semPoderes(s.recurso(), restantes);
+        if (semPoderes > 0) {
+            var aviso = net.minecraft.network.chat.Component.translatable("hud.minerwk.sem_poderes", LogicaHud.segundos(semPoderes));
+            g.drawString(fonte, aviso, (g.guiWidth() - fonte.width(aviso)) / 2, yQuadros - 11, TEXTO_SEM_RECURSO, true);
+        }
+
         double maximo = Math.max(1, s.maximo());
         int larguraBarra = Math.max(larguraTotal, 80);
         int xb = (g.guiWidth() - larguraBarra) / 2;

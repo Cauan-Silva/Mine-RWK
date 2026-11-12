@@ -24,6 +24,85 @@ Voltar para [[00 Início]].
 - Gojo (revisão 09/11, menores que ficaram): o Roxo pode derrubar plantas vizinhas (o `BreakEvent` para mods de proteção entrou em 09/11, no Gojo peso); o Vermelho atravessa parede fina encostada no rosto; bola de fogo e crânio de Wither voltam a acelerar no Infinito (o dano é cancelado mesmo assim); TNT sem dono passa pelo Infinito; sobram até 2 ticks de Infinito e 5 de Paralisia depois de morrer. Corrigidos na revisão: efeitos acabam ao mudar de dimensão; golpes não atingem pets, montaria nem projéteis do próprio Gojo; Paralisia não cancela Espinhos nem dano em si mesmo; ícone da Paralisia escondido (falta textura).
 
 ## Para testar no jogo
+- Ichigo, parte 8, a forma Hollow completa (12/11): **ver primeiro a prévia** `previas/ichigo_parte8_hollow.mp4` (`./gradlew runClientDemo -Pdemo=hollow`) e **ouvir** os quatro últimos sons de `previas/sfx_ichigo.wav` (rugido, garra, carga do Cero e Cero). No jogo: `/rwk trocar <jogador> ichigo`, `/rwk despertar <jogador> sim`, G para o Bankai, e levar um golpe que mataria (em sobrevivência; `/damage @s 1000` serve).
+  - **O modelo (refeito em 12/11 pelas referências do autor, sem o cabelo longo):** ver primeiro `previas/ichigo_vasto_lorde_perto.mp4` (o modelo de perto no jogo: frente, andando, costas, perfil e um pulo; `./gradlew runClientDemo -Pdemo=hollow_perto`) e `previas/traje_ichigo_hollow.png` (quatro vistas, de `python ferramentas/previa_traje.py ichigo_hollow`). A máscara de listras com os chifres que saem para os lados e dobram para a frente, a gola de pelo vermelho, o buraco com as marcas até os ombros, a manga preta rasgada só no braço direito, as chamas nos pulsos e tornozelos, a faixa branca, o hakama mais curto na perna esquerda e a Tensa Zangetsu na mão. Os chifres foram afinados e os olhos e a boca aumentados a pedido do autor. **Pano:** o hakama (uma saia de tiras presa na cintura), a manga rasgada e as pontas da faixa balançam pelo tecido do Bankai; conferir andando, correndo, pulando e no Sonído (a perna atravessa a saia? as tiras da frente abrem demais?). O autor achou a primeira versão feia: a máscara foi repintada com quatro vezes mais detalhe (olhos rasgados, presas, testa e focinho em relevo), os chifres viraram uma curva de oito segmentos e a gola e as chamas viraram tufos com volume. Agradou agora? O que ainda incomoda? No jogo o reiatsu em volta esconde parte do corpo: diminuir?
+  - **A transformação:** o estouro, o rugido e o reiatsu preto e vermelho em volta do corpo pelos 10 s. Em primeira pessoa o reiatsu atrapalha a visão?
+  - **O que a forma faz sozinha:** garra a cada 1,5 s em quem está a até 4 blocos, Sonído para junto de quem está mais longe (até 24) e, aos 6 s, o Cero violeta. Ela escolhe **o inimigo mais próximo à vista**: monstros, quem está atrás do Ichigo ou o feriu por último, e outros jogadores (com PvP). Animais, aldeões, golens mansos e bichos dos outros ficam de fora (o Cero, que é um feixe, ainda pega quem estiver na linha). Deve preferir quem bateu no Ichigo, ou jogadores? A prévia foi regravada com o modelo novo e os husks.
+  - **O jogador só anda e pula:** teclas e clique não respondem, nem usar item, bloco ou entidade (arco, comida, porta, baú): conferir se algo ainda escapa. Como o Sonído e a garra viram o corpo para o alvo, a câmera gira sozinha: fica ruim de jogar?
+  - **O golpe que mataria** conta o dano já reduzido por armadura, encantamento e absorção: um golpe forte que a armadura segura não gasta a forma. Totem da Imortalidade na mão: a forma vem antes e o totem não é gasto; é o que se quer?
+  - **Sair no meio:** trocar de dimensão ou sair do jogo durante a forma acaba com ela na hora, com o mesmo custo (Shikai, 6 de vida, G em recarga).
+  - **Regras:** metade do dano e não morre durante a forma; o reiatsu fica parado; ao acabar, Shikai com 6 de vida e o G em recarga de 20 s; a forma só volta em 5 minutos (não há aviso na tela dessa recarga: faz falta?). Não ativa no Shikai, antes de vencer o Zangetsu, nem na arena de um boss.
+  - **O Cero do Zangetsu interior** passou a usar os sons novos (carga e disparo).
+- Ichigo, parte 7 (12/11): **ver primeiro a prévia** `previas/ichigo_parte7_zangetsu.mp4` (a luta inteira, gravada por `./gradlew runClientDemo -Pdemo=zangetsu`). No jogo:
+  - **Árvore (H):** os 13 nós do Ichigo. Os seis primeiros e o Despertar (5 pontos, maestria 20) abrem logo; os outros seis só depois de vencer o Zangetsu. Os números de cada nó foram escolha minha: conferir se algum pesa demais ou de menos.
+  - **Máscara Rachada:** a receita sem forma (osso, pérola do Ender, espada de ferro) e as recusas (outro personagem, sem o nó, já na arena). Ela é gasta só quando a luta começa? Para pular os requisitos: `/rwk zangetsu <jogador>`.
+  - **Mundo interior:** o chão é a fachada de um prédio deitado, com janelas de vidro azul, e há três prédios em volta. Lê como "prédios de lado"? O céu é o entardecer da dimensão das arenas, não o azul do spec: trocar pede uma dimensão própria; vale a pena?
+  - **A chegada:** ele espera 2 s parado e depois faz a entrada (2 s) com a fala. Na prévia a tela de carregamento comeu a entrada inteira; ver se no jogo normal dá tempo de vê-la. Se não der, a saída é o cliente avisar o servidor quando terminou de carregar.
+  - **Os golpes:** corte de perto (setor no chão), Getsuga branco (linha de aviso), Shunpo (some e surge atrás, com a sombra), espada arremessada (linha curta; ele fica sem espada até ela voltar) e Cero (carga na cara e o raio vermelho). Dá para ler e desviar de cada um? Ele fica colado demais no jogador?
+  - **A queda:** o golpe que mataria derruba; a cutscene curta, a máscara no rosto, e o jogador se levanta de vida cheia, em Bankai, de máscara e com os golpes trancados liberados. Só vale uma vez por luta: da segunda vez o jogador morre.
+  - **A máscara dele:** abaixo de 40% da vida ele veste a máscara, anda e ataca mais rápido, e o Getsuga vem em três, cada um mirado de novo.
+  - **Fim:** vencer dá 500 de XP de maestria, o despertar de vez e nenhum item, e devolve o jogador para onde estava. Morrer, sair ou deixar o tempo acabar tranca tudo de novo.
+  - **Perder de máscara:** quem perde a luta depois da queda volta ao mundo ainda em Bankai e com a máscara no rosto até ela acabar (uns segundos), embora os golpes voltem a trancar. Incomoda? Dá para tirar a máscara na hora.
+  - **Máscara Rachada devolvida:** ela volta ao inventário se o Zangetsu não conseguir entrar; mas quem morre ou sai do jogo nos poucos segundos em que a arena é montada ainda a perde.
+  - **Som:** o Cero usa por enquanto a carga do Bankai e a onda; o boss usa os sons do Ichigo. Sons próprios ficam para a parte 8, se o autor quiser.
+- Mugetsu fino e longo (12/11), prévia em `previas/ichigo_mugetsu.mp4`:
+  - O véu agora tem 3 de largura, 40 de altura e 150 de alcance. A largura está fina o bastante? O topo aparece como pontas (uma cortina a cada 3 blocos); agrada ou prefere liso?
+  - Com 3 de largura é preciso mirar: testar se dá para acertar um alvo andando. Ele também pega quem está voando até 40 blocos acima.
+  - 150 blocos passa da distância de visão em servidores com poucos chunks: ver se o véu aparece inteiro e se quem está longe do Ichigo o vê.
+  - O plano aberto da cutscene ficou mais afastado para caber o véu; conferir se a câmera não entra em morro ou árvore.
+- Ichigo, parte 6, apresentação (11/11): **ver primeiro as folhas de quadros** `previas/ichigo_mugetsu.png` e `previas/ichigo_mugetsu_cutscene.png` e **ouvir** `previas/sfx_ichigo.wav` (os seis últimos sons). No jogo (`/rwk trocar <jogador> ichigo`, `/rwk despertar <jogador> sim`, G):
+  - **V:** a mão passa pelo rosto e a máscara aparece; fica bem em skins diferentes (cabeça com camada de chapéu)? O som de formar e o de quebrar aos 11 s.
+  - **R, a cutscene:** os seis planos. O corte para a forma final aos 1,5 s, as duas palavras, o silêncio antes do corte. A forma final convence sem o cabelo longo? O ritmo de 6 s está bom ou arrasta?
+  - **R, o véu:** no plano aberto dá para ver a parede preta avançar; de outro jogador, de fora e de dentro dela; o céu escurecendo e voltando.
+  - **Depois:** o aviso "Sem poderes: N s" no HUD (encosta em outras mensagens?), o reiatsu indo embora 1,5 s depois do corte e voltando aos 60 s, com som.
+  - **Golpe forte na cutscene:** a câmera volta, o som e a fumaça param, a forma final some.
+  - **Com `cutscenes = false`** na config: só as palavras, sem a câmera.
+  - **Em terreno fechado** (floresta, caverna): a câmera da cutscene entra em blocos? Na prévia o último plano entrou numa árvore.
+- Ichigo, parte 6, mecânica (11/11): máscara, Mugetsu e perda dos poderes, **ainda sem visual nem som próprios**. Para testar: `/rwk trocar <jogador> ichigo`, `/rwk despertar <jogador> sim`, entrar no Bankai (G):
+  - **V (máscara):** nada aparece no rosto ainda, mas por 11 s a barra de reiatsu para de descer, o Getsuga negro sai mais largo e tudo fere 30% mais. A duração e a recarga de 40 s estão boas?
+  - **R (Mugetsu):** precisa de 100 de reiatsu. Fica 6 s parado (a cutscene ainda não existe) e solta o véu (invisível por enquanto): 40 de dano em quem estiver nos 150 blocos à frente, numa faixa de 3 de largura e 40 de altura (medidas de 12/11). Levar um golpe forte nesses 6 s cancela.
+  - **Sem poderes:** depois do R, volta ao Shikai com o reiatsu em zero e os cinco golpes em recarga de 60 s; só o clique da espada funciona. Sair e entrar no jogo não devolve os poderes. 60 s é muito? pouco?
+  - **Sem despertar:** V e R aparecem com cadeado no Bankai.
+  - **Balanceamento:** o véu atravessa paredes; 40 de dano ignorando armadura mata quase qualquer jogador. É isso mesmo que se quer do golpe final?
+- Ichigo, parte 5 (11/11): som dos golpes. **Ouvir primeiro a prévia** `previas/sfx_ichigo.wav` (os 11 sons, 3 variações de cada, em fila). Depois no jogo (`/rwk trocar <jogador> ichigo`):
+  - **Z (Shikai):** o som da carga cresce enquanto segura e para ao soltar; a saída do corte, o voo e o estouro quando a meia-lua se desfaz. Bater numa parede perto: o estouro do som chega atrasado em relação ao visual?
+  - **Z (Bankai):** mais grave e mais rápido que o do Shikai. Dá para distinguir os dois de ouvido?
+  - **X:** o passo. Vários Shunpos seguidos no Bankai (recarga de 2 s) cansam?
+  - **C (Shikai):** a espada cravando e a onda; **V:** o giro na ida, a volta e o baque na mão caem junto com a espada?
+  - **G:** a pressão se juntando na carga e o estouro na liberação. O estouro tem peso de transformação? Cortar a carga (levar um golpe forte) para o som.
+  - **C (Bankai):** a lâmina acesa soa pelos 6 s sem incomodar; sair do Bankai no meio apaga o som.
+  - **Clique da espada:** o corte curto a cada ataque básico. Com cliques rápidos vira uma rajada?
+  - **Geral:** volume de cada som em relação aos do Gojo e aos do jogo; de perto e de longe; outro jogador ouvindo; legendas ligadas; a opção `SFX de anime` desligada.
+  - **Ainda sem som:** máscara, Mugetsu e forma Hollow (partes 6 e 8, que ainda não existem).
+- Ichigo, parte 4 (11/11): VFX e animações (prévia em `previas/ichigo.mp4`):
+  - **Getsuga (Z):** o reiatsu azul sobe enquanto segura; a meia-lua sai do corte, acompanha o dano e se parte em lascas na parede (atirar de perto numa parede e ver se as lascas aparecem do lado de cá). No Bankai é preta com borda vermelha. Ver de frente, de lado e em primeira pessoa se o tamanho e o brilho agradam.
+  - **Shunpo (X):** riscos, vultos e poeira no caminho; conferir em primeira pessoa se não atrapalha a visão.
+  - **Ajustes ainda sem prévia** (gravar com `./gradlew runClientDemo -Pdemo=ichigo` ou ver no jogo): o rasgo no chão por onde o Getsuga passa; o rastro de corte em cada clique da espada (Shikai, Bankai e maior com o C do Bankai), em primeira e terceira pessoa; o tranco de câmera no Getsuga e o clarão na onda e na entrada do Bankai (ver se não ficou demais).
+  - **C do Shikai:** a parede da onda abre até onde o golpe alcança (5 blocos).
+  - **Arremesso (V):** a espada gira no ar presa pelo pano e volta à mão; atirar contra uma parede próxima e ver se ela para antes do bloco.
+  - **Bankai (G):** a carga puxa o reiatsu e escurece; o pilar esconde a troca do traje. Levar dano durante a carga: o visual e a animação param.
+  - **C do Bankai:** chamas na lâmina por 6 s, e somem ao sair do Bankai ou morrer.
+  - **Animações:** olhar as nove em terceira pessoa (F5), andando e parado; a espada acompanha o braço em todas? Ajustes de pose dá para fazer no Blockbench.
+  - **Outro jogador** vê os mesmos visuais (precisa de dois clientes).
+- Ichigo, parte 3 (11/11): arma e traje (prévia em `previas/ichigo_traje.mp4`):
+  - **Shikai:** shihakushō e a Zangetsu na mão direita, sem item no inventário. As mangas e a faixa da espada balançam ao andar e ao virar a câmera.
+  - **Bankai (G):** o traje vira o casaco longo e a espada vira a Tensa Zangetsu; o casaco abre na entrada e balança ao correr, pular e girar. Olhar de perto se os painéis do casaco mostram fresta ou se a perna atravessa (se incomodar, dá para trazer a folha lisa do Minezin).
+  - **Arremesso (V):** a espada some da mão e volta depois de uns 16 ticks.
+  - **Primeira pessoa:** com a mão vazia, a espada aparece no braço; conferir se o tamanho e a posição agradam.
+  - **Outro jogador:** quem está vendo o Ichigo vê a troca de traje e de espada na hora (precisa de dois clientes).
+  - **Gojo:** conferir que o traje dele continua igual (venda, olhos e barra do casaco).
+- Ichigo, parte 2 (11/11): o kit das duas formas, ainda só com partículas (`/rwk trocar <jogador> ichigo`):
+  - **Shikai:** Z segurado e solto cedo (o segurado fere mais), atravessando dois inimigos em fila e parando na parede; X avança 8 blocos e para antes de parede (testar olhando para baixo, para cima e num degrau); C empurra, fere e apaga flechas de esqueleto; V lança a espada e, até ela voltar, o clique é um soco.
+  - **Bankai:** G leva 1,5 s e empurra quem está perto; a barra fica vermelho-escura e escorre. Z sai na hora; X com um inimigo na mira surge atrás dele já olhando para ele; C deixa o clique alcançar 5 blocos por 6 s; G volta e o Bankai fica 5 s em recarga.
+  - **Reiatsu em zero:** o Bankai acaba sozinho e o G fica 10 s em recarga.
+  - **Ataque básico:** o clique tira 7 no Shikai e 6 no Bankai (mais rápido), com qualquer item na mão. Conferir se a barra de recarga do ataque acompanha a velocidade, e se o balanceamento agrada (o Bankai dura 100 s parado; cada golpe encurta).
+  - **Shunpo:** ver se o deslocamento fica bom em primeira pessoa (é um teleporte seco, sem animação ainda) e se dá para abusar dele para subir muros.
+- Ichigo, parte 1 (11/11): as formas no núcleo. O Ichigo ainda não existe no jogo; dá para ver pelo personagem de teste (`/rwk trocar <jogador> teste`):
+  - **G** entra na "forma de teste": o HUD passa a mostrar só o Z e o G, e o Z vira o "Golpe forte de teste". G de novo volta.
+  - **Recarga:** usar o Z, transformar e usar o Z da forma (não deve estar em recarga); voltar e ver que a recarga do primeiro Z continuou correndo.
+  - **Morrer** transformado: renasce na forma base.
+  - **Tela de escolha:** o personagem de teste mostra "Forma de teste" e os golpes dela abaixo dos da base (o teste não aparece na tela normal; `/rwk` de teste da tela, se usar).
+  - **Gojo:** conferir que nada mudou nos cadeados (X, V, G, R trancados antes do despertar).
 - Arena da Escola Jujutsu (11/11), conferir no jogo (`/rwk toji <jogador>`); substitui os itens de **cenário** da lista "Arena, partes 2 e 3" abaixo:
   - **Entrada:** quanto tempo fica a tela preta e a de carregamento? Ficou mais longa que antes? Se incomodar, dá para enxugar mais a floresta.
   - **Cenário:** parece a Escola Jujutsu? Olhar a escadaria com os torii atrás de onde você entra, o salão ao norte, os dois pavilhões e a floresta. Os telhados ficaram bons? O céu está de pôr do sol?

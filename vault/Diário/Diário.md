@@ -28,9 +28,20 @@ Voltar para [[00 Início]].
 - [[2026-11-10 Maestria parte 3]]: tela da árvore (tecla H), compra pelo cliente e o estado "despertou"
 - [[2026-11-10 Toji parte 1]]: golpes trancados até o despertar, cadeado no HUD e o "desperto na luta"
 - [[2026-11-10 Toji parte 2]]: o boss essencial (motor de golpes, três golpes, Contrato, despertar no meio da luta)
+- [[2026-11-11 Ichigo pesquisa]]: pesquisa canônica do Ichigo, kit proposto, e o guia de portar personagem completado
 - [[2026-11-10 Toji parte 3]]: o resto da luta (três golpes novos, três fases, marcas no chão, sons, entrada e cutscene do despertar)
 - [[2026-11-10 Arena parte 0]]: prova da arena do Toji (dimensão `minerwk:arena`, ponto de retorno e `/rwk arena ir` e `voltar`)
 - [[2026-11-10 Arena parte 1]]: a luta do Toji acontece na arena (vagas, montagem em fatias, todos os fins de luta, morte sem perder itens)
 - [[2026-11-10 Arena partes 2 e 3]]: regras da arena (barreira, queda no vazio, blocos) e o cenário da entrada da Escola Jujutsu, com a tela escurecendo
 - [[2026-11-11 Queda do despertar]]: o Gojo passa a cair de costas e se levantar no despertar (antes ficava em pé)
 - [[2026-11-11 Arena da Escola Jujutsu]]: o cenário da arena refeito como a Escola (escadaria com torii, pátio, salão, pavilhões e floresta)
+- [[2026-11-11 Ichigo parte 1]]: formas no núcleo (transformações, trancas por golpe, sincronização e tela de escolha) e o Reiatsu
+- [[2026-11-11 Ichigo parte 2]]: kit do Shikai e do Bankai (nove golpes, Shunpo, ataque básico da Zangetsu) com apresentação provisória
+- [[2026-11-11 Ichigo parte 3]]: Zangetsu e Tensa Zangetsu na mão, traje do Shikai e do Bankai e o pano animado trazido do Minezin
+- [[2026-11-11 Ichigo parte 4]]: VFX dos golpes do Ichigo (Getsuga em volume, Shunpo, onda, arremesso, entrada do Bankai) e nove animações do jogador
+- [[2026-11-11 Ichigo parte 5]]: som dos golpes do Ichigo (11 sons sintetizados, presos aos visuais) e o `SonsDosVisuais` para todos os personagens
+- [[2026-11-11 Ichigo parte 6 mecânica]]: máscara Hollow, Mugetsu e a perda dos poderes funcionando no servidor (falta a apresentação)
+- [[2026-11-11 Ichigo parte 6 apresentação]]: máscara no rosto, forma final, cutscene, véu, sons, animações e o aviso de "sem poderes" (a parte 6 fica completa)
+- [[2026-11-12 Mugetsu fino e longo]]: o véu do Mugetsu passa a ter 3 de largura, 40 de altura e 150 de alcance, a pedido do autor
+- [[2026-11-12 Ichigo parte 7]]: árvore do Ichigo com o nó Despertar, boss Zangetsu interior, Máscara Rachada e a arena do mundo interior
+- [[2026-11-12 Ichigo parte 8]]: a forma Hollow completa (modelo de chifres, garra, Sonído e Cero sozinhos, sons e animações); o Ichigo fecha as 8 partes

@@ -42,4 +42,21 @@ public final class LogicaHud {
     public static List<Tecla> teclasVisiveis(Set<Tecla> doPersonagem) {
         return Arrays.stream(Tecla.values()).filter(doPersonagem::contains).toList();
     }
+
+    /** Recarga a partir da qual todos os golpes parados juntos contam como perda de poderes: 10 segundos. */
+    static final long LONGA = 200;
+
+    /**
+     * Se o jogador está sem poderes (o custo do Mugetsu do Ichigo): sem recurso e com todos os golpes da forma
+     * em recarga longa. Devolve os ticks que faltam para o último voltar, ou 0 se não é o caso.
+     */
+    public static long semPoderes(double recurso, List<Long> restantes) {
+        if (recurso > 1e-9 || restantes.isEmpty()) return 0;
+        long maior = 0;
+        for (long r : restantes) {
+            if (r < LONGA) return 0;
+            maior = Math.max(maior, r);
+        }
+        return maior;
+    }
 }

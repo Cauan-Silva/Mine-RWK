@@ -25,6 +25,10 @@ public final class Sons {
         for (String id : com.minerwk.core.personagens.gojo.SonsGojo.TODOS) {
             REGISTRO.register(id, () -> SoundEvent.createVariableRangeEvent(MineRWK.id(id)));
         }
+        // Sons do Ichigo, gerados por ferramentas/gerar_sfx_ichigo.py; os ids ficam em core (SonsIchigo).
+        for (String id : com.minerwk.core.personagens.ichigo.SonsIchigo.TODOS) {
+            REGISTRO.register(id, () -> SoundEvent.createVariableRangeEvent(MineRWK.id(id)));
+        }
     }
 
     /** O som do Toji com esse id de {@code SonsToji}. */

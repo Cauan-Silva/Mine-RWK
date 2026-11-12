@@ -1,0 +1,596 @@
+{
+  "ichigo_getsuga_carga": {
+    "duration": 0.55,
+    "sample_rate": 48000,
+    "channels": 1,
+    "peak": 0.56776,
+    "rms": 0.1236,
+    "sha256": "fd4c2f8572ca663f4077c816c03f1f7b5b67d38525bf7250d87ced93407628cc",
+    "ticks": 11,
+    "marcos": {
+      "cheia": 10
+    }
+  },
+  "ichigo_getsuga_carga_2": {
+    "duration": 0.5288,
+    "sample_rate": 48000,
+    "channels": 1,
+    "peak": 0.60536,
+    "rms": 0.12763,
+    "sha256": "e3d73e16bada45396ade7e255d0ab22ca1025577c941f901b83139dc1b6e42d4"
+  },
+  "ichigo_getsuga_carga_3": {
+    "duration": 0.5729,
+    "sample_rate": 48000,
+    "channels": 1,
+    "peak": 0.63734,
+    "rms": 0.15255,
+    "sha256": "6ffbe783855c8e57fadae6e1314e86b9d291b769f156814c0624c0bcfc1de72d"
+  },
+  "ichigo_getsuga": {
+    "duration": 2.15,
+    "sample_rate": 48000,
+    "channels": 1,
+    "peak": 0.62418,
+    "rms": 0.08427,
+    "sha256": "ad9c057cc8996576677781444efeccf37cd96509b35e1531af533986bbca1b6c",
+    "ticks": 43,
+    "marcos": {
+      "voo": 15,
+      "fim": 31
+    }
+  },
+  "ichigo_getsuga_2": {
+    "duration": 2.0673,
+    "sample_rate": 48000,
+    "channels": 1,
+    "peak": 0.63156,
+    "rms": 0.08868,
+    "sha256": "de93cda942ac0564594c53bb09ea90bf4f03307539683e835e73ee0812181afd"
+  },
+  "ichigo_getsuga_3": {
+    "duration": 2.2396,
+    "sample_rate": 48000,
+    "channels": 1,
+    "peak": 0.63,
+    "rms": 0.09602,
+    "sha256": "67b63f5bab7e69c04733a280edf6d0a76b3268675ce68141333ade481fb37150"
+  },
+  "ichigo_getsuga_negro": {
+    "duration": 2.0,
+    "sample_rate": 48000,
+    "channels": 1,
+    "peak": 0.55687,
+    "rms": 0.08488,
+    "sha256": "fd22faa187113c2a8c610b753edd155b14337b6c3cc7ee7c94d9749a84144341",
+    "ticks": 40,
+    "marcos": {
+      "voo": 12,
+      "fim": 28
+    }
+  },
+  "ichigo_getsuga_negro_2": {
+    "duration": 1.9231,
+    "sample_rate": 48000,
+    "channels": 1,
+    "peak": 0.58381,
+    "rms": 0.0817,
+    "sha256": "42d8aa046a0fa48121a09202af84ec56cafbbb15f2c0fb2e8858a5caf76c6709"
+  },
+  "ichigo_getsuga_negro_3": {
+    "duration": 2.0833,
+    "sample_rate": 48000,
+    "channels": 1,
+    "peak": 0.65802,
+    "rms": 0.08297,
+    "sha256": "fe08ab0ca7de077159cbfed7b86231580e5bc956d6e8b34c4c7778867d70c671"
+  },
+  "ichigo_shunpo": {
+    "duration": 0.75,
+    "sample_rate": 48000,
+    "channels": 1,
+    "peak": 0.59649,
+    "rms": 0.0926,
+    "sha256": "7e1ce8b4233d23616f455e79e0a0be81acf5eace1d3ec4205d363b645bddba5d",
+    "ticks": 15,
+    "marcos": {
+      "fim": 9
+    }
+  },
+  "ichigo_shunpo_2": {
+    "duration": 0.7211,
+    "sample_rate": 48000,
+    "channels": 1,
+    "peak": 0.68179,
+    "rms": 0.10108,
+    "sha256": "cfae16753debeb42f7259b67676a567ddbae0fcbed4012107ad0304f8e3b1594"
+  },
+  "ichigo_shunpo_3": {
+    "duration": 0.7812,
+    "sample_rate": 48000,
+    "channels": 1,
+    "peak": 0.64066,
+    "rms": 0.10432,
+    "sha256": "ec311c520d7088734d5e5b48f8598da9d1855477c930e97537b1a4ec4231875e"
+  },
+  "ichigo_onda": {
+    "duration": 2.0,
+    "sample_rate": 48000,
+    "channels": 1,
+    "peak": 0.60285,
+    "rms": 0.13702,
+    "sha256": "76acdab2fec8c6b3c5a9a0dd42c3fba5ed6c69814f3f90b182ce0817e69d9c3d",
+    "ticks": 40,
+    "marcos": {
+      "fim": 16
+    }
+  },
+  "ichigo_onda_2": {
+    "duration": 1.9231,
+    "sample_rate": 48000,
+    "channels": 1,
+    "peak": 0.62258,
+    "rms": 0.1505,
+    "sha256": "1868b76b6bff6dd2e1c71785301311234f2faeee89ae4c4a2b8df39acfcb3c2d"
+  },
+  "ichigo_onda_3": {
+    "duration": 2.0833,
+    "sample_rate": 48000,
+    "channels": 1,
+    "peak": 0.60812,
+    "rms": 0.14681,
+    "sha256": "8cc0b19b7e8f3f13b245a3ffcfbec48662f068af1a97aeb27b2cec64350233fc"
+  },
+  "ichigo_arremesso": {
+    "duration": 1.05,
+    "sample_rate": 48000,
+    "channels": 1,
+    "peak": 0.58673,
+    "rms": 0.1358,
+    "sha256": "6a6c6b746a03a21e7d0b32b37430aae5fcf0c71d75c1ad5fc3c61573de15fe3b",
+    "ticks": 21,
+    "marcos": {
+      "volta": 8,
+      "fim": 16
+    }
+  },
+  "ichigo_arremesso_2": {
+    "duration": 1.0096,
+    "sample_rate": 48000,
+    "channels": 1,
+    "peak": 0.58384,
+    "rms": 0.12598,
+    "sha256": "9428ffdcd938572ee2ed9d07f5eb32f889d3985b9f0ca484bf8c7fdb3de84a0e"
+  },
+  "ichigo_arremesso_3": {
+    "duration": 1.0937,
+    "sample_rate": 48000,
+    "channels": 1,
+    "peak": 0.66201,
+    "rms": 0.14334,
+    "sha256": "311fc42b6c6fa0a0314a532dcba0404fdff71870ae7516667a1bfd39118d0dab"
+  },
+  "ichigo_bankai_carga": {
+    "duration": 1.55,
+    "sample_rate": 48000,
+    "channels": 1,
+    "peak": 0.60166,
+    "rms": 0.13269,
+    "sha256": "8ae9bc9d8d0ef8eef4de54ecf8fe8f0142dceeb34ad688053098b90a9c390050",
+    "ticks": 31,
+    "marcos": {
+      "libera": 30
+    }
+  },
+  "ichigo_bankai_carga_2": {
+    "duration": 1.4904,
+    "sample_rate": 48000,
+    "channels": 1,
+    "peak": 0.62065,
+    "rms": 0.13855,
+    "sha256": "d03feedde491e88a465af3dfac1d2ba3902dd415242ab7bea38306b570968c5c"
+  },
+  "ichigo_bankai_carga_3": {
+    "duration": 1.6146,
+    "sample_rate": 48000,
+    "channels": 1,
+    "peak": 0.6131,
+    "rms": 0.13862,
+    "sha256": "4424de04ca6bffd6fddd68ac3c1866d767489ef0fadd57376430b737c9935006"
+  },
+  "ichigo_bankai": {
+    "duration": 3.3,
+    "sample_rate": 48000,
+    "channels": 1,
+    "peak": 0.65713,
+    "rms": 0.12932,
+    "sha256": "017a99f6a5e2f87c7cfe68043f36a144fef3c01fecf08363fdac1045eb1b7f35",
+    "ticks": 66,
+    "marcos": {
+      "fim": 34
+    }
+  },
+  "ichigo_bankai_2": {
+    "duration": 3.1731,
+    "sample_rate": 48000,
+    "channels": 1,
+    "peak": 0.61,
+    "rms": 0.14793,
+    "sha256": "a8309d05017dfa6f52d6ac94618ad350332eff8a56bb586c275f3bed04e77e7c"
+  },
+  "ichigo_bankai_3": {
+    "duration": 3.4375,
+    "sample_rate": 48000,
+    "channels": 1,
+    "peak": 0.61423,
+    "rms": 0.15118,
+    "sha256": "81d0ffc37a53ba97624415b4a1998f5743716baea264eb7532b5951f67dd8e87"
+  },
+  "ichigo_lamina": {
+    "duration": 6.3,
+    "sample_rate": 48000,
+    "channels": 1,
+    "peak": 0.61784,
+    "rms": 0.08898,
+    "sha256": "3ebfc03dc54866656c566c29dccf1a49c31c31f7ce5cd5777a2c08a07f5dba5a",
+    "ticks": 126,
+    "marcos": {
+      "fim": 120
+    }
+  },
+  "ichigo_lamina_2": {
+    "duration": 6.0577,
+    "sample_rate": 48000,
+    "channels": 1,
+    "peak": 0.70359,
+    "rms": 0.09325,
+    "sha256": "355ff7fff65a9a4b900479ab4fbf8427cf3521109cb33880a60788a9566357a7"
+  },
+  "ichigo_lamina_3": {
+    "duration": 6.5625,
+    "sample_rate": 48000,
+    "channels": 1,
+    "peak": 0.60169,
+    "rms": 0.08498,
+    "sha256": "1fd03eb127505e3d5b2fe288813b284d326209d2a913424d26a78abf52b0d6df"
+  },
+  "ichigo_sair": {
+    "duration": 1.2,
+    "sample_rate": 48000,
+    "channels": 1,
+    "peak": 0.60043,
+    "rms": 0.12474,
+    "sha256": "4b12d5a638167333bf804d1715353186140167005c02989b30d5dedc9eecb2e3",
+    "ticks": 24,
+    "marcos": {
+      "fim": 14
+    }
+  },
+  "ichigo_sair_2": {
+    "duration": 1.1538,
+    "sample_rate": 48000,
+    "channels": 1,
+    "peak": 0.68718,
+    "rms": 0.14987,
+    "sha256": "944db0ab7b680ac7049e0a4b5108b1df57ee05e8ab641b948c30dadc11828ee8"
+  },
+  "ichigo_sair_3": {
+    "duration": 1.25,
+    "sample_rate": 48000,
+    "channels": 1,
+    "peak": 0.6676,
+    "rms": 0.14886,
+    "sha256": "1846f3491dc7eee8ae27293c0620c89085f7d3a666e86ad9164a48dbe9da2b67"
+  },
+  "ichigo_corte": {
+    "duration": 0.45,
+    "sample_rate": 48000,
+    "channels": 1,
+    "peak": 0.6228,
+    "rms": 0.11684,
+    "sha256": "f07c659d3c358ec90881efc60b8dd3b5e341a62f99a2a44d38d573f5c4324539",
+    "ticks": 9,
+    "marcos": {
+      "fim": 7
+    }
+  },
+  "ichigo_corte_2": {
+    "duration": 0.4327,
+    "sample_rate": 48000,
+    "channels": 1,
+    "peak": 0.65259,
+    "rms": 0.12445,
+    "sha256": "6ffc9164f1bcce382ac66b721da0b54370ec51a5a6054145da716176b86a2086"
+  },
+  "ichigo_corte_3": {
+    "duration": 0.4687,
+    "sample_rate": 48000,
+    "channels": 1,
+    "peak": 0.58485,
+    "rms": 0.09752,
+    "sha256": "9559da83cdcecb8b911b01179c91d757a3f4da8fb266b108a15eb69be205ccfd"
+  },
+  "ichigo_mascara_veste": {
+    "duration": 1.7,
+    "sample_rate": 48000,
+    "channels": 1,
+    "peak": 0.61826,
+    "rms": 0.12847,
+    "sha256": "10cc96fa088dbb307d48a8e36b5b695bb999afdf1eb3153837b711ff5f9a7877",
+    "ticks": 34,
+    "marcos": {
+      "fecha": 8
+    }
+  },
+  "ichigo_mascara_veste_2": {
+    "duration": 1.6346,
+    "sample_rate": 48000,
+    "channels": 1,
+    "peak": 0.60902,
+    "rms": 0.13311,
+    "sha256": "360ce593961f55edc4ef0fa85a25183892a490d2cc3d739349d1ad78e711907b"
+  },
+  "ichigo_mascara_veste_3": {
+    "duration": 1.7708,
+    "sample_rate": 48000,
+    "channels": 1,
+    "peak": 0.59084,
+    "rms": 0.13405,
+    "sha256": "baeb94f951f58e461ad8f254ebaf16b133a7319e60d2100683d925156d3fa375"
+  },
+  "ichigo_mascara_quebra": {
+    "duration": 1.1,
+    "sample_rate": 48000,
+    "channels": 1,
+    "peak": 0.51366,
+    "rms": 0.08177,
+    "sha256": "9e9e521ea19864ac90d35dec62d92eab2bf96bca0466b3e26a83718e4a6c6a1b",
+    "ticks": 22,
+    "marcos": {
+      "quebra": 8
+    }
+  },
+  "ichigo_mascara_quebra_2": {
+    "duration": 1.0577,
+    "sample_rate": 48000,
+    "channels": 1,
+    "peak": 0.63831,
+    "rms": 0.0925,
+    "sha256": "3fac5e0ead957112e799c6f3576a0543bf1a5e503135d1f6f1369dc86f38285f"
+  },
+  "ichigo_mascara_quebra_3": {
+    "duration": 1.1458,
+    "sample_rate": 48000,
+    "channels": 1,
+    "peak": 0.58992,
+    "rms": 0.09346,
+    "sha256": "f0ac5094eccebed83b23a7259453f153248f89c9c8ae78a3d55ca06212606163"
+  },
+  "ichigo_mugetsu_carga": {
+    "duration": 6.05,
+    "sample_rate": 48000,
+    "channels": 1,
+    "peak": 0.59671,
+    "rms": 0.12328,
+    "sha256": "74d12f553e126d9df35545aa0672bd6a52101939eb405feece22c9921734edb8",
+    "ticks": 121,
+    "marcos": {
+      "transforma": 30,
+      "silencio": 84,
+      "corte": 120
+    }
+  },
+  "ichigo_mugetsu_carga_2": {
+    "duration": 5.8173,
+    "sample_rate": 48000,
+    "channels": 1,
+    "peak": 0.61009,
+    "rms": 0.09789,
+    "sha256": "32d17053a66521e596ad4a92fa1c41aaf1c904d7e2c6490c567b163378b2f559"
+  },
+  "ichigo_mugetsu_carga_3": {
+    "duration": 6.3021,
+    "sample_rate": 48000,
+    "channels": 1,
+    "peak": 0.61119,
+    "rms": 0.12111,
+    "sha256": "ffde9a97e5751f5333f3e8144b9b6dc9500145e868835ae2f2b63196ccf0e48b"
+  },
+  "ichigo_mugetsu": {
+    "duration": 4.7,
+    "sample_rate": 48000,
+    "channels": 1,
+    "peak": 0.63454,
+    "rms": 0.12259,
+    "sha256": "a5d9d7fe752608c57a4d11cd62e5ba0b66c26a8f7c06c3bebd8b375ef0d25f79",
+    "ticks": 94,
+    "marcos": {
+      "passou": 20,
+      "fim": 50
+    }
+  },
+  "ichigo_mugetsu_2": {
+    "duration": 4.5192,
+    "sample_rate": 48000,
+    "channels": 1,
+    "peak": 0.62335,
+    "rms": 0.11751,
+    "sha256": "906c7052f5564dc496773c6236534d9e9d8d1dd9d9147f7cf6d02c6a15d810cb"
+  },
+  "ichigo_mugetsu_3": {
+    "duration": 4.8958,
+    "sample_rate": 48000,
+    "channels": 1,
+    "peak": 0.56968,
+    "rms": 0.11305,
+    "sha256": "379f74894174fffda42e1a7f8e3d36932f91f8968e9478f96ae7e73c8562609e"
+  },
+  "ichigo_poderes_perdidos": {
+    "duration": 2.1,
+    "sample_rate": 48000,
+    "channels": 1,
+    "peak": 0.65604,
+    "rms": 0.14226,
+    "sha256": "daa97f78f170782ba3c169f7f37f2a97b0d48389c2d490fd37de4aaf9724ecac",
+    "ticks": 42,
+    "marcos": {
+      "fim": 30
+    }
+  },
+  "ichigo_poderes_perdidos_2": {
+    "duration": 2.0192,
+    "sample_rate": 48000,
+    "channels": 1,
+    "peak": 0.66211,
+    "rms": 0.14457,
+    "sha256": "6c92393893929bdca7aafd0f01bc96ef7056282a33f92d89af50aab504a57842"
+  },
+  "ichigo_poderes_perdidos_3": {
+    "duration": 2.1875,
+    "sample_rate": 48000,
+    "channels": 1,
+    "peak": 0.6405,
+    "rms": 0.13017,
+    "sha256": "6cf2a6a3011c6100749e3dace9b0ba103b7fc1962eeb757883d303c4696d86fc"
+  },
+  "ichigo_poderes_voltam": {
+    "duration": 1.9,
+    "sample_rate": 48000,
+    "channels": 1,
+    "peak": 0.57076,
+    "rms": 0.10172,
+    "sha256": "8f93bbb947da656ecc9ec109125b70d2018a1e7d23c9442aa4b44eedfe907add",
+    "ticks": 38,
+    "marcos": {
+      "fim": 30
+    }
+  },
+  "ichigo_poderes_voltam_2": {
+    "duration": 1.8269,
+    "sample_rate": 48000,
+    "channels": 1,
+    "peak": 0.62014,
+    "rms": 0.11115,
+    "sha256": "bc8ab73d618ffe8caf7414e15692105418a24ed0133b81831b55cf4fab63ce55"
+  },
+  "ichigo_poderes_voltam_3": {
+    "duration": 1.9791,
+    "sample_rate": 48000,
+    "channels": 1,
+    "peak": 0.61651,
+    "rms": 0.11308,
+    "sha256": "663bc3717a906919e08625dbe235b678584f8ddaf112fc0bc9c093d136725a76"
+  },
+  "ichigo_hollow": {
+    "duration": 2.2,
+    "sample_rate": 48000,
+    "channels": 1,
+    "peak": 0.5849,
+    "rms": 0.21837,
+    "sha256": "597c67cf19729b75a4723c18bee68886e797d2b48134f8eb0661e004e8262981",
+    "ticks": 44,
+    "marcos": {
+      "rugido": 12
+    }
+  },
+  "ichigo_hollow_2": {
+    "duration": 2.1154,
+    "sample_rate": 48000,
+    "channels": 1,
+    "peak": 0.64155,
+    "rms": 0.2386,
+    "sha256": "b63ceb672abe8e4bdbf2a916f209b2a473d7829565c3665c100d0c741360ee6d"
+  },
+  "ichigo_hollow_3": {
+    "duration": 2.2916,
+    "sample_rate": 48000,
+    "channels": 1,
+    "peak": 0.58979,
+    "rms": 0.2286,
+    "sha256": "2cd1a5ae382ed6bda077ef2f7a6037461ac1d87d884635c649c5fe8450b1e9fe"
+  },
+  "ichigo_hollow_garra": {
+    "duration": 0.7,
+    "sample_rate": 48000,
+    "channels": 1,
+    "peak": 0.63552,
+    "rms": 0.09923,
+    "sha256": "03fc233b4f181c10be20e6985d54c72c43d55cd2198cd1febf4ec615a42b6708",
+    "ticks": 14,
+    "marcos": {
+      "fim": 8
+    }
+  },
+  "ichigo_hollow_garra_2": {
+    "duration": 0.6731,
+    "sample_rate": 48000,
+    "channels": 1,
+    "peak": 0.59465,
+    "rms": 0.09334,
+    "sha256": "fec30e20a7c84808bebe2bf8b6b7af3198a7d399d2dc82647640a29f3e9f726d"
+  },
+  "ichigo_hollow_garra_3": {
+    "duration": 0.7291,
+    "sample_rate": 48000,
+    "channels": 1,
+    "peak": 0.6213,
+    "rms": 0.09372,
+    "sha256": "289b29dd3fe4226f2da290a984edeaab43d44f74b041a7ddf33623b6f5cd974f"
+  },
+  "ichigo_cero_carga": {
+    "duration": 1.05,
+    "sample_rate": 48000,
+    "channels": 1,
+    "peak": 0.5954,
+    "rms": 0.1394,
+    "sha256": "657011338a2825b3797994206a77c9e97a30f8c6a1c61f64a4903d0f3a9db3ec",
+    "ticks": 21,
+    "marcos": {
+      "dispara": 20
+    }
+  },
+  "ichigo_cero_carga_2": {
+    "duration": 1.0096,
+    "sample_rate": 48000,
+    "channels": 1,
+    "peak": 0.57017,
+    "rms": 0.14932,
+    "sha256": "577e1b054e490662a0bb67bb0da56e47a1fdd9b5ef21f4d495e31e0333060567"
+  },
+  "ichigo_cero_carga_3": {
+    "duration": 1.0937,
+    "sample_rate": 48000,
+    "channels": 1,
+    "peak": 0.59444,
+    "rms": 0.14095,
+    "sha256": "7a59bd8f3a95f6750c2f2b020e7a3f715af324a068de7cbcfff789f3ef6bd212"
+  },
+  "ichigo_cero": {
+    "duration": 2.3,
+    "sample_rate": 48000,
+    "channels": 1,
+    "peak": 0.61868,
+    "rms": 0.16483,
+    "sha256": "8ef6ac2f5fe514bfd0d6a811046753c740cffd79fb3af7dc0d992295965a9158",
+    "ticks": 46,
+    "marcos": {
+      "fim": 14
+    }
+  },
+  "ichigo_cero_2": {
+    "duration": 2.2115,
+    "sample_rate": 48000,
+    "channels": 1,
+    "peak": 0.62645,
+    "rms": 0.1688,
+    "sha256": "351a69625ac6821e5d2912d4afe77ee6c180e640732d25bfc3606a30e613bf57"
+  },
+  "ichigo_cero_3": {
+    "duration": 2.3958,
+    "sample_rate": 48000,
+    "channels": 1,
+    "peak": 0.59862,
+    "rms": 0.15842,
+    "sha256": "cb372d82f352bcbcc7b7bb2478583c7b9ed00036e33fa17ab3d3f248942d3995"
+  }
+}

@@ -43,10 +43,14 @@ public final class MineRWK {
         Regras.registrar();
         Personagens.registrar(PersonagemTeste.criar());
         Personagens.registrar(Gojo.criar());
+        Personagens.registrar(com.minerwk.core.personagens.ichigo.Ichigo.criar());
         ServicoKits.registrarEventos();
+        com.minerwk.kit.ArmaServidor.registrarEventos();
         ProtecoesServidor.registrarEventos();
+        com.minerwk.kit.HollowServidor.registrarEventos();
         // Depois das proteções: um golpe que o Infinito parou não chega à luta do Toji.
         com.minerwk.boss.LutasToji.registrarEventos();
+        com.minerwk.boss.LutasZangetsu.registrarEventos();
         ArremessosServidor.registrarEventos();
         BarreirasServidor.registrarEventos();
         SuspensosServidor.registrarEventos();
@@ -57,6 +61,7 @@ public final class MineRWK {
         NeoForge.EVENT_BUS.addListener((RegisterCommandsEvent e) -> ComandoTrocar.registrarMaestria(e.getDispatcher()));
         NeoForge.EVENT_BUS.addListener((RegisterCommandsEvent e) -> ComandoTrocar.registrarDespertar(e.getDispatcher()));
         NeoForge.EVENT_BUS.addListener((RegisterCommandsEvent e) -> ComandoTrocar.registrarToji(e.getDispatcher()));
+        NeoForge.EVENT_BUS.addListener((RegisterCommandsEvent e) -> ComandoTrocar.registrarZangetsu(e.getDispatcher()));
         modBus.addListener(Pacotes::registrar);
         modBus.addListener(this::commonSetup);
     }

@@ -568,5 +568,362 @@
         "attenuation_distance": 64
       }
     ]
+  },
+  "ichigo_getsuga_carga": {
+    "subtitle": "subtitles.minerwk.ichigo_getsuga_carga",
+    "sounds": [
+      {
+        "name": "minerwk:ichigo/ichigo_getsuga_carga",
+        "attenuation_distance": 32
+      },
+      {
+        "name": "minerwk:ichigo/ichigo_getsuga_carga_2",
+        "attenuation_distance": 32
+      },
+      {
+        "name": "minerwk:ichigo/ichigo_getsuga_carga_3",
+        "attenuation_distance": 32
+      }
+    ]
+  },
+  "ichigo_getsuga": {
+    "subtitle": "subtitles.minerwk.ichigo_getsuga",
+    "sounds": [
+      {
+        "name": "minerwk:ichigo/ichigo_getsuga",
+        "attenuation_distance": 64
+      },
+      {
+        "name": "minerwk:ichigo/ichigo_getsuga_2",
+        "attenuation_distance": 64
+      },
+      {
+        "name": "minerwk:ichigo/ichigo_getsuga_3",
+        "attenuation_distance": 64
+      }
+    ]
+  },
+  "ichigo_getsuga_negro": {
+    "subtitle": "subtitles.minerwk.ichigo_getsuga_negro",
+    "sounds": [
+      {
+        "name": "minerwk:ichigo/ichigo_getsuga_negro",
+        "attenuation_distance": 64
+      },
+      {
+        "name": "minerwk:ichigo/ichigo_getsuga_negro_2",
+        "attenuation_distance": 64
+      },
+      {
+        "name": "minerwk:ichigo/ichigo_getsuga_negro_3",
+        "attenuation_distance": 64
+      }
+    ]
+  },
+  "ichigo_shunpo": {
+    "subtitle": "subtitles.minerwk.ichigo_shunpo",
+    "sounds": [
+      {
+        "name": "minerwk:ichigo/ichigo_shunpo",
+        "attenuation_distance": 32
+      },
+      {
+        "name": "minerwk:ichigo/ichigo_shunpo_2",
+        "attenuation_distance": 32
+      },
+      {
+        "name": "minerwk:ichigo/ichigo_shunpo_3",
+        "attenuation_distance": 32
+      }
+    ]
+  },
+  "ichigo_onda": {
+    "subtitle": "subtitles.minerwk.ichigo_onda",
+    "sounds": [
+      {
+        "name": "minerwk:ichigo/ichigo_onda",
+        "attenuation_distance": 48
+      },
+      {
+        "name": "minerwk:ichigo/ichigo_onda_2",
+        "attenuation_distance": 48
+      },
+      {
+        "name": "minerwk:ichigo/ichigo_onda_3",
+        "attenuation_distance": 48
+      }
+    ]
+  },
+  "ichigo_arremesso": {
+    "subtitle": "subtitles.minerwk.ichigo_arremesso",
+    "sounds": [
+      {
+        "name": "minerwk:ichigo/ichigo_arremesso",
+        "attenuation_distance": 48
+      },
+      {
+        "name": "minerwk:ichigo/ichigo_arremesso_2",
+        "attenuation_distance": 48
+      },
+      {
+        "name": "minerwk:ichigo/ichigo_arremesso_3",
+        "attenuation_distance": 48
+      }
+    ]
+  },
+  "ichigo_bankai_carga": {
+    "subtitle": "subtitles.minerwk.ichigo_bankai_carga",
+    "sounds": [
+      {
+        "name": "minerwk:ichigo/ichigo_bankai_carga",
+        "attenuation_distance": 48
+      },
+      {
+        "name": "minerwk:ichigo/ichigo_bankai_carga_2",
+        "attenuation_distance": 48
+      },
+      {
+        "name": "minerwk:ichigo/ichigo_bankai_carga_3",
+        "attenuation_distance": 48
+      }
+    ]
+  },
+  "ichigo_bankai": {
+    "subtitle": "subtitles.minerwk.ichigo_bankai",
+    "sounds": [
+      {
+        "name": "minerwk:ichigo/ichigo_bankai",
+        "attenuation_distance": 96
+      },
+      {
+        "name": "minerwk:ichigo/ichigo_bankai_2",
+        "attenuation_distance": 96
+      },
+      {
+        "name": "minerwk:ichigo/ichigo_bankai_3",
+        "attenuation_distance": 96
+      }
+    ]
+  },
+  "ichigo_lamina": {
+    "subtitle": "subtitles.minerwk.ichigo_lamina",
+    "sounds": [
+      {
+        "name": "minerwk:ichigo/ichigo_lamina",
+        "attenuation_distance": 32
+      },
+      {
+        "name": "minerwk:ichigo/ichigo_lamina_2",
+        "attenuation_distance": 32
+      },
+      {
+        "name": "minerwk:ichigo/ichigo_lamina_3",
+        "attenuation_distance": 32
+      }
+    ]
+  },
+  "ichigo_sair": {
+    "subtitle": "subtitles.minerwk.ichigo_sair",
+    "sounds": [
+      {
+        "name": "minerwk:ichigo/ichigo_sair",
+        "attenuation_distance": 32
+      },
+      {
+        "name": "minerwk:ichigo/ichigo_sair_2",
+        "attenuation_distance": 32
+      },
+      {
+        "name": "minerwk:ichigo/ichigo_sair_3",
+        "attenuation_distance": 32
+      }
+    ]
+  },
+  "ichigo_corte": {
+    "subtitle": "subtitles.minerwk.ichigo_corte",
+    "sounds": [
+      {
+        "name": "minerwk:ichigo/ichigo_corte",
+        "attenuation_distance": 24
+      },
+      {
+        "name": "minerwk:ichigo/ichigo_corte_2",
+        "attenuation_distance": 24
+      },
+      {
+        "name": "minerwk:ichigo/ichigo_corte_3",
+        "attenuation_distance": 24
+      }
+    ]
+  },
+  "ichigo_mascara_veste": {
+    "subtitle": "subtitles.minerwk.ichigo_mascara_veste",
+    "sounds": [
+      {
+        "name": "minerwk:ichigo/ichigo_mascara_veste",
+        "attenuation_distance": 48
+      },
+      {
+        "name": "minerwk:ichigo/ichigo_mascara_veste_2",
+        "attenuation_distance": 48
+      },
+      {
+        "name": "minerwk:ichigo/ichigo_mascara_veste_3",
+        "attenuation_distance": 48
+      }
+    ]
+  },
+  "ichigo_mascara_quebra": {
+    "subtitle": "subtitles.minerwk.ichigo_mascara_quebra",
+    "sounds": [
+      {
+        "name": "minerwk:ichigo/ichigo_mascara_quebra",
+        "attenuation_distance": 32
+      },
+      {
+        "name": "minerwk:ichigo/ichigo_mascara_quebra_2",
+        "attenuation_distance": 32
+      },
+      {
+        "name": "minerwk:ichigo/ichigo_mascara_quebra_3",
+        "attenuation_distance": 32
+      }
+    ]
+  },
+  "ichigo_mugetsu_carga": {
+    "subtitle": "subtitles.minerwk.ichigo_mugetsu_carga",
+    "sounds": [
+      {
+        "name": "minerwk:ichigo/ichigo_mugetsu_carga",
+        "attenuation_distance": 64
+      },
+      {
+        "name": "minerwk:ichigo/ichigo_mugetsu_carga_2",
+        "attenuation_distance": 64
+      },
+      {
+        "name": "minerwk:ichigo/ichigo_mugetsu_carga_3",
+        "attenuation_distance": 64
+      }
+    ]
+  },
+  "ichigo_mugetsu": {
+    "subtitle": "subtitles.minerwk.ichigo_mugetsu",
+    "sounds": [
+      {
+        "name": "minerwk:ichigo/ichigo_mugetsu",
+        "attenuation_distance": 128
+      },
+      {
+        "name": "minerwk:ichigo/ichigo_mugetsu_2",
+        "attenuation_distance": 128
+      },
+      {
+        "name": "minerwk:ichigo/ichigo_mugetsu_3",
+        "attenuation_distance": 128
+      }
+    ]
+  },
+  "ichigo_poderes_perdidos": {
+    "subtitle": "subtitles.minerwk.ichigo_poderes_perdidos",
+    "sounds": [
+      {
+        "name": "minerwk:ichigo/ichigo_poderes_perdidos",
+        "attenuation_distance": 32
+      },
+      {
+        "name": "minerwk:ichigo/ichigo_poderes_perdidos_2",
+        "attenuation_distance": 32
+      },
+      {
+        "name": "minerwk:ichigo/ichigo_poderes_perdidos_3",
+        "attenuation_distance": 32
+      }
+    ]
+  },
+  "ichigo_poderes_voltam": {
+    "subtitle": "subtitles.minerwk.ichigo_poderes_voltam",
+    "sounds": [
+      {
+        "name": "minerwk:ichigo/ichigo_poderes_voltam",
+        "attenuation_distance": 32
+      },
+      {
+        "name": "minerwk:ichigo/ichigo_poderes_voltam_2",
+        "attenuation_distance": 32
+      },
+      {
+        "name": "minerwk:ichigo/ichigo_poderes_voltam_3",
+        "attenuation_distance": 32
+      }
+    ]
+  },
+  "ichigo_hollow": {
+    "subtitle": "subtitles.minerwk.ichigo_hollow",
+    "sounds": [
+      {
+        "name": "minerwk:ichigo/ichigo_hollow",
+        "attenuation_distance": 96
+      },
+      {
+        "name": "minerwk:ichigo/ichigo_hollow_2",
+        "attenuation_distance": 96
+      },
+      {
+        "name": "minerwk:ichigo/ichigo_hollow_3",
+        "attenuation_distance": 96
+      }
+    ]
+  },
+  "ichigo_hollow_garra": {
+    "subtitle": "subtitles.minerwk.ichigo_hollow_garra",
+    "sounds": [
+      {
+        "name": "minerwk:ichigo/ichigo_hollow_garra",
+        "attenuation_distance": 32
+      },
+      {
+        "name": "minerwk:ichigo/ichigo_hollow_garra_2",
+        "attenuation_distance": 32
+      },
+      {
+        "name": "minerwk:ichigo/ichigo_hollow_garra_3",
+        "attenuation_distance": 32
+      }
+    ]
+  },
+  "ichigo_cero_carga": {
+    "subtitle": "subtitles.minerwk.ichigo_cero_carga",
+    "sounds": [
+      {
+        "name": "minerwk:ichigo/ichigo_cero_carga",
+        "attenuation_distance": 64
+      },
+      {
+        "name": "minerwk:ichigo/ichigo_cero_carga_2",
+        "attenuation_distance": 64
+      },
+      {
+        "name": "minerwk:ichigo/ichigo_cero_carga_3",
+        "attenuation_distance": 64
+      }
+    ]
+  },
+  "ichigo_cero": {
+    "subtitle": "subtitles.minerwk.ichigo_cero",
+    "sounds": [
+      {
+        "name": "minerwk:ichigo/ichigo_cero",
+        "attenuation_distance": 96
+      },
+      {
+        "name": "minerwk:ichigo/ichigo_cero_2",
+        "attenuation_distance": 96
+      },
+      {
+        "name": "minerwk:ichigo/ichigo_cero_3",
+        "attenuation_distance": 96
+      }
+    ]
   }
 }

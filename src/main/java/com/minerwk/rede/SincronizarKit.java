@@ -21,14 +21,17 @@ import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
  * @param xpProximo   XP que o nível pede ao todo; 0 no nível máximo
  * @param nos         nível comprado de cada nó da árvore do personagem
  * @param despertou   se o jogador já despertou neste personagem
+ * @param forma       a forma em que o jogador está; as habilidades são as dela
  */
 public record SincronizarKit(String personagem, String nomeRecurso, int corRecurso, double recurso, double maximo,
                              List<HabilidadeHud> habilidades, String emUso, List<PersonagemEscolha> escolhiveis,
-                             int nivel, int xpNoNivel, int xpProximo, Map<String, Integer> nos, boolean despertou)
+                             int nivel, int xpNoNivel, int xpProximo, Map<String, Integer> nos, boolean despertou,
+                             String forma)
         implements CustomPacketPayload {
     public static final Type<SincronizarKit> TIPO = new Type<>(MineRWK.id("sincronizar_kit"));
 
-    public static final SincronizarKit VAZIO = new SincronizarKit("", "", 0, 0, 0, List.of(), "", List.of(), 0, 0, 0, Map.of(), false);
+    public static final SincronizarKit VAZIO = new SincronizarKit("", "", 0, 0, 0, List.of(), "", List.of(), 0, 0, 0, Map.of(), false,
+            com.minerwk.core.kit.Forma.BASE);
 
     /**
      * @param prontaNoTick tick do jogo em que a recarga acaba
@@ -69,6 +72,7 @@ public record SincronizarKit(String personagem, String nomeRecurso, int corRecur
                 ByteBufCodecs.VAR_INT.encode(buf, p.xpProximo);
                 NOS.encode(buf, p.nos);
                 ByteBufCodecs.BOOL.encode(buf, p.despertou);
+                ByteBufCodecs.STRING_UTF8.encode(buf, p.forma);
             },
             buf -> new SincronizarKit(
                     ByteBufCodecs.STRING_UTF8.decode(buf),
@@ -83,7 +87,8 @@ public record SincronizarKit(String personagem, String nomeRecurso, int corRecur
                     ByteBufCodecs.VAR_INT.decode(buf),
                     ByteBufCodecs.VAR_INT.decode(buf),
                     NOS.decode(buf),
-                    ByteBufCodecs.BOOL.decode(buf)));
+                    ByteBufCodecs.BOOL.decode(buf),
+                    ByteBufCodecs.STRING_UTF8.decode(buf)));
 
     @Override
     public Type<SincronizarKit> type() {

@@ -176,9 +176,87 @@ public interface Contexto {
     default void curar(float vida) {
     }
 
+    /** Põe a vida do jogador em {@code vida} (até o máximo dele). */
+    default void vida(float vida) {
+    }
+
+    /**
+     * O inimigo vivo mais perto do jogador, a até {@code raio} blocos e à vista: monstros, quem o ataca e
+     * outros jogadores, nunca animais nem aldeões (é para golpes que escolhem o alvo sozinhos). Devolve a mesma chave opaca
+     * de {@link #marcarAlvo}, ou null.
+     */
+    default Object inimigoProximo(double raio) {
+        return null;
+    }
+
     /** Gasta do recurso do jogador; devolve falso (e não gasta) se não houver o bastante. */
     default boolean gastarRecurso(double quantidade) {
         return true;
+    }
+
+    /** Manda um sinal ao recurso do jogador (ver {@link Recurso#sinal}). */
+    default void sinalAoRecurso(String sinal, int ticks) {
+    }
+
+    /** Se o jogador tem um efeito desse tipo em andamento. */
+    default boolean efeitoAtivo(Class<? extends Efeito> tipo) {
+        return false;
+    }
+
+    /** O id do golpe que o jogador está executando (da carga ao fim), ou vazio. */
+    default String golpeEmAndamento() {
+        return "";
+    }
+
+    /**
+     * Como {@link #danoUmaVez}, mas o dano ignora a armadura do alvo. Devolve quantos foram feridos.
+     */
+    default int danoDiretoUmaVez(Vetor centro, double raio, float dano, java.util.Set<Object> atingidos) {
+        return danoUmaVez(centro, raio, dano, atingidos);
+    }
+
+    /** A forma em que o jogador está. */
+    default String forma() {
+        return Forma.BASE;
+    }
+
+    /** Passa o jogador para outra forma do personagem. Devolve se mudou. */
+    default boolean mudarForma(String forma) {
+        return false;
+    }
+
+    /** Quanto o jogador tem do recurso agora. */
+    default double recurso() {
+        return Double.MAX_VALUE;
+    }
+
+    /** Põe uma habilidade do jogador em recarga por {@code ticks}, a partir de agora. */
+    default void recarga(String habilidade, int ticks) {
+    }
+
+    /**
+     * O ataque básico do jogador neste tick. Vale enquanto for pedido: quem tem arma própria pede todo tick
+     * (a passiva), e o último pedido do tick ganha (um efeito pode trocar a arma por um tempo).
+     */
+    default void arma(Arma arma) {
+    }
+
+    /**
+     * Leva o jogador em linha reta por até {@code distancia} blocos, parando antes de parede; com
+     * {@code encarar}, ele chega olhando para esse ponto. Devolve onde os pés ficaram.
+     */
+    default Vetor deslocar(Vetor direcao, double distancia, Vetor encarar) {
+        return Vetor.ZERO;
+    }
+
+    /** Se há bloco sólido entre os dois pontos (inimigos não contam: é para o que os atravessa). */
+    default boolean colideBloco(Vetor de, Vetor ate) {
+        return false;
+    }
+
+    /** Desfaz os projéteis dos outros dentro da esfera; devolve quantos. */
+    default int desfazerProjeteis(Vetor centro, double raio) {
+        return 0;
     }
 
     /** Começa um efeito solto no kit do jogador. */

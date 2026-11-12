@@ -209,6 +209,24 @@ public final class ContextoServidor implements Contexto {
         return feridos[0];
     }
 
+    /** Dano que não conta a armadura do alvo (o Mugetsu); o tipo está em {@code data/minerwk/damage_type}. */
+    public static final net.minecraft.resources.ResourceKey<net.minecraft.world.damagesource.DamageType> DANO_DIRETO =
+            net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.DAMAGE_TYPE,
+                    com.minerwk.MineRWK.id("direto"));
+
+    @Override
+    public int danoDiretoUmaVez(Vetor centro, double raio, float dano, Set<Object> atingidos) {
+        var fonte = new net.minecraft.world.damagesource.DamageSource(nivel().registryAccess()
+                .registryOrThrow(net.minecraft.core.registries.Registries.DAMAGE_TYPE).getHolderOrThrow(DANO_DIRETO), jogador);
+        int[] feridos = {0};
+        ServicoKits.comoGolpeDoKit(jogador, () -> {
+            for (LivingEntity alvo : naEsfera(LivingEntity.class, vec(centro), raio, e -> true)) {
+                if (atingidos.add(alvo.getUUID()) && alvo.hurt(fonte, dano)) feridos[0]++;
+            }
+        });
+        return feridos[0];
+    }
+
     @Override
     public void arremessar(Vetor centro, double raio, double forca, int congelar, Vetor eixo) {
         for (LivingEntity alvo : naEsfera(LivingEntity.class, vec(centro), raio, e -> true)) {
@@ -299,6 +317,40 @@ public final class ContextoServidor implements Contexto {
             }
         }
         return melhor == null ? null : melhor.getUUID();
+    }
+
+    @Override
+    public Object inimigoProximo(double raio) {
+        Vec3 olhos = jogador.getEyePosition();
+        LivingEntity melhor = null;
+        double melhorLonge = raio * raio;
+        for (LivingEntity e : nivel().getEntitiesOfClass(LivingEntity.class, jogador.getBoundingBox().inflate(raio),
+                e -> afetavel(e) && inimigo(e))) {
+            double longe = e.getBoundingBox().getCenter().distanceToSqr(olhos);
+            if (longe > melhorLonge || !jogador.hasLineOfSight(e)) continue;
+            melhor = e;
+            melhorLonge = longe;
+        }
+        return melhor == null ? null : melhor.getUUID();
+    }
+
+    /**
+     * Quem um golpe sem mira pode escolher: monstros, quem está atrás do jogador, quem o feriu por último e
+     * outros jogadores (o PvP já foi conferido). Animais, aldeões e bichos dos outros ficam de fora.
+     */
+    private boolean inimigo(LivingEntity e) {
+        if (e instanceof ArmorStand) return false;
+        if (e instanceof Player) return !e.isAlliedTo(jogador);
+        if (e instanceof OwnableEntity dono && dono.getOwnerUUID() != null) {
+            return e instanceof net.minecraft.world.entity.Mob m && m.getTarget() == jogador;
+        }
+        return e instanceof net.minecraft.world.entity.monster.Enemy || e == jogador.getLastHurtByMob()
+                || e instanceof net.minecraft.world.entity.Mob m && m.getTarget() == jogador;
+    }
+
+    @Override
+    public void vida(float vida) {
+        jogador.setHealth(Math.max(1, Math.min(vida, jogador.getMaxHealth())));
     }
 
     /** O alvo marcado, se ainda está vivo neste mundo. */
@@ -433,8 +485,114 @@ public final class ContextoServidor implements Contexto {
     }
 
     @Override
+    public void sinalAoRecurso(String sinal, int ticks) {
+        kit().ifPresent(k -> k.recurso().sinal(sinal, ticks));
+    }
+
+    @Override
+    public boolean efeitoAtivo(Class<? extends com.minerwk.core.kit.Efeito> tipo) {
+        return kit().map(k -> k.efeitos().stream().anyMatch(tipo::isInstance)).orElse(false);
+    }
+
+    @Override
+    public String golpeEmAndamento() {
+        return kit().flatMap(KitDoJogador::execucao).map(e -> e.habilidade().id()).orElse("");
+    }
+
+    @Override
     public com.minerwk.core.maestria.Melhorias melhorias() {
         return kit().map(KitDoJogador::melhorias).orElse(com.minerwk.core.maestria.Melhorias.NENHUMA);
+    }
+
+    @Override
+    public String forma() {
+        return kit().map(KitDoJogador::forma).orElse(com.minerwk.core.kit.Forma.BASE);
+    }
+
+    @Override
+    public boolean mudarForma(String forma) {
+        return kit().map(k -> k.mudarForma(forma, this)).orElse(false);
+    }
+
+    @Override
+    public double recurso() {
+        return kit().map(k -> k.recurso().atual()).orElse(0.0);
+    }
+
+    @Override
+    public void recarga(String habilidade, int ticks) {
+        kit().ifPresent(k -> k.recargas().iniciar(habilidade, nivel().getGameTime(), ticks));
+    }
+
+    @Override
+    public void arma(com.minerwk.core.kit.Arma arma) {
+        ArmaServidor.pedir(jogador, arma);
+    }
+
+    @Override
+    public boolean colideBloco(Vetor de, Vetor ate) {
+        return nivel().clip(new ClipContext(vec(de), vec(ate), ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, jogador))
+                .getType() != HitResult.Type.MISS;
+    }
+
+    @Override
+    public int desfazerProjeteis(Vetor centro, double raio) {
+        List<Projectile> projeteis = naEsfera(Projectile.class, vec(centro), raio, p -> true);
+        for (Projectile p : projeteis) p.discard();
+        return projeteis.size();
+    }
+
+    /** Tamanho de cada passo do deslocamento: menor que a largura do jogador, para não pular parede fina. */
+    private static final double PASSO_DO_DESLOCAMENTO = 0.5;
+
+    @Override
+    public Vetor deslocar(Vetor direcao, double distancia, Vetor encarar) {
+        Vec3 dir = vec(direcao);
+        Vec3 pos = jogador.position();
+        if (dir.lengthSqr() > 1e-9 && distancia > 0) {
+            dir = dir.normalize();
+            AABB caixa = jogador.getBoundingBox();
+            for (double andou = 0; andou < distancia - 1e-6; andou += PASSO_DO_DESLOCAMENTO) {
+                Vec3 passo = passoLivre(caixa, dir.scale(Math.min(PASSO_DO_DESLOCAMENTO, distancia - andou)));
+                if (passo == null) break;
+                caixa = caixa.move(passo);
+                pos = pos.add(passo);
+            }
+        }
+        float giro = jogador.getYRot();
+        float inclinacao = jogador.getXRot();
+        if (encarar != null) {
+            Vec3 ate = vec(encarar).subtract(pos.add(0, jogador.getEyeHeight(), 0));
+            if (ate.lengthSqr() > 1e-6) {
+                giro = (float) (Math.toDegrees(Math.atan2(ate.z, ate.x)) - 90);
+                inclinacao = (float) -Math.toDegrees(Math.atan2(ate.y, ate.horizontalDistance()));
+            }
+        }
+        jogador.stopRiding();
+        jogador.fallDistance = 0;
+        if (jogador.connection != null && encarar == null) {
+            // Sem ponto para encarar, a câmera do jogador fica como está (giro relativo zero), sem tranco.
+            jogador.connection.teleport(pos.x, pos.y, pos.z, 0, 0, java.util.Set.of(
+                    net.minecraft.world.entity.RelativeMovement.X_ROT, net.minecraft.world.entity.RelativeMovement.Y_ROT));
+        } else if (jogador.connection != null) {
+            jogador.connection.teleport(pos.x, pos.y, pos.z, giro, inclinacao);
+        } else {
+            jogador.moveTo(pos.x, pos.y, pos.z, giro, inclinacao);
+        }
+        return vetor(pos);
+    }
+
+    /**
+     * O passo que cabe: reto; senão rente ao chão ou ao teto (quem olha um pouco para baixo não empaca);
+     * senão subindo um degrau. Null se há parede.
+     */
+    private Vec3 passoLivre(AABB caixa, Vec3 passo) {
+        if (nivel().noCollision(jogador, caixa.move(passo))) return passo;
+        Vec3 rente = new Vec3(passo.x, 0, passo.z);
+        if (passo.y != 0 && rente.lengthSqr() > 1e-6 && nivel().noCollision(jogador, caixa.move(rente))) return rente;
+        Vec3 degrau = new Vec3(passo.x, Math.max(passo.y, 0) + 1, passo.z);
+        if (rente.lengthSqr() > 1e-6 && nivel().noCollision(jogador, caixa.move(degrau))) return degrau;
+        return null;
     }
 
     @Override

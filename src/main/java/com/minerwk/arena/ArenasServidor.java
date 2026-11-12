@@ -147,6 +147,12 @@ public final class ArenasServidor {
      * leva dano. Devolve false se ele já tem arena, já está na dimensão ou a dimensão não existe.
      */
     public static boolean entrar(ServerPlayer jogador, BiConsumer<ServerPlayer, CaixaArena> aoChegar) {
+        return entrar(jogador, PlantaEscola.cenario(), aoChegar);
+    }
+
+    /** O mesmo, com o cenário de quem chama (cada boss tem o seu). */
+    public static boolean entrar(ServerPlayer jogador, List<PlantaEscola.Bloco> cenario,
+                                 BiConsumer<ServerPlayer, CaixaArena> aoChegar) {
         ServerLevel arena = nivel(jogador.server);
         if (arena == null || naArena(jogador) || ARENAS.containsKey(jogador.getUUID())) return false;
         Arena a = new Arena(jogador, VAGAS.reservar(), aoChegar);
@@ -156,7 +162,7 @@ public final class ArenasServidor {
         jogador.addEffect(new MobEffectInstance(MobEffects.DAMAGE_RESISTANCE, TICKS_DE_ESPERA, 4, false, false, false));
         // Preta até a arena ficar pronta; ao chegar, outro pedido a clareia.
         Envio.para(jogador, new EscurecerTela(TICKS_ESCURECENDO, TICKS_DE_ESPERA, TICKS_CLAREANDO));
-        ObrasArena.montar(arena, a.caixa, PlantaEscola.cenario(), () -> chegar(arena, a));
+        ObrasArena.montar(arena, a.caixa, cenario, () -> chegar(arena, a));
         return true;
     }
 

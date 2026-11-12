@@ -12,10 +12,10 @@ Personagens que existem no Minezin (estado de 08/11/2026) e serão portados. Vol
 | Dio | JoJo's Bizarre Adventure | pendente | não |
 | Douma | Demon Slayer | pendente | não |
 | Frieren | Frieren | pendente | não |
-| [[Gojo]] | Jujutsu Kaisen | feita, kit aprovado | mecânica pronta; falta visual e som |
+| [[Gojo]] | Jujutsu Kaisen | feita, kit aprovado | sim (falta o teste no jogo) |
 | Guts | Berserk | pendente | não |
 | Homura | Madoka Magica | pendente | não |
-| Ichigo | Bleach | pendente | não |
+| [[Ichigo]] | Bleach | feita (11/11), kit proposto, aguardando aprovação | não |
 | Jin-Woo | Solo Leveling | pendente | não |
 | Killua | Hunter x Hunter | pendente | não |
 | Rudeus | Mushoku Tensei | pendente | não |

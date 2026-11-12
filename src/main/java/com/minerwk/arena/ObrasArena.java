@@ -172,6 +172,9 @@ public final class ObrasArena {
             case ASSOALHO -> Blocks.SPRUCE_PLANKS.defaultBlockState();
             case TELHA -> Blocks.DEEPSLATE_TILES.defaultBlockState();
             case LAJE_TELHA -> Blocks.DEEPSLATE_TILE_SLAB.defaultBlockState();
+            case CONCRETO_CLARO -> Blocks.WHITE_CONCRETE.defaultBlockState();
+            case VIDRO_AZUL -> Blocks.LIGHT_BLUE_STAINED_GLASS.defaultBlockState();
+            case FUNDO_ESCURO -> Blocks.BLUE_CONCRETE.defaultBlockState();
         };
     }
 }
