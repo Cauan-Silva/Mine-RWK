@@ -144,42 +144,64 @@ def textura():
 cubo = h.cubo
 
 
-# O capuz: onde as laterais acabam e o telhado começa, a altura da cumeeira e o quanto ele passa da testa.
-BEIRAL, CUME, MEIA, FRENTE, FUNDO = 32.4, 35.7, 5.1, -5.3, 4.5
+# O capuz, em fatias da testa à nuca: (z da frente, fundura, meia largura, altura da ponta). A da frente é a mais
+# alta e passa da testa; para trás ele baixa e estreita, como um capuz caído sobre a cabeça.
+FATIAS = [(-5.7, 2.3, 5.35, 36.3), (-3.4, 2.2, 5.3, 35.7), (-1.2, 2.2, 5.25, 35.1), (1.0, 2.0, 5.15, 34.6),
+          (3.0, 1.6, 5.0, 34.2)]
+BARRA_DO_CAPUZ, BEIRAL = 24.6, 32.0
+
+
+def perfil(meia, ponta):
+    """Meio arco do capuz, de baixo para cima: abre para os ombros, sobe reto ao lado do rosto e fecha em ogiva."""
+    sobe = ponta - BEIRAL
+    return [(meia + .75, BARRA_DO_CAPUZ), (meia, 28.0), (meia, BEIRAL), (meia - 1.0, BEIRAL + sobe * .42),
+            (meia * .45, BEIRAL + sobe * .78), (0, ponta)]
+
+
+def placa(de, ate, lado, z0, fundo, cor, grosso=.5, **faces):
+    """Uma placa do arco, do ponto {@code de} ao {@code ate} (x, y) do lado dado. O cubo nasce de pé e é girado em
+    z: ângulo positivo leva o alto para +x."""
+    dx, dy = (ate[0] - de[0]) * lado, ate[1] - de[1]
+    return cubo([de[0] * lado - grosso / 2, de[1], z0], [grosso, math.hypot(dx, dy) + .12, fundo], cor,
+                giro=[0, 0, round(math.degrees(math.atan2(dx, dy)), 2)], pivo=[de[0] * lado, de[1], 0], **faces)
+
+
+def meia_largura(pontos, y):
+    for (x1, y1), (x2, y2) in zip(pontos, pontos[1:]):
+        if y1 <= y <= y2:
+            return x1 + (x2 - x1) * (y - y1) / (y2 - y1)
+    return 0
 
 
 def capuz():
-    """O capuz em ponta: duas águas que sobem das laterais até a cumeeira, as laterais abrindo um pouco para baixo
-    e a nuca fechada. Aberto na frente, sem nada sobre o rosto, que é o da skin do jogador. Avesso roxo e um filete
-    dourado na beirada da abertura."""
+    """O capuz em ogiva: arcos de placas, da testa à nuca, cada um mais baixo e estreito que o da frente. Aberto na
+    frente, sem nada sobre o rosto, que é o da skin do jogador. Avesso roxo e o filete dourado na beirada."""
     roxo = uv_de(COR_ROXO_ESCURO)
-    comprido = FUNDO + .5 - FRENTE
-    agua = math.hypot(MEIA, CUME - BEIRAL)
-    tombo = math.degrees(math.atan2(MEIA, CUME - BEIRAL))
     cubos = []
-    for lado in (-1, 1):
-        x = MEIA if lado > 0 else -MEIA - .5
-        dentro, fora = ('west', 'east') if lado > 0 else ('east', 'west')
-        pivo = [MEIA * lado, BEIRAL, 0]
-        # A lateral, do beiral até o ombro, abrindo para baixo.
-        abre = [0, 0, -6 * lado]
-        cubos.append(cubo([x, BEIRAL - 7.8, FRENTE], [.5, 7.8, comprido], COR_EBANO, giro=abre, pivo=pivo,
-                          **{fora: TEMPORA, dentro: roxo}))
-        cubos.append(cubo([x - .03, BEIRAL - 7.8, FRENTE - .1], [.56, 7.8, .16], COR_OURO, giro=abre, pivo=pivo))
-        # A água do telhado, da lateral até a cumeeira.
-        sobe = [0, 0, -tombo * lado]
-        cubos.append(cubo([x, BEIRAL, FRENTE], [.5, agua, comprido], COR_EBANO, giro=sobe, pivo=pivo,
-                          **{fora: TOPO, dentro: roxo}))
-        cubos.append(cubo([x - .03, BEIRAL, FRENTE - .1], [.56, agua, .16], COR_OURO, giro=sobe, pivo=pivo))
-    # A cumeeira fecha o encontro das duas águas.
-    cubos.append(cubo([-.4, CUME - .25, FRENTE - .05], [.8, .6, comprido + .05], COR_EBANO_CLARO))
-    # A nuca: a placa de trás e o triângulo sob o telhado, em degraus.
-    cubos.append(cubo([-MEIA - .3, BEIRAL - 7.8, FUNDO], [2 * MEIA + .6, 7.8, .5], COR_EBANO, south=NUCA, north=roxo))
-    degraus = 5
-    for i in range(degraus):
-        meia = MEIA * (1 - (i + .5) / degraus) + .2
-        alto = (CUME - BEIRAL) / degraus
-        cubos.append(cubo([-meia, BEIRAL + i * alto, FUNDO], [2 * meia, alto, .5], COR_EBANO, north=roxo))
+    for i, (z0, fundo, meia, ponta) in enumerate(FATIAS):
+        pontos = perfil(meia, ponta)
+        for lado in (-1, 1):
+            dentro, fora = ('west', 'east') if lado > 0 else ('east', 'west')
+            for s in range(len(pontos) - 1):
+                faces = {dentro: roxo}
+                if s < 2:
+                    faces[fora] = TEMPORA
+                cubos.append(placa(pontos[s], pontos[s + 1], lado, z0, fundo, COR_EBANO if s != 3 else COR_EBANO_CLARO,
+                                   **faces))
+                if i == 0:
+                    cubos.append(placa(pontos[s], pontos[s + 1], lado, z0 - .1, .16, COR_OURO, grosso=.58))
+        # A ponta do arco, onde os dois lados se encontram.
+        cubos.append(cubo([-.3, ponta - .35, z0], [.6, .5, fundo], COR_EBANO_CLARO))
+    # A nuca: fecha o último arco, em degraus, e um gomo mais para trás, que arredonda o capuz.
+    z0, fundo, meia, ponta = FATIAS[-1]
+    pontos, z, alto = perfil(meia, ponta), z0 + fundo, .7
+    y = BARRA_DO_CAPUZ
+    while y < ponta - .2:
+        larga = max(meia_largura(pontos, y), meia_largura(pontos, min(y + alto, ponta))) + .2
+        cubos.append(cubo([-larga, y, z], [2 * larga, alto, .5], COR_EBANO, north=roxo))
+        y += alto
+    cubos.append(cubo([-3.9, 25.6, z + .5], [7.8, 7.0, .55], COR_EBANO, south=NUCA))
+    cubos.append(cubo([-2.6, 26.8, z + 1.05], [5.2, 4.4, .45], COR_EBANO_CLARO))
     return cubos
 
 
