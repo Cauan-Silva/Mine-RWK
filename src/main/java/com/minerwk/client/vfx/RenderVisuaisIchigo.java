@@ -1,5 +1,6 @@
 package com.minerwk.client.vfx;
 
+import com.minerwk.core.vfx.MugetsuIchigo;
 import com.minerwk.core.kit.Vetor;
 import com.minerwk.core.traje.TrajeIchigo;
 import com.minerwk.core.vfx.FormasIchigo;
@@ -64,6 +65,11 @@ final class RenderVisuaisIchigo {
                 case "ichigo_bankai" -> bankai(o, t);
                 case "ichigo_lamina" -> lamina(camera, parcial, v, t, sai);
                 case "ichigo_sair" -> sair(camera, parcial, v, o, t);
+                case "ichigo_mugetsu_carga" -> mugetsuCarga(camera, parcial, v, t, sai);
+                case "ichigo_mugetsu" -> veu(v, o, t);
+                case "ichigo_mascara" -> mascara(camera, parcial, v, t);
+                case "ichigo_poderes_perdidos" -> poderes(camera, parcial, v, t, false);
+                case "ichigo_poderes_voltam" -> poderes(camera, parcial, v, t, true);
                 default -> {
                 }
             }
@@ -751,6 +757,151 @@ final class RenderVisuaisIchigo {
         fechar();
         abrir(true, false);
         halo(pes.add(0, 1, 0), 1.7, AZUL, (float) Math.max(0, 1 - t / 8) * .3f);
+        fechar();
+    }
+
+    // ---------------------------------------------------------------- Mugetsu
+
+    /**
+     * A transformação: o reiatsu preto sobe pelo corpo como fumaça, engole o vermelho do Bankai quando a
+     * forma final aparece e depois murcha até sobrar um fio parado. Tinta opaca, sem luz: é o contrário do
+     * estouro do Bankai. Segue o dono.
+     */
+    private static void mugetsuCarga(Vec3 camera, float parcial, VisuaisAtivos.Visual v, double t, float sai) {
+        Entity e = dono(v);
+        if (e == null) return;
+        Vec3 pes = e.getPosition(parcial).subtract(camera);
+        float f = (float) MugetsuIchigo.fumaca(t, MugetsuIchigo.TRANSFORMA, MugetsuIchigo.SILENCIO) * sai;
+        if (f <= .01f) return;
+        abrir(false, false);
+        // Duas camadas de línguas em ritmos diferentes: parece fumaça grossa, não chama.
+        linguas(pes, t * .6, 1.4 + 2.8 * f, .34, TINTA, .9f * f);
+        linguas(pes, t * .45 + 7, 1.1 + 2.1 * f, .5, NEGRO, .55f * f);
+        disco(pes.add(0, .04, 0), 1.2 + 2.6 * f, TINTA, .75f * f, 0);
+        // A poça de escuridão se espalha em anéis lentos.
+        for (int k = 0; k < 2; k++) {
+            double g = ((t * .5 + k * 9) % 18) / 18;
+            anel(pes.add(0, .05, 0), .6 + 4.2 * g * f, .35, TINTA, f * (float) (1 - g) * .6f);
+        }
+        fechar();
+        // Até a forma final aparecer, o vermelho do Bankai ainda lambe por fora e vai sendo engolido.
+        float rubro = f * (float) Math.max(0, 1 - t / MugetsuIchigo.TRANSFORMA);
+        if (rubro > .02f) {
+            abrir(true, false);
+            linguas(pes, t + 4, 1.6 + 2.4 * f, .05, RUBRO, rubro * .7f);
+            fechar();
+        }
+    }
+
+    /**
+     * O véu: uma parede de escuridão de 9 blocos que sobe do chão e avança em linha reta. É desenhado como
+     * cortinas atravessadas no caminho, uma a cada 2 blocos, com as laterais e a frente fechadas: de fora
+     * parece um volume preto; de dentro, não se vê nada. Depois de passar, se desfaz devagar.
+     */
+    private static void veu(VisuaisAtivos.Visual v, Vec3 o, double t) {
+        float op = (float) MugetsuIchigo.opacidade(t);
+        if (op <= .01f) return;
+        Base b = Base.de(new Vec3(v.direcao.x(), 0, v.direcao.z()));
+        double frente = MugetsuIchigo.frente(t), meia = MugetsuIchigo.MEIA_LARGURA;
+        if (frente <= .05) return;
+        int colunas = 8;
+        abrir(false, false);
+        // O chão coberto de tinta por onde o véu já passou.
+        Vec3 e0 = o.add(b.lado().scale(-meia)).add(0, .06, 0), d0 = o.add(b.lado().scale(meia)).add(0, .06, 0);
+        quad(e0, d0, d0.add(b.frente().scale(frente)), e0.add(b.frente().scale(frente)), TINTA, .82f * op);
+        // As cortinas atravessadas e as duas laterais, trecho a trecho.
+        double passo = 2;
+        for (double z = 0; z < frente; z += passo) {
+            double z1 = Math.min(frente, z + passo);
+            Vec3 c0 = o.add(b.frente().scale(z)), c1 = o.add(b.frente().scale(z1));
+            for (int i = 0; i < colunas; i++) {
+                double u0 = -1 + 2.0 * i / colunas, u1 = -1 + 2.0 * (i + 1) / colunas;
+                pano(c1.add(b.lado().scale(u0 * meia)), c1.add(b.lado().scale(u1 * meia)),
+                        MugetsuIchigo.altura(u0, z1, t), MugetsuIchigo.altura(u1, z1, t), .5f * op);
+            }
+            for (int lado = -1; lado <= 1; lado += 2) {
+                pano(c0.add(b.lado().scale(lado * meia)), c1.add(b.lado().scale(lado * meia)),
+                        MugetsuIchigo.altura(lado, z, t), MugetsuIchigo.altura(lado, z1, t), .7f * op);
+            }
+        }
+        // A frente: a face que avança, mais cheia. Ela ainda está subindo do chão, então é mais baixa.
+        Vec3 cf = o.add(b.frente().scale(frente));
+        for (int i = 0; i < colunas; i++) {
+            double u0 = -1 + 2.0 * i / colunas, u1 = -1 + 2.0 * (i + 1) / colunas;
+            double h0 = Math.max(2.5, MugetsuIchigo.altura(u0, frente - 1.2, t)), h1 = Math.max(2.5, MugetsuIchigo.altura(u1, frente - 1.2, t));
+            pano(cf.add(b.lado().scale(u0 * meia)), cf.add(b.lado().scale(u1 * meia)), h0, h1, .92f * op);
+        }
+        fechar();
+    }
+
+    /** Um pano de escuridão em pé: cheio do chão até quase o topo, esfiapando no alto. */
+    private static void pano(Vec3 p0, Vec3 p1, double h0, double h1, float alpha) {
+        if (h0 <= .02 && h1 <= .02) return;
+        Vec3 m0 = p0.add(0, h0 * .72, 0), m1 = p1.add(0, h1 * .72, 0);
+        quad(p0, p1, m1, m0, TINTA, alpha);
+        ponto(m0, TINTA, alpha);
+        ponto(m1, TINTA, alpha);
+        ponto(p1.add(0, h1, 0), NEGRO, 0);
+        ponto(p0.add(0, h0, 0), NEGRO, 0);
+    }
+
+    // ---------------------------------------------------------------- máscara e poderes
+
+    /**
+     * A máscara em si é desenhada com o traje, presa à cabeça. Aqui ficam só os dois instantes: o osso se
+     * fechando sobre o rosto quando ela se forma e os cacos quando se desfaz.
+     */
+    private static void mascara(Vec3 camera, float parcial, VisuaisAtivos.Visual v, double t) {
+        Entity e = dono(v);
+        if (e == null) return;
+        Vec3 rosto = e.getEyePosition(parcial).subtract(camera);
+        double falta = v.duracao - t;
+        float forma = (float) Math.max(0, 1 - t / 8), quebra = falta < 8 ? (float) Math.max(0, 1 - falta / 8) : 0;
+        if (v.fimEm >= 0) quebra = 1 - (float) Math.max(0, 1 - (t - (v.fimEm - v.inicio)) / VisuaisAtivos.SAIDA);
+        if (forma <= .01f && quebra <= .01f) return;
+        abrir(true, false);
+        if (forma > .01f) {
+            // Lascas de osso vindas de fora para o rosto.
+            for (int k = 0; k < 10; k++) {
+                double a = k * 2.399, r = .25 + 1.5 * forma;
+                Vec3 de = rosto.add(Math.cos(a) * r, Math.sin(a * 1.7) * r * .6, Math.sin(a) * r);
+                fita(de, rosto.add(de.subtract(rosto).scale(.35)), .05, MARFIM, 0, forma * .8f);
+            }
+            halo(rosto, .5 + .4 * forma, MARFIM, forma * .35f);
+        }
+        if (quebra > .01f) {
+            // Os cacos saltando para fora e caindo.
+            for (int k = 0; k < 12; k++) {
+                double a = k * 2.399, r = .2 + 1.3 * quebra;
+                Vec3 p = rosto.add(Math.cos(a) * r, Math.sin(a * 1.3) * r * .5 - quebra * quebra * .8, Math.sin(a) * r);
+                fita(p, p.add(0, -.12, 0), .07, MARFIM, (1 - quebra) * .9f, 0);
+            }
+            halo(rosto, .45, RUBRO, (1 - quebra) * .25f);
+        }
+        fechar();
+    }
+
+    /**
+     * O reiatsu indo embora depois do Mugetsu (fios azuis que sobem e somem) ou voltando aos 60 s (um anel
+     * que sobe pelos pés e acende). Segue o dono.
+     */
+    private static void poderes(Vec3 camera, float parcial, VisuaisAtivos.Visual v, double t, boolean voltam) {
+        Entity e = dono(v);
+        if (e == null) return;
+        Vec3 pes = e.getPosition(parcial).subtract(camera);
+        double f = Mth.clamp(t / Math.max(1, v.duracao), 0, 1);
+        abrir(true, false);
+        if (voltam) {
+            float a = (float) (Math.sin(Math.PI * f));
+            anel(pes.add(0, .1 + 1.9 * f, 0), .75, .12, AZUL, a * .8f);
+            linguas(pes, t, .6 + 1.6 * f, .1, AZUL, a * .6f);
+            halo(pes.add(0, 1, 0), .8 + 1.2 * f, BRANCO, a * .22f);
+        } else {
+            float a = (float) (1 - f);
+            // Os mesmos fios do Shikai, mas soltos do corpo: sobem e se apagam.
+            linguas(pes.add(0, 1.6 * f, 0), t, 1.4 + 1.2 * f, .08, AZUL, a * a * .7f);
+            halo(pes.add(0, 1.2 + f, 0), 1.1, AZUL, a * .15f);
+        }
         fechar();
     }
 }

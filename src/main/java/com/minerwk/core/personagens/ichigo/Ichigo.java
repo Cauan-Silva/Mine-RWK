@@ -14,6 +14,7 @@ import com.minerwk.core.kit.Trancas;
 import com.minerwk.core.kit.Vetor;
 import com.minerwk.core.vfx.FormasIchigo;
 import com.minerwk.core.vfx.GetsugaIchigo;
+import com.minerwk.core.vfx.MugetsuIchigo;
 import com.minerwk.core.maestria.Arvore;
 import java.util.HashSet;
 import java.util.List;
@@ -513,9 +514,9 @@ public final class Ichigo {
      */
     static final class Mugetsu extends Golpe {
         /** A cutscene: 6 segundos da transformação ao corte. */
-        static final int CARGA = 120;
+        static final int CARGA = MugetsuIchigo.CARGA;
         /** Dentro da carga: quando a forma final aparece e quando tudo se cala antes do corte. */
-        static final int TRANSFORMA = 30, SILENCIO = 84;
+        static final int TRANSFORMA = MugetsuIchigo.TRANSFORMA, SILENCIO = MugetsuIchigo.SILENCIO;
         static final String VISUAL_DA_CARGA = "ichigo_mugetsu_carga", VISUAL = "ichigo_mugetsu";
         /** Os golpes do Shikai, que ficam em recarga enquanto ele está sem poderes. */
         private static final List<String> DO_SHIKAI = List.of("ichigo_getsuga", "ichigo_shunpo", "ichigo_getsuga_chao",
@@ -608,9 +609,10 @@ public final class Ichigo {
      */
     static final class Veu implements Efeito {
         static final float DANO = 40;
-        static final double ALCANCE = 40, MEIA_LARGURA = 4.5, PASSO = 2;
+        /** As medidas são as do visual ({@link MugetsuIchigo}): o dano pega onde o véu é desenhado. */
+        static final double ALCANCE = MugetsuIchigo.ALCANCE, MEIA_LARGURA = MugetsuIchigo.MEIA_LARGURA, PASSO = MugetsuIchigo.PASSO;
         /** Ticks do avanço, e os do céu voltando ao normal depois (só no visual). */
-        static final int TICKS = (int) (ALCANCE / PASSO), RESTO = 30;
+        static final int TICKS = MugetsuIchigo.TICKS, RESTO = MugetsuIchigo.RESTO;
         private final Vetor origem, rumo;
         private final float dano;
         private final Set<Object> atingidos = new HashSet<>();
