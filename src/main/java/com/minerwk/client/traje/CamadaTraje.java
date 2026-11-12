@@ -1,6 +1,7 @@
 package com.minerwk.client.traje;
 
 import net.minecraft.client.renderer.RenderType;
+import net.neoforged.neoforge.client.event.RenderPlayerEvent;
 import net.minecraft.client.model.geom.builders.MeshDefinition;
 import net.minecraft.client.model.geom.builders.LayerDefinition;
 import net.minecraft.client.model.geom.builders.CubeListBuilder;
@@ -86,10 +87,16 @@ public final class CamadaTraje {
         java.util.UUID pano;
         float parcialDoPano;
         boolean semArma;
+        /** O traje Hollow: o buraco no peito é vazado, e o tronco do jogador por baixo não é desenhado. */
+        boolean corpoVazado;
 
-        Renderer() {
+        /**
+         * {@code brilho}: o traje tem {@code _glowmask}. Sem ela a camada de brilho do GeckoLib desenha o modelo
+         * de novo com uma máscara vazia e pinta de preto os pixels transparentes (o buraco do Hollow sumia).
+         */
+        Renderer(boolean brilho) {
             super(new Modelo());
-            addRenderLayer(new AutoGlowingGeoLayer<>(this));
+            if (brilho) addRenderLayer(new AutoGlowingGeoLayer<>(this));
         }
 
         @Override
@@ -103,7 +110,7 @@ public final class CamadaTraje {
             } else if (baseModel != null) {
                 cabeca = baseModel.head.visible;
                 setBoneVisible(head, baseModel.head.visible);
-                setBoneVisible(body, baseModel.body.visible);
+                setBoneVisible(body, baseModel.body.visible || corpoVazado);
                 setBoneVisible(rightArm, baseModel.rightArm.visible);
                 setBoneVisible(leftArm, baseModel.leftArm.visible);
                 setBoneVisible(rightLeg, baseModel.rightLeg.visible);
@@ -251,7 +258,8 @@ public final class CamadaTraje {
     }
 
     private static Renderer renderer(String traje) {
-        return RENDERERS.computeIfAbsent(traje, n -> new Renderer());
+        return RENDERERS.computeIfAbsent(traje, n -> new Renderer(Minecraft.getInstance().getResourceManager()
+                .getResource(MineRWK.id("textures/traje/" + n + "_glowmask.png")).isPresent()));
     }
 
     /** Se a venda deste jogador está fora, pelos visuais dele em andamento. */
@@ -304,6 +312,7 @@ public final class CamadaTraje {
         renderer.pano = jogador.getUUID();
         renderer.parcialDoPano = parcial;
         renderer.semArma = PersonagensVistos.visto(jogador.getId()).semArma();
+        renderer.corpoVazado = TrajeIchigo.HOLLOW.equals(traje);
         balancarBarra(renderer, jogador, idade);
         renderer.prepForRender(jogador, item(traje), EquipmentSlot.CHEST, modelo, buffer, parcial, passo, passada,
                 cabecaYaw, cabecaPitch);
@@ -327,6 +336,18 @@ public final class CamadaTraje {
                 }
             }
         }
+    }
+
+    /**
+     * O traje Hollow tem um buraco de verdade no peito: o tronco do jogador (e a jaqueta da skin) some, senão ele
+     * apareceria no vão. O PlayerRenderer reseta a visibilidade a cada quadro, antes deste evento.
+     */
+    public static void antesDoJogador(RenderPlayerEvent.Pre evento) {
+        if (!(evento.getEntity() instanceof AbstractClientPlayer jogador)) return;
+        if (!TrajeIchigo.HOLLOW.equals(trajeDe(jogador))) return;
+        PlayerModel<AbstractClientPlayer> modelo = evento.getRenderer().getModel();
+        modelo.body.visible = false;
+        modelo.jacket.visible = false;
     }
 
     /** Primeira pessoa: a manga do traje no braço que o jogo está desenhando. */

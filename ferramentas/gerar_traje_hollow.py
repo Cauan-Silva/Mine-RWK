@@ -57,6 +57,10 @@ BRACO = (80, 32, 16, 48)
 PERNA = (96, 32, 16, 48)
 MANGA = (112, 32, 16, 40)
 NADA = (200, 100, 1, 1)
+# O buraco no peito, nos quadros PEITO e COSTAS: a partir de xm (o x dobrado) e entre as linhas y. O tronco tem
+# 8x12 pixels de modelo em 32x48 da textura (4 por pixel): 3x3 pixels no meio, 5 pixels abaixo do ombro.
+BURACO_X = 10.5
+BURACO_Y = (14, 26)
 # Cores chapadas (um quadrado 2x2).
 (COR_PELE, COR_OSSO, COR_PRETO, COR_RUBRO, COR_PANO, COR_FAIXA, COR_SOMBRA, COR_FAIXA_SOMBRA, COR_PANO_CLARO,
  COR_RUBRO_CLARO, COR_RUBRO_ESCURO, COR_OSSO_MEIA) = [(2 * i, 200) for i in range(12)]
@@ -164,9 +168,17 @@ def textura():
     pintar(TEMPORA, tempora)
 
     # --- O tronco ---
-    def peito(xm, y, x):
-        if (xm - 15.5) ** 2 + (y - 19) ** 2 <= 5.3 ** 2:
+    def buraco(xm, y):
+        """O buraco atravessa o tronco: 3x3 pixels do modelo vazados (12x12 aqui), com a borda preta."""
+        if xm >= BURACO_X and BURACO_Y[0] <= y < BURACO_Y[1]:
+            return NADA_COR
+        if xm >= BURACO_X - 1.5 and BURACO_Y[0] - 1.5 <= y < BURACO_Y[1] + 1.5:
             return PRETO
+        return None
+
+    def peito(xm, y, x):
+        if buraco(xm, y):
+            return buraco(xm, y)
         # Duas marcas de cada lado até o ombro, as do pescoço e a ponta para baixo.
         if a_linha(xm, y, [(11, 16), (5, 10), (0, 7)]) <= 1.6 or a_linha(xm, y, [(11, 21.5), (5, 20.5), (0, 21)]) <= 1.5:
             return PRETO
@@ -192,6 +204,8 @@ def textura():
     pintar(PEITO, peito)
 
     def costas(xm, y, x):
+        if buraco(xm, y):
+            return buraco(xm, y)
         if a_linha(xm, y, [(8, 12), (4, 9), (0, 7)]) <= 1.6 or a_linha(xm, y, [(7, 21.5), (0, 21)]) <= 1.5:
             return PRETO
         if xm < 1.5 or xm > 14.6:
@@ -232,6 +246,17 @@ def cubo(origem, tamanho, cor, inflar=0.0, giro=None, pivo=None, **faces):
         c['rotation'] = giro
         c['pivot'] = pivo
     return c
+
+
+def tunel():
+    """As paredes pretas de dentro do buraco, da frente às costas: o vão da textura, no tronco inflado em .3."""
+    esq, dir_ = -4.3 + 8.6 * 10 / 32, -4.3 + 8.6 * 22 / 32
+    topo, base = 24.3 - 12.6 * BURACO_Y[0] / 48, 24.3 - 12.6 * BURACO_Y[1] / 48
+    e, z, fundo = .12, -2.28, 4.56
+    return [cubo([esq - e, base - e, z], [e, topo - base + 2 * e, fundo], COR_PRETO),
+            cubo([dir_, base - e, z], [e, topo - base + 2 * e, fundo], COR_PRETO),
+            cubo([esq, topo, z], [dir_ - esq, e, fundo], COR_PRETO),
+            cubo([esq, base - e, z], [dir_ - esq, e, fundo], COR_PRETO)]
 
 
 def haste(de, ate, raio, cor, sobra=.25):
@@ -429,6 +454,7 @@ def modelo(im):
         ]},
         {'name': 'armorBody', 'pivot': [0, 24, 0], 'cubes': [
             cubo([-4, 12, -2], [8, 12, 4], COR_PELE, inflar=.3, north=PEITO, south=COSTAS, east=LATERAL, west=LATERAL),
+            *tunel(),
             *gola(),
             # O cós preto do hakama e a faixa branca, com o laço.
             cubo([-4, 12, -2], [8, 1.4, 4], COR_PANO, inflar=.5),
