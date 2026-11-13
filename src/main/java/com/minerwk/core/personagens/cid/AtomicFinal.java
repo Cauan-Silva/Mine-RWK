@@ -44,12 +44,15 @@ public final class AtomicFinal {
     public static final int ATOMIC = TERCEIRA + TICKS_DA_PALAVRA;
     public static final int TICKS_DA_FALA = ATOMIC - FALA;
     public static final float DANO = 44;
-    /** A esfera de luz roxa no espaço: nasce pequena, cresce devagar até tomar a tela e some; só então os dois voltam. */
-    public static final int TICKS_DO_CLARAO = 70;
+    /**
+     * O estouro no espaço: a esfera de luz roxa nasce e cresce em {@link #TICKS_DA_ESFERA} ticks; quem vê a cutscene
+     * vê a câmera recuar até o sistema solar ({@link SistemaSolar}); só no fim do clarão os dois voltam.
+     */
+    public static final int TICKS_DO_CLARAO = 130, TICKS_DA_ESFERA = 70;
     public static final int VOLTA = ATOMIC + TICKS_DO_CLARAO;
-    /** No mundo de onde saíram: quem está a até 96 blocos vê a luz no céu por 6 s. */
+    /** No mundo de onde saíram: quem está a até 96 blocos vê a luz no céu do estouro até 2,5 s depois da volta. */
     public static final double RAIO_DA_LUZ = 96;
-    public static final int TICKS_DA_LUZ = 120;
+    public static final int TICKS_DA_LUZ = TICKS_DO_CLARAO + 50;
     /** O risco roxo que quem ficou embaixo vê quando os dois somem para cima. */
     public static final int TICKS_DO_RISCO = 14;
     /** A onda de choque na volta: empurra quem está a até 10 blocos do ponto de partida, sem ferir nem quebrar nada. */
@@ -156,7 +159,7 @@ public final class AtomicFinal {
 
     /** O raio da esfera, em fração do máximo, {@code t} ticks depois do Atomic: nasce pequena e cresce cada vez mais depressa. */
     public static double raioDoClarao(double t) {
-        double s = Math.max(0, Math.min(1, t / TICKS_DO_CLARAO));
+        double s = Math.max(0, Math.min(1, t / TICKS_DA_ESFERA));
         return Math.pow(s, 1.6);
     }
 

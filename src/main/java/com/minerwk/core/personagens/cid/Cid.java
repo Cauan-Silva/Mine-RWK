@@ -540,7 +540,8 @@ public final class Cid {
             ctx.visual(ATOMIC, meio, rumo, 0f, AtomicFinal.TICKS_DO_CLARAO + 10);
             ctx.visualNaOrigem(Atomic.LUZ, 0f, AtomicFinal.TICKS_DA_LUZ, AtomicFinal.RAIO_DA_LUZ);
             ctx.cutscene(CutsceneAtomic.CLARAO, cid.mais(new Vetor(0, 1.62, 0)), rumo);
-            ctx.tremor(2.5f, AtomicFinal.TICKS_DO_CLARAO - 20, 64);
+            // Só o estouro treme: no recuo até o sistema solar a câmera fica firme.
+            ctx.tremor(2.5f, 40, 64);
         }
 
         private void voltar(Contexto ctx, boolean comCena) {

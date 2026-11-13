@@ -67,9 +67,12 @@ public final class CutsceneAtomic {
                 new Quadro(fim + ESPERA, new Vetor(.1, -.45, 1.5), new Vetor(0, .1, 0), .6, 0)));
     }
 
+    /** Onde a câmera do estouro para: de cima e de lado, para as órbitas do sistema solar aparecerem em elipse. */
+    public static final Vetor LONGE = new Vetor(40, 55, -100);
+
     /** A câmera se afasta de uma vez, até os dois virarem um ponto entre os planetas, e fica. */
     public static Coreografia doClarao() {
-        Vetor centro = new Vetor(0, 0, AtomicFinal.AO_LADO / 2), longe = new Vetor(40, 25, -105);
+        Vetor centro = new Vetor(0, 0, AtomicFinal.AO_LADO / 2), longe = LONGE;
         return new Coreografia(List.of(
                 new Quadro(0, new Vetor(3, 1, -4), centro, .9, 0),
                 new Quadro(4, new Vetor(5, 2, -8), centro, .95, 0),

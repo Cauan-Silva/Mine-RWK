@@ -103,7 +103,7 @@ class CidAtomicTest {
         assertEquals(112, AtomicFinal.FALA);
         assertEquals(168, AtomicFinal.CARGA, "duas palavras e os silêncios");
         assertEquals(222, AtomicFinal.ATOMIC, "a carga e a terceira palavra");
-        assertEquals(292, AtomicFinal.VOLTA);
+        assertEquals(352, AtomicFinal.VOLTA, "o estouro dura 130 ticks");
         assertTrue(AtomicFinal.FIM >= 300, "o golpe dura pelo menos 15 s");
         assertTrue(AtomicFinal.FIM >= AtomicFinal.ATOMIC + AtomicFinal.TICKS_DA_LUZ, "o golpe cobre a luz no céu");
     }

@@ -24,6 +24,11 @@ public record Vetor(double x, double y, double z) {
         return menos(o).comprimento();
     }
 
+    /** O produto escalar. */
+    public double ponto(Vetor o) {
+        return x * o.x + y * o.y + z * o.z;
+    }
+
     /** Mesmo sentido com comprimento 1; o zero continua zero. */
     public Vetor normalizado() {
         double c = comprimento();

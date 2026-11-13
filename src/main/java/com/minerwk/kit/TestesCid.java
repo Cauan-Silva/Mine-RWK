@@ -4,6 +4,7 @@ import com.minerwk.MineRWK;
 import com.minerwk.core.kit.KitDoJogador;
 import com.minerwk.core.kit.Personagens;
 import com.minerwk.core.kit.Tecla;
+import com.minerwk.core.personagens.cid.AtomicFinal;
 import com.minerwk.core.personagens.cid.Cid;
 import com.minerwk.registro.Efeitos;
 import net.minecraft.core.BlockPos;
@@ -379,7 +380,7 @@ public final class TestesCid {
         ticks(jogador, 80);
         helper.assertTrue(perto(zumbi.getHealth(), 40), "o Atomic tira 44, vida " + zumbi.getHealth());
         helper.assertTrue(EspacoServidor.emViagem(jogador), "o clarão ainda dura");
-        ticks(jogador, 70);
+        ticks(jogador, AtomicFinal.TICKS_DO_CLARAO);
         helper.assertTrue(!EspacoServidor.emViagem(jogador) && !EspacoServidor.emViagem(zumbi), "a viagem acabou");
         helper.assertTrue(jogador.position().distanceTo(cidAntes) < .01 && !jogador.isNoGravity(), "o Cid volta ao ponto de partida");
         helper.assertTrue(zumbi.position().distanceTo(zumbiAntes) < .01 && !zumbi.isNoGravity() && zumbi.isNoAi(),
@@ -404,7 +405,7 @@ public final class TestesCid {
         ticks(jogador, 18);
         helper.assertTrue(!zumbi.isAlive(), "o segundo soco mata");
         helper.assertTrue(EspacoServidor.emViagem(jogador), "o Cid segue para o Atomic");
-        ticks(jogador, 76);
+        ticks(jogador, 6 + AtomicFinal.TICKS_DO_CLARAO);
         helper.assertTrue(!EspacoServidor.emViagem(jogador), "e volta sem esperar os socos que faltavam");
         helper.assertTrue(jogador.position().distanceTo(cidAntes) < .01 && !jogador.isNoGravity(), "ao ponto de partida");
         helper.succeed();
