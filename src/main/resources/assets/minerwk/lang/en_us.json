@@ -324,5 +324,11 @@
   "subtitles.minerwk.ragnarok_rugido": "Ragnarok howls in pain",
   "subtitles.minerwk.ragnarok_morte": "Ragnarok falls",
   "cutscene.minerwk.ragnarok_asa.1": "Worm... my wing!",
-  "cutscene.minerwk.ragnarok_asa.1.jp": "グォォォッ！"
+  "cutscene.minerwk.ragnarok_asa.1.jp": "グォォォッ！",
+  "config.minerwk.vidaExtra": "Character extra health",
+  "config.minerwk.reducaoDeDano": "Damage taken reduction",
+  "config.minerwk.multiplicadorDosGolpes": "Ability damage multiplier",
+  "config.minerwk.vidaDosBosses": "Boss health",
+  "config.minerwk.danoDosBosses": "Boss damage",
+  "config.minerwk.poder": "Balance"
 }

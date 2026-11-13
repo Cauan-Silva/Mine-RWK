@@ -19,7 +19,9 @@ import com.minerwk.registro.Sons;
 import com.mojang.logging.LogUtils;
 import net.minecraft.resources.ResourceLocation;
 import net.neoforged.bus.api.IEventBus;
+import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.Mod;
+import net.neoforged.fml.config.ModConfig;
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.RegisterCommandsEvent;
@@ -31,7 +33,8 @@ public final class MineRWK {
     public static final String MOD_ID = "minerwk";
     public static final Logger LOGGER = LogUtils.getLogger();
 
-    public MineRWK(IEventBus modBus) {
+    public MineRWK(IEventBus modBus, ModContainer container) {
+        container.registerConfig(ModConfig.Type.SERVER, ConfigServidor.SPEC);
         Sons.REGISTRO.register(modBus);
         Anexos.REGISTRO.register(modBus);
         Efeitos.REGISTRO.register(modBus);

@@ -324,5 +324,11 @@
   "subtitles.minerwk.ragnarok_rugido": "Ragnarok urra de dor",
   "subtitles.minerwk.ragnarok_morte": "Ragnarok cai",
   "cutscene.minerwk.ragnarok_asa.1": "Verme... a minha asa!",
-  "cutscene.minerwk.ragnarok_asa.1.jp": "グォォォッ！"
+  "cutscene.minerwk.ragnarok_asa.1.jp": "グォォォッ！",
+  "config.minerwk.vidaExtra": "Vida extra do personagem",
+  "config.minerwk.reducaoDeDano": "Redução do dano recebido",
+  "config.minerwk.multiplicadorDosGolpes": "Multiplicador dos golpes",
+  "config.minerwk.vidaDosBosses": "Vida dos bosses",
+  "config.minerwk.danoDosBosses": "Dano dos bosses",
+  "config.minerwk.poder": "Balanceamento"
 }
