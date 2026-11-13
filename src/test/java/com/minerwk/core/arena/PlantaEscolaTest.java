@@ -304,4 +304,29 @@ class PlantaEscolaTest {
         assertTrue(m.containsValue(Material.TATAME));
         assertTrue(temCaminho(m, PlantaEscola.SALAO, 0, -36), "a nave não se alcança pela porta");
     }
+
+    @Test
+    void pavilhoesMobiliadosComCaminho() {
+        Map<String, Material> m = mapa(PlantaEscola.cenario());
+        int quadros = 0, mesas = 0, alvos = 0, barris = 0;
+        for (Map.Entry<String, Material> e : m.entrySet()) {
+            String[] c = e.getKey().split(",");
+            int x = Integer.parseInt(c[0]), y = Integer.parseInt(c[1]), z = Integer.parseInt(c[2]);
+            boolean leste = PlantaEscola.PAVILHAO_LESTE.perto(x, z, 0), oeste = PlantaEscola.PAVILHAO_OESTE.perto(x, z, 0);
+            switch (e.getValue()) {
+                case QUADRO -> quadros += leste ? 1 : 0;
+                case LAJE_MADEIRA -> mesas += leste ? 1 : 0;
+                case ALVO -> {
+                    if (oeste && m.get(chave(x, y - 1, z)) == Material.FENO) alvos++;
+                }
+                case BARRIL -> barris += oeste ? 1 : 0;
+                case TAPETE -> assertTrue(solido(m.get(chave(x, y - 1, z))), "tapete sem apoio em " + e.getKey());
+                default -> { }
+            }
+        }
+        assertTrue(quadros > 0, "sem quadro na sala de aula");
+        assertTrue(mesas >= 6, "mesas: " + mesas);
+        assertEquals(2, alvos, "alvos sobre feno");
+        assertTrue(barris > 0, "sem barril na sala de treino");
+    }
 }

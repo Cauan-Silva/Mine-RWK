@@ -148,6 +148,8 @@ public final class PlantaEscola {
         for (int k : TORII_DA_ESCADA) torii(o, ESCADA_EM + 1 + 2 * k, -1 - k, PILAR_DA_ESCADA, VAO_DA_ESCADA);
         for (Predio p : PREDIOS) predio(o, p);
         interiorSalao(o);
+        interiorSalaDeAula(o);
+        interiorSalaDeTreino(o);
         // Lanternas de pedra na borda do pátio, fora da frente das portas e do caminho.
         for (int i : new int[] {-16, -8, 8, 16}) {
             lanterna(o, MEIO_PATIO_ESCOLA, i);
@@ -305,6 +307,46 @@ public final class PlantaEscola {
             o.por(8 * lado, pe, -29, Material.LAJE_MADEIRA);
             o.por(7 * lado, pe, -29, Material.TAPETE);
             o.por(9 * lado, pe, -29, Material.TAPETE);
+        }
+    }
+
+    /** O pavilhão leste é a sala de aula: mesas baixas viradas para o quadro na parede do fundo. */
+    private static void interiorSalaDeAula(Obra o) {
+        Predio p = PAVILHAO_LESTE;
+        int pe = p.podio();
+        // Fileiras de mesa com a almofada atrás, deixando livre o corredor do meio.
+        for (int dx : new int[] {31, 34}) {
+            for (int dz : new int[] {-7, -6, -4, -3, 3, 4, 6, 7}) {
+                o.por(dx, pe, dz, Material.LAJE_MADEIRA);
+                o.por(dx - 1, pe, dz, Material.TAPETE);
+            }
+        }
+        // O quadro embutido na parede do fundo, e as estantes dos lados.
+        for (int dz = -2; dz <= 2; dz++) {
+            for (int dy = pe + 1; dy <= pe + 2; dy++) o.por(p.x1(), dy, dz, Material.QUADRO);
+        }
+        for (int dz : new int[] {-7, -6, -5, 5, 6, 7}) {
+            for (int dy = pe; dy <= pe + 1; dy++) o.por(p.x1() - 1, dy, dz, Material.ESTANTE);
+        }
+    }
+
+    /** O pavilhão oeste é a sala de treino: o suporte de armas, os alvos e o tapete no meio. */
+    private static void interiorSalaDeTreino(Obra o) {
+        Predio p = PAVILHAO_OESTE;
+        int pe = p.podio();
+        // O suporte de armas na parede norte, com barris embaixo.
+        for (int dx = -36; dx <= -30; dx++) {
+            o.por(dx, pe, p.z0() + 1, Material.BARRIL);
+            o.por(dx, pe + 1, p.z0() + 1, Material.SUPORTE_ARMADURA);
+        }
+        // Dois alvos na parede do fundo: feno com o alvo em cima.
+        for (int dz : new int[] {-4, 4}) {
+            o.por(p.x0() + 1, pe, dz, Material.FENO);
+            o.por(p.x0() + 1, pe + 1, dz, Material.ALVO);
+        }
+        // O tapete de treino, 5 × 5, no meio.
+        for (int dx = -35; dx <= -31; dx++) {
+            for (int dz = -2; dz <= 2; dz++) o.por(dx, pe, dz, Material.TAPETE);
         }
     }
 
