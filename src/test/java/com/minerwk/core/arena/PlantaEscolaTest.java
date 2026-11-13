@@ -329,4 +329,52 @@ class PlantaEscolaTest {
         assertEquals(2, alvos, "alvos sobre feno");
         assertTrue(barris > 0, "sem barril na sala de treino");
     }
+
+    @Test
+    void sinoTemApoio() {
+        Map<String, Material> m = mapa(PlantaEscola.cenario());
+        int[] s = PlantaEscola.SINO;
+        assertEquals(Material.SINO, m.get(chave(s[0], s[1], s[2])));
+        assertNotNull(m.get(chave(s[0], s[1] + 1, s[2])), "o sino não está preso a nada");
+        assertTrue(Math.abs(s[0]) > P || Math.abs(s[2]) > P, "a torre do sino está no pátio de luta");
+    }
+
+    @Test
+    void engawaCercaOSalaoComEntrada() {
+        Map<String, Material> m = mapa(PlantaEscola.cenario());
+        PlantaEscola.Predio p = PlantaEscola.SALAO;
+        int frente = p.z1() + PlantaEscola.Predio.BEIRAL, pe = p.podio();
+        assertEquals(Material.CERCA_ESCURA, m.get(chave(-8, pe, frente)), "sem guarda-corpo");
+        assertEquals(Material.ASSOALHO, m.get(chave(-8, pe - 1, p.z1() + 1)), "sem varanda de madeira");
+        for (int dx = -2; dx <= 2; dx++) assertNull(m.get(chave(dx, pe, frente)), "guarda-corpo na entrada");
+    }
+
+    @Test
+    void janelasNaoFicamNaPorta() {
+        Map<String, Material> m = mapa(PlantaEscola.cenario());
+        int janelas = 0;
+        for (Map.Entry<String, Material> e : m.entrySet()) {
+            if (e.getValue() != Material.GRADE_NS && e.getValue() != Material.GRADE_LO) continue;
+            janelas++;
+            String[] c = e.getKey().split(",");
+            int x = Integer.parseInt(c[0]), z = Integer.parseInt(c[2]);
+            for (PlantaEscola.Predio p : PlantaEscola.PREDIOS) {
+                int mx = (p.x0() + p.x1()) / 2, mz = (p.z0() + p.z1()) / 2;
+                boolean naPorta = p.porta() == 'S' ? z == p.z1() && Math.abs(x - mx) <= 2
+                        : x == (p.porta() == 'O' ? p.x0() : p.x1()) && Math.abs(z - mz) <= 2;
+                assertFalse(naPorta, "janela na porta em " + e.getKey());
+            }
+        }
+        assertTrue(janelas >= 12, "janelas: " + janelas);
+    }
+
+    @Test
+    void depositoTemPorta() {
+        Map<String, Material> m = mapa(PlantaEscola.cenario());
+        PlantaEscola.Predio d = PlantaEscola.DEPOSITO;
+        int mx = (d.x0() + d.x1()) / 2;
+        assertEquals(Material.MADEIRA_ESCURA, m.get(chave(d.x0(), 0, d.z0())));
+        for (int dy = 0; dy <= 1; dy++) assertNull(m.get(chave(mx, dy, d.z1())), "depósito sem porta");
+        assertNotNull(m.get(chave(mx, d.parede(), (d.z0() + d.z1()) / 2)), "depósito sem teto");
+    }
 }

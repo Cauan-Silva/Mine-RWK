@@ -94,6 +94,12 @@ public final class PlantaEscola {
     public static final Predio PAVILHAO_LESTE = new Predio(27, 39, -10, 10, 1, 5, 'O', false);
     public static final Predio PAVILHAO_OESTE = new Predio(-39, -27, -10, 10, 1, 5, 'L', false);
     public static final List<Predio> PREDIOS = List.of(SALAO, PAVILHAO_LESTE, PAVILHAO_OESTE);
+    /** O depósito, ao noroeste: pequeno, de madeira, com uma porta de 1 × 2 ao sul. Fora de {@link #PREDIOS}. */
+    public static final Predio DEPOSITO = new Predio(-26, -22, -25, -21, 0, 3, 'S', false);
+    /** Onde fica o sino da torre, ao nordeste, fora do pátio de luta. */
+    public static final int[] SINO = {23, 4, -23};
+    /** O portão lateral, atrás do pavilhão oeste, na borda da grama. */
+    private static final int PORTAO_X = -47;
 
     /** De quanto em quanto a floresta tenta uma árvore. */
     private static final int PASSO_DA_FLORESTA = 7;
@@ -122,6 +128,11 @@ public final class PlantaEscola {
         boolean tem(int dx, int dy, int dz) {
             return blocos.containsKey(chave(dx, dy, dz));
         }
+
+        Material em(int dx, int dy, int dz) {
+            Bloco b = blocos.get(chave(dx, dy, dz));
+            return b == null ? null : b.material();
+        }
     }
 
     /** A fileira é a de um degrau da escadaria (e não a de um patamar)? */
@@ -146,7 +157,15 @@ public final class PlantaEscola {
         torii(o, TORII_GRANDE_EM, 0, PILAR_GRANDE, VAO_GRANDE);
         torii(o, TORII_DO_CAMINHO, 0, PILAR_DO_CAMINHO, VAO_DO_CAMINHO);
         for (int k : TORII_DA_ESCADA) torii(o, ESCADA_EM + 1 + 2 * k, -1 - k, PILAR_DA_ESCADA, VAO_DA_ESCADA);
-        for (Predio p : PREDIOS) predio(o, p);
+        for (Predio p : PREDIOS) {
+            predio(o, p);
+            janelas(o, p);
+            ornamentos(o, p);
+        }
+        engawa(o);
+        torreDoSino(o);
+        deposito(o);
+        portaoLateral(o);
         interiorSalao(o);
         interiorSalaDeAula(o);
         interiorSalaDeTreino(o);
@@ -350,6 +369,117 @@ public final class PlantaEscola {
         }
     }
 
+    /** Uma grade de janela em cada vão de parede branca entre dois pilares, fora da porta. */
+    private static void janelas(Obra o, Predio p) {
+        int dy = p.podio() + 2;
+        int mx = (p.x0() + p.x1()) / 2, mz = (p.z0() + p.z1()) / 2;
+        for (int dx = p.x0() + 2; dx < p.x1(); dx += 4) {
+            for (int dz : new int[] {p.z0(), p.z1()}) {
+                if (p.porta() == 'S' && dz == p.z1() && Math.abs(dx - mx) <= 2) continue;
+                if (o.em(dx, dy, dz) == Material.PAREDE_BRANCA) o.por(dx, dy, dz, Material.GRADE_NS);
+            }
+        }
+        for (int dz = p.z0() + 2; dz < p.z1(); dz += 4) {
+            for (int dx : new int[] {p.x0(), p.x1()}) {
+                boolean porta = (p.porta() == 'O' && dx == p.x0()) || (p.porta() == 'L' && dx == p.x1());
+                if (porta && Math.abs(dz - mz) <= 2) continue;
+                if (o.em(dx, dy, dz) == Material.PAREDE_BRANCA) o.por(dx, dy, dz, Material.GRADE_LO);
+            }
+        }
+    }
+
+    /** Um ornamento de pé nos quatro cantos erguidos do beiral, e a cumeeira escura no alto do telhado. */
+    private static void ornamentos(Obra o, Predio p) {
+        int b = Predio.BEIRAL, beiral = p.podio() + p.parede();
+        for (int dx : new int[] {p.x0() - b, p.x1() + b}) {
+            for (int dz : new int[] {p.z0() - b, p.z1() + b}) o.por(dx, beiral + 1, dz, Material.CERCA_ESCURA);
+        }
+        boolean emX = p.x1() - p.x0() >= p.z1() - p.z0();
+        int mx = (p.x0() + p.x1()) / 2, mz = (p.z0() + p.z1()) / 2;
+        int de = emX ? p.x0() - b : p.z0() - b, ate = emX ? p.x1() + b : p.z1() + b;
+        int[] topo = new int[ate - de + 1];
+        int maior = Integer.MIN_VALUE;
+        for (int i = de; i <= ate; i++) {
+            int x = emX ? i : mx, z = emX ? mz : i;
+            int y = beiral + 20;
+            while (y > beiral && !o.tem(x, y, z)) y--;
+            topo[i - de] = y;
+            maior = Math.max(maior, y);
+        }
+        for (int i = de; i <= ate; i++) {
+            if (topo[i - de] == maior) o.por(emX ? i : mx, maior + 1, emX ? mz : i, Material.MADEIRA_ESCURA);
+        }
+    }
+
+    /**
+     * A varanda do salão: o anel de madeira logo fora das paredes e o guarda-corpo na borda da base, aberto
+     * na frente da escada.
+     */
+    private static void engawa(Obra o) {
+        Predio p = SALAO;
+        int b = Predio.BEIRAL, piso = p.podio() - 1;
+        for (int dx = p.x0() - b; dx <= p.x1() + b; dx++) {
+            for (int dz = p.z0() - b; dz <= p.z1() + b; dz++) {
+                boolean fora = dx < p.x0() || dx > p.x1() || dz < p.z0() || dz > p.z1();
+                if (!fora) continue;
+                boolean borda = dx == p.x0() - b || dx == p.x1() + b || dz == p.z0() - b || dz == p.z1() + b;
+                if (!borda) o.por(dx, piso, dz, Material.ASSOALHO);
+                else if (!(dz == p.z1() + b && Math.abs(dx) <= 3)) o.por(dx, p.podio(), dz, Material.CERCA_ESCURA);
+            }
+        }
+    }
+
+    /** A torre do sino (shoro): quatro pilares, um teto pequeno e o sino pendurado no meio. */
+    private static void torreDoSino(Obra o) {
+        int cx = SINO[0], cz = SINO[2], teto = SINO[1] + 1;
+        for (int dx = cx - 1; dx <= cx + 1; dx += 2) {
+            for (int dz = cz - 1; dz <= cz + 1; dz += 2) {
+                for (int dy = 0; dy < teto; dy++) o.por(dx, dy, dz, Material.PILAR);
+            }
+        }
+        for (int dx = cx - 2; dx <= cx + 2; dx++) {
+            for (int dz = cz - 2; dz <= cz + 2; dz++) o.por(dx, teto, dz, Material.LAJE_TELHA);
+        }
+        o.por(cx, teto, cz, Material.MADEIRA_ESCURA);
+        o.por(cx, teto + 1, cz, Material.LAJE_TELHA);
+        o.por(cx, SINO[1], cz, Material.SINO);
+    }
+
+    /** O depósito: paredes de madeira escura, teto de telha e a porta ao sul. */
+    private static void deposito(Obra o) {
+        Predio d = DEPOSITO;
+        int mx = (d.x0() + d.x1()) / 2;
+        for (int dx = d.x0(); dx <= d.x1(); dx++) {
+            for (int dz = d.z0(); dz <= d.z1(); dz++) {
+                boolean parede = dx == d.x0() || dx == d.x1() || dz == d.z0() || dz == d.z1();
+                if (parede) {
+                    for (int dy = 0; dy < d.parede(); dy++) o.por(dx, dy, dz, Material.MADEIRA_ESCURA);
+                }
+            }
+        }
+        for (int dx = d.x0() - 1; dx <= d.x1() + 1; dx++) {
+            for (int dz = d.z0() - 1; dz <= d.z1() + 1; dz++) o.por(dx, d.parede(), dz, Material.LAJE_TELHA);
+        }
+        o.tirar(mx, 0, d.z1());
+        o.tirar(mx, 1, d.z1());
+        o.por(d.x0() + 1, 0, d.z0() + 1, Material.BARRIL);
+    }
+
+    /** O portão lateral: dois pilares, a viga vermelha e o telhado; fechado por uma cerca, sem saída. */
+    private static void portaoLateral(Obra o) {
+        int x = PORTAO_X;
+        for (int dz : new int[] {-2, 2}) {
+            for (int dy = 0; dy < 5; dy++) o.por(x, dy, dz, Material.PILAR);
+        }
+        for (int dz = -3; dz <= 3; dz++) o.por(x, 5, dz, Material.MADEIRA_VERMELHA);
+        for (int dx = x - 1; dx <= x + 1; dx++) {
+            for (int dz = -4; dz <= 4; dz++) o.por(dx, 6, dz, Material.LAJE_TELHA);
+        }
+        for (int dz = -1; dz <= 1; dz++) {
+            for (int dy = 0; dy <= 1; dy++) o.por(x, dy, dz, Material.CERCA_ESCURA);
+        }
+    }
+
     /** As quatro paredes de um retângulo: pilar escuro nos cantos e de 4 em 4, branco entre eles, viga escura em cima. */
     private static void paredes(Obra o, int x0, int x1, int z0, int z1, int de, int ate) {
         for (int dx = x0; dx <= x1; dx++) {
@@ -414,6 +544,8 @@ public final class PlantaEscola {
         for (Predio p : PREDIOS) {
             if (p.perto(x, z, folga)) return false;
         }
+        if (DEPOSITO.perto(x, z, folga)) return false;
+        if (Math.abs(x - PORTAO_X) <= folga && Math.abs(z) <= 4 + folga) return false;
         return true;
     }
 
