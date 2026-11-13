@@ -22,7 +22,8 @@ public final class CidServidor {
 
     public static void registrarEventos() {
         // O dano que de fato tiraria vida, já com armadura e absorção descontadas, como na forma Hollow.
-        NeoForge.EVENT_BUS.addListener(EventPriority.LOW, CidServidor::aoReceberDano);
+        // Antes da camada de poder (HIGH): o golpe forte é medido como antes do balanceamento.
+        NeoForge.EVENT_BUS.addListener(EventPriority.HIGHEST, CidServidor::aoReceberDano);
     }
 
     private static void aoReceberDano(LivingDamageEvent.Pre evento) {

@@ -88,7 +88,7 @@ public final class LutasZangetsu {
         // a luta, não só o golpe dele: um empurrão para o vão entre os prédios também fere.
         ZangetsuEntity zangetsu = de(vitima.getUUID()).orElse(null);
         if (zangetsu != null && zangetsu.level() == vitima.level() && zangetsu.podeDerrubar(vitima)
-                && ZangetsuBoss.golpeMortal(vitima.getHealth(), evento.getAmount())) {
+                && ZangetsuBoss.golpeMortal(vitima.getHealth(), com.minerwk.kit.PoderServidor.recebidoPor(vitima, evento.getAmount()))) {
             evento.setCanceled(true);
             zangetsu.derrubar(vitima);
         }

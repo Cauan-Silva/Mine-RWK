@@ -35,5 +35,19 @@ O autor testou o [[Gojo]], o [[Ichigo]] e o [[Cid]] e apanhou demais de um Warde
 - JUnit: `PoderTest` (6), dois novos em `GojoTest`, um em `IchigoTest`; os testes de reiatsu passaram aos ritmos novos.
 - GameTest: `TestesPoder` (8): golpe do kit ×3, vida extra e a volta sem personagem, renascido com a vida extra, golpe do Warden pela metade, sem personagem apanha inteiro, `/kill`, bosses com o dobro da vida (uma vez só), golpe do boss multiplicado e reduzido. As arenas: `apagarNaArenaNaoMexe` e `arrancarNaArenaNaoMexe`. Os 124 passam.
 
+## Revisão final (revisor separado)
+Nenhum crítico, dois importantes e sete menores. Corrigidos com um teste que falhou antes e passa agora (os GameTests foram a 128):
+- **Importante: sair e entrar no mundo cortava a vida em 20.** O modificador de vida não era salvo; agora é (`addPermanentModifier`). Teste: `sairEEntrarMantemAVida`.
+- **Importante: o despertar das lutas do Toji e do Zangetsu disparava cedo.** A queda decide antes da redução e via o golpe dobrado inteiro: um soco que deixaria 2 de vida derrubava. Agora ela mede o dano que de fato chega (`PoderServidor.recebidoPor`). Teste: `socoDoTojiNaoDerrubaQuemSobrevive`.
+- **O traje de slime do Cid passou a disparar só com golpes de 16.** Ele media o golpe já reduzido. Agora a ordem é fixa: o traje (prioridade mais alta) mede antes da camada, a camada reduz, e a forma Hollow decide o golpe letal já com a redução. Teste: `trajeDoCidContinuaComOGolpeForteDeAntes`.
+- **Explosões do jogo (creeper, TNT) ainda quebravam a arena.** Agora não. Teste: `explosaoNaArenaNaoQuebraBlocos`.
+- **A queda no vazio da arena** passou a usar o dano do vazio, que a camada não corta (continua 4, como no spec da arena).
+- **A vida dos bosses vai até ×3 na config:** o jogo limita a vida de qualquer criatura a 1024.
+
+Registrado sem mudança:
+- Na forma Hollow as duas reduções se multiplicam: o dano chega a 25%.
+- O traje do Cid também: quando ele dispara, o golpe chega a 25%.
+- O punho do Gojo (6, velocidade 4) dá uns 24 de dano por segundo com o clique: dá para matar um Warden só no soco em uns 20 s. Está dentro do spec; o autor vê no jogo.
+
 ## Falta
 O teste do autor no jogo (roteiro em [[Pendências]]). Depois, os dois trabalhos seguintes: o final do I Am Atomic do Cid e o detalhe nas arenas.

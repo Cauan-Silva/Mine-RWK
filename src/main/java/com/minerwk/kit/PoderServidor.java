@@ -54,7 +54,9 @@ public final class PoderServidor {
     }
 
     public static void registrarEventos() {
-        NeoForge.EVENT_BUS.addListener(PoderServidor::aoReceberDano);
+        // Ordem fixa no LivingDamageEvent.Pre: o traje do Cid (HIGHEST) mede o golpe antes da camada, a camada
+        // (HIGH) reduz, e a forma Hollow (NORMAL) decide se o golpe mata já com a redução.
+        NeoForge.EVENT_BUS.addListener(net.neoforged.bus.api.EventPriority.HIGH, PoderServidor::aoReceberDano);
         NeoForge.EVENT_BUS.addListener((PlayerEvent.PlayerLoggedInEvent e) -> {
             if (e.getEntity() instanceof ServerPlayer j) aplicarVida(j);
         });
@@ -78,7 +80,9 @@ public final class PoderServidor {
         if (extra <= 0) {
             if (atual != null) vida.removeModifier(VIDA);
         } else if (atual == null || Math.abs(atual.amount() - extra) > 1e-6) {
-            vida.addOrUpdateTransientModifier(new AttributeModifier(VIDA, extra, AttributeModifier.Operation.ADD_VALUE));
+            // Salvo com o jogador: carregado antes da vida, então sair e entrar não corta a vida em 20.
+            vida.removeModifier(VIDA);
+            vida.addPermanentModifier(new AttributeModifier(VIDA, extra, AttributeModifier.Operation.ADD_VALUE));
         }
         if (jogador.getHealth() > jogador.getMaxHealth()) jogador.setHealth(jogador.getMaxHealth());
     }
@@ -88,6 +92,14 @@ public final class PoderServidor {
         boolean cheio = novo.getHealth() >= novo.getMaxHealth() - 1e-3;
         aplicarVida(novo);
         if (cheio) novo.setHealth(novo.getMaxHealth());
+    }
+
+    /**
+     * O dano que de fato chega a este jogador por causa da camada (sem a armadura). Para quem decide antes do
+     * {@code LivingDamageEvent}, como a queda das lutas contra o Toji e o Zangetsu.
+     */
+    public static float recebidoPor(ServerPlayer jogador, float dano) {
+        return ServicoKits.dados(jogador).temPersonagem() ? de(jogador).recebido(dano) : dano;
     }
 
     /** Depois da armadura, para somar com ela; {@code /kill} e o vazio passam inteiros. */

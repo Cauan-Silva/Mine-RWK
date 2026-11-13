@@ -656,4 +656,18 @@ public final class TestesArena {
             helper.succeed();
         });
     }
+
+    @GameTest(template = "vazio", batch = "arena_24b")
+    public static void explosaoNaArenaNaoQuebraBlocos(GameTestHelper helper) {
+        ServerLevel arena = garantirDimensao(helper.getLevel().getServer());
+        CaixaArena caixa = CaixaArena.daVaga(62);
+        BlockPos alvo = new BlockPos(caixa.centroX(), 70, caixa.centroZ());
+        arena.setChunkForced(alvo.getX() >> 4, alvo.getZ() >> 4, true);
+        arena.setBlockAndUpdate(alvo, Blocks.STONE.defaultBlockState());
+        arena.explode(null, alvo.getX() + .5, alvo.getY() + 1.2, alvo.getZ() + .5, 4, Level.ExplosionInteraction.TNT);
+        helper.assertTrue(arena.getBlockState(alvo).is(Blocks.STONE), "a explosão não quebra a arena");
+        arena.setBlockAndUpdate(alvo, Blocks.AIR.defaultBlockState());
+        arena.setChunkForced(alvo.getX() >> 4, alvo.getZ() >> 4, false);
+        helper.succeed();
+    }
 }

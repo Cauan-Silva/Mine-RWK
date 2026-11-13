@@ -37,7 +37,7 @@ Vale para quem tem um personagem escolhido. Os números ficam na **config do ser
 | `vidaExtra` | 20 | Soma à vida máxima: 20 vira 40 |
 | `reducaoDeDano` | 0,5 | Corta o dano recebido de qualquer fonte, exceto `/kill` e o vazio. O golpe do Warden (30) vira 15 |
 | `multiplicadorDosGolpes` | 3 | Multiplica o dano de todos os golpes do kit (não o do clique, que tem o dele) |
-| `vidaDosBosses` | 2 | Multiplica a vida dos três bosses |
+| `vidaDosBosses` | 2 | Multiplica a vida dos três bosses (até 3: o jogo limita a vida a 1024) |
 | `danoDosBosses` | 2 | Multiplica o dano dos três bosses. Com a redução de 50%, chega ao jogador o mesmo que hoje |
 
 - **A vida extra** é um modificador de atributo: entra ao escolher o personagem e sai ao ficar sem personagem. Ao entrar, o jogador não ganha vida de graça; a barra só aumenta.

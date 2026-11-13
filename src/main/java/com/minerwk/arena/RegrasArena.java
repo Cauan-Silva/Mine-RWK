@@ -45,6 +45,10 @@ public final class RegrasArena {
     }
 
     static void registrarEventos() {
+        // Arenas indestrutíveis (spec "Balanceamento"): explosões do jogo (creeper, TNT, cristal) também não quebram.
+        NeoForge.EVENT_BUS.addListener((net.neoforged.neoforge.event.level.ExplosionEvent.Detonate e) -> {
+            if (e.getLevel().dimension() == ArenasServidor.DIMENSAO) e.getAffectedBlocks().clear();
+        });
         // A arena é apagada quando a luta acaba: o que caísse nela sumiria. Quem morre lá não perde nada.
         NeoForge.EVENT_BUS.addListener(EventPriority.LOWEST, RegrasArena::aoMorrer);
         NeoForge.EVENT_BUS.addListener(RegrasArena::aoDerrubar);
@@ -139,7 +143,7 @@ public final class RegrasArena {
         e.setDeltaMovement(Vec3.ZERO);
         e.hurtMarked = true;
         e.resetFallDistance();
-        e.hurt(e.damageSources().generic(), DANO_DA_QUEDA);
+        e.hurt(e.damageSources().fellOutOfWorld(), DANO_DA_QUEDA);
     }
 
     /** Por último e só se a morte valeu: o inventário é copiado antes de o jogo esvaziá-lo. */

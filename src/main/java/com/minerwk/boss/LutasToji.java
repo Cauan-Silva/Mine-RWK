@@ -78,7 +78,7 @@ public final class LutasToji {
         }
         // O golpe do Toji que mataria quem o invocou vira o despertar.
         if (evento.getSource().getEntity() instanceof TojiEntity toji && toji.podeDerrubar(vitima)
-                && TojiBoss.golpeMortal(vitima.getHealth(), evento.getAmount())) {
+                && TojiBoss.golpeMortal(vitima.getHealth(), com.minerwk.kit.PoderServidor.recebidoPor(vitima, evento.getAmount()))) {
             evento.setCanceled(true);
             toji.derrubar(vitima);
         }

@@ -25,8 +25,9 @@ public final class ConfigServidor {
         MULTIPLICADOR_DOS_GOLPES = b.comment("Multiplica o dano de todos os golpes dos personagens (não o do clique)")
                 .translation("config.minerwk.multiplicadorDosGolpes")
                 .defineInRange("multiplicadorDosGolpes", Poder.PADRAO.multiplicadorDosGolpes(), .1, 20);
-        VIDA_DOS_BOSSES = b.comment("Multiplica a vida dos bosses (Toji, Zangetsu interior, Ragnarok)")
-                .translation("config.minerwk.vidaDosBosses").defineInRange("vidaDosBosses", Poder.PADRAO.vidaDosBosses(), .1, 20);
+        // Até 3: o jogo limita a vida de qualquer criatura a 1024, e o Ragnarok (320) chega a 960.
+        VIDA_DOS_BOSSES = b.comment("Multiplica a vida dos bosses (Toji, Zangetsu interior, Ragnarok); até 3, pelo limite de vida do jogo")
+                .translation("config.minerwk.vidaDosBosses").defineInRange("vidaDosBosses", Poder.PADRAO.vidaDosBosses(), .1, 3);
         DANO_DOS_BOSSES = b.comment("Multiplica o dano dos bosses (a redução de dano do jogador vale por cima)")
                 .translation("config.minerwk.danoDosBosses").defineInRange("danoDosBosses", Poder.PADRAO.danoDosBosses(), .1, 20);
         b.pop();

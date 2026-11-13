@@ -159,4 +159,57 @@ public final class TestesPoder {
         toji.discard();
         helper.succeed();
     }
+
+    // --- Achados da revisão final ---
+
+    @GameTest(template = "vazio")
+    public static void sairEEntrarMantemAVida(GameTestHelper helper) {
+        ServerPlayer jogador = gojo(helper);
+        jogador.setHealth(38);
+        // Sair e entrar no mundo: o jogador é salvo e carregado de novo.
+        net.minecraft.nbt.CompoundTag salvo = new net.minecraft.nbt.CompoundTag();
+        jogador.saveWithoutId(salvo);
+        ServerPlayer carregado = new ServerPlayer(helper.getLevel().getServer(), helper.getLevel(), jogador.getGameProfile(),
+                ClientInformation.createDefault());
+        carregado.load(salvo);
+        PoderServidor.aplicarVida(carregado);
+        helper.assertTrue(perto(carregado.getMaxHealth(), 20 + poder().vidaExtra()), "máximo depois de entrar: " + carregado.getMaxHealth());
+        helper.assertTrue(perto(carregado.getHealth(), 38), "a vida de quando saiu: " + carregado.getHealth());
+        helper.succeed();
+    }
+
+    @GameTest(template = "vazio")
+    public static void socoDoTojiNaoDerrubaQuemSobrevive(GameTestHelper helper) {
+        ServerPlayer jogador = gojo(helper);
+        ServicoKits.definirDespertou(jogador, false);
+        var toji = com.minerwk.registro.Entidades.TOJI.get().create(helper.getLevel());
+        toji.moveTo(jogador.getX() + 2, jogador.getY(), jogador.getZ());
+        helper.getLevel().addFreshEntity(toji);
+        toji.comecarLuta(jogador);
+        float chega = poder().recebido(poder().danoDoBoss(6));
+        jogador.setHealth(chega + 2);
+        toji.ferirParaTeste(jogador, 6);
+        helper.assertFalse(com.minerwk.boss.LutasToji.caido(jogador), "o soco não mataria: não é hora do despertar");
+        helper.assertTrue(perto(jogador.getHealth(), 2), "o soco chega reduzido, vida " + jogador.getHealth());
+        toji.discard();
+        helper.succeed();
+    }
+
+    @GameTest(template = "vazio")
+    public static void trajeDoCidContinuaComOGolpeForteDeAntes(GameTestHelper helper) {
+        ServerPlayer jogador = gojo(helper);
+        ServicoKits.definirPersonagem(jogador, com.minerwk.core.kit.Personagens.porId(com.minerwk.core.personagens.cid.Cid.ID).orElseThrow());
+        PoderServidor.aplicarVida(jogador);
+        jogador.setHealth(jogador.getMaxHealth());
+        Zombie zumbi = helper.spawn(EntityType.ZOMBIE, new BlockPos(3, 2, 1));
+        zumbi.setNoAi(true);
+        float antes = jogador.getHealth();
+        // Um golpe de 10 era forte antes da camada (8 ou mais): o traje continua cortando.
+        jogador.hurt(zumbi.damageSources().mobAttack(zumbi), 10);
+        var kit = ServicoKits.kit(jogador).orElseThrow();
+        helper.assertFalse(kit.recargas().pronta(com.minerwk.core.personagens.cid.Cid.TRAJE, helper.getLevel().getGameTime()),
+                "o traje de slime deveria ter cortado o golpe de 10");
+        helper.assertTrue(perto(antes - jogador.getHealth(), poder().recebido(5)), "metade do traje e a redução: tirou " + (antes - jogador.getHealth()));
+        helper.succeed();
+    }
 }
