@@ -7,7 +7,7 @@ import java.util.List;
  * A cena do recuo do Atomic: o sistema solar visto por uma câmera virtual que se afasta da Terra. A Terra fica
  * parada no centro da cena, com raio 1; tudo está na base da cutscene (lado, cima, frente), e os tempos são em
  * ticks desde o "atomic". No começo a câmera está colada na Terra, que toma a metade de baixo do céu como o
- * planeta de sempre; no fim ela está longe, atrás da câmera da cutscene, e o sistema inteiro cabe no quadro.
+ * planeta de sempre; no fim ela está longe (500 raios da Terra), atrás da câmera da cutscene, e o sistema inteiro cabe no quadro.
  * Sem classes do Minecraft: o céu do espaço (no cliente) desenha o que estas contas dizem.
  */
 public final class SistemaSolar {
@@ -16,7 +16,7 @@ public final class SistemaSolar {
     /** O último pulso do ponto roxo, que se abre até tomar a tela e emenda no branco. */
     public static final int PULSO = 95, FIM_DO_PULSO = 120;
     /** O menor tamanho com que um astro é desenhado (meio ângulo): longe, a Terra ainda é um ponto visível. */
-    public static final double MINIMO = Math.toRadians(.35);
+    public static final double MINIMO = Math.toRadians(.5);
     /** Até onde o planeta de hoje sobe, medido do ponto bem embaixo (o mesmo do céu do espaço). */
     public static final double BORDA = Math.toRadians(62);
     /** Onde o clarão está: no topo da Terra, onde os dois estavam. */
@@ -44,7 +44,7 @@ public final class SistemaSolar {
     public static final Vetor OLHAR = new Vetor(0, 0, AtomicFinal.AO_LADO / 2).menos(CutsceneAtomic.LONGE).normalizado();
     private static final Vetor CIMA = new Vetor(0, 1, 0);
     /** A distância da câmera virtual em que a Terra toma o céu até {@link #BORDA}; a da Terra inteira; a do fim. */
-    private static final double PERTO = 1 / Math.sin(BORDA), INTEIRA = 4, LONGE = 650;
+    private static final double PERTO = 1 / Math.sin(BORDA), INTEIRA = 4, LONGE = 500;
     /** A velocidade de uma órbita como a da Terra, em radianos por tick (as de dentro giram mais depressa). */
     private static final double GIRO = .004;
 
@@ -56,9 +56,12 @@ public final class SistemaSolar {
         return x * x * (3 - 2 * x);
     }
 
-    /** O quanto a câmera já virou do alto da Terra para trás da câmera da cutscene, de 0 a 1. */
+    /**
+     * O quanto a câmera já virou do alto da Terra para trás da câmera da cutscene, de 0 a 1. Vira junto com a Terra
+     * encolhendo: quando ela é uma bola inteira, já está no meio do quadro (a câmera da cutscene chega lá no tick 18).
+     */
     public static double recuo(double t) {
-        return suave((t - INICIO) / (SISTEMA - INICIO));
+        return suave((t - INICIO) / (TERRA_INTEIRA - INICIO));
     }
 
     /** A distância da câmera virtual ao centro da Terra, em raios da Terra. */

@@ -123,6 +123,16 @@ public final class CutsceneCliente {
         return atual != null;
     }
 
+    /** Se a cutscene {@code id} está na tela agora, com a câmera de cinema (com a config desligada, não). */
+    public static boolean emCurso(String id) {
+        return atual != null && comCamera && atual.id().equals(id);
+    }
+
+    /** Para onde a cutscene atual está virada (a frente da base dos quadros), ou {@code null} sem cutscene. */
+    public static Vetor direcao() {
+        return atual == null ? null : atual.direcao();
+    }
+
     public static void receber(Cutscene pacote) {
         Minecraft mc = Minecraft.getInstance();
         if (pacote.id().equals(Cutscene.FIM)) {

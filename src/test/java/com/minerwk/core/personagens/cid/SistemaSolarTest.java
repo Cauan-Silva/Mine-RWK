@@ -29,17 +29,35 @@ class SistemaSolarTest {
         assertTrue(r > 10 && r < 20, "a Terra inteira na tela: " + r);
     }
 
+    /** O quadro é largo (16:9) e as barras de cinema cortam em cima e embaixo: 45 graus para os lados, 22 para cima e para baixo. */
     @Test
     void noFimTodosOsAstrosCabemNoQuadro() {
+        Vetor frente = SistemaSolar.OLHAR;
+        Vetor lado = new Vetor(-frente.z(), 0, frente.x()).normalizado();
+        Vetor cima = new Vetor(lado.y() * frente.z() - lado.z() * frente.y(), lado.z() * frente.x() - lado.x() * frente.z(),
+                lado.x() * frente.y() - lado.y() * frente.x());
         for (SistemaSolar.Astro a : SistemaSolar.ASTROS) {
-            double ang = grausAte(SistemaSolar.direcao(a, SistemaSolar.SISTEMA), SistemaSolar.OLHAR);
-            assertTrue(ang < 30, a.nome() + " fora do quadro: " + ang);
+            Vetor d = SistemaSolar.direcao(a, SistemaSolar.SISTEMA);
+            double horizontal = Math.toDegrees(Math.atan2(Math.abs(d.ponto(lado)), d.ponto(frente)));
+            double vertical = Math.toDegrees(Math.atan2(Math.abs(d.ponto(cima)), d.ponto(frente)));
+            assertTrue(horizontal < 45 && vertical < 22, a.nome() + " fora do quadro: " + horizontal + ", " + vertical);
         }
     }
 
     @Test
     void noFimATerraFicaNoMeioDoQuadro() {
         assertTrue(grausAte(SistemaSolar.direcao(SistemaSolar.TERRA, SistemaSolar.SISTEMA), SistemaSolar.OLHAR) < 1);
+    }
+
+    @Test
+    void aTerraNuncaSaiDoQuadroDepoisQueACameraParaDeRecuar() {
+        // A câmera da cutscene chega ao plano final no tick 18: dali em diante a borda da Terra fica a menos de 20 graus do
+        // meio do quadro (o quadro mostra uns 25 para cima e para baixo, entre as barras de cinema).
+        for (int t = 18; t <= SistemaSolar.SISTEMA; t++) {
+            double borda = grausAte(SistemaSolar.direcao(SistemaSolar.TERRA, t), SistemaSolar.OLHAR)
+                    - Math.toDegrees(SistemaSolar.raioAparente(SistemaSolar.TERRA, t));
+            assertTrue(borda < 20, "a Terra saiu do quadro em t = " + t + ": " + borda);
+        }
     }
 
     @Test

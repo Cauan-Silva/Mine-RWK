@@ -72,7 +72,7 @@ public final class DemoVfx {
     private static final boolean CID_ATOMICO = MODO.equals("cid_atomico");
     /** {@code cid_final}: o R inteiro num alvo parado, com a cutscene: a subida, o espaço, o Atomic e a volta. */
     private static final boolean CID_FINAL = MODO.equals("cid_final");
-    private static final int FIM_PREVIA = HUD ? 280 : CID ? 250 : CID_FINAL ? 410 : CID_ATOMICO ? 215 : HOLLOW_PERTO || CID_PERTO ? 272 : HOLLOW ? 330 : ZANGETSU || RAGNAROK ? 2400 : TOJI ? 520 : ARVORE ? 400 : TRAJE ? 260 : TRAJE_ICHIGO ? 300 : ICHIGO ? 350 : MUGETSU ? 360 : R_COMPLETO ? 360
+    private static final int FIM_PREVIA = HUD ? 280 : CID ? 250 : CID_FINAL ? 470 : CID_ATOMICO ? 215 : HOLLOW_PERTO || CID_PERTO ? 272 : HOLLOW ? 330 : ZANGETSU || RAGNAROK ? 2400 : TOJI ? 520 : ARVORE ? 400 : TRAJE ? 260 : TRAJE_ICHIGO ? 300 : ICHIGO ? 350 : MUGETSU ? 360 : R_COMPLETO ? 360
             : ENCANTAMENTO ? CARGA + 90 : ESTOURO + RoxoMaximo.TICKS_EXPLOSAO + 110;
     private static int ticks;
     private static int quadro;
@@ -110,7 +110,8 @@ public final class DemoVfx {
             if (CID_PERTO || CID || CID_ATOMICO || CID_FINAL || RAGNAROK) {
                 jogador.connection.sendCommand("rwk trocar @s cid");
                 if (CID_ATOMICO || CID_FINAL) jogador.connection.sendCommand("rwk despertar @s sim");
-                jogador.connection.sendCommand("tp @s ~150 ~12 ~");
+                // O R precisa do alvo à vista: sempre o mesmo campo de neve aberto (o fim de cada prévia anda o jogador).
+                jogador.connection.sendCommand(CID_FINAL ? "tp @s 170.26 75 -97.67" : "tp @s ~150 ~12 ~");
             }
             if (TRAJE_ICHIGO || ICHIGO || MUGETSU || ZANGETSU || HOLLOW) {
                 jogador.connection.sendCommand("rwk trocar @s ichigo");
@@ -575,7 +576,9 @@ public final class DemoVfx {
             jogador.connection.sendCommand("gamerule sendCommandFeedback false");
             jogador.connection.sendCommand("gamemode survival");
             jogador.connection.sendCommand("kill @e[type=minecraft:husk,distance=..60]");
-            jogador.connection.sendCommand("execute at @s run summon minecraft:husk ~ ~ ~4 {NoAI:1b,Rotation:[180f,0f]}");
+            // Com vida de sobra: os golpes ×3 da camada de poder o matariam nos socos, e o golpe pularia para o Atomic.
+            jogador.connection.sendCommand("execute at @s run summon minecraft:husk ~ ~ ~4 {NoAI:1b,Rotation:[180f,0f],Health:400f,"
+                    + "attributes:[{id:\"minecraft:generic.max_health\",base:400d}]}");
             jogador.connection.sendCommand("rwk recarregar");
         }
         if (t == 30) tecla(com.minerwk.core.kit.Tecla.R, true);

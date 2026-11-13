@@ -1,7 +1,10 @@
 package com.minerwk.client.vfx;
 
 import com.minerwk.core.kit.Vetor;
+import com.minerwk.client.camera.CutsceneCliente;
 import com.minerwk.core.personagens.cid.AtomicFinal;
+import com.minerwk.core.personagens.cid.CutsceneAtomic;
+import com.minerwk.core.personagens.cid.SistemaSolar;
 import com.minerwk.core.vfx.FormasCid;
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
@@ -754,6 +757,8 @@ final class RenderVisuaisCid {
      */
     private static void atomic(Vec3 o, double t) {
         float a = (float) AtomicFinal.clarao(t);
+        // Com a cutscene, a câmera recua até o sistema solar: a esfera passa a ser o ponto roxo do céu.
+        if (CutsceneCliente.emCurso(CutsceneAtomic.CLARAO)) a *= (float) SistemaSolar.esferaNoMundo(t);
         if (a <= .004f) return;
         double raio = RAIO_DO_ATOMIC * (.05 + .95 * AtomicFinal.raioDoClarao(t));
         abrir(true);

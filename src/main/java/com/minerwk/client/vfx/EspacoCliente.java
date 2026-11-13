@@ -1,7 +1,15 @@
 package com.minerwk.client.vfx;
 
 import com.minerwk.MineRWK;
+import com.minerwk.client.camera.CutsceneCliente;
+import com.minerwk.core.camera.Coreografia;
+import com.minerwk.core.kit.Vetor;
 import com.minerwk.core.personagens.cid.AtomicFinal;
+import com.minerwk.core.personagens.cid.CutsceneAtomic;
+import com.minerwk.core.personagens.cid.SistemaSolar;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
 import com.minerwk.kit.EspacoServidor;
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
@@ -80,6 +88,12 @@ public final class EspacoCliente {
         return AtomicFinal.clarao(t) * Math.min(1, .25 + AtomicFinal.raioDoClarao(t) * 2);
     }
 
+    /** Ticks desde o Atomic, ou {@code NaN} se não houve. */
+    static double tempoDoAtomic(float parcial) {
+        ClientLevel nivel = Minecraft.getInstance().level;
+        return nivel == null || atomicEm == Long.MIN_VALUE ? Double.NaN : nivel.getGameTime() - atomicEm + parcial;
+    }
+
     private static double branco(float parcial) {
         ClientLevel nivel = Minecraft.getInstance().level;
         return nivel == null || atomicEm == Long.MIN_VALUE ? 0 : AtomicFinal.branco(nivel.getGameTime() - atomicEm + parcial);
@@ -128,6 +142,8 @@ public final class EspacoCliente {
 
         private BufferBuilder b;
         private Matrix4f m;
+        /** Multiplica a opacidade de tudo o que se desenha (os astros de sempre somem no recuo). */
+        private double alfaGeral = 1;
 
         Ceu() {
             super(Float.NaN, false, SkyType.NONE, true, true);
@@ -154,17 +170,33 @@ public final class EspacoCliente {
             RenderSystem.setShader(GameRenderer::getPositionColorShader);
             try {
                 RenderSystem.defaultBlendFunc();
+                // Quem vê a cutscene do estouro vê a câmera recuar até o sistema solar; os outros, o céu de sempre.
+                double t = tempoDoAtomic(parcial);
+                Vetor rumo = CutsceneCliente.emCurso(CutsceneAtomic.CLARAO) ? CutsceneCliente.direcao() : null;
+                boolean recuo = rumo != null && t >= 0;
                 abrir();
                 fundo();
                 estrelas(ticks + parcial);
-                astros();
-                planeta();
+                if (recuo) {
+                    alfaGeral = SistemaSolar.astrosAntigos(t);
+                    if (alfaGeral > .004) astros();
+                    alfaGeral = 1;
+                    sistema(t, rumo);
+                } else {
+                    astros();
+                    planeta();
+                }
                 fechar();
                 RenderSystem.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE);
                 abrir();
-                luzes();
+                if (recuo) {
+                    luzesDoRecuo(t, rumo);
+                } else {
+                    luzes();
+                }
                 fechar();
             } finally {
+                alfaGeral = 1;
                 if (b != null) {
                     MeshData resto = b.build();
                     if (resto != null) resto.close();
@@ -188,7 +220,7 @@ public final class EspacoCliente {
 
         private void ponto(Vec3 p, int cor, double alpha) {
             b.addVertex(m, (float) p.x, (float) p.y, (float) p.z)
-                    .setColor((cor >> 16) & 255, (cor >> 8) & 255, cor & 255, (int) (Math.max(0, Math.min(1, alpha)) * 255));
+                    .setColor((cor >> 16) & 255, (cor >> 8) & 255, cor & 255, (int) (Math.max(0, Math.min(1, alpha * alfaGeral)) * 255));
         }
 
         private static double acaso(double n) {
@@ -344,6 +376,185 @@ public final class EspacoCliente {
             disco(sol, 34, 0x6FA8FF, .35, 0);
             disco(sol, 14, 0xCFE2FF, .7, 0);
             disco(sol, 4.5, 0xFFFFFF, 1, 0);
+        }
+
+        // ------------------------------------------------------------ o recuo até o sistema solar
+
+        /** Uma direção da cena (na base da cutscene) no céu, na casca. */
+        private static Vec3 noCeu(Vetor base, Vetor rumo, double raio) {
+            Vetor v = Coreografia.naBase(base, Vetor.ZERO, rumo).normalizado();
+            return new Vec3(v.x(), v.y(), v.z()).scale(raio);
+        }
+
+        /** O raio, na casca, de um meio ângulo (o pulso final chega a cobrir a tela). */
+        private static double naCasca(double meioAngulo) {
+            return R * Math.tan(Math.min(meioAngulo, Math.toRadians(85)));
+        }
+
+        /** Dois eixos perpendiculares a {@code e}; com {@code e} para baixo, são os eixos x e z do mundo, como os do planeta de sempre. */
+        private static Vec3[] eixos(Vec3 e) {
+            Vec3 u = new Vec3(1, 0, 0).subtract(e.scale(e.x));
+            if (u.lengthSqr() < 1e-6) u = new Vec3(0, 0, 1).subtract(e.scale(e.z));
+            u = u.normalize();
+            return new Vec3[] {u, e.cross(u).normalize()};
+        }
+
+        /** O ponto da casca a {@code a} radianos de {@code e}, no giro {@code g}. */
+        private static Vec3 naCalota(Vec3 e, Vec3[] uv, double a, double g, double raio) {
+            return e.scale(Math.cos(a)).add(uv[0].scale(Math.sin(a) * Math.cos(g))).add(uv[1].scale(Math.sin(a) * Math.sin(g))).scale(raio);
+        }
+
+        /** Os astros, do mais longe ao mais perto (a Terra, enorme no começo, cobre o que está atrás dela), e as órbitas. */
+        private void sistema(double t, Vetor rumo) {
+            double novos = 1 - SistemaSolar.astrosAntigos(t);
+            orbitas(t, rumo, novos);
+            Vetor camera = SistemaSolar.camera(t);
+            List<SistemaSolar.Astro> ordem = new ArrayList<>(SistemaSolar.ASTROS);
+            ordem.sort(Comparator.comparingDouble((SistemaSolar.Astro a) -> -SistemaSolar.posicao(a, t).distancia(camera)));
+            for (SistemaSolar.Astro a : ordem) {
+                if (a == SistemaSolar.TERRA) {
+                    terra(t, rumo);
+                } else if (novos > .004) {
+                    astro(a, t, rumo, novos);
+                }
+            }
+        }
+
+        /** As órbitas: anéis finos e apagados, que aparecem quando a Terra já é uma bola. */
+        private void orbitas(double t, Vetor rumo, double novos) {
+            double u = Math.max(0, Math.min(1, (t - SistemaSolar.TERRA_INTEIRA) / 30.0));
+            double alfa = .28 * novos * u * u * (3 - 2 * u);
+            if (alfa < .004) return;
+            Vetor camera = SistemaSolar.camera(t), sol = SistemaSolar.posicao(SistemaSolar.SOL, t);
+            int n = 120;
+            for (SistemaSolar.Astro a : SistemaSolar.ASTROS) {
+                if (a == SistemaSolar.SOL) continue;
+                Vec3 antes = null;
+                for (int k = 0; k <= n; k++) {
+                    double g = Math.PI * 2 * k / n;
+                    Vetor p = sol.mais(new Vetor(Math.cos(g), 0, Math.sin(g)).vezes(a.orbita()));
+                    if (p.distancia(camera) < 3) {
+                        antes = null;
+                        continue;
+                    }
+                    Vec3 agora = noCeu(SistemaSolar.direcao(p, t), rumo, R * .995);
+                    if (antes != null) {
+                        Vec3 largura = agora.subtract(antes).cross(agora).normalize().scale(.09);
+                        ponto(antes.subtract(largura), 0x8FA6D8, alfa);
+                        ponto(agora.subtract(largura), 0x8FA6D8, alfa);
+                        ponto(agora.add(largura), 0x8FA6D8, alfa);
+                        ponto(antes.add(largura), 0x8FA6D8, alfa);
+                    }
+                    antes = agora;
+                }
+            }
+        }
+
+        /** Um astro: o disco com a face de trás na sombra (longe do Sol); o Sol com o halo; Saturno com o anel. */
+        private void astro(SistemaSolar.Astro a, double t, Vetor rumo, double alfa) {
+            Vec3 c = noCeu(SistemaSolar.direcao(a, t), rumo, R * .997);
+            double raio = naCasca(SistemaSolar.raioAparente(a, t));
+            if (a == SistemaSolar.SOL) {
+                disco(c, raio * 4, 0xFFC56A, .25 * alfa, 0);
+                disco(c, raio * 1.8, 0xFFE2A0, .6 * alfa, 0);
+                disco(c, raio, a.cor(), alfa, alfa);
+                return;
+            }
+            if (a.anel()) anel(c, raio, alfa);
+            disco(c, raio, a.cor(), alfa, alfa);
+            Vec3 paraOSol = noCeu(SistemaSolar.direcao(SistemaSolar.SOL, t), rumo, R).subtract(c);
+            Vec3 ver = c.normalize();
+            Vec3 lado = paraOSol.subtract(ver.scale(paraOSol.dot(ver)));
+            if (lado.lengthSqr() > 1e-9) {
+                disco(c.subtract(lado.normalize().scale(raio * .55)).scale(.999), raio * .9, 0x020108, .75 * alfa, .4 * alfa);
+            }
+        }
+
+        /** O anel de Saturno: uma faixa fina e inclinada atravessando o disco. */
+        private void anel(Vec3 c, double raio, double alfa) {
+            Vec3 v = c.normalize(), l = v.cross(new Vec3(0, 1, 0)).normalize(), cc = l.cross(v);
+            Vec3 eixo = l.scale(raio * 2.1).add(cc.scale(raio * .5)), fino = cc.scale(raio * .14).subtract(l.scale(raio * .03));
+            ponto(c.subtract(eixo).subtract(fino), 0xE8D7B0, .85 * alfa);
+            ponto(c.add(eixo).subtract(fino), 0xE8D7B0, .85 * alfa);
+            ponto(c.add(eixo).add(fino), 0xE8D7B0, .85 * alfa);
+            ponto(c.subtract(eixo).add(fino), 0xE8D7B0, .85 * alfa);
+        }
+
+        /**
+         * A Terra: a calota do planeta de sempre em volta da direção dela, com o mesmo desenho reescalado. No
+         * começo do recuo é igual ao planeta de sempre; depois encolhe até virar uma bola e um ponto.
+         */
+        private void terra(double t, Vetor rumo) {
+            Vec3 e = noCeu(SistemaSolar.direcao(SistemaSolar.TERRA, t), rumo, 1);
+            double raio = SistemaSolar.raioAparente(SistemaSolar.TERRA, t);
+            if (raio <= SistemaSolar.MINIMO * 1.01) {
+                disco(e.scale(R * .99), naCasca(raio), 0x4F8FE8, 1, 1);
+                return;
+            }
+            Vec3[] uv = eixos(e);
+            int aneis = 14, gomos = 72;
+            for (int i = 0; i < aneis; i++) {
+                double a0 = raio * i / aneis, a1 = raio * (i + 1) / aneis;
+                double c0 = BORDA * i / aneis, c1 = BORDA * (i + 1) / aneis;
+                for (int k = 0; k < gomos; k++) {
+                    double g0 = Math.PI * 2 * k / gomos, g1 = Math.PI * 2 * (k + 1) / gomos;
+                    ponto(naCalota(e, uv, a0, g0, R * .99), corDoPlaneta(c0, g0), 1);
+                    ponto(naCalota(e, uv, a1, g0, R * .99), corDoPlaneta(c1, g0), 1);
+                    ponto(naCalota(e, uv, a1, g1, R * .99), corDoPlaneta(c1, g1), 1);
+                    ponto(naCalota(e, uv, a0, g1, R * .99), corDoPlaneta(c0, g1), 1);
+                }
+            }
+        }
+
+        /**
+         * As luzes do recuo, que somam: a atmosfera em volta da Terra (do tamanho dela), o sol de sempre nascendo
+         * atrás dela enquanto ela é o chão, o banho roxo sobre a Terra e o ponto roxo do clarão, que pulsa e se
+         * abre no fim até tomar a tela.
+         */
+        private void luzesDoRecuo(double t, Vetor rumo) {
+            Vec3 e = noCeu(SistemaSolar.direcao(SistemaSolar.TERRA, t), rumo, 1);
+            double raio = SistemaSolar.raioAparente(SistemaSolar.TERRA, t), escala = raio / BORDA;
+            double antigos = SistemaSolar.astrosAntigos(t);
+            Vec3[] uv = eixos(e);
+            int gomos = 72;
+            double fora = Math.toRadians(5) * escala, dentro = Math.toRadians(9) * escala;
+            for (int k = 0; k < gomos; k++) {
+                double g0 = Math.PI * 2 * k / gomos, g1 = Math.PI * 2 * (k + 1) / gomos;
+                double d0 = .3 + .7 * Math.pow(.5 + .5 * Math.cos(g0 - SOL), 2), d1 = .3 + .7 * Math.pow(.5 + .5 * Math.cos(g1 - SOL), 2);
+                ponto(naCalota(e, uv, raio, g0, R * .98), 0x4FA3FF, .9 * d0);
+                ponto(naCalota(e, uv, raio + fora, g0, R * .98), 0x2A5BD8, 0);
+                ponto(naCalota(e, uv, raio + fora, g1, R * .98), 0x2A5BD8, 0);
+                ponto(naCalota(e, uv, raio, g1, R * .98), 0x4FA3FF, .9 * d1);
+                ponto(naCalota(e, uv, raio, g0, R * .98), 0x7FC2FF, .7 * d0);
+                ponto(naCalota(e, uv, raio - dentro, g0, R * .98), 0x2A6FE0, 0);
+                ponto(naCalota(e, uv, raio - dentro, g1, R * .98), 0x2A6FE0, 0);
+                ponto(naCalota(e, uv, raio, g1, R * .98), 0x7FC2FF, .7 * d1);
+            }
+            if (antigos > .004) {
+                Vec3 sol = naCalota(e, uv, raio + Math.toRadians(2.5) * escala, SOL, R * .97);
+                disco(sol, 34 * escala, 0x6FA8FF, .35 * antigos, 0);
+                disco(sol, 14 * escala, 0xCFE2FF, .7 * antigos, 0);
+                disco(sol, 4.5 * escala, 0xFFFFFF, antigos, 0);
+            }
+            double roxo = Math.min(1, SistemaSolar.pontoRoxo(t));
+            if (roxo <= .004) return;
+            disco(e.scale(R * .985), naCasca(raio), 0x9A7CFF, .45 * roxo, .2 * roxo);
+            Vec3 c = noCeu(SistemaSolar.direcao(SistemaSolar.PONTO, t), rumo, R * .96);
+            double tamanho = naCasca(SistemaSolar.raioDoPonto(t));
+            double pulso = SistemaSolar.pontoRoxo(t);
+            disco(c, tamanho * 5 * pulso, 0x7A4CFF, .45 * roxo, 0);
+            disco(c, tamanho * 2 * pulso, 0xB89CFF, .9 * roxo, 0);
+            disco(c, tamanho * .8, 0xFFFFFF, roxo, 0);
+            if (t >= SistemaSolar.TERRA_INTEIRA) {
+                Vec3 ver = c.normalize();
+                for (Vec3 eixo : eixos(ver)) {
+                    Vec3 comprido = eixo.scale(tamanho * 9 * pulso), fino = eixo.cross(ver).normalize().scale(tamanho * .12);
+                    ponto(c.subtract(comprido), 0xD8C8FF, 0);
+                    ponto(c.subtract(fino), 0xD8C8FF, .8 * roxo);
+                    ponto(c.add(comprido), 0xD8C8FF, 0);
+                    ponto(c.add(fino), 0xD8C8FF, .8 * roxo);
+                }
+            }
         }
     }
 }
