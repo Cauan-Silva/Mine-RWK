@@ -12,6 +12,7 @@ import com.minerwk.kit.Anexos;
 import com.minerwk.kit.ContextoServidor;
 import com.minerwk.kit.TestesGojo;
 import io.netty.channel.embedded.EmbeddedChannel;
+import com.minerwk.rede.CenarioArena;
 import java.util.List;
 import java.util.Optional;
 import net.minecraft.core.BlockPos;
@@ -238,6 +239,29 @@ public final class TestesArena {
             helper.assertTrue(arena.getBlockState(centro.offset(sino[0], sino[1], sino[2])).is(Blocks.BELL), "o sino ficou pendurado");
             helper.assertTrue(arena.getBlockState(centro.offset(45, 0, 0)).is(Blocks.BAMBOO), "o bambu ficou de pé");
             ObrasArena.apagar(arena, caixa, () -> { });
+        });
+    }
+
+    @GameTest(template = "vazio", batch = "arena_27", timeoutTicks = 400)
+    public static void cenarioEscolaAoChegarEVazioAoVoltar(GameTestHelper helper) {
+        ServerPlayer jogador = jogador(helper);
+        boolean[] chegou = {false};
+        helper.assertTrue(ArenasServidor.entrar(jogador, (j, caixa) -> chegou[0] = true), "a entrada deveria começar");
+        helper.assertTrue(ArenasServidor.cenarioEnviado(jogador.getUUID()) == null
+                        || CenarioArena.NENHUM.equals(ArenasServidor.cenarioEnviado(jogador.getUUID())),
+                "durante a montagem o cenário ainda não foi mandado");
+        boolean[] acabou = {false};
+        helper.succeedWhen(() -> {
+            helper.assertTrue(chegou[0], "o jogador deveria chegar à arena");
+            if (!acabou[0]) {
+                helper.assertTrue(CenarioArena.ESCOLA.equals(ArenasServidor.cenarioEnviado(jogador.getUUID())),
+                        "ao chegar o cliente recebe a escola");
+                acabou[0] = true;
+                ArenasServidor.lutaAcabou(jogador.server, jogador.getUUID(), false);
+            }
+            helper.assertFalse(ArenasServidor.naArena(jogador), "o jogador deveria ter voltado");
+            helper.assertTrue(CenarioArena.NENHUM.equals(ArenasServidor.cenarioEnviado(jogador.getUUID())),
+                    "ao voltar o cliente recebe o cenário vazio");
         });
     }
 

@@ -20,12 +20,13 @@ public final class Pacotes {
     public static volatile Consumer<EncerrarVisual> aoEncerrarVisual = p -> { };
     public static volatile Consumer<Acertou> aoAcertar = p -> { };
     public static volatile Consumer<Cutscene> aoCutscene = p -> { };
+    public static volatile Consumer<CenarioArena> aoCenarioArena = p -> { };
 
     private Pacotes() {
     }
 
     public static void registrar(RegisterPayloadHandlersEvent evento) {
-        PayloadRegistrar r = evento.registrar("6");
+        PayloadRegistrar r = evento.registrar("7");
         r.playToServer(UsarTecla.TIPO, UsarTecla.CODEC, (p, ctx) -> {
             if (ctx.player() instanceof ServerPlayer jogador) ServicoKits.usarTecla(jogador, p.tecla(), p.apertou());
         });
@@ -44,5 +45,6 @@ public final class Pacotes {
         r.playToClient(EncerrarVisual.TIPO, EncerrarVisual.CODEC, (p, ctx) -> aoEncerrarVisual.accept(p));
         r.playToClient(Acertou.TIPO, Acertou.CODEC, (p, ctx) -> aoAcertar.accept(p));
         r.playToClient(Cutscene.TIPO, Cutscene.CODEC, (p, ctx) -> aoCutscene.accept(p));
+        r.playToClient(CenarioArena.TIPO, CenarioArena.CODEC, (p, ctx) -> aoCenarioArena.accept(p));
     }
 }

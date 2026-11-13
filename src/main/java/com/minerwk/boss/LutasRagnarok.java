@@ -105,7 +105,7 @@ public final class LutasRagnarok {
         if (resposta != TojiBoss.Invocacao.OK) return resposta;
         MinecraftServer servidor = jogador.server;
         UUID id = jogador.getUUID();
-        return ArenasServidor.entrar(jogador, PlantaOriana.cenario(), LutasRagnarok::entrarNaArena, () -> desistiu(servidor, id))
+        return ArenasServidor.entrar(jogador, com.minerwk.rede.CenarioArena.ORIANA, PlantaOriana.cenario(), LutasRagnarok::entrarNaArena, () -> desistiu(servidor, id))
                 ? TojiBoss.Invocacao.OK : TojiBoss.Invocacao.NA_ARENA;
     }
 

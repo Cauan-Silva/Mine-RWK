@@ -6,6 +6,7 @@ import com.minerwk.core.arena.PlantaEscola;
 import com.minerwk.core.arena.VagasArena;
 import com.minerwk.core.kit.Vetor;
 import com.minerwk.kit.Anexos;
+import com.minerwk.rede.CenarioArena;
 import com.minerwk.rede.Envio;
 import com.minerwk.rede.EscurecerTela;
 import java.util.HashMap;
@@ -13,6 +14,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiConsumer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.Registries;
@@ -67,6 +69,8 @@ public final class ArenasServidor {
         /** Chamado se a entrada for desfeita antes de a luta começar (quem pagou para entrar recebe de volta). */
         Runnable aoDesistir = () -> {
         };
+        /** O nome do cenário, que o cliente recebe ao chegar ({@link CenarioArena}). */
+        String cenario = CenarioArena.ESCOLA;
 
         Arena(ServerPlayer pediu, int indice, BiConsumer<ServerPlayer, CaixaArena> aoChegar) {
             this.dono = pediu.getUUID();
@@ -78,6 +82,8 @@ public final class ArenasServidor {
     }
 
     private static final VagasArena VAGAS = new VagasArena();
+    /** O último cenário mandado a cada jogador, para os GameTests. */
+    private static final Map<UUID, String> CENARIOS_ENVIADOS = new ConcurrentHashMap<>();
     private static final Map<UUID, Arena> ARENAS = new HashMap<>();
 
     private ArenasServidor() {
@@ -149,13 +155,13 @@ public final class ArenasServidor {
      * leva dano. Devolve false se ele já tem arena, já está na dimensão ou a dimensão não existe.
      */
     public static boolean entrar(ServerPlayer jogador, BiConsumer<ServerPlayer, CaixaArena> aoChegar) {
-        return entrar(jogador, PlantaEscola.cenario(), aoChegar);
+        return entrar(jogador, CenarioArena.ESCOLA, PlantaEscola.cenario(), aoChegar);
     }
 
-    /** O mesmo, com o cenário de quem chama (cada boss tem o seu). */
-    public static boolean entrar(ServerPlayer jogador, List<PlantaEscola.Bloco> cenario,
+    /** O mesmo, com o cenário de quem chama (cada boss tem o seu) e o nome dele para o cliente. */
+    public static boolean entrar(ServerPlayer jogador, String nome, List<PlantaEscola.Bloco> cenario,
                                  BiConsumer<ServerPlayer, CaixaArena> aoChegar) {
-        return entrar(jogador, cenario, aoChegar, () -> {
+        return entrar(jogador, nome, cenario, aoChegar, () -> {
         });
     }
 
@@ -163,12 +169,13 @@ public final class ArenasServidor {
      * O mesmo, com um aviso para quando a entrada é desfeita no meio da montagem (o jogador saiu do jogo,
      * morreu ou foi parar em outra arena): {@code aoChegar} nunca é chamado nesse caso.
      */
-    public static boolean entrar(ServerPlayer jogador, List<PlantaEscola.Bloco> cenario,
+    public static boolean entrar(ServerPlayer jogador, String nome, List<PlantaEscola.Bloco> cenario,
                                  BiConsumer<ServerPlayer, CaixaArena> aoChegar, Runnable aoDesistir) {
         ServerLevel arena = nivel(jogador.server);
         if (arena == null || naArena(jogador) || ARENAS.containsKey(jogador.getUUID())) return false;
         Arena a = new Arena(jogador, VAGAS.reservar(), aoChegar);
         a.aoDesistir = aoDesistir;
+        a.cenario = nome;
         ARENAS.put(a.dono, a);
         jogador.setData(Anexos.RETORNO_ARENA, PontoRetorno.de(jogador));
         jogador.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, TICKS_DE_ESPERA, 9, false, false, false));
@@ -195,6 +202,7 @@ public final class ArenasServidor {
         soltar(jogador);
         levar(jogador, a.caixa);
         clarear(jogador);
+        mandarCenario(jogador, a.cenario);
         a.estado = Estado.LUTANDO;
         a.aoChegar.accept(jogador, a.caixa);
     }
@@ -225,6 +233,7 @@ public final class ArenasServidor {
             }
             // Morreu (renasce no lugar normal) ou saiu da dimensão por comando: o ponto guardado já não vale.
             else jogador.removeData(Anexos.RETORNO_ARENA);
+            mandarCenario(jogador, CenarioArena.NENHUM);
         }
         // Quem saiu do jogo continua com o ponto salvo: ao entrar de novo, é por ele que volta.
         ServerLevel arena = nivel(servidor);
@@ -278,6 +287,17 @@ public final class ArenasServidor {
         ServerPlayer j = servidor.getPlayerList().getPlayer(a.dono);
         if (j == null) j = a.pediu;
         return j.hasDisconnected() ? null : j;
+    }
+
+    /** Avisa o cliente em que cenário ele está; quem saiu do jogo limpa o cenário sozinho ao sair. */
+    private static void mandarCenario(ServerPlayer jogador, String cenario) {
+        Envio.para(jogador, new CenarioArena(cenario));
+        CENARIOS_ENVIADOS.put(jogador.getUUID(), cenario);
+    }
+
+    /** O último cenário mandado a este jogador (null se nenhum). */
+    static String cenarioEnviado(UUID jogador) {
+        return CENARIOS_ENVIADOS.get(jogador);
     }
 
     /** A tela, que estava preta para esconder o teleporte, fica mais um instante assim e clareia. */
