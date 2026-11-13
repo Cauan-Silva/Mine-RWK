@@ -1,6 +1,6 @@
 ---
 tags: [desenvolvimento, spec]
-estado: aguardando revisão
+estado: aprovado
 ---
 # Spec: balanceamento depois do primeiro teste no jogo
 
