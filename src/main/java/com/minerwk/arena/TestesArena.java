@@ -556,7 +556,7 @@ public final class TestesArena {
     }
 
     @GameTest(template = "vazio", batch = "arena_20")
-    public static void apagarNaoPassaDaCaixa(GameTestHelper helper) {
+    public static void apagarNaArenaNaoMexe(GameTestHelper helper) {
         ServerPlayer jogador = jogador(helper);
         CaixaArena caixa = CaixaArena.daVaga(56);
         ServerLevel arena = ArenasServidor.nivel(helper.getLevel().getServer());
@@ -571,7 +571,7 @@ public final class TestesArena {
         Vec3 meio = Vec3.atCenterOf(dentro).add(.5, 0, 0);
         new ContextoServidor(jogador).apagarCasca(new Vetor(meio.x, meio.y, meio.z), 0, 6);
         helper.runAfterDelay(4, () -> {
-            helper.assertTrue(arena.getBlockState(dentro).isAir(), "o bloco de dentro da caixa é apagado");
+            helper.assertTrue(arena.getBlockState(dentro).is(Blocks.STONE), "a arena é indestrutível: o bloco de dentro da caixa fica");
             helper.assertTrue(arena.getBlockState(fora).is(Blocks.STONE), "o de fora fica");
             arena.setBlockAndUpdate(fora, Blocks.AIR.defaultBlockState());
             arena.setChunkForced(dentro.getX() >> 4, dentro.getZ() >> 4, false);
@@ -582,7 +582,7 @@ public final class TestesArena {
     }
 
     @GameTest(template = "vazio", batch = "arena_21")
-    public static void arrancarNaoPassaDaCaixa(GameTestHelper helper) {
+    public static void arrancarNaArenaNaoMexe(GameTestHelper helper) {
         ServerPlayer jogador = jogador(helper);
         CaixaArena caixa = CaixaArena.daVaga(57);
         ServerLevel arena = ArenasServidor.nivel(helper.getLevel().getServer());
@@ -594,7 +594,7 @@ public final class TestesArena {
         Vec3 meio = Vec3.atCenterOf(dentro).add(.5, 0, 0);
         ContextoServidor ctx = new ContextoServidor(jogador);
         for (int i = 0; i < 80; i++) ctx.arrancarBlocos(new Vetor(meio.x, meio.y, meio.z), 1.5, 2, .6f);
-        helper.assertTrue(arena.getBlockState(dentro).isAir(), "a terra de dentro da caixa é arrancada");
+        helper.assertTrue(arena.getBlockState(dentro).is(Blocks.DIRT), "a arena é indestrutível: a terra de dentro da caixa fica");
         helper.assertTrue(arena.getBlockState(fora).is(Blocks.DIRT), "a de fora fica");
         arena.setBlockAndUpdate(fora, Blocks.AIR.defaultBlockState());
         jogador.remove(Entity.RemovalReason.DISCARDED);

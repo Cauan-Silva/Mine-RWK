@@ -123,12 +123,11 @@ public final class ArenasServidor {
     }
 
     /**
-     * Se um golpe pode apagar ou arrancar o bloco. Fora da dimensão da arena, sempre; dentro, só o que está
-     * na caixa da vaga daquela posição: a destruição não vaza para o vazio em volta.
+     * Se um golpe pode apagar ou arrancar o bloco. Fora da dimensão das arenas, sempre; dentro, nunca: as
+     * arenas de boss são indestrutíveis (spec "Balanceamento", 12/11). Os visuais dos golpes continuam iguais.
      */
     public static boolean podeMexer(Level nivel, BlockPos pos) {
-        if (nivel.dimension() != DIMENSAO) return true;
-        return CaixaArena.daPosicao(pos.getX(), pos.getZ()).contemBloco(pos.getX(), pos.getY(), pos.getZ());
+        return nivel.dimension() != DIMENSAO;
     }
 
     /** A caixa da arena desse jogador, do pedido até ele sair dela. */
