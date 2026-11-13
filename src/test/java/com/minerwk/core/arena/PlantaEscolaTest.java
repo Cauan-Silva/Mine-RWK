@@ -240,4 +240,10 @@ class PlantaEscolaTest {
         Files.writeString(saida, s);
         assertTrue(Files.size(saida) > 0);
     }
+
+    @Test
+    void todoMaterialTemCorNaPrevia() throws IOException {
+        String script = Files.readString(Path.of("ferramentas/previa_arena.py"));
+        for (Material m : Material.values()) assertTrue(script.contains("\"" + m.name() + "\":"), m + " sem cor");
+    }
 }
