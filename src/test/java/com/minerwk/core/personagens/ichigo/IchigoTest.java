@@ -149,7 +149,7 @@ class IchigoTest {
         assertEquals(List.of(12f), ctx.danos);
         double maisLonge = ctx.pontosDeDano.stream().mapToDouble(Vetor::x).max().orElse(0);
         assertEquals(25, maisLonge, 1e-6, "sai a 1 bloco dos olhos e anda 24");
-        assertEquals(Reiatsu.MAXIMO - 20, kit.recurso().atual(), 5);
+        assertEquals(Reiatsu.MAXIMO - 12, kit.recurso().atual(), 5);
         assertFalse(kit.recargas().pronta("ichigo_getsuga", agora));
     }
 
@@ -248,7 +248,7 @@ class IchigoTest {
         assertEquals(List.of("empurrar"), ctx.chamadas);
         assertEquals(6, ctx.areas.get(0)[0]);
         assertTrue(ctx.danos.isEmpty());
-        assertEquals(Reiatsu.MAXIMO - 50, kit.recurso().atual(), 1e-6);
+        assertEquals(Reiatsu.MAXIMO - 40, kit.recurso().atual(), 1e-6);
         assertEquals("ichigo_getsuga_negro", kit.habilidade(Tecla.Z).orElseThrow().id());
     }
 
@@ -518,7 +518,7 @@ class IchigoTest {
         assertEquals(220, Ichigo.MascaraAtiva.DURACAO);
         double antes = kit.recurso().atual();
         ticks(20);
-        assertEquals(antes - 2, kit.recurso().atual(), 1e-6, "sem a máscara o dreno volta: 2 por segundo");
+        assertEquals(antes - 1, kit.recurso().atual(), 1e-6, "sem a máscara o dreno volta: 1 por segundo");
         assertEquals(Reiatsu.BANKAI, kit.forma(), "a máscara acabar não tira do Bankai");
         assertFalse(kit.recargas().pronta(Ichigo.MASCARA, agora));
         assertTrue(kit.recargas().restante(Ichigo.MASCARA, agora) > 500, "recarga de 40 s contada do uso");
@@ -580,7 +580,7 @@ class IchigoTest {
         ticks(45);
         double antes = kit.recurso().atual();
         ticks(20);
-        assertEquals(antes - 2, kit.recurso().atual(), 1e-6);
+        assertEquals(antes - 1, kit.recurso().atual(), 1e-6);
     }
 
     @Test
@@ -930,5 +930,23 @@ class IchigoTest {
         virarHollow();
         ticks(Ichigo.FormaHollow.CERO_EM + Ichigo.FormaHollow.CERO_CARGA + 1);
         assertEquals(List.of(18f), ctx.danos);
+    }
+
+    // --- Balanceamento (12/11): o Ichigo gasta menos reiatsu ---
+
+    @Test
+    void custosDoReiatsuDepoisDoTeste() {
+        java.util.Map<String, Double> custos = new java.util.HashMap<>();
+        for (Habilidade h : ichigo.todasAsHabilidades()) custos.put(h.id(), h.numeros().custo());
+        assertEquals(java.util.Map.ofEntries(
+                java.util.Map.entry("ichigo_getsuga", 12.0), java.util.Map.entry("ichigo_shunpo", 10.0),
+                java.util.Map.entry("ichigo_getsuga_chao", 20.0), java.util.Map.entry("ichigo_arremesso", 12.0),
+                java.util.Map.entry(Ichigo.ENTRAR_NO_BANKAI, 40.0), java.util.Map.entry("ichigo_getsuga_negro", 10.0),
+                java.util.Map.entry("ichigo_shunpo_bankai", 6.0), java.util.Map.entry("ichigo_getsuga_lamina", 20.0),
+                java.util.Map.entry("ichigo_sair_bankai", 0.0), java.util.Map.entry(Ichigo.MASCARA, 40.0),
+                java.util.Map.entry(Ichigo.MUGETSU, 100.0)), custos);
+        assertEquals(1.0 / 20, Reiatsu.DRENO, 1e-12, "o Bankai drena 1 por segundo");
+        assertEquals(2.5 / 20, Reiatsu.GANHO, 1e-12);
+        assertEquals(5.0 / 20, Reiatsu.GANHO_CALMO, 1e-12);
     }
 }

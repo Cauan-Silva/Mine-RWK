@@ -205,7 +205,7 @@ public final class Ichigo {
         static final String VISUAL = "ichigo_getsuga";
 
         GetsugaTensho() {
-            super(VISUAL, new Numeros(2, 10, 2, 6, true, 20, 80));
+            super(VISUAL, new Numeros(2, 10, 2, 6, true, 12, 80));
         }
 
         /** O reiatsu sobe pelo corpo enquanto a tecla está segurada. */
@@ -238,7 +238,7 @@ public final class Ichigo {
         static final float LARGURA_COM_MASCARA = 1.5f;
 
         GetsugaNegro() {
-            super(VISUAL, Numeros.instantanea(2, 2, 4, 15, 30));
+            super(VISUAL, Numeros.instantanea(2, 2, 4, 10, 30));
         }
 
         @Override
@@ -311,7 +311,7 @@ public final class Ichigo {
     /** X do Shikai: o passo rápido, em linha reta até 8 blocos. */
     static final class Shunpo extends Golpe {
         Shunpo() {
-            super("ichigo_shunpo", Numeros.instantanea(1, 1, 3, 15, 140));
+            super("ichigo_shunpo", Numeros.instantanea(1, 1, 3, 10, 140));
         }
 
         @Override
@@ -327,7 +327,7 @@ public final class Ichigo {
         static final double ALCANCE = 14, LARGURA_DA_MIRA = 1.5;
 
         ShunpoDoBankai() {
-            super("ichigo_shunpo_bankai", Numeros.instantanea(1, 1, 2, 10, 40));
+            super("ichigo_shunpo_bankai", Numeros.instantanea(1, 1, 2, 6, 40));
         }
 
         @Override
@@ -358,7 +358,7 @@ public final class Ichigo {
         static final double RAIO = FormasIchigo.ONDA_RAIO;
 
         GetsugaNoChao() {
-            super("ichigo_getsuga_chao", Numeros.instantanea(8, 2, 6, 30, 240));
+            super("ichigo_getsuga_chao", Numeros.instantanea(8, 2, 6, 20, 240));
         }
 
         @Override
@@ -375,7 +375,7 @@ public final class Ichigo {
     /** V do Shikai: gira a Zangetsu pelo pano e a lança; enquanto ela não volta, o Ichigo está sem espada. */
     static final class Arremesso extends Golpe {
         Arremesso() {
-            super("ichigo_arremesso", Numeros.instantanea(6, Lancada.IDA, Lancada.IDA, 20, 200));
+            super("ichigo_arremesso", Numeros.instantanea(6, Lancada.IDA, Lancada.IDA, 12, 200));
         }
 
         @Override
@@ -427,7 +427,7 @@ public final class Ichigo {
     /** G do Shikai: a liberação. Afasta quem está perto, sem ferir, e passa para o Bankai. */
     static final class Bankai extends Golpe {
         Bankai() {
-            super(ENTRAR_NO_BANKAI, Numeros.instantanea(30, 4, 6, 50, 0));
+            super(ENTRAR_NO_BANKAI, Numeros.instantanea(30, 4, 6, 40, 0));
         }
 
         /** O reiatsu é puxado para o corpo durante a carga; some se a liberação for cortada. */
@@ -471,7 +471,7 @@ public final class Ichigo {
     /** C do Bankai: o Getsuga fica na lâmina, e por 6 s o ataque básico alcança mais e fere mais. */
     static final class GetsugaNaLamina extends Golpe {
         GetsugaNaLamina() {
-            super("ichigo_getsuga_lamina", Numeros.instantanea(4, 2, 4, 30, 280));
+            super("ichigo_getsuga_lamina", Numeros.instantanea(4, 2, 4, 20, 280));
         }
 
         @Override

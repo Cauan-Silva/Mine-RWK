@@ -47,10 +47,10 @@ class ReiatsuTest {
     }
 
     @Test
-    void noShikaiVoltaTresPorSegundoParaQuemNaoApanha() {
+    void noShikaiVoltaCincoPorSegundoParaQuemNaoApanha() {
         Reiatsu r = com(100);
         for (int i = 0; i < 20; i++) r.tick(NADA);
-        assertEquals(103, r.atual(), 1e-6);
+        assertEquals(105, r.atual(), 1e-6);
     }
 
     @Test
@@ -58,12 +58,12 @@ class ReiatsuTest {
         Reiatsu r = com(100);
         r.tick(APANHOU);
         for (int i = 1; i < 20; i++) r.tick(NADA);
-        assertEquals(101.5, r.atual(), 1e-6, "1,5 por segundo logo depois de apanhar");
+        assertEquals(102.5, r.atual(), 1e-6, "2,5 por segundo logo depois de apanhar");
         // Completa os 4 segundos sem apanhar: o ganho dobra.
         for (int i = 20; i <= Reiatsu.CALMA; i++) r.tick(NADA);
         double antes = r.atual();
         for (int i = 0; i < 20; i++) r.tick(NADA);
-        assertEquals(3, r.atual() - antes, 1e-6);
+        assertEquals(5, r.atual() - antes, 1e-6);
     }
 
     @Test
@@ -74,19 +74,19 @@ class ReiatsuTest {
     }
 
     @Test
-    void noBankaiNaoVoltaEDrenaDoisPorSegundo() {
+    void noBankaiNaoVoltaEDrenaUmPorSegundo() {
         Reiatsu r = com(100);
         r.forma(Reiatsu.BANKAI);
         for (int i = 0; i < 20; i++) r.tick(NADA);
-        assertEquals(98, r.atual(), 1e-6);
+        assertEquals(99, r.atual(), 1e-6);
         assertFalse(r.esgotado());
     }
 
     @Test
-    void bankaiCheioDuraCemSegundosEEsgota() {
+    void bankaiCheioDuraDuzentosSegundosEEsgota() {
         Reiatsu r = new Reiatsu();
         r.forma(Reiatsu.BANKAI);
-        for (int i = 0; i < 100 * 20 - 1; i++) r.tick(NADA);
+        for (int i = 0; i < 200 * 20 - 1; i++) r.tick(NADA);
         assertFalse(r.esgotado(), "um tick antes ainda tem reiatsu");
         r.tick(NADA);
         r.tick(NADA);
@@ -139,7 +139,7 @@ class ReiatsuTest {
         for (int i = 0; i < 40; i++) r.tick(NADA);
         assertEquals(100, r.atual(), 1e-9);
         for (int i = 0; i < 20; i++) r.tick(NADA);
-        assertEquals(98, r.atual(), 1e-6, "acabou a pausa: 2 por segundo de novo");
+        assertEquals(99, r.atual(), 1e-6, "acabou a pausa: 1 por segundo de novo");
     }
 
     @Test
@@ -149,7 +149,7 @@ class ReiatsuTest {
         r.sinal(Reiatsu.SEM_DRENO, 400);
         r.sinal(Reiatsu.SEM_DRENO, 0);
         for (int i = 0; i < 20; i++) r.tick(NADA);
-        assertEquals(98, r.atual(), 1e-6);
+        assertEquals(99, r.atual(), 1e-6);
     }
 
     @Test
@@ -160,7 +160,7 @@ class ReiatsuTest {
         r.forma("base");
         r.forma(Reiatsu.BANKAI);
         for (int i = 0; i < 20; i++) r.tick(NADA);
-        assertEquals(98, r.atual(), 1e-6);
+        assertEquals(99, r.atual(), 1e-6);
     }
 
     @Test
@@ -172,7 +172,7 @@ class ReiatsuTest {
         for (int i = 0; i < 100; i++) r.tick(NADA);
         assertEquals(0, r.atual(), 1e-9);
         for (int i = 0; i < 20; i++) r.tick(NADA);
-        assertEquals(3, r.atual(), 1e-6, "selo aberto: volta a regenerar");
+        assertEquals(5, r.atual(), 1e-6, "selo aberto: volta a regenerar");
     }
 
     @Test

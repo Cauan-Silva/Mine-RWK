@@ -14,14 +14,14 @@ public final class Reiatsu implements Recurso {
     /** Id da forma Hollow completa: nela o reiatsu não sobe nem desce. */
     public static final String HOLLOW = "hollow";
     public static final double MAXIMO = 200;
-    /** Por tick no Shikai: 1,5 por segundo. */
-    public static final double GANHO = 1.5 / 20;
-    /** Por tick no Shikai depois de {@link #CALMA} ticks sem apanhar: 3 por segundo. */
-    public static final double GANHO_CALMO = 3.0 / 20;
+    /** Por tick no Shikai: 2,5 por segundo (era 1,5 até o balanceamento de 12/11). */
+    public static final double GANHO = 2.5 / 20;
+    /** Por tick no Shikai depois de {@link #CALMA} ticks sem apanhar: 5 por segundo. */
+    public static final double GANHO_CALMO = 5.0 / 20;
     /** Ticks sem apanhar para o ganho dobrar: 4 segundos. */
     public static final int CALMA = 80;
-    /** Por tick no Bankai: 2 por segundo. */
-    public static final double DRENO = 2.0 / 20;
+    /** Por tick no Bankai: 1 por segundo (eram 2). */
+    public static final double DRENO = 1.0 / 20;
     static final int COR_SHIKAI = 0x8FD8FF;
     static final int COR_BANKAI = 0x8E1B1B;
 
