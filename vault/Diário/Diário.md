@@ -62,3 +62,4 @@ Voltar para [[00 Início]].
 - [[2026-11-12 Balanceamento]]: camada de poder (vida 40, metade do dano recebido, golpes ×3, bosses ×2) pela config do servidor; punho do Gojo, Vermelho mais leve, Ichigo mais barato e arenas indestrutíveis
 - [[2026-11-12 Cid Atomic sistema solar]]: no recuo do I Am Atomic a Terra vira uma bola e depois um ponto entre os planetas do sistema solar, com o clarão roxo pulsando nela; o estouro passa a 6,5 s
 - [[2026-11-13 Escola detalhe parte 1]]
+- [[2026-11-13 Escola detalhe parte 2]]

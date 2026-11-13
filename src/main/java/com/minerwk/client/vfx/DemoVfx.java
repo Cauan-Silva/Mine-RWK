@@ -46,6 +46,11 @@ public final class DemoVfx {
     private static final boolean ARVORE = MODO.equals("arvore");
     /** {@code hud}: a HUD do Gojo, do Ichigo no Bankai e do Cid, com uma recarga correndo, o brilho e o cadeado. */
     private static final boolean HUD = MODO.equals("hud");
+    /**
+     * {@code escola}: a Escola Jujutsu detalhada, sem luta: dentro do salão, na sala de treino, no jardim e no
+     * alto da escadaria olhando o horizonte ao sul (também com o VFX reduzido), e a volta, sem horizonte.
+     */
+    private static final boolean ESCOLA = MODO.equals("escola");
     /** {@code toji}: a luta contra o Toji: a entrada, a Nuvem, a investida, a queda com a cutscene, o Desaparecer e a fase 3. */
     private static final boolean TOJI = MODO.equals("toji");
     /** {@code zangetsu}: a luta contra o Zangetsu interior, do mundo interior à vitória, com a queda e a máscara. */
@@ -53,6 +58,9 @@ public final class DemoVfx {
     /** O tick da prévia em que o Zangetsu apareceu (a arena leva um tempo para ficar pronta). */
     private static int zangetsuEm = -1;
     private static boolean fimDaDemo;
+    /** Na prévia da Escola: o tick em que o jogador chegou à arena e o bloco do centro dela. */
+    private static int escolaEm = -1;
+    private static int centroX, centroZ;
     /** {@code ragnarok}: a luta contra o Ragnarok, da entrada à vitória, com os cinco golpes, a asa cortada e o pisão. */
     private static final boolean RAGNAROK = MODO.equals("ragnarok");
     private static int ragnarokEm = -1;
@@ -72,7 +80,7 @@ public final class DemoVfx {
     private static final boolean CID_ATOMICO = MODO.equals("cid_atomico");
     /** {@code cid_final}: o R inteiro num alvo parado, com a cutscene: a subida, o espaço, o Atomic e a volta. */
     private static final boolean CID_FINAL = MODO.equals("cid_final");
-    private static final int FIM_PREVIA = HUD ? 280 : CID ? 250 : CID_FINAL ? 470 : CID_ATOMICO ? 215 : HOLLOW_PERTO || CID_PERTO ? 272 : HOLLOW ? 330 : ZANGETSU || RAGNAROK ? 2400 : TOJI ? 520 : ARVORE ? 400 : TRAJE ? 260 : TRAJE_ICHIGO ? 300 : ICHIGO ? 350 : MUGETSU ? 360 : R_COMPLETO ? 360
+    private static final int FIM_PREVIA = ESCOLA ? 900 : HUD ? 280 : CID ? 250 : CID_FINAL ? 470 : CID_ATOMICO ? 215 : HOLLOW_PERTO || CID_PERTO ? 272 : HOLLOW ? 330 : ZANGETSU || RAGNAROK ? 2400 : TOJI ? 520 : ARVORE ? 400 : TRAJE ? 260 : TRAJE_ICHIGO ? 300 : ICHIGO ? 350 : MUGETSU ? 360 : R_COMPLETO ? 360
             : ENCANTAMENTO ? CARGA + 90 : ESTOURO + RoxoMaximo.TICKS_EXPLOSAO + 110;
     private static int ticks;
     private static int quadro;
@@ -100,7 +108,7 @@ public final class DemoVfx {
         if (DEMO && ticks == 40) {
             jogador.connection.sendCommand(ENCANTAMENTO || R_COMPLETO || TRAJE || TRAJE_ICHIGO || ICHIGO || MUGETSU || TOJI || ZANGETSU || HOLLOW || CID_PERTO || CID || CID_ATOMICO || CID_FINAL ? "time set noon" : "time set midnight");
             if (ARVORE) jogador.connection.sendCommand("rwk trocar @s gojo");
-            if (TOJI) {
+            if (TOJI || ESCOLA) {
                 jogador.connection.sendCommand("rwk trocar @s gojo");
                 jogador.connection.sendCommand("rwk despertar @s nao");
                 jogador.connection.sendCommand("tp @s ~150 ~12 ~");
@@ -153,6 +161,10 @@ public final class DemoVfx {
     }
 
     private static void tocarPrevia(Minecraft mc, LocalPlayer jogador, int t) {
+        if (ESCOLA) {
+            previaDaEscola(mc, jogador, t);
+            return;
+        }
         if (HUD) {
             previaDaHud(mc, jogador, t);
             return;
@@ -454,6 +466,57 @@ public final class DemoVfx {
      * A luta inteira contra o Zangetsu interior. Os tempos contam de quando ele aparece, porque a arena do
      * mundo interior leva um tempo para ficar pronta.
      */
+    /** Os pontos da prévia da Escola: x, y (pés, do pátio), z, yaw e pitch, a partir do centro da arena. */
+    private static final float[][] PONTOS_DA_ESCOLA = {
+            {0, 2, -29, 180, 6},      // a antessala do salão, olhando o altar
+            {-29, 1, 0, 90, 4},       // a sala de treino, olhando os alvos
+            {18, 1, 10, -45, 16},     // o jardim, olhando a lagoa
+            {-4, 1, 20, 20, -3},      // o alto da escadaria, olhando a cidade ao sul
+            {0, 14, 24, 0, 2},        // mais alto, para ver as três camadas de montanhas
+            {0, 14, 24, 0, 2}};       // o mesmo, com o VFX reduzido
+    private static final int TICKS_POR_PONTO = 40;
+
+    private static void previaDaEscola(Minecraft mc, LocalPlayer jogador, int t) {
+        if (t == 0) {
+            jogador.connection.sendCommand("gamerule sendCommandFeedback false");
+            jogador.connection.sendCommand("rwk toji @s");
+        }
+        mc.gui.getChat().clearMessages(false);
+        if (escolaEm < 0) {
+            if (mc.level.dimension() != com.minerwk.arena.ArenasServidor.DIMENSAO) return;
+            escolaEm = t;
+            // O jogador chega na entrada da vaga: 16 blocos ao sul do centro.
+            centroX = net.minecraft.util.Mth.floor(jogador.getX());
+            centroZ = net.minecraft.util.Mth.floor(jogador.getZ()) - 16;
+            // Espectador: o Toji não o vê e a câmera passa por onde for preciso; o Toji some da imagem.
+            jogador.connection.sendCommand("gamemode spectator");
+            jogador.connection.sendCommand("effect give @e[type=minerwk:toji] minecraft:invisibility 999 0 true");
+            mc.options.hideGui = true;
+        }
+        int e = t - escolaEm;
+        int ponto = (e - 40) / TICKS_POR_PONTO;
+        if (e >= 40 && (e - 40) % TICKS_POR_PONTO == 0 && ponto < PONTOS_DA_ESCOLA.length) {
+            float[] p = PONTOS_DA_ESCOLA[ponto];
+            com.minerwk.client.arena.HorizonteCliente.reduzidoNaPrevia = ponto == PONTOS_DA_ESCOLA.length - 1;
+            jogador.connection.sendCommand("effect give @e[type=minerwk:toji] minecraft:invisibility 999 0 true");
+            jogador.connection.sendCommand(String.format(java.util.Locale.ROOT, "tp @s %.1f %.1f %.1f %.0f %.0f",
+                    centroX + p[0] + .5, com.minerwk.core.arena.CaixaArena.Y_PATIO + p[1], centroZ + p[2] + .5, p[3], p[4]));
+        }
+        int fim = 40 + PONTOS_DA_ESCOLA.length * TICKS_POR_PONTO;
+        // A vitória devolve o jogador ao mundo: o horizonte some.
+        if (e == fim) {
+            com.minerwk.client.arena.HorizonteCliente.reduzidoNaPrevia = false;
+            jogador.connection.sendCommand("kill @e[type=minerwk:toji]");
+        }
+        int volta = fim + com.minerwk.arena.ArenasServidor.TICKS_DEPOIS_DA_VITORIA + 40;
+        if (e == volta) {
+            jogador.connection.sendCommand("gamemode creative");
+            jogador.connection.sendCommand("gamerule sendCommandFeedback true");
+            mc.options.hideGui = false;
+        }
+        if (e >= volta + 10) fimDaDemo = true;
+    }
+
     private static void previaDoZangetsu(Minecraft mc, LocalPlayer jogador, int t) {
         if (t == 0) {
             jogador.connection.sendCommand("gamerule sendCommandFeedback false");
