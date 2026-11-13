@@ -137,6 +137,7 @@ class SonsCidTest {
         assertEquals(AtomicFinal.TICKS_DA_FALA, marco(m, SonsCid.ATOMIC_AURA, "fim"));
         assertEquals(AtomicFinal.TICKS_DA_ONDA, marco(m, SonsCid.ATOMIC_ONDA, "fim"));
         assertEquals(AtomicFinal.TICKS_DO_CLARAO, marco(m, SonsCid.ATOMIC, "clarao"));
+        assertEquals(SistemaSolar.PULSO, marco(m, SonsCid.ATOMIC, "pulso"), "o último estouro no pulso final do recuo");
         assertEquals(AtomicFinal.TICKS_DA_LUZ, marco(m, SonsCid.ATOMIC_LUZ, "fim"), "o estouro distante dura a luz no céu");
         assertEquals(FormasCid.COLUNA, marco(m, SonsCid.RECOVERY, "fim"));
         for (String som : SonsCid.TODOS) {

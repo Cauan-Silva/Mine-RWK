@@ -27,7 +27,8 @@ TRAJE = 12 * T            # FormasCid.TRAJE
 CARGA_DA_ESPADA, VOO_DO_CORTE, CORTE_ATOMICO = 12 * T, 4 * T, 10 * T   # FormasCid, os mesmos nomes
 CARGA_DO_RECOVERY, ONDA, COLUNA = 60 * T, 10 * T, 40 * T               # FormasCid, os mesmos nomes
 # AtomicFinal: ENTRE_SOCOS, TICKS_DO_RISCO, TICKS_DA_FALA, TICKS_DO_CLARAO e TICKS_DA_LUZ
-SOCO, RISCO, FALA, CLARAO, LUZ = 12 * T, 14 * T, 110 * T, 70 * T, 120 * T
+SOCO, RISCO, FALA, CLARAO, LUZ = 12 * T, 14 * T, 110 * T, 130 * T, 180 * T
+PULSO = 95 * T            # SistemaSolar.PULSO: o último pulso do ponto roxo, no fim do recuo
 # AtomicFinal: PARADA, CARGA - FALA, TERCEIRA - FALA e TICKS_DA_ONDA
 PARADA, DUAS, MUDA, CHOQUE = 3 * T, 56 * T, 86 * T, 24 * T
 SILENCIO = .22            # o instante sem som antes do estouro, no espaço
@@ -73,7 +74,7 @@ MARCOS = {
     'cid_atomic_soco': {'parada': ticks(PARADA), 'fim': ticks(SOCO)},
     'cid_atomic_risco': {'fim': ticks(RISCO)},
     'cid_atomic_aura': {'carga': ticks(DUAS), 'muda': ticks(MUDA), 'fim': ticks(FALA)},
-    'cid_atomic': {'clarao': ticks(CLARAO)},
+    'cid_atomic': {'clarao': ticks(CLARAO), 'pulso': ticks(PULSO)},
     'cid_atomic_luz': {'fim': ticks(LUZ)},
     'cid_atomic_onda': {'fim': ticks(CHOQUE)},
 }
@@ -225,7 +226,12 @@ def sintetico(nome, s):
         luz = .3 * s.girar(s.ruido(1500, 13000, .25), hz=5, prof=.5) * s.env(SILENCIO, .04, 1.4, .2) * s.janela(SILENCIO, CLARAO + .8, .6)
         ronco = .7 * s.passa_baixa(s.ruido(30, 400, .9), 180) * (.35 + .65 * s.crescer(SILENCIO, CLARAO, 1.4)) * s.janela(SILENCIO, CLARAO + 1.2, .8)
         cresce = .3 * s.tom(55, 110, 1.5, SILENCIO, CLARAO, (1, 2, 3)) * s.crescer(SILENCIO, CLARAO, 1.8) * s.janela(SILENCIO, CLARAO + .6, .5)
-        return fio + abre + s.reverb(acorde + luz + ronco + cresce, 2.4, .4, 6000)
+        # O recuo até o sistema solar: um grave largo e parado, o tamanho do espaço, que cresce até o pulso;
+        # no pulso, o último estouro, curto e fundo, e o ronco sobe até o branco.
+        vasto = .5 * s.passa_baixa(s.ruido(20, 160, 1.), 90) * s.crescer(SILENCIO + 1., PULSO, 1.2) * s.janela(SILENCIO + .8, CLARAO + 1., .9)
+        orgao = .18 * sum(s.tom(f, harmonicos=(1, 2.003)) for f in (41.2, 61.7, 82.4)) * s.crescer(SILENCIO + 1.5, PULSO, 1.5) * s.janela(SILENCIO + 1.5, CLARAO + .8, .8)
+        pulso = 1.8 * s.sub(PULSO, 60, 20, 1.4, 3.5) + .9 * s.transiente(PULSO, 2600, .02)
+        return fio + abre + pulso + s.reverb(acorde + luz + ronco + cresce + vasto + orgao, 2.4, .4, 6000)
     if nome == 'cid_atomic_luz':
         # Do chão: o estouro vem de muito longe e de cima, abafado, um trovão comprido que rola e some.
         ronco = s.passa_baixa(s.ruido(25, 500, 1.), 220) * s.env(.12, .25, .7, .25) * s.janela(.1, LUZ + 1.3, 1.)
@@ -275,7 +281,8 @@ def gravado(nome, s):
         return s.amostra(WHOOSH, 0, .8, .6) + s.amostra(VENTO, 0, .4, 1.) * s.janela(0, RISCO + .3, .1)
     if nome == 'cid_atomic':
         return (s.amostra(SUBGRAVE, SILENCIO, 1., .7) + s.amostra(EXPLOSOES, SILENCIO, .8, .5)
-                + s.amostra(TROVOES, SILENCIO + .1, .6, .8))
+                + s.amostra(TROVOES, SILENCIO + .1, .6, .8)
+                + s.amostra(EXPLOSOES, PULSO, .7, .45) + s.amostra(SUBGRAVE, PULSO, .8, .6))
     if nome == 'cid_atomic_luz':
         return s.amostra(TROVOES, .12, 1., .8) + .7 * s.amostra(TROVOES, .3, 1., .7)
     if nome == 'cid_atomic_onda':
