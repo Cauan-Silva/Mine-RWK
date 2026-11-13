@@ -98,6 +98,10 @@ public final class PlantaEscola {
     public static final Predio DEPOSITO = new Predio(-26, -22, -25, -21, 0, 3, 'S', false);
     /** Onde fica o sino da torre, ao nordeste, fora do pátio de luta. */
     public static final int[] SINO = {23, 4, -23};
+    /** A lagoa, ao sudeste, fora do pátio de luta: a borda inclusa. */
+    public static final int LAGOA_X0 = 22, LAGOA_X1 = 28, LAGOA_Z0 = 14, LAGOA_Z1 = 20;
+    /** As cerejeiras: x, z e a altura do tronco. */
+    private static final int[][] CEREJEIRAS = {{18, -31, 7}, {-18, -31, 7}, {31, 17, 6}, {-31, 17, 8}, {-31, -31, 6}};
     /** O portão lateral, atrás do pavilhão oeste, na borda da grama. */
     private static final int PORTAO_X = -47;
 
@@ -177,6 +181,11 @@ public final class PlantaEscola {
         }
         lanterna(o, PILAR_GRANDE + 3, MEIO_PATIO_ESCOLA);
         lanterna(o, -PILAR_GRANDE - 3, MEIO_PATIO_ESCOLA);
+        lagoa(o);
+        jardimSeco(o);
+        for (int[] c : CEREJEIRAS) cerejeira(o, c[0], c[1], c[2]);
+        bambuzal(o);
+        acabamento(o);
         floresta(o);
         return new ArrayList<>(o.blocos.values());
     }
@@ -480,6 +489,102 @@ public final class PlantaEscola {
         }
     }
 
+    /**
+     * A lagoa: borda de pedra com musgo, água de 2 no meio e 1 nas bordas, fundo de pedra, vitórias-régias e
+     * pedras de passo. O fundo e a borda vêm antes da água na lista, para a água nunca escorrer na montagem.
+     */
+    private static void lagoa(Obra o) {
+        for (int dx = LAGOA_X0; dx <= LAGOA_X1; dx++) {
+            for (int dz = LAGOA_Z0; dz <= LAGOA_Z1; dz++) {
+                boolean borda = dx == LAGOA_X0 || dx == LAGOA_X1 || dz == LAGOA_Z0 || dz == LAGOA_Z1;
+                if (borda) o.por(dx, -1, dz, Material.PEDRA_MUSGO);
+                else if (fundaNaLagoa(dx, dz)) o.por(dx, -3, dz, Material.PEDRA);
+                else o.por(dx, -2, dz, Material.PEDRA);
+            }
+        }
+        int passo = (LAGOA_Z0 + LAGOA_Z1) / 2;
+        for (int dx = LAGOA_X0 + 1; dx < LAGOA_X1; dx += 2) o.por(dx, -1, passo, Material.LAJE_PEDRA);
+        for (int dx = LAGOA_X0 + 1; dx < LAGOA_X1; dx++) {
+            for (int dz = LAGOA_Z0 + 1; dz < LAGOA_Z1; dz++) {
+                if (fundaNaLagoa(dx, dz)) o.por(dx, -2, dz, Material.AGUA);
+                if (o.em(dx, -1, dz) != Material.LAJE_PEDRA) o.por(dx, -1, dz, Material.AGUA);
+            }
+        }
+        o.por(LAGOA_X0 + 1, 0, LAGOA_Z0 + 1, Material.VITORIA_REGIA);
+        o.por(LAGOA_X1 - 1, 0, LAGOA_Z1 - 1, Material.VITORIA_REGIA);
+        o.por(LAGOA_X0 + 2, 0, LAGOA_Z1 - 2, Material.VITORIA_REGIA);
+    }
+
+    private static boolean fundaNaLagoa(int dx, int dz) {
+        return dx >= LAGOA_X0 + 2 && dx <= LAGOA_X1 - 2 && dz >= LAGOA_Z0 + 2 && dz <= LAGOA_Z1 - 2;
+    }
+
+    /** O jardim seco, ao sudoeste, espelhando a lagoa: cascalho, uma borda baixa e três pedras. */
+    private static void jardimSeco(Obra o) {
+        for (int dx = -LAGOA_X1; dx <= -LAGOA_X0; dx++) {
+            for (int dz = LAGOA_Z0; dz <= LAGOA_Z1; dz++) {
+                boolean borda = dx == -LAGOA_X1 || dx == -LAGOA_X0 || dz == LAGOA_Z0 || dz == LAGOA_Z1;
+                if (borda) o.por(dx, 0, dz, Material.LAJE_PEDRA);
+                else o.por(dx, -1, dz, Material.CASCALHO);
+            }
+        }
+        for (int dx = -26; dx <= -25; dx++) {
+            for (int dz = 16; dz <= 17; dz++) {
+                for (int dy = 0; dy <= 1; dy++) o.por(dx, dy, dz, Material.PEDRA_MUSGO);
+            }
+        }
+        o.por(-23, 0, 18, Material.ANDESITO_POLIDO);
+        o.por(-23, 1, 18, Material.ANDESITO_POLIDO);
+        o.por(-24, 0, 15, Material.PEDRA_MUSGO);
+    }
+
+    /** Cerejeira: tronco de {@code altura} blocos e uma copa larga e achatada. */
+    private static void cerejeira(Obra o, int x, int z, int altura) {
+        int pe = chao(z) + 1, topo = pe + altura;
+        for (int dy = -2; dy <= 1; dy++) {
+            int raio = dy == 1 ? 2 : 3;
+            for (int dx = -raio; dx <= raio; dx++) {
+                for (int dz = -raio; dz <= raio; dz++) {
+                    if (dx * dx + dz * dz > raio * raio + 1) continue;
+                    o.por(x + dx, topo + dy, z + dz, Material.FOLHA_CEREJEIRA);
+                }
+            }
+        }
+        for (int dy = 0; dy < altura; dy++) o.por(x, pe + dy, z, Material.TRONCO_CEREJEIRA);
+    }
+
+    /** Touceiras de bambu atrás dos dois pavilhões. */
+    private static void bambuzal(Obra o) {
+        for (int x : new int[] {-45, -43, 43, 45}) {
+            for (int z = -10; z <= 10; z += 2) {
+                int altura = 4 + Math.floorMod(x * 31 + z * 17, 4);
+                for (int dy = 0; dy < altura; dy++) o.por(x, dy, z, Material.BAMBU);
+            }
+        }
+    }
+
+    /**
+     * Os bancos virados para o pátio, a pedra com musgo sorteada na calçada (sempre a mesma: é um hash da
+     * posição) e a cerca baixa entre o pátio e a floresta.
+     */
+    private static void acabamento(Obra o) {
+        for (int z : new int[] {-7, -6, 6, 7}) {
+            o.por(22, 0, z, Material.ESCADA_MADEIRA_L);
+            o.por(-22, 0, z, Material.ESCADA_MADEIRA_O);
+        }
+        for (int dx = -CALCADA; dx <= CALCADA; dx++) {
+            for (int dz = -CALCADA; dz < ESCADA_EM; dz++) {
+                if (Math.max(Math.abs(dx), Math.abs(dz)) <= MEIO_PATIO_ESCOLA) continue;
+                if (o.em(dx, -1, dz) != Material.TIJOLO_PEDRA || o.tem(dx, 0, dz)) continue;
+                if (Math.floorMod(dx * 7919 + dz * 104729 + dx * dz, 100) < 15) o.por(dx, -1, dz, Material.PEDRA_MUSGO);
+            }
+        }
+        for (int lado : new int[] {-1, 1}) {
+            for (int ax = 15; ax <= 29; ax++) o.por(lado * ax, 0, -29, Material.CERCA_ESCURA);
+            for (int z = 13; z <= 22; z++) o.por(lado * 29, chao(z) + 1, z, Material.CERCA_ESCURA);
+        }
+    }
+
     /** As quatro paredes de um retângulo: pilar escuro nos cantos e de 4 em 4, branco entre eles, viga escura em cima. */
     private static void paredes(Obra o, int x0, int x1, int z0, int z1, int de, int ate) {
         for (int dx = x0; dx <= x1; dx++) {
@@ -545,6 +650,9 @@ public final class PlantaEscola {
             if (p.perto(x, z, folga)) return false;
         }
         if (DEPOSITO.perto(x, z, folga)) return false;
+        for (int[] c : CEREJEIRAS) {
+            if (Math.abs(x - c[0]) <= 3 + folga && Math.abs(z - c[1]) <= 3 + folga) return false;
+        }
         if (Math.abs(x - PORTAO_X) <= folga && Math.abs(z) <= 4 + folga) return false;
         return true;
     }

@@ -138,8 +138,9 @@ public final class ObrasArena {
             while (o.blocos.hasNext() && mexidos < POR_TICK) {
                 PlantaEscola.Bloco b = o.blocos.next();
                 p.set(cx + b.dx(), CaixaArena.Y_PATIO + b.dy(), cz + b.dz());
-                if (b.material() == PlantaEscola.Material.MURO) {
-                    // O muro se liga aos vizinhos: ele e os vizinhos recalculam a forma.
+                if (b.material() == PlantaEscola.Material.MURO || b.material() == PlantaEscola.Material.CERCA_ESCURA
+                        || b.material() == PlantaEscola.Material.SHOJI) {
+                    // Muro, cerca e painel se ligam aos vizinhos: eles e os vizinhos recalculam a forma.
                     o.nivel.setBlock(p, Block.updateFromNeighbourShapes(estado(b.material()), o.nivel, p), Block.UPDATE_CLIENTS);
                 } else {
                     o.nivel.setBlock(p, estado(b.material()), MARCAS);

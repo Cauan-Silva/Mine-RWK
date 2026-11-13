@@ -213,6 +213,34 @@ public final class TestesArena {
         });
     }
 
+    @GameTest(template = "vazio", batch = "arena_26", timeoutTicks = 300)
+    public static void escolaMontaInteiraSemVazarAgua(GameTestHelper helper) {
+        ServerLevel arena = garantirDimensao(helper.getLevel().getServer());
+        CaixaArena caixa = CaixaArena.daVaga(41);
+        BlockPos centro = new BlockPos(caixa.centroX(), CaixaArena.Y_PATIO, caixa.centroZ());
+        long comeco = arena.getGameTime();
+        String[] erro = {null};
+        boolean[] pronto = {false};
+        ObrasArena.montar(arena, caixa, PlantaEscola.cenario(), () -> {
+            long levou = arena.getGameTime() - comeco;
+            // A limpeza da caixa vazia e mais os 65 mil blocos, a 4000 por tick.
+            if (levou > 40) erro[0] = "a Escola deveria montar em até 40 ticks, levou " + levou;
+            pronto[0] = true;
+        });
+        int lx = (PlantaEscola.LAGOA_X0 + PlantaEscola.LAGOA_X1) / 2, lz = PlantaEscola.LAGOA_Z0 + 2;
+        int[] sino = PlantaEscola.SINO;
+        helper.succeedWhen(() -> {
+            helper.assertTrue(pronto[0], "a montagem deveria terminar");
+            helper.assertTrue(erro[0] == null, String.valueOf(erro[0]));
+            helper.assertTrue(arena.getBlockState(centro.offset(lx, -2, lz)).is(Blocks.WATER), "água no fundo da lagoa");
+            helper.assertTrue(arena.getBlockState(centro.offset(PlantaEscola.LAGOA_X0 - 1, 0, lz)).isAir(),
+                    "a água não sai da lagoa");
+            helper.assertTrue(arena.getBlockState(centro.offset(sino[0], sino[1], sino[2])).is(Blocks.BELL), "o sino ficou pendurado");
+            helper.assertTrue(arena.getBlockState(centro.offset(45, 0, 0)).is(Blocks.BAMBOO), "o bambu ficou de pé");
+            ObrasArena.apagar(arena, caixa, () -> { });
+        });
+    }
+
     // --- A luta do Toji na arena ---
 
     private static boolean perto(ServerPlayer jogador, Vec3 ponto) {

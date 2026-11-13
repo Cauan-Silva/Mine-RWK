@@ -55,8 +55,8 @@ class PlantaEscolaTest {
                     "fora da altura da caixa: " + b);
             assertTrue(vistas.add(chave(b.dx(), b.dy(), b.dz())), "repetida: " + b);
         }
-        // 4000 blocos por tick: até 20 ticks de montagem.
-        assertTrue(blocos.size() <= 80000, "blocos demais: " + blocos.size());
+        // O teto do spec: 65 mil blocos, cerca de 18 ticks de montagem.
+        assertTrue(blocos.size() <= 65000, "blocos demais: " + blocos.size());
     }
 
     @Test
@@ -376,5 +376,71 @@ class PlantaEscolaTest {
         assertEquals(Material.MADEIRA_ESCURA, m.get(chave(d.x0(), 0, d.z0())));
         for (int dy = 0; dy <= 1; dy++) assertNull(m.get(chave(mx, dy, d.z1())), "depósito sem porta");
         assertNotNull(m.get(chave(mx, d.parede(), (d.z0() + d.z1()) / 2)), "depósito sem teto");
+    }
+
+    @Test
+    void aguaNaoVaza() {
+        List<Bloco> blocos = PlantaEscola.cenario();
+        Map<String, Integer> indice = new HashMap<>();
+        for (int i = 0; i < blocos.size(); i++) {
+            Bloco b = blocos.get(i);
+            indice.put(chave(b.dx(), b.dy(), b.dz()), i);
+        }
+        Map<String, Material> m = mapa(blocos);
+        int aguas = 0;
+        for (int i = 0; i < blocos.size(); i++) {
+            Bloco b = blocos.get(i);
+            if (b.material() != Material.AGUA) continue;
+            aguas++;
+            int[][] vizinhos = {{0, -1, 0}, {1, 0, 0}, {-1, 0, 0}, {0, 0, 1}, {0, 0, -1}};
+            for (int[] v : vizinhos) {
+                String c = chave(b.dx() + v[0], b.dy() + v[1], b.dz() + v[2]);
+                Material viz = m.get(c);
+                if (viz == Material.AGUA) continue;
+                assertTrue(solido(viz), "água vaza de " + b + " para " + c);
+                assertTrue(indice.get(c) < i, "a água vem antes do apoio em " + c);
+            }
+        }
+        assertTrue(aguas >= 20, "lagoa pequena: " + aguas);
+    }
+
+    @Test
+    void plantasTemApoio() {
+        Map<String, Material> m = mapa(PlantaEscola.cenario());
+        int bambus = 0, regias = 0;
+        for (Map.Entry<String, Material> e : m.entrySet()) {
+            String[] c = e.getKey().split(",");
+            Material baixo = m.get(chave(Integer.parseInt(c[0]), Integer.parseInt(c[1]) - 1, Integer.parseInt(c[2])));
+            switch (e.getValue()) {
+                case BAMBU -> {
+                    bambus++;
+                    assertTrue(baixo == Material.GRAMA || baixo == Material.BAMBU, "bambu solto em " + e.getKey());
+                }
+                case VITORIA_REGIA -> {
+                    regias++;
+                    assertEquals(Material.AGUA, baixo, "vitória-régia fora da água em " + e.getKey());
+                }
+                case TAPETE -> assertTrue(solido(baixo), "tapete sem apoio em " + e.getKey());
+                default -> { }
+            }
+        }
+        assertTrue(bambus > 0, "sem bambu");
+        assertTrue(regias >= 3, "vitórias-régias: " + regias);
+    }
+
+    @Test
+    void cerejeirasForaDaLutaEDosPredios() {
+        Map<String, Material> m = mapa(PlantaEscola.cenario());
+        int troncos = 0;
+        for (Map.Entry<String, Material> e : m.entrySet()) {
+            Material mat = e.getValue();
+            if (mat != Material.TRONCO_CEREJEIRA && mat != Material.FOLHA_CEREJEIRA && mat != Material.BAMBU) continue;
+            if (mat == Material.TRONCO_CEREJEIRA) troncos++;
+            String[] c = e.getKey().split(",");
+            int x = Integer.parseInt(c[0]), z = Integer.parseInt(c[2]);
+            assertFalse(Math.abs(x) <= P && Math.abs(z) <= P, mat + " no pátio de luta em " + e.getKey());
+            for (PlantaEscola.Predio p : PlantaEscola.PREDIOS) assertFalse(p.perto(x, z, 0), mat + " no prédio em " + e.getKey());
+        }
+        assertTrue(troncos >= 4 * 6, "cerejeiras: " + troncos + " blocos de tronco");
     }
 }
