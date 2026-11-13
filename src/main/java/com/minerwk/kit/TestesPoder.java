@@ -115,4 +115,48 @@ public final class TestesPoder {
         helper.assertTrue(jogador.isDeadOrDying(), "/kill continua matando");
         helper.succeed();
     }
+
+    // --- Os bosses ---
+
+    private static void vidaDobrada(GameTestHelper helper, net.minecraft.world.entity.Mob boss, ServerPlayer dono,
+                                    java.util.function.Consumer<ServerPlayer> comecar, float vida) {
+        boss.moveTo(dono.getX() + 6, dono.getY(), dono.getZ());
+        helper.getLevel().addFreshEntity(boss);
+        comecar.accept(dono);
+        helper.assertTrue(perto(boss.getMaxHealth(), poder().vidaDoBoss(vida)),
+                boss.getName().getString() + ": vida " + boss.getMaxHealth() + " em vez de " + poder().vidaDoBoss(vida));
+        helper.assertTrue(perto(boss.getHealth(), boss.getMaxHealth()), "e começa com ela cheia");
+        // Começar a luta de novo (o boss salvo no disco é carregado com a vida já multiplicada) não multiplica outra vez.
+        comecar.accept(dono);
+        helper.assertTrue(perto(boss.getMaxHealth(), poder().vidaDoBoss(vida)), "uma vez só");
+        boss.discard();
+    }
+
+    @GameTest(template = "vazio")
+    public static void bossesNascemComAVidaMultiplicada(GameTestHelper helper) {
+        ServerPlayer jogador = gojo(helper);
+        var toji = com.minerwk.registro.Entidades.TOJI.get().create(helper.getLevel());
+        vidaDobrada(helper, toji, jogador, toji::comecarLuta, com.minerwk.core.boss.TojiBoss.VIDA);
+        var zangetsu = com.minerwk.registro.Entidades.ZANGETSU.get().create(helper.getLevel());
+        vidaDobrada(helper, zangetsu, jogador, zangetsu::comecarLuta, com.minerwk.core.boss.ZangetsuBoss.VIDA);
+        var ragnarok = com.minerwk.registro.Entidades.RAGNAROK.get().create(helper.getLevel());
+        vidaDobrada(helper, ragnarok, jogador, ragnarok::comecarLuta, com.minerwk.core.boss.RagnarokBoss.VIDA);
+        helper.succeed();
+    }
+
+    @GameTest(template = "vazio")
+    public static void golpeDoBossChegaMultiplicadoEReduzido(GameTestHelper helper) {
+        ServerPlayer jogador = gojo(helper);
+        var toji = com.minerwk.registro.Entidades.TOJI.get().create(helper.getLevel());
+        toji.moveTo(jogador.getX() + 2, jogador.getY(), jogador.getZ());
+        helper.getLevel().addFreshEntity(toji);
+        toji.comecarLuta(jogador);
+        float antes = jogador.getHealth();
+        toji.ferirParaTeste(jogador, 6);
+        float esperado = poder().recebido(poder().danoDoBoss(6));
+        helper.assertTrue(perto(antes - jogador.getHealth(), esperado),
+                "o soco de 6 deveria tirar " + esperado + ", tirou " + (antes - jogador.getHealth()));
+        toji.discard();
+        helper.succeed();
+    }
 }

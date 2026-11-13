@@ -147,6 +147,11 @@ public final class TojiEntity extends Monster implements GeoEntity {
     public void comecarLuta(ServerPlayer dono) {
         invocadorId = dono.getUUID();
         invocador = dono;
+        // Vida e dano pela config ("Balanceamento"), a partir da constante: começar de novo não multiplica duas vezes.
+        poder = com.minerwk.kit.PoderServidor.de(dono);
+        var vida = getAttribute(net.minecraft.world.entity.ai.attributes.Attributes.MAX_HEALTH);
+        if (vida != null) vida.setBaseValue(poder.vidaDoBoss(TojiBoss.VIDA));
+        setHealth(getMaxHealth());
         LutasToji.registrar(this);
         if (ServicoKits.desperto(dono)) {
             despertarFeito = true;
@@ -514,9 +519,17 @@ public final class TojiEntity extends Monster implements GeoEntity {
         alvo.hasImpulse = true;
     }
 
+    /** Ferramenta dos GameTests: o mesmo caminho de dano dos golpes dele. */
+    public boolean ferirParaTeste(LivingEntity alvo, float dano) {
+        return ferir(alvo, dano);
+    }
+
+    /** Os multiplicadores do balanceamento, lidos ao começar a luta. */
+    private com.minerwk.core.kit.Poder poder = com.minerwk.ConfigServidor.poder();
+
     private boolean ferir(LivingEntity alvo, float dano) {
         return alvo.hurt(new DamageSource(level().registryAccess().registryOrThrow(Registries.DAMAGE_TYPE)
-                .getHolderOrThrow(DANO), this), dano);
+                .getHolderOrThrow(DANO), this), poder.danoDoBoss(dano));
     }
 
     /** Os vivos a até {@code raio} do segmento, mais quem invocou (o jogador dos GameTests não está no mundo). */

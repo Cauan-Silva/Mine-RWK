@@ -173,6 +173,11 @@ public final class ZangetsuEntity extends Monster implements GeoEntity {
     public void comecarLuta(ServerPlayer dono) {
         invocadorId = dono.getUUID();
         invocador = dono;
+        // Vida e dano pela config ("Balanceamento"), a partir da constante: começar de novo não multiplica duas vezes.
+        poder = com.minerwk.kit.PoderServidor.de(dono);
+        var vida = getAttribute(net.minecraft.world.entity.ai.attributes.Attributes.MAX_HEALTH);
+        if (vida != null) vida.setBaseValue(poder.vidaDoBoss(com.minerwk.core.boss.ZangetsuBoss.VIDA));
+        setHealth(getMaxHealth());
         LutasZangetsu.registrar(this);
         despertarFeito = ServicoKits.desperto(dono);
         paradoAte = level().getGameTime() + ZangetsuBoss.CHEGADA + ZangetsuBoss.ENTRADA;
@@ -481,11 +486,14 @@ public final class ZangetsuEntity extends Monster implements GeoEntity {
         e.hurtMarked = true;
     }
 
+    /** Os multiplicadores do balanceamento, lidos ao começar a luta. */
+    private com.minerwk.core.kit.Poder poder = com.minerwk.ConfigServidor.poder();
+
     private boolean ferir(LivingEntity alvo, float dano) {
         // Cada golpe dele vale: os três Getsugas da máscara saem quase no tempo de invulnerabilidade do anterior.
         alvo.invulnerableTime = 0;
         return alvo.hurt(new DamageSource(level().registryAccess().registryOrThrow(Registries.DAMAGE_TYPE)
-                .getHolderOrThrow(DANO), this), dano);
+                .getHolderOrThrow(DANO), this), poder.danoDoBoss(dano));
     }
 
     /** Onde o segmento bate num bloco sólido, ou null. */
