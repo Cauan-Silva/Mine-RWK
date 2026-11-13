@@ -13,9 +13,14 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.BellBlock;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.CandleBlock;
 import net.minecraft.world.level.block.LeavesBlock;
 import net.minecraft.world.level.block.StairBlock;
+import net.minecraft.world.level.block.TrapDoorBlock;
+import net.minecraft.world.level.block.state.properties.BellAttachType;
+import net.minecraft.world.level.block.state.properties.Half;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.neoforged.neoforge.common.NeoForge;
@@ -133,8 +138,9 @@ public final class ObrasArena {
             while (o.blocos.hasNext() && mexidos < POR_TICK) {
                 PlantaEscola.Bloco b = o.blocos.next();
                 p.set(cx + b.dx(), CaixaArena.Y_PATIO + b.dy(), cz + b.dz());
-                if (b.material() == PlantaEscola.Material.MURO) {
-                    // O muro se liga aos vizinhos: ele e os vizinhos recalculam a forma.
+                if (b.material() == PlantaEscola.Material.MURO || b.material() == PlantaEscola.Material.CERCA_ESCURA
+                        || b.material() == PlantaEscola.Material.SHOJI) {
+                    // Muro, cerca e painel se ligam aos vizinhos: eles e os vizinhos recalculam a forma.
                     o.nivel.setBlock(p, Block.updateFromNeighbourShapes(estado(b.material()), o.nivel, p), Block.UPDATE_CLIENTS);
                 } else {
                     o.nivel.setBlock(p, estado(b.material()), MARCAS);
@@ -177,6 +183,41 @@ public final class ObrasArena {
             case FUNDO_ESCURO -> Blocks.BLUE_CONCRETE.defaultBlockState();
             case PORTAL_NEGRO -> Blocks.BLACK_CONCRETE.defaultBlockState();
             case PORTAL_ROXO -> Blocks.CRYING_OBSIDIAN.defaultBlockState();
+            case TATAME, FENO -> Blocks.HAY_BLOCK.defaultBlockState();
+            case BAMBU_PISO -> Blocks.BAMBOO_MOSAIC.defaultBlockState();
+            case SHOJI -> Blocks.WHITE_STAINED_GLASS_PANE.defaultBlockState();
+            case GRADE_NS -> grade(Direction.NORTH);
+            case GRADE_LO -> grade(Direction.EAST);
+            case VELA -> Blocks.CANDLE.defaultBlockState().setValue(CandleBlock.CANDLES, 3).setValue(CandleBlock.LIT, true);
+            case BARRIL -> Blocks.BARREL.defaultBlockState();
+            case ESTANTE -> Blocks.BOOKSHELF.defaultBlockState();
+            case SUPORTE_ARMADURA -> Blocks.SPRUCE_TRAPDOOR.defaultBlockState().setValue(TrapDoorBlock.HALF, Half.TOP);
+            case LAJE_MADEIRA -> Blocks.DARK_OAK_SLAB.defaultBlockState();
+            case TAPETE -> Blocks.RED_CARPET.defaultBlockState();
+            case ALVO -> Blocks.TARGET.defaultBlockState();
+            case QUADRO -> Blocks.BLACK_CONCRETE.defaultBlockState();
+            case CERCA_ESCURA -> Blocks.DARK_OAK_FENCE.defaultBlockState();
+            case AGUA -> Blocks.WATER.defaultBlockState();
+            case VITORIA_REGIA -> Blocks.LILY_PAD.defaultBlockState();
+            case CASCALHO -> Blocks.GRAVEL.defaultBlockState();
+            case PEDRA_MUSGO -> Blocks.MOSSY_STONE_BRICKS.defaultBlockState();
+            case FOLHA_CEREJEIRA -> Blocks.CHERRY_LEAVES.defaultBlockState().setValue(LeavesBlock.PERSISTENT, true);
+            case TRONCO_CEREJEIRA -> Blocks.CHERRY_LOG.defaultBlockState();
+            case BAMBU -> Blocks.BAMBOO.defaultBlockState();
+            case SINO -> Blocks.BELL.defaultBlockState().setValue(BellBlock.ATTACHMENT, BellAttachType.CEILING);
+            case ESCADA_MADEIRA_N -> escadaMadeira(Direction.NORTH);
+            case ESCADA_MADEIRA_S -> escadaMadeira(Direction.SOUTH);
+            case ESCADA_MADEIRA_L -> escadaMadeira(Direction.EAST);
+            case ESCADA_MADEIRA_O -> escadaMadeira(Direction.WEST);
         };
+    }
+
+    /** Um alçapão de abeto aberto, em pé, como a grade de uma janela. */
+    private static BlockState grade(Direction lado) {
+        return Blocks.SPRUCE_TRAPDOOR.defaultBlockState().setValue(TrapDoorBlock.OPEN, true).setValue(TrapDoorBlock.FACING, lado);
+    }
+
+    private static BlockState escadaMadeira(Direction lado) {
+        return Blocks.DARK_OAK_STAIRS.defaultBlockState().setValue(StairBlock.FACING, lado);
     }
 }

@@ -12,6 +12,7 @@ import com.minerwk.kit.Anexos;
 import com.minerwk.kit.ContextoServidor;
 import com.minerwk.kit.TestesGojo;
 import io.netty.channel.embedded.EmbeddedChannel;
+import com.minerwk.rede.CenarioArena;
 import java.util.List;
 import java.util.Optional;
 import net.minecraft.core.BlockPos;
@@ -210,6 +211,57 @@ public final class TestesArena {
             AABB tudo = new AABB(centro).inflate(CaixaArena.MEIA + 1, 64, CaixaArena.MEIA + 1);
             helper.assertTrue(arena.getEntitiesOfClass(ItemEntity.class, tudo).isEmpty(), "sem itens caídos na caixa");
             helper.assertTrue(ObrasArena.ocioso(), "sem obra pendente");
+        });
+    }
+
+    @GameTest(template = "vazio", batch = "arena_26", timeoutTicks = 300)
+    public static void escolaMontaInteiraSemVazarAgua(GameTestHelper helper) {
+        ServerLevel arena = garantirDimensao(helper.getLevel().getServer());
+        CaixaArena caixa = CaixaArena.daVaga(41);
+        BlockPos centro = new BlockPos(caixa.centroX(), CaixaArena.Y_PATIO, caixa.centroZ());
+        long comeco = arena.getGameTime();
+        String[] erro = {null};
+        boolean[] pronto = {false};
+        ObrasArena.montar(arena, caixa, PlantaEscola.cenario(), () -> {
+            long levou = arena.getGameTime() - comeco;
+            // A limpeza da caixa vazia e mais os 65 mil blocos, a 4000 por tick.
+            if (levou > 40) erro[0] = "a Escola deveria montar em até 40 ticks, levou " + levou;
+            pronto[0] = true;
+        });
+        int lx = (PlantaEscola.LAGOA_X0 + PlantaEscola.LAGOA_X1) / 2, lz = PlantaEscola.LAGOA_Z0 + 2;
+        int[] sino = PlantaEscola.SINO;
+        helper.succeedWhen(() -> {
+            helper.assertTrue(pronto[0], "a montagem deveria terminar");
+            helper.assertTrue(erro[0] == null, String.valueOf(erro[0]));
+            helper.assertTrue(arena.getBlockState(centro.offset(lx, -2, lz)).is(Blocks.WATER), "água no fundo da lagoa");
+            helper.assertTrue(arena.getBlockState(centro.offset(PlantaEscola.LAGOA_X0 - 1, 0, lz)).isAir(),
+                    "a água não sai da lagoa");
+            helper.assertTrue(arena.getBlockState(centro.offset(sino[0], sino[1], sino[2])).is(Blocks.BELL), "o sino ficou pendurado");
+            helper.assertTrue(arena.getBlockState(centro.offset(45, 0, 0)).is(Blocks.BAMBOO), "o bambu ficou de pé");
+            ObrasArena.apagar(arena, caixa, () -> { });
+        });
+    }
+
+    @GameTest(template = "vazio", batch = "arena_27", timeoutTicks = 400)
+    public static void cenarioEscolaAoChegarEVazioAoVoltar(GameTestHelper helper) {
+        ServerPlayer jogador = jogador(helper);
+        boolean[] chegou = {false};
+        helper.assertTrue(ArenasServidor.entrar(jogador, (j, caixa) -> chegou[0] = true), "a entrada deveria começar");
+        helper.assertTrue(ArenasServidor.cenarioEnviado(jogador.getUUID()) == null
+                        || CenarioArena.NENHUM.equals(ArenasServidor.cenarioEnviado(jogador.getUUID())),
+                "durante a montagem o cenário ainda não foi mandado");
+        boolean[] acabou = {false};
+        helper.succeedWhen(() -> {
+            helper.assertTrue(chegou[0], "o jogador deveria chegar à arena");
+            if (!acabou[0]) {
+                helper.assertTrue(CenarioArena.ESCOLA.equals(ArenasServidor.cenarioEnviado(jogador.getUUID())),
+                        "ao chegar o cliente recebe a escola");
+                acabou[0] = true;
+                ArenasServidor.lutaAcabou(jogador.server, jogador.getUUID(), false);
+            }
+            helper.assertFalse(ArenasServidor.naArena(jogador), "o jogador deveria ter voltado");
+            helper.assertTrue(CenarioArena.NENHUM.equals(ArenasServidor.cenarioEnviado(jogador.getUUID())),
+                    "ao voltar o cliente recebe o cenário vazio");
         });
     }
 

@@ -55,8 +55,8 @@ class PlantaEscolaTest {
                     "fora da altura da caixa: " + b);
             assertTrue(vistas.add(chave(b.dx(), b.dy(), b.dz())), "repetida: " + b);
         }
-        // 4000 blocos por tick: até 20 ticks de montagem.
-        assertTrue(blocos.size() <= 80000, "blocos demais: " + blocos.size());
+        // O teto do spec: 65 mil blocos, cerca de 18 ticks de montagem.
+        assertTrue(blocos.size() <= 65000, "blocos demais: " + blocos.size());
     }
 
     @Test
@@ -161,14 +161,16 @@ class PlantaEscolaTest {
             // Por dentro: assoalho e ar até a viga.
             for (int dx = p.x0() + 1; dx < p.x1(); dx++) {
                 for (int dz = p.z0() + 1; dz < p.z1(); dz++) {
-                    assertEquals(Material.ASSOALHO, m.get(chave(dx, p.podio() - 1, dz)), "assoalho em " + dx + "," + dz);
-                    for (int dy = p.podio() + 1; dy <= topo; dy++) assertNull(m.get(chave(dx, dy, dz)), "prédio não é oco");
+                    assertTrue(solido(m.get(chave(dx, p.podio() - 1, dz))), "piso em " + dx + "," + dz);
                     // Nenhuma coluna aberta para o céu.
                     boolean coberto = false;
                     for (int dy = topo + 1; dy <= topo + 16; dy++) coberto |= m.get(chave(dx, dy, dz)) != null;
                     assertTrue(coberto, "telhado furado em " + dx + "," + dz);
                 }
             }
+            // Mobiliado por dentro, mas o meio da sala é livre até a viga e se chega nele pela porta.
+            for (int dy = p.podio() + 1; dy <= topo; dy++) assertNull(m.get(chave(mx, dy, mz)), "meio ocupado em " + p);
+            assertTrue(temCaminho(m, p, mx, mz), "sem caminho até o meio de " + p);
             // A porta: 5 de largura e 4 de altura, do lado do pátio.
             for (int i = -2; i <= 2; i++) {
                 for (int dy = p.podio(); dy < p.podio() + 4; dy++) {
@@ -222,7 +224,8 @@ class PlantaEscolaTest {
         for (Bloco b : blocos) {
             if (b.material() != Material.LANTERNA) continue;
             Material apoio = m.get(chave(b.dx(), b.dy() - 1, b.dz()));
-            assertTrue(apoio == Material.MURO || apoio == Material.ASSOALHO, "lanterna sem apoio firme: " + b);
+            assertTrue(apoio == Material.MURO || apoio == Material.ASSOALHO || apoio == Material.TATAME
+                    || apoio == Material.CERCA_ESCURA, "lanterna sem apoio firme: " + b);
             lanternas++;
         }
         assertTrue(lanternas >= 14 + 12, "lanternas do pátio e de dentro dos prédios: " + lanternas);
@@ -239,5 +242,205 @@ class PlantaEscolaTest {
         Files.createDirectories(saida.getParent());
         Files.writeString(saida, s);
         assertTrue(Files.size(saida) > 0);
+    }
+
+    @Test
+    void todoMaterialTemCorNaPrevia() throws IOException {
+        String script = Files.readString(Path.of("ferramentas/previa_arena.py"));
+        for (Material m : Material.values()) assertTrue(script.contains("\"" + m.name() + "\":"), m + " sem cor");
+    }
+
+    /**
+     * Dá para andar da porta até (x, z) dentro do prédio? Uma posição é livre quando os pés estão no ar (ou
+     * sobre um tapete) e a cabeça no ar.
+     */
+    static boolean temCaminho(Map<String, Material> m, PlantaEscola.Predio p, int x, int z) {
+        int mx = (p.x0() + p.x1()) / 2, mz = (p.z0() + p.z1()) / 2;
+        int[] inicio = p.porta() == 'S' ? new int[] {mx, p.z1()} : new int[] {p.porta() == 'O' ? p.x0() : p.x1(), mz};
+        java.util.ArrayDeque<int[]> fila = new java.util.ArrayDeque<>();
+        Set<String> vistos = new HashSet<>();
+        fila.add(inicio);
+        vistos.add(inicio[0] + "," + inicio[1]);
+        while (!fila.isEmpty()) {
+            int[] c = fila.poll();
+            if (c[0] == x && c[1] == z) return true;
+            for (int[] d : new int[][] {{1, 0}, {-1, 0}, {0, 1}, {0, -1}}) {
+                int nx = c[0] + d[0], nz = c[1] + d[1];
+                if (nx < p.x0() || nx > p.x1() || nz < p.z0() || nz > p.z1()) continue;
+                Material pes = m.get(chave(nx, p.podio(), nz));
+                if ((pes != null && pes != Material.TAPETE) || m.get(chave(nx, p.podio() + 1, nz)) != null) continue;
+                if (vistos.add(nx + "," + nz)) fila.add(new int[] {nx, nz});
+            }
+        }
+        return false;
+    }
+
+    private static boolean solido(Material m) {
+        return m != null && m != Material.AGUA && m != Material.TAPETE && m != Material.VITORIA_REGIA && m != Material.VELA
+                && m != Material.LANTERNA && m != Material.BAMBU && m != Material.SINO;
+    }
+
+    @Test
+    void salaoTemAltarEVelasComApoio() {
+        Map<String, Material> m = mapa(PlantaEscola.cenario());
+        int velas = 0, estantes = 0;
+        for (Map.Entry<String, Material> e : m.entrySet()) {
+            String[] c = e.getKey().split(",");
+            int x = Integer.parseInt(c[0]), y = Integer.parseInt(c[1]), z = Integer.parseInt(c[2]);
+            if (e.getValue() == Material.VELA) {
+                velas++;
+                assertTrue(solido(m.get(chave(x, y - 1, z))), "vela sem apoio em " + e.getKey());
+            }
+            if (e.getValue() == Material.ESTANTE && PlantaEscola.SALAO.perto(x, z, 0)) estantes++;
+        }
+        assertTrue(velas >= 3, "velas: " + velas);
+        assertTrue(estantes > 0, "sem estante no salão");
+    }
+
+    @Test
+    void salaoTemShojiComPassagem() {
+        Map<String, Material> m = mapa(PlantaEscola.cenario());
+        assertTrue(m.containsValue(Material.SHOJI));
+        assertTrue(m.containsValue(Material.TATAME));
+        assertTrue(temCaminho(m, PlantaEscola.SALAO, 0, -36), "a nave não se alcança pela porta");
+    }
+
+    @Test
+    void pavilhoesMobiliadosComCaminho() {
+        Map<String, Material> m = mapa(PlantaEscola.cenario());
+        int quadros = 0, mesas = 0, alvos = 0, barris = 0;
+        for (Map.Entry<String, Material> e : m.entrySet()) {
+            String[] c = e.getKey().split(",");
+            int x = Integer.parseInt(c[0]), y = Integer.parseInt(c[1]), z = Integer.parseInt(c[2]);
+            boolean leste = PlantaEscola.PAVILHAO_LESTE.perto(x, z, 0), oeste = PlantaEscola.PAVILHAO_OESTE.perto(x, z, 0);
+            switch (e.getValue()) {
+                case QUADRO -> quadros += leste ? 1 : 0;
+                case LAJE_MADEIRA -> mesas += leste ? 1 : 0;
+                case ALVO -> {
+                    if (oeste && m.get(chave(x, y - 1, z)) == Material.FENO) alvos++;
+                }
+                case BARRIL -> barris += oeste ? 1 : 0;
+                case TAPETE -> assertTrue(solido(m.get(chave(x, y - 1, z))), "tapete sem apoio em " + e.getKey());
+                default -> { }
+            }
+        }
+        assertTrue(quadros > 0, "sem quadro na sala de aula");
+        assertTrue(mesas >= 6, "mesas: " + mesas);
+        assertEquals(2, alvos, "alvos sobre feno");
+        assertTrue(barris > 0, "sem barril na sala de treino");
+    }
+
+    @Test
+    void sinoTemApoio() {
+        Map<String, Material> m = mapa(PlantaEscola.cenario());
+        int[] s = PlantaEscola.SINO;
+        assertEquals(Material.SINO, m.get(chave(s[0], s[1], s[2])));
+        assertNotNull(m.get(chave(s[0], s[1] + 1, s[2])), "o sino não está preso a nada");
+        assertTrue(Math.abs(s[0]) > P || Math.abs(s[2]) > P, "a torre do sino está no pátio de luta");
+    }
+
+    @Test
+    void engawaCercaOSalaoComEntrada() {
+        Map<String, Material> m = mapa(PlantaEscola.cenario());
+        PlantaEscola.Predio p = PlantaEscola.SALAO;
+        int frente = p.z1() + PlantaEscola.Predio.BEIRAL, pe = p.podio();
+        assertEquals(Material.CERCA_ESCURA, m.get(chave(-8, pe, frente)), "sem guarda-corpo");
+        assertEquals(Material.ASSOALHO, m.get(chave(-8, pe - 1, p.z1() + 1)), "sem varanda de madeira");
+        for (int dx = -2; dx <= 2; dx++) assertNull(m.get(chave(dx, pe, frente)), "guarda-corpo na entrada");
+    }
+
+    @Test
+    void janelasNaoFicamNaPorta() {
+        Map<String, Material> m = mapa(PlantaEscola.cenario());
+        int janelas = 0;
+        for (Map.Entry<String, Material> e : m.entrySet()) {
+            if (e.getValue() != Material.GRADE_NS && e.getValue() != Material.GRADE_LO) continue;
+            janelas++;
+            String[] c = e.getKey().split(",");
+            int x = Integer.parseInt(c[0]), z = Integer.parseInt(c[2]);
+            for (PlantaEscola.Predio p : PlantaEscola.PREDIOS) {
+                int mx = (p.x0() + p.x1()) / 2, mz = (p.z0() + p.z1()) / 2;
+                boolean naPorta = p.porta() == 'S' ? z == p.z1() && Math.abs(x - mx) <= 2
+                        : x == (p.porta() == 'O' ? p.x0() : p.x1()) && Math.abs(z - mz) <= 2;
+                assertFalse(naPorta, "janela na porta em " + e.getKey());
+            }
+        }
+        assertTrue(janelas >= 12, "janelas: " + janelas);
+    }
+
+    @Test
+    void depositoTemPorta() {
+        Map<String, Material> m = mapa(PlantaEscola.cenario());
+        PlantaEscola.Predio d = PlantaEscola.DEPOSITO;
+        int mx = (d.x0() + d.x1()) / 2;
+        assertEquals(Material.MADEIRA_ESCURA, m.get(chave(d.x0(), 0, d.z0())));
+        for (int dy = 0; dy <= 1; dy++) assertNull(m.get(chave(mx, dy, d.z1())), "depósito sem porta");
+        assertNotNull(m.get(chave(mx, d.parede(), (d.z0() + d.z1()) / 2)), "depósito sem teto");
+    }
+
+    @Test
+    void aguaNaoVaza() {
+        List<Bloco> blocos = PlantaEscola.cenario();
+        Map<String, Integer> indice = new HashMap<>();
+        for (int i = 0; i < blocos.size(); i++) {
+            Bloco b = blocos.get(i);
+            indice.put(chave(b.dx(), b.dy(), b.dz()), i);
+        }
+        Map<String, Material> m = mapa(blocos);
+        int aguas = 0;
+        for (int i = 0; i < blocos.size(); i++) {
+            Bloco b = blocos.get(i);
+            if (b.material() != Material.AGUA) continue;
+            aguas++;
+            int[][] vizinhos = {{0, -1, 0}, {1, 0, 0}, {-1, 0, 0}, {0, 0, 1}, {0, 0, -1}};
+            for (int[] v : vizinhos) {
+                String c = chave(b.dx() + v[0], b.dy() + v[1], b.dz() + v[2]);
+                Material viz = m.get(c);
+                if (viz == Material.AGUA) continue;
+                assertTrue(solido(viz), "água vaza de " + b + " para " + c);
+                assertTrue(indice.get(c) < i, "a água vem antes do apoio em " + c);
+            }
+        }
+        assertTrue(aguas >= 20, "lagoa pequena: " + aguas);
+    }
+
+    @Test
+    void plantasTemApoio() {
+        Map<String, Material> m = mapa(PlantaEscola.cenario());
+        int bambus = 0, regias = 0;
+        for (Map.Entry<String, Material> e : m.entrySet()) {
+            String[] c = e.getKey().split(",");
+            Material baixo = m.get(chave(Integer.parseInt(c[0]), Integer.parseInt(c[1]) - 1, Integer.parseInt(c[2])));
+            switch (e.getValue()) {
+                case BAMBU -> {
+                    bambus++;
+                    assertTrue(baixo == Material.GRAMA || baixo == Material.BAMBU, "bambu solto em " + e.getKey());
+                }
+                case VITORIA_REGIA -> {
+                    regias++;
+                    assertEquals(Material.AGUA, baixo, "vitória-régia fora da água em " + e.getKey());
+                }
+                case TAPETE -> assertTrue(solido(baixo), "tapete sem apoio em " + e.getKey());
+                default -> { }
+            }
+        }
+        assertTrue(bambus > 0, "sem bambu");
+        assertTrue(regias >= 3, "vitórias-régias: " + regias);
+    }
+
+    @Test
+    void cerejeirasForaDaLutaEDosPredios() {
+        Map<String, Material> m = mapa(PlantaEscola.cenario());
+        int troncos = 0;
+        for (Map.Entry<String, Material> e : m.entrySet()) {
+            Material mat = e.getValue();
+            if (mat != Material.TRONCO_CEREJEIRA && mat != Material.FOLHA_CEREJEIRA && mat != Material.BAMBU) continue;
+            if (mat == Material.TRONCO_CEREJEIRA) troncos++;
+            String[] c = e.getKey().split(",");
+            int x = Integer.parseInt(c[0]), z = Integer.parseInt(c[2]);
+            assertFalse(Math.abs(x) <= P && Math.abs(z) <= P, mat + " no pátio de luta em " + e.getKey());
+            for (PlantaEscola.Predio p : PlantaEscola.PREDIOS) assertFalse(p.perto(x, z, 0), mat + " no prédio em " + e.getKey());
+        }
+        assertTrue(troncos >= 4 * 6, "cerejeiras: " + troncos + " blocos de tronco");
     }
 }

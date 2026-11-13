@@ -93,6 +93,10 @@ public final class MineRWKClient {
                 com.minerwk.client.arena.Escurecer::desenhar));
         NeoForge.EVENT_BUS.addListener(com.minerwk.client.arena.Escurecer::aoTick);
         NeoForge.EVENT_BUS.addListener((ClientPlayerNetworkEvent.LoggingOut e) -> com.minerwk.client.arena.Escurecer.limpar());
+        // O horizonte de cada arena: o servidor diz em qual cenário o jogador está.
+        com.minerwk.rede.Pacotes.aoCenarioArena = com.minerwk.client.arena.CenarioCliente::receber;
+        NeoForge.EVENT_BUS.addListener(com.minerwk.client.arena.HorizonteCliente::aoRenderizar);
+        NeoForge.EVENT_BUS.addListener((ClientPlayerNetworkEvent.LoggingOut e) -> com.minerwk.client.arena.CenarioCliente.limpar());
         NeoForge.EVENT_BUS.addListener(TeclasKit::aoTick);
         NeoForge.EVENT_BUS.addListener((ClientPlayerNetworkEvent.LoggingOut e) -> RecepcaoKit.esquecer());
         NeoForge.EVENT_BUS.addListener((RegisterClientCommandsEvent e) -> ComandosTeste.registrar(e.getDispatcher()));

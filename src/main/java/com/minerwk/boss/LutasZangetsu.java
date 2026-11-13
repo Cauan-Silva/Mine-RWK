@@ -110,7 +110,7 @@ public final class LutasZangetsu {
         TojiBoss.Invocacao resposta = exigir ? TojiBoss.podeInvocar(dados.personagem, Ichigo.ID, temNo, temBoss)
                 : temBoss ? TojiBoss.Invocacao.JA_EXISTE : TojiBoss.Invocacao.OK;
         if (resposta != TojiBoss.Invocacao.OK) return resposta;
-        return ArenasServidor.entrar(jogador, PlantaMundoInterior.cenario(), LutasZangetsu::entrarNaArena)
+        return ArenasServidor.entrar(jogador, com.minerwk.rede.CenarioArena.INTERIOR, PlantaMundoInterior.cenario(), LutasZangetsu::entrarNaArena)
                 ? TojiBoss.Invocacao.OK : TojiBoss.Invocacao.NA_ARENA;
     }
 
