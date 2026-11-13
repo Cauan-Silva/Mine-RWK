@@ -71,10 +71,10 @@ public final class TestesIchigo {
         helper.assertTrue(Forma.BASE.equals(kit.forma()), "sem reiatsu o Bankai acaba");
         long faltam = kit.recargas().restante(Ichigo.ENTRAR_NO_BANKAI, jogador.level().getGameTime());
         helper.assertTrue(faltam > 150, "o G deveria ficar em recarga, faltam " + faltam);
-        // Outro personagem: a arma do kit some.
+        // Outro personagem: a arma do kit troca pela dele (o Gojo bate com o punho).
         ServicoKits.definirPersonagem(jogador, Personagens.porId(com.minerwk.core.personagens.gojo.Gojo.ID).orElseThrow());
         ticks(jogador, 1);
-        helper.assertTrue(ArmaServidor.atual(jogador) == null, "o Gojo não tem arma do kit");
+        helper.assertTrue(com.minerwk.core.personagens.gojo.Gojo.PUNHO.equals(ArmaServidor.atual(jogador)), "a Zangetsu vira o punho do Gojo");
         helper.assertTrue(perto(jogador.getAttributeValue(Attributes.ATTACK_SPEED), 4), "a velocidade de ataque volta ao normal");
         helper.succeed();
     }
@@ -107,7 +107,8 @@ public final class TestesIchigo {
         Zombie terceiro = zumbi(helper, 5, 3);
         ServicoKits.tickJogador(gojo);
         terceiro.hurt(gojo.damageSources().playerAttack(gojo), 1f);
-        helper.assertTrue(perto(terceiro.getHealth(), 19), "o soco do Gojo não muda, vida " + terceiro.getHealth());
+        helper.assertTrue(perto(terceiro.getHealth(), 20 - com.minerwk.core.personagens.gojo.Gojo.PUNHO.dano()),
+                "o soco do Gojo é o punho dele, vida " + terceiro.getHealth());
         helper.succeed();
     }
 

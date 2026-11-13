@@ -244,8 +244,9 @@ public final class KitDoJogador {
 
     public List<Execucao.Evento> tick(long agora, EstadoDoJogador estado, Contexto contexto) {
         recurso.tick(estado);
-        if (desperto || !personagem.trancas().passivas()) {
-            for (Passiva p : passivas) p.tick(contexto, estado);
+        boolean livres = desperto || !personagem.trancas().passivas();
+        for (Passiva p : passivas) {
+            if (livres || !p.trancavel()) p.tick(contexto, estado);
         }
         tickEfeitos(contexto);
         List<Execucao.Evento> eventos = new ArrayList<>(1);

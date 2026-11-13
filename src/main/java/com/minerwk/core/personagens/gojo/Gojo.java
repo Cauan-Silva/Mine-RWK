@@ -35,9 +35,25 @@ public final class Gojo {
         Map<Tecla, com.minerwk.core.kit.Habilidade> golpes = Map.of(Tecla.Z, new Azul(), Tecla.X, new Vermelho(),
                 Tecla.C, new Infinito(), Tecla.V, new Roxo(), Tecla.G, new VazioInfinito(), Tecla.R, new Roxo200());
         return new Personagem(ID, "Satoru Gojo", "Jujutsu Kaisen", EnergiaAmaldicoada::new, golpes,
-                List.of(TecnicaReversa::new), ArvoreGojo.ARVORE,
+                List.of(TecnicaReversa::new, Punho::new), ArvoreGojo.ARVORE,
                 // Como na obra: antes do Toji ele só tem o Azul e o Infinito.
                 Trancas.dasTeclas(golpes, java.util.Set.of(Tecla.X, Tecla.V, Tecla.G, Tecla.R), true));
+    }
+
+    /** O clique do Gojo: o soco com a energia amaldiçoada (spec "Balanceamento"). Antes caía no soco da mão (1). */
+    public static final com.minerwk.core.kit.Arma PUNHO = new com.minerwk.core.kit.Arma(6, 4, 0);
+
+    /** Põe o punho a cada tick. Não é trancada: o clique vale desde o começo, antes do despertar. */
+    static final class Punho implements com.minerwk.core.kit.Passiva {
+        @Override
+        public void tick(com.minerwk.core.kit.Contexto ctx, com.minerwk.core.kit.EstadoDoJogador estado) {
+            ctx.arma(PUNHO);
+        }
+
+        @Override
+        public boolean trancavel() {
+            return false;
+        }
     }
 
     /** Base das habilidades do Gojo: id e números fixos. */
@@ -131,6 +147,11 @@ public final class Gojo {
             super("gojo_vermelho", new Numeros(5, 30, 2, 6, true, 30, 200));
         }
 
+        /** Quanto o Vermelho arremessa quem pega, pela força da carga. Mais leve depois do primeiro teste. */
+        public static double arremesso(float forca) {
+            return 1.2 + .8 * forca;
+        }
+
         @Override
         public void aoIniciarCarga(Contexto ctx) {
             super.aoIniciarCarga(ctx);
@@ -198,7 +219,7 @@ public final class Gojo {
         @Override
         public void aoAcabar(Contexto ctx) {
             int feridos = ctx.danoUmaVez(posicao, 3, (6 + 8 * forca) * fatorDano, new HashSet<>());
-            ctx.arremessar(posicao, 4, 2.5 + 1.5 * forca, 3, null);
+            ctx.arremessar(posicao, 4, Vermelho.arremesso(forca), 3, null);
             if (feridos > 0) ctx.acertou(.5f + .5f * forca);
             ctx.tremor(0.3f + 0.5f * forca, 12, 16);
             ctx.visualFim("gojo_vermelho", posicao);

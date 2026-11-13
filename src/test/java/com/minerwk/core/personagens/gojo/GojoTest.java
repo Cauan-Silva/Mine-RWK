@@ -107,7 +107,7 @@ class GojoTest {
         Personagem p = Gojo.criar();
         assertEquals("gojo", p.id());
         for (Tecla t : Tecla.values()) assertTrue(p.naTecla(t).isPresent(), "falta " + t);
-        assertEquals(1, p.passivas().size());
+        assertEquals(2, p.passivas().size(), "a Técnica Reversa e o punho");
     }
 
     @Test
@@ -491,5 +491,31 @@ class GojoTest {
         assertFalse(k.trancada(Tecla.C));
         for (Tecla t : new Tecla[] {Tecla.X, Tecla.V, Tecla.G, Tecla.R}) assertTrue(k.trancada(t), t + " deveria exigir o despertar");
         assertTrue(Gojo.criar().trancas().passivas(), "a Técnica Reversa exige o despertar");
+    }
+
+    // --- Balanceamento (12/11) ---
+
+    @Test
+    void oCliqueDoGojoEOPunhoMesmoSemDespertar() {
+        Personagem gojo = Gojo.criar();
+        KitDoJogador kit = new KitDoJogador(gojo);
+        kit.definirDesperto(false);
+        com.minerwk.core.kit.Arma[] pedida = {null};
+        Contexto ctx = new Contexto() {
+            @Override
+            public void arma(com.minerwk.core.kit.Arma arma) {
+                pedida[0] = arma;
+            }
+        };
+        kit.tick(0, new EstadoDoJogador(true, false, false), ctx);
+        assertEquals(Gojo.PUNHO, pedida[0], "o punho vale antes do despertar: só a Técnica Reversa é trancada");
+        assertEquals(6, Gojo.PUNHO.dano(), 1e-6);
+        assertEquals(4, Gojo.PUNHO.velocidade(), 1e-6);
+    }
+
+    @Test
+    void oVermelhoEmpurraMenos() {
+        assertEquals(1.2, Gojo.Vermelho.arremesso(0), 1e-9);
+        assertEquals(2.0, Gojo.Vermelho.arremesso(1), 1e-9);
     }
 }
