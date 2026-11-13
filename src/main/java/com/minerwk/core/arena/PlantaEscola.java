@@ -147,6 +147,7 @@ public final class PlantaEscola {
         torii(o, TORII_DO_CAMINHO, 0, PILAR_DO_CAMINHO, VAO_DO_CAMINHO);
         for (int k : TORII_DA_ESCADA) torii(o, ESCADA_EM + 1 + 2 * k, -1 - k, PILAR_DA_ESCADA, VAO_DA_ESCADA);
         for (Predio p : PREDIOS) predio(o, p);
+        interiorSalao(o);
         // Lanternas de pedra na borda do pátio, fora da frente das portas e do caminho.
         for (int i : new int[] {-16, -8, 8, 16}) {
             lanterna(o, MEIO_PATIO_ESCOLA, i);
@@ -262,6 +263,49 @@ public final class PlantaEscola {
         int r = 2;
         paredes(o, p.x0() + r, p.x1() - r, p.z0() + r, p.z1() - r, beiral + 2, beiral + 4);
         telhado(o, p.x0() + r, p.x1() - r, p.z0() + r, p.z1() - r, beiral + 5, Integer.MAX_VALUE);
+    }
+
+    /**
+     * O salão por dentro, como um templo: a antessala logo depois da porta, separada da nave por painéis de
+     * papel; a nave com tatame e pilares; o altar ao fundo, com a estante embutida na parede de trás.
+     */
+    private static void interiorSalao(Obra o) {
+        Predio p = SALAO;
+        int piso = p.podio() - 1, pe = p.podio();
+        // Piso da nave: faixas de tatame separadas por uma linha de mosaico de bambu.
+        for (int dx = p.x0() + 1; dx < p.x1(); dx++) {
+            for (int dz = p.z0() + 1; dz <= -31; dz++) {
+                o.por(dx, piso, dz, (dz - p.z0()) % 3 == 0 ? Material.BAMBU_PISO : Material.TATAME);
+            }
+        }
+        // Os painéis de papel, com a passagem de 3 no meio.
+        for (int dx = p.x0() + 1; dx < p.x1(); dx++) {
+            if (Math.abs(dx) <= 1) continue;
+            for (int dy = pe; dy < pe + 3; dy++) o.por(dx, dy, -30, Material.SHOJI);
+        }
+        // Os pilares da nave, nas duas laterais.
+        for (int dx : new int[] {-9, 9}) {
+            for (int dz : new int[] {-36, -33}) {
+                for (int dy = pe; dy < pe + p.parede() - 1; dy++) o.por(dx, dy, dz, Material.PILAR);
+            }
+        }
+        // O altar: a estante embutida na parede do fundo, a mesa com velas e o degrau na frente.
+        for (int dx = -3; dx <= 3; dx++) {
+            for (int dy = pe; dy < pe + 3; dy++) o.por(dx, dy, p.z0(), Material.ESTANTE);
+            o.por(dx, pe, p.z0() + 1, Material.MADEIRA_ESCURA);
+            o.por(dx, pe, p.z0() + 2, Material.LAJE_MADEIRA);
+        }
+        for (int dx : new int[] {-2, 0, 2}) o.por(dx, pe + 1, p.z0() + 1, Material.VELA);
+        for (int dx : new int[] {-4, 4}) {
+            o.por(dx, pe, p.z0() + 1, Material.CERCA_ESCURA);
+            o.por(dx, pe + 1, p.z0() + 1, Material.LANTERNA);
+        }
+        // A antessala: mesas baixas com almofadas dos lados.
+        for (int lado : new int[] {-1, 1}) {
+            o.por(8 * lado, pe, -29, Material.LAJE_MADEIRA);
+            o.por(7 * lado, pe, -29, Material.TAPETE);
+            o.por(9 * lado, pe, -29, Material.TAPETE);
+        }
     }
 
     /** As quatro paredes de um retângulo: pilar escuro nos cantos e de 4 em 4, branco entre eles, viga escura em cima. */
