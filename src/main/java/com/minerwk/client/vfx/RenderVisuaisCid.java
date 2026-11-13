@@ -757,10 +757,13 @@ final class RenderVisuaisCid {
      */
     private static void atomic(Vec3 o, double t) {
         float a = (float) AtomicFinal.clarao(t);
-        // Com a cutscene, a câmera recua até o sistema solar: a esfera passa a ser o ponto roxo do céu.
-        if (CutsceneCliente.emCurso(CutsceneAtomic.CLARAO)) a *= (float) SistemaSolar.esferaNoMundo(t);
+        // Com a cutscene, a câmera recua até o sistema solar: a esfera passa a ser o ponto roxo do céu. Sem ela,
+        // a esfera dá o pulso final no lugar do ponto, junto com o som.
+        boolean naCena = CutsceneCliente.emCurso(CutsceneAtomic.CLARAO);
+        if (naCena) a *= (float) SistemaSolar.esferaNoMundo(t);
         if (a <= .004f) return;
-        double raio = RAIO_DO_ATOMIC * (.05 + .95 * AtomicFinal.raioDoClarao(t));
+        double raio = RAIO_DO_ATOMIC * (.05 + .95 * AtomicFinal.raioDoClarao(t)) * (naCena ? 1 : SistemaSolar.repiqueDaEsfera(t));
+        float pulso = naCena ? 0 : (float) SistemaSolar.estouroDoPulso(t);
         abrir(true);
         // O estouro: nos primeiros ticks tudo é branco em volta do ponto.
         if (t < 8) {
@@ -772,6 +775,11 @@ final class RenderVisuaisCid {
                 Vec3 r = new Vec3(Math.cos(g), Math.sin(g) * .25, Math.sin(g));
                 fita(o.subtract(r.scale(220 * e)), o.add(r.scale(220 * e)), 1.2, BRANCO, e, e);
             }
+        }
+        if (pulso > .004f) {
+            halo(o, raio * .8, BRANCO, pulso);
+            halo(o, raio * 2.4, CLARO, pulso * .6f);
+            anel(o, raio * (1.2 + (1 - pulso) * 1.5), raio * (1.3 + (1 - pulso) * 1.6), CLARO, 0, pulso * .7f);
         }
         halo(o, raio * 1.9, ROXO, a * .5f);
         halo(o, raio * 1.3, ROXO, a);

@@ -26,7 +26,7 @@ Voltar para [[00 Início]].
 ## Para testar no jogo
 - Recuo do I Am Atomic (12/11, [[2026-11-12 Cid Atomic sistema solar]]):
   - **Com a cutscene:** depois do "atomic", a Terra sai de baixo, vira uma bola e um ponto entre os planetas, com as órbitas e o ponto roxo pulsando; o pulso final abre no branco. Algum salto no começo do recuo? O sistema cabe na tela?
-  - **Sem a cutscene** (`cutscenes = false`): o céu e a esfera roxa como antes.
+  - **Sem a cutscene** (`cutscenes = false`, e o alvo quando é jogador): o céu como antes; a esfera roxa cresce, e no pulso (junto com o último estouro do som) dá um clarão e volta a crescer até o branco. O trecho entre a esfera parar e o pulso ficou parado demais?
   - **O tempo:** o golpe agora dura 20 s. Ficou longo demais?
   - **O som:** o grave do recuo e o último estouro no pulso.
 - Balanceamento (12/11), conferir no jogo:

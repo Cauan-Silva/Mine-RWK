@@ -29,5 +29,16 @@ No teste depois do balanceamento, o autor achou que o final do I Am Atomic ainda
 ## Testes
 JUnit: `SistemaSolarTest` (15), cobrindo a Terra que começa igual ao planeta de hoje, a bola inteira em t = 45, a Terra que não sai do quadro durante o recuo, tudo no quadro em t = 95 (45° para os lados, 22° para cima e para baixo), a Terra no meio, o Sol maior, as órbitas, a esfera passando para o céu, o pulso cobrindo a tela e a luz depois da volta. Também o `CidAtomicTest` com a volta em 352 e o marco do pulso no `SonsCidTest`. GameTests: os 128 passam.
 
+## Revisão final (revisor separado)
+Aprovado com ressalvas: nenhum achado crítico, um importante e seis menores.
+- **Importante, corrigido:** quem não vê a cutscene (o alvo jogador, ou com as cutscenes desligadas) ficava uns 2 s olhando uma esfera parada e ouvia o estouro do pulso sem nada na tela. Agora a esfera do mundo dá o mesmo pulso: um clarão em t = 95 e cresce de novo até 1,8 vez até o branco. Teste: `semACenaAEsferaDoMundoTambemPulsa`, que falhou antes.
+- **Menores, deixados para depois:**
+  - o lado do dia da Terra não aponta para o Sol novo;
+  - a Terra clareia de repente quando vira um ponto (t ≈ 77);
+  - a sombra dos planetas sai do disco, e aparece sobre o halo do Sol;
+  - com FOV menor que 70 ou tela 4:3, Netuno pode sair do quadro;
+  - de t = 0 a 10, com a cutscene, o planeta não fica roxo (o branco do estouro esconde quase tudo);
+  - a prévia usa uma coordenada fixa do mundo de `run/`.
+
 ## Falta
 O autor ver a prévia `previas/cid_atomic_recuo.gif` (a folha de quadros em `previas/cid_atomic_recuo.png`), ouvir `previas/sfx_cid_atomic_recuo.wav` e testar no jogo (roteiro em [[Pendências]]).

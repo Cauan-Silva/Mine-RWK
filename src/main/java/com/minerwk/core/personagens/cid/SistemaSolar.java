@@ -119,6 +119,19 @@ public final class SistemaSolar {
         return Math.toRadians(1.5 + 98.5 * Math.pow(u, 2.2));
     }
 
+    /**
+     * Para quem não vê a cutscene (o alvo, ou com a config desligada), a esfera do mundo dá o mesmo pulso final:
+     * volta a crescer, de 1 a 1,8 vezes, do {@link #PULSO} ao {@link #FIM_DO_PULSO}, junto com o último estouro do som.
+     */
+    public static double repiqueDaEsfera(double t) {
+        return 1 + .8 * suave((t - PULSO) / (FIM_DO_PULSO - PULSO));
+    }
+
+    /** O clarão branco no instante do pulso, de 1 a 0 em 8 ticks. */
+    public static double estouroDoPulso(double t) {
+        return t < PULSO || t >= PULSO + 8 ? 0 : 1 - (t - PULSO) / 8;
+    }
+
     /** A lua e os dois planetas do céu de hoje, que somem no começo do recuo (de 1 a 0). */
     public static double astrosAntigos(double t) {
         return 1 - suave((t - INICIO) / (TERRA_INTEIRA - INICIO));

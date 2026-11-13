@@ -103,6 +103,17 @@ class SistemaSolarTest {
         assertEquals(0, SistemaSolar.astrosAntigos(SistemaSolar.TERRA_INTEIRA), 1e-9);
     }
 
+    /** Quem não vê a cutscene (o alvo, ou com a config desligada) vê a esfera do mundo dar o mesmo pulso, junto com o som. */
+    @Test
+    void semACenaAEsferaDoMundoTambemPulsa() {
+        assertEquals(1, SistemaSolar.repiqueDaEsfera(SistemaSolar.PULSO - 1), 1e-9);
+        assertTrue(SistemaSolar.repiqueDaEsfera(110) > SistemaSolar.repiqueDaEsfera(100));
+        assertTrue(SistemaSolar.repiqueDaEsfera(SistemaSolar.FIM_DO_PULSO) >= 1.7);
+        assertEquals(0, SistemaSolar.estouroDoPulso(SistemaSolar.PULSO - 1), 1e-9);
+        assertEquals(1, SistemaSolar.estouroDoPulso(SistemaSolar.PULSO), 1e-9);
+        assertEquals(0, SistemaSolar.estouroDoPulso(SistemaSolar.PULSO + 10), 1e-9);
+    }
+
     @Test
     void oPulsoFinalCobreATela() {
         assertTrue(SistemaSolar.raioDoPonto(100) < SistemaSolar.raioDoPonto(110));
