@@ -59,3 +59,4 @@ Voltar para [[00 Início]].
 - [[2026-11-12 Buraco do Hollow]]: o buraco no peito da forma Hollow atravessa o corpo; a camada de brilho do GeckoLib não pinta mais de preto os trajes sem máscara
 - [[2026-11-12 Cid parte 7b]]: os onze sons próprios do Ragnarok, os efeitos dos golpes (cratera, projéteis, feixe, onda) e a cena da asa com o corte do Shadow
 - [[2026-11-12 Cid parte 6 ritmo e impacto]]: o R do Cid refeito a pedido do autor: de 7,7 s para 17 s, parada de impacto nos socos, a carga antes do Atomic, a esfera maior e a onda de choque no chão
+- [[2026-11-12 Balanceamento]]: camada de poder (vida 40, metade do dano recebido, golpes ×3, bosses ×2) pela config do servidor; punho do Gojo, Vermelho mais leve, Ichigo mais barato e arenas indestrutíveis

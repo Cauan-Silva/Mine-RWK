@@ -24,6 +24,13 @@ Voltar para [[00 Início]].
 - Gojo (revisão 09/11, menores que ficaram): o Roxo pode derrubar plantas vizinhas (o `BreakEvent` para mods de proteção entrou em 09/11, no Gojo peso); o Vermelho atravessa parede fina encostada no rosto; bola de fogo e crânio de Wither voltam a acelerar no Infinito (o dano é cancelado mesmo assim); TNT sem dono passa pelo Infinito; sobram até 2 ticks de Infinito e 5 de Paralisia depois de morrer. Corrigidos na revisão: efeitos acabam ao mudar de dimensão; golpes não atingem pets, montaria nem projéteis do próprio Gojo; Paralisia não cancela Espinhos nem dano em si mesmo; ícone da Paralisia escondido (falta textura).
 
 ## Para testar no jogo
+- Balanceamento (12/11), conferir no jogo:
+  - **Warden** (Normal): com cada personagem, vence com folga? Aguenta uns 5 golpes dele? No Difícil?
+  - **Gojo:** o clique dá dano (6); as técnicas ferem o Toji de verdade; o Vermelho empurra na medida.
+  - **Bosses:** Toji, Zangetsu interior e Ragnarok com o dobro de vida e de dano (o dano chega como antes, por causa da redução). Estão longos demais? Curtos?
+  - **Ichigo:** o reiatsu dura o bastante? O Bankai agora dura bem mais (200 s sem golpes).
+  - **Arenas:** nenhum golpe quebra blocos lá dentro.
+  - **Config:** `saves/<mundo>/serverconfig/minerwk-server.toml`, seção `poder`. Dá para mudar os cinco números com o mundo fechado e reabrir.
 - Cid, parte 7, a árvore e o Ragnarok (12/11): **ver primeiro** `previas/cid_parte7_ragnarok.mp4` (a luta inteira pelos olhos do jogador). No jogo: `/rwk trocar <jogador> cid` e `/rwk ragnarok <jogador>` (sem o anel e sem o nó), ou o caminho de verdade: maestria 20, o nó Despertar (tecla H) e o Anel da Sucessão (barra de ouro + fragmento de ametista + pérola do Ender, sem forma).
   - **Decisões minhas para aprovar:** os onze nós da árvore e os valores (8% força e recarga, 10% Prisão e Magia, 15% no recuo do Overdrive); a receita do anel; o Ragnarok imune à Prisão de Correntes; ele entra a 24 blocos, não a 16.
   - **O modelo:** sete blocos, preto-azulado, membros cor de sangue, quatro garras, chifres, presas, asas, cauda, a brasa no peito. Foi feito por código (cubos com textura de 16x16 esticada). Serve, ou quer mais detalhe? A asa esquerda some na fase 2.
