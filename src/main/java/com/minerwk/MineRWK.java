@@ -49,6 +49,7 @@ public final class MineRWK {
         Personagens.registrar(com.minerwk.core.personagens.ichigo.Ichigo.criar());
         Personagens.registrar(com.minerwk.core.personagens.cid.Cid.criar());
         ServicoKits.registrarEventos();
+        com.minerwk.kit.PoderServidor.registrarEventos();
         com.minerwk.kit.ArmaServidor.registrarEventos();
         ProtecoesServidor.registrarEventos();
         com.minerwk.kit.HollowServidor.registrarEventos();

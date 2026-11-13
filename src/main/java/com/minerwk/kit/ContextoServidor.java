@@ -94,13 +94,22 @@ public final class ContextoServidor implements Contexto {
                 e -> afetavel(e) && e.getBoundingBox().getCenter().distanceToSqr(centro) <= raio * raio && filtro.test(e));
     }
 
+    /**
+     * O dano de um golpe do kit, com o multiplicador da config ("Balanceamento"). Todo método de dano daqui
+     * passa por ele uma vez só; o clique ({@code ArmaServidor}) não.
+     */
+    private float golpe(float dano) {
+        return PoderServidor.de(jogador).golpe(dano);
+    }
+
     @Override
     public void danoEmArea(double raio, float dano) {
         danoEm(vetor(jogador.position()), raio, dano);
     }
 
     @Override
-    public void danoSeguidoEmArea(double raio, float dano) {
+    public void danoSeguidoEmArea(double raio, float danoBase) {
+        float dano = golpe(danoBase);
         var fonte = jogador.damageSources().playerAttack(jogador);
         Vec3 centro = jogador.position();
         ServicoKits.comoGolpeDoKit(jogador, () -> {
@@ -231,7 +240,8 @@ public final class ContextoServidor implements Contexto {
     }
 
     @Override
-    public void danoEm(Vetor centro, double raio, float dano) {
+    public void danoEm(Vetor centro, double raio, float danoBase) {
+        float dano = golpe(danoBase);
         var fonte = jogador.damageSources().playerAttack(jogador);
         ServicoKits.comoGolpeDoKit(jogador, () -> {
             for (LivingEntity alvo : naEsfera(LivingEntity.class, vec(centro), raio, e -> true)) alvo.hurt(fonte, dano);
@@ -239,7 +249,8 @@ public final class ContextoServidor implements Contexto {
     }
 
     @Override
-    public int danoUmaVez(Vetor centro, double raio, float dano, Set<Object> atingidos) {
+    public int danoUmaVez(Vetor centro, double raio, float danoBase, Set<Object> atingidos) {
+        float dano = golpe(danoBase);
         var fonte = jogador.damageSources().playerAttack(jogador);
         int[] feridos = {0};
         ServicoKits.comoGolpeDoKit(jogador, () -> {
@@ -256,7 +267,8 @@ public final class ContextoServidor implements Contexto {
                     com.minerwk.MineRWK.id("direto"));
 
     @Override
-    public int danoDiretoUmaVez(Vetor centro, double raio, float dano, Set<Object> atingidos) {
+    public int danoDiretoUmaVez(Vetor centro, double raio, float danoBase, Set<Object> atingidos) {
+        float dano = golpe(danoBase);
         var fonte = new net.minecraft.world.damagesource.DamageSource(nivel().registryAccess()
                 .registryOrThrow(net.minecraft.core.registries.Registries.DAMAGE_TYPE).getHolderOrThrow(DANO_DIRETO), jogador);
         int[] feridos = {0};
@@ -424,7 +436,8 @@ public final class ContextoServidor implements Contexto {
     }
 
     @Override
-    public void ferir(Object alvo, float dano) {
+    public void ferir(Object alvo, float danoBase) {
+        float dano = golpe(danoBase);
         LivingEntity e = marcado(alvo);
         if (e == null) return;
         // Na viagem do R do Cid só este dano chega ao alvo, e um soco não o protege do seguinte.
@@ -576,7 +589,8 @@ public final class ContextoServidor implements Contexto {
     }
 
     @Override
-    public int danoEmArco(Vetor origem, Vetor direcao, double alcance, double graus, double altura, float dano) {
+    public int danoEmArco(Vetor origem, Vetor direcao, double alcance, double graus, double altura, float danoBase) {
+        float dano = golpe(danoBase);
         var fonte = jogador.damageSources().playerAttack(jogador);
         Vec3 centro = vec(origem);
         int[] feridos = {0};

@@ -83,6 +83,7 @@ public final class ServicoKits {
         novo.definirDesperto(desperto(jogador));
         novo.recarregar();
         Sincronizacao.enviar(jogador);
+        PoderServidor.aplicarVida(jogador);
         // Quem já está vendo o jogador passa a vê-lo com o traje do personagem novo.
         APARENCIAS.remove(jogador.getUUID());
         avisarAparencia(jogador, novo);

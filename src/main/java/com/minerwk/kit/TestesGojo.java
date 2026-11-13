@@ -45,6 +45,8 @@ public final class TestesGojo {
         // Recém-nascido fica 60 ticks imune a dano; sem zerar, os testes de dano passariam sem testar nada.
         ObfuscationReflectionHelper.setPrivateValue(ServerPlayer.class, jogador, 0, "spawnInvulnerableTime");
         jogador.setPos(helper.absoluteVec(new Vec3(1.5, 2, 1.5)));
+        // Os testes de mecânica conferem os números de cada golpe: sem a camada de poder (ver TestesPoder).
+        PoderServidor.semCamada(jogador);
         ServicoKits.definirPersonagem(jogador, Personagens.porId(Gojo.ID).orElseThrow());
         // Os testes dos golpes não são sobre o trancamento: o Gojo deles já despertou.
         ServicoKits.definirDespertou(jogador, true);
