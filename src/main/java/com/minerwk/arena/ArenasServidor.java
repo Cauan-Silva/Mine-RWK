@@ -296,8 +296,9 @@ public final class ArenasServidor {
     }
 
     /**
-     * Troca o cenário de quem está numa arena (a fase 2 do Zangetsu traz a chuva): a vaga guarda o novo, para quem
-     * sair e voltar ao jogo, e o cliente recebe na hora. Sem vaga (um boss invocado fora da arena), só o pacote.
+     * Troca o cenário de quem está numa arena (a fase 2 do Zangetsu traz a chuva): o cliente recebe na hora, e a vaga
+     * guarda o novo por coerência (sair do jogo no meio da luta encerra a luta, então ninguém volta à mesma vaga).
+     * Sem vaga (um boss invocado fora da arena), só o pacote.
      */
     public static void trocarCenario(ServerPlayer jogador, String cenario) {
         Arena a = ARENAS.get(jogador.getUUID());

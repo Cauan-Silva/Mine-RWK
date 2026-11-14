@@ -27,7 +27,7 @@ Voltar para [[00 Início]].
 - Mundo interior (13/11, [[2026-11-13 Mundo interior]]):
   - **A máscara:** o céu fica cinza e chove ao mesmo tempo que ela aparece.
   - **A chuva não vaza:** depois da vitória, de morrer na luta, de sair do jogo lá dentro e voltar, e na Escola, em Oriana e no mundo normal.
-  - **Sair e voltar no meio da fase 2:** a chuva continua?
+  - **Sair do jogo no meio da fase 2:** a luta acaba, e ao voltar o jogador está no mundo normal, sem chuva.
   - **O céu e o horizonte** com distância de renderização 8 e 16, e com o VFX reduzido.
   - **Os céus dos golpes:** o Roxo Máximo e o Mugetsu dentro do mundo interior ficam por cima do azul?
 - Oriana sob ataque (13/11, [[2026-11-13 Oriana sob ataque]]):

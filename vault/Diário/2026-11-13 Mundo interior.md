@@ -32,6 +32,24 @@ Voltar para [[Diário]]. Spec e plano: [[2026-11-13 Mundo interior]]. Branch `mu
 - GameTest: a máscara manda o cenário da chuva.
 - Os 131 passam. Na tarefa 1, duas rodadas caíram por instabilidade de fora: o Vermelho uma vez e o Toji com o GeckoLib outra.
 
+## Revisão final (revisor separado)
+Nenhum achado crítico, um importante e nove menores. Corrigidos:
+- **Importante: no céu escuro do Mugetsu e do Roxo Máximo, o horizonte e a chuva continuavam claros por cima.**
+  - **Também na Escola e em Oriana:** o horizonte já tinha esse problema lá.
+  - **A correção:** o anel, a saia e a chuva escurecem junto com o céu do golpe (`HorizonteCliente.escuroDosGolpes`).
+  - **Sem teste automático,** porque é desenho do cliente. Está em Pendências.
+- **Menores, corrigidos junto:**
+  - **o comentário e a Pendência prometiam a chuva depois de sair e voltar:** sair do jogo encerra a luta, então isso não acontece. Os textos dizem agora o que acontece de fato;
+  - **a chuva acompanhava a câmera ao pular e cair:** agora fica presa ao mundo;
+  - **a saia do horizonte trocava de cor de uma vez:** agora escurece junto com o resto, em 3 s;
+  - **o VFX reduzido não valia para a chuva:** agora ela cai num raio menor, com metade dos respingos e o som a cada 20 ticks;
+  - **o vidro claro das laterais saía cortado no meio de uma janela:** agora o sorteio é por janela.
+- **Menores, deixados para depois:**
+  - um teste de jogo com a arena de verdade (chuva na fase 2 e o vazio na volta);
+  - o teste dos detalhes poderia vigiar o vão entre os prédios e as marquises;
+  - o despejo da planta para a prévia roda em todo build;
+  - a caixa d'água e o letreiro do prédio baixo servem de esconderijo dos golpes do Zangetsu. O autor julga jogando.
+
 ## Prévia
 `previas/mundo_interior.gif` e a folha `previas/mundo_interior.png` (`./gradlew runClientDemo -Pdemo=interior`). A prévia força a fase 2 no meio e volta ao mundo sem chuva. A planta vista de cima: `python ferramentas/previa_arena.py interior`.
 

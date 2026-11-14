@@ -75,7 +75,9 @@ public final class PlantaMundoInterior {
         for (int dy = y0; dy <= y1; dy++) {
             for (int dz = z0; dz <= z1; dz++) {
                 Material m = grade(dy - y0 + 1, dz);
-                por(blocos, dx, dy, dz, m == Material.VIDRO_AZUL ? vidro(dx, dy / VAO_LARGURA, dz / VAO_COMPRIMENTO) : m);
+                // O sorteio é por janela (o mesmo vão da grade), para a janela não sair metade clara e metade azul.
+                int jy = Math.floorDiv(dy - y0 + 1, VAO_LARGURA), jz = Math.floorDiv(dz, VAO_COMPRIMENTO);
+                por(blocos, dx, dy, dz, m == Material.VIDRO_AZUL ? vidro(dx, jy, jz) : m);
             }
         }
     }

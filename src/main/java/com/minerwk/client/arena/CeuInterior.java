@@ -65,12 +65,13 @@ public final class CeuInterior {
         if (chuva <= .05f) return;
         ClientLevel nivel = mc.level;
         // Respingos no que estiver embaixo da chuva, perto do jogador.
-        for (int k = 0; k < (int) (8 * chuva); k++) {
+        boolean reduzido = com.minerwk.client.ConfigCliente.vfxReduzido() || HorizonteCliente.reduzidoNaPrevia;
+        for (int k = 0; k < (int) ((reduzido ? 4 : 8) * chuva); k++) {
             double x = mc.player.getX() + nivel.random.nextGaussian() * 6, z = mc.player.getZ() + nivel.random.nextGaussian() * 6;
             int topo = nivel.getHeight(Heightmap.Types.MOTION_BLOCKING, Mth.floor(x), Mth.floor(z));
             if (topo > nivel.getMinBuildHeight()) nivel.addParticle(ParticleTypes.RAIN, x, topo + .05, z, 0, 0, 0);
         }
-        if (nivel.getGameTime() % 10 == 0) {
+        if (nivel.getGameTime() % (reduzido ? 20 : 10) == 0) {
             nivel.playLocalSound(mc.player.getX(), mc.player.getY() + 2, mc.player.getZ(), SoundEvents.WEATHER_RAIN, SoundSource.WEATHER,
                     .35f * chuva, .9f + nivel.random.nextFloat() * .2f, false);
         }
@@ -183,15 +184,19 @@ public final class CeuInterior {
         RenderSystem.setShader(GameRenderer::getPositionColorShader);
         BufferBuilder b = Tesselator.getInstance().begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
         double tempo = ticks + parcial;
-        int cx = Mth.floor(camX), cz = Mth.floor(camZ), alcance = 12;
-        int alfa = (int) (120 * forca);
+        boolean reduzido = com.minerwk.client.ConfigCliente.vfxReduzido() || HorizonteCliente.reduzidoNaPrevia;
+        int cx = Mth.floor(camX), cz = Mth.floor(camZ), alcance = reduzido ? 8 : 12;
+        // No céu escuro do Roxo Máximo e do Mugetsu, a chuva quase some com ele.
+        int alfa = (int) (120 * forca * HorizonteCliente.escuroDosGolpes());
+        // Presa ao mundo: quem pula ou cai vê a chuva passar, e não uma cortina que vai junto.
+        int topo = Mth.floor(camY) + 10;
         for (int i = -alcance; i <= alcance; i++) {
             for (int j = -alcance; j <= alcance; j++) {
                 int bx = cx + i, bz = cz + j;
                 double h = acaso(bx * 31 + bz * 17);
                 if (h > .2 + .6 * forca) continue;
                 double x = bx + acaso(bx * 7 + bz * 13 + 1), z = bz + acaso(bx * 11 + bz * 5 + 2);
-                double y = camY + 10 - ((tempo * .9 + h * 40) % 22);
+                double y = topo - ((tempo * .9 + h * 40) % 22);
                 if (y < nivel.getHeight(Heightmap.Types.MOTION_BLOCKING, bx, bz)) continue;
                 double rx = x - camX, rz = z - camZ, d = Math.sqrt(rx * rx + rz * rz);
                 if (d < .5) continue;

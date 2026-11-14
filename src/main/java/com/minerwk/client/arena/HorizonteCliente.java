@@ -34,7 +34,7 @@ public final class HorizonteCliente {
     /** A cor do pé do morro perto na textura de cada cenário: a saia embaixo do anel continua o chão escuro. */
     private static final java.util.Map<String, int[]> CHAO = java.util.Map.of(CenarioArena.ESCOLA, new int[] {14, 18, 20},
             CenarioArena.ORIANA, new int[] {10, 8, 12}, CenarioArena.INTERIOR, new int[] {150, 168, 188},
-            CenarioArena.INTERIOR_CHUVA, new int[] {70, 78, 88});
+            CenarioArena.INTERIOR_CHUVA, new int[] {150, 168, 188});
     @SuppressWarnings("unchecked")
     private static final List<AnelHorizonte.Quad>[] ANEIS = new List[RAIOS.length];
     /** A prévia liga isto para gravar o quadro do VFX reduzido sem mexer na configuração do jogador. */
@@ -71,7 +71,9 @@ public final class HorizonteCliente {
         float base = (float) (CaixaArena.Y_PATIO + AnelHorizonte.Y_BASE - camera.y);
         float topo = (float) (CaixaArena.Y_PATIO + AnelHorizonte.Y_TOPO - camera.y);
         boolean reduzido = ConfigCliente.vfxReduzido() || reduzidoNaPrevia;
-        int brilho = (int) (255 * CeuInterior.brilhoDoHorizonte());
+        // Na chuva do mundo interior o anel escurece; no céu escuro do Roxo Máximo e do Mugetsu, quase some com ele.
+        float luz = CeuInterior.brilhoDoHorizonte() * escuroDosGolpes();
+        int brilho = (int) (255 * luz);
         // Neste estágio a matriz do sistema não tem a rotação da câmera: ela vai em cada vértice.
         Matrix4f m = evento.getModelViewMatrix();
 
@@ -95,7 +97,7 @@ public final class HorizonteCliente {
                 BufferUploader.drawWithShader(b.buildOrThrow());
             }
         }
-        sobNevoa(m, base, CHAO.get(cenario));
+        sobNevoa(m, base, CHAO.get(cenario), luz);
         RenderSystem.depthMask(true);
         RenderSystem.enableCull();
         RenderSystem.disableBlend();
@@ -108,7 +110,13 @@ public final class HorizonteCliente {
      * Embaixo do anel mais perto: uma saia escura até bem abaixo, para quem olha do alto não ver o vazio por
      * baixo, e uma faixa de névoa na cor do céu na altura do pátio, onde a borda do cenário encontra o anel.
      */
-    private static void sobNevoa(Matrix4f m, float base, int[] chao) {
+    /** O quanto o céu escuro dos golpes (o Roxo Máximo e o Mugetsu) deixa o horizonte aparecer, de .12 a 1. */
+    public static float escuroDosGolpes() {
+        return (float) (1 - com.minerwk.client.vfx.CeuRoxo.escuro() * .88);
+    }
+
+    private static void sobNevoa(Matrix4f m, float base, int[] chaoClaro, float luz) {
+        int[] chao = {(int) (chaoClaro[0] * luz), (int) (chaoClaro[1] * luz), (int) (chaoClaro[2] * luz)};
         float[] cor = RenderSystem.getShaderFogColor();
         int r = (int) (cor[0] * 255), g = (int) (cor[1] * 255), bl = (int) (cor[2] * 255);
         float patio = (float) (base - AnelHorizonte.Y_BASE);
