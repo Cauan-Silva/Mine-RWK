@@ -53,9 +53,11 @@ A primeira leitura disse "não está pronto": um achado crítico, um importante 
 - **Menores, corrigidos junto, no mesmo arquivo:** as fagulhas agora aparecem de longe, e a fumaça segue a opção de partículas do jogador.
 - **Menores, deixados para depois:**
   - a cúpula é montada a cada quadro, mas poderia ser montada uma vez só;
-  - **as brasas no meio do campo machucam quem pisa:** foi pedido do spec, e é preciso perguntar ao autor;
   - o teste de jogo do fogo não pega fogo novo nascendo fora da planta (quem segura é o teste da distância);
   - o fim da investida do Ragnarok pode pousar dentro de destroços de 1 bloco nas beiradas.
+
+## Depois da revisão: as brasas só nas beiradas
+O autor decidiu (13/11) que a brasa, que machuca quem pisa, fica só nas crateras das beiradas. As quatro crateras do meio livre têm o miolo de pedra negra. Teste: `oCampoTemCraterasEDestrocos` falhou antes e passa agora.
 
 ## Prévia
 `previas/oriana_ataque.gif` e a folha `previas/oriana_ataque.png` (`./gradlew runClientDemo -Pdemo=oriana`). A planta vista de cima: `python ferramentas/previa_arena.py oriana` gera `previas/arena_oriana.png`.

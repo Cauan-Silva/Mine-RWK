@@ -186,6 +186,9 @@ class PlantaOrianaTest {
             }
         }
         assertTrue(brasas >= 4, "brasas no chão: " + brasas);
+        // Pedido do autor (13/11): a brasa machuca quem pisa, então fica só nas crateras das beiradas.
+        assertTrue(CENARIO.stream().noneMatch(b -> b.material() == Material.BRASA && Math.abs(b.dx()) <= 30 && Math.abs(b.dz()) <= 30),
+                "brasa no meio livre");
         assertTrue(queimado >= 60, "chão queimado: " + queimado);
         assertTrue(fogueiras >= 2, "fogueiras: " + fogueiras);
         assertTrue(CENARIO.stream().anyMatch(b -> b.material() == Material.FENO), "feno espalhado");

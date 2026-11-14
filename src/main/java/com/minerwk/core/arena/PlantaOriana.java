@@ -247,13 +247,15 @@ public final class PlantaOriana {
         }
     }
 
-    /** Uma cratera no chão: o miolo em brasa, um anel de pedra negra e a borda de terra queimada. */
+    /** Uma cratera no chão: o miolo em brasa (só fora do meio livre), um anel de pedra negra e a borda de terra queimada. */
     private static void cratera(Map<Long, Bloco> blocos, int x, int z, int raio, boolean erguida) {
         for (int dx = -raio - 1; dx <= raio + 1; dx++) {
             for (int dz = -raio - 1; dz <= raio + 1; dz++) {
                 double d = Math.sqrt(dx * dx + dz * dz);
                 if (d <= Math.max(1, raio * .35)) {
-                    por(blocos, x + dx, -1, z + dz, Material.BRASA);
+                    // A brasa machuca quem pisa: no meio livre, onde se luta, o miolo é só pedra negra.
+                    boolean noMeio = Math.abs(x + dx) <= 30 && Math.abs(z + dz) <= 30;
+                    por(blocos, x + dx, -1, z + dz, noMeio ? Material.PEDRA_NEGRA : Material.BRASA);
                 } else if (d <= raio * .7) {
                     por(blocos, x + dx, -1, z + dz, Material.PEDRA_NEGRA);
                 } else if (d <= raio) {

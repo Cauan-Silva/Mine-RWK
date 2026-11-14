@@ -27,7 +27,7 @@ Voltar para [[00 Início]].
 - Oriana sob ataque (13/11, [[2026-11-13 Oriana sob ataque]]):
   - **O fogo:** continua igual depois de alguns minutos, sem se espalhar nem queimar nada. Ele queima quem encosta, mas só fica nas beiradas.
   - **A muralha:** dá para olhar a cidade pelas brechas e pelo portão, mas não dá para sair da caixa.
-  - **O Ragnarok:** voa e faz a investida sem bater em nada novo. A brasa das crateras machuca de leve quem pisa: incomoda na luta?
+  - **O Ragnarok:** voa e faz a investida sem bater em nada novo. A brasa ficou só nas crateras das beiradas; as do meio não machucam.
   - **A noite e a cidade:** só aparecem em Oriana, nunca na Escola, no mundo interior ou no mundo normal. As nuvens continuam na Escola.
   - **Distância de renderização** 8 e 16, e com o VFX reduzido.
   - **Os céus dos golpes:** o Roxo Máximo, o domínio do Gojo e o Mugetsu dentro de Oriana. O céu e a névoa escurecem por cima da noite?
