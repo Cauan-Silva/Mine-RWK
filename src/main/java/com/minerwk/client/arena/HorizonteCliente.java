@@ -29,14 +29,22 @@ public final class HorizonteCliente {
     /** Os raios, do mais longe ao mais perto; cada um usa a sua linha da textura (0 em cima). */
     private static final double[] RAIOS = {300, 220, 160};
     private static final int SEGMENTOS = 16;
-    private static final ResourceLocation[] FAIXAS = new ResourceLocation[AnelHorizonte.FAIXAS];
+    /** As faixas de cada cenário que tem horizonte; os outros não desenham nada. */
+    private static final java.util.Map<String, ResourceLocation[]> FAIXAS = new java.util.HashMap<>();
+    /** A cor do pé do morro perto na textura de cada cenário: a saia embaixo do anel continua o chão escuro. */
+    private static final java.util.Map<String, int[]> CHAO = java.util.Map.of(CenarioArena.ESCOLA, new int[] {14, 18, 20},
+            CenarioArena.ORIANA, new int[] {10, 8, 12});
     @SuppressWarnings("unchecked")
     private static final List<AnelHorizonte.Quad>[] ANEIS = new List[RAIOS.length];
     /** A prévia liga isto para gravar o quadro do VFX reduzido sem mexer na configuração do jogador. */
     public static boolean reduzidoNaPrevia;
 
     static {
-        for (int f = 0; f < FAIXAS.length; f++) FAIXAS[f] = MineRWK.id("textures/ceu/horizonte_escola_" + f + ".png");
+        for (String cenario : new String[] {CenarioArena.ESCOLA, CenarioArena.ORIANA}) {
+            ResourceLocation[] faixas = new ResourceLocation[AnelHorizonte.FAIXAS];
+            for (int f = 0; f < faixas.length; f++) faixas[f] = MineRWK.id("textures/ceu/horizonte_" + cenario + "_" + f + ".png");
+            FAIXAS.put(cenario, faixas);
+        }
         for (int i = 0; i < RAIOS.length; i++) {
             ANEIS[i] = AnelHorizonte.anel(RAIOS[i], AnelHorizonte.Y_BASE, AnelHorizonte.Y_TOPO, SEGMENTOS);
         }
@@ -49,7 +57,9 @@ public final class HorizonteCliente {
         if (evento.getStage() != RenderLevelStageEvent.Stage.AFTER_SKY) return;
         Minecraft mc = Minecraft.getInstance();
         if (mc.level == null || mc.level.dimension() != ArenasServidor.DIMENSAO) return;
-        if (!CenarioArena.ESCOLA.equals(CenarioCliente.atual())) return;
+        String cenario = CenarioCliente.atual();
+        ResourceLocation[] faixas = FAIXAS.get(cenario);
+        if (faixas == null) return;
         Vec3 camera = evento.getCamera().getPosition();
         // A altura do anel é a do mundo: o pátio fica em Y_PATIO.
         float base = (float) (CaixaArena.Y_PATIO + AnelHorizonte.Y_BASE - camera.y);
@@ -65,8 +75,8 @@ public final class HorizonteCliente {
         RenderSystem.setShader(GameRenderer::getPositionTexColorShader);
         for (int camada = reduzido ? RAIOS.length - 1 : 0; camada < RAIOS.length; camada++) {
             float v0 = camada / 3f, v1 = (camada + 1) / 3f;
-            for (int f = 0; f < FAIXAS.length; f++) {
-                RenderSystem.setShaderTexture(0, FAIXAS[f]);
+            for (int f = 0; f < faixas.length; f++) {
+                RenderSystem.setShaderTexture(0, faixas[f]);
                 BufferBuilder b = Tesselator.getInstance().begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX_COLOR);
                 for (AnelHorizonte.Quad q : ANEIS[camada]) {
                     if (q.faixa() != f) continue;
@@ -78,14 +88,12 @@ public final class HorizonteCliente {
                 BufferUploader.drawWithShader(b.buildOrThrow());
             }
         }
-        sobNevoa(m, base);
+        sobNevoa(m, base, CHAO.get(cenario));
         RenderSystem.depthMask(true);
         RenderSystem.enableCull();
         RenderSystem.disableBlend();
     }
 
-    /** A cor do pé da floresta na textura: a saia embaixo do anel continua o chão escuro até sumir de vista. */
-    private static final int[] CHAO = {14, 18, 20};
     /** Até onde a saia desce abaixo da base do anel. */
     private static final float SAIA = 200;
 
@@ -93,7 +101,7 @@ public final class HorizonteCliente {
      * Embaixo do anel mais perto: uma saia escura até bem abaixo, para quem olha do alto não ver o vazio por
      * baixo, e uma faixa de névoa na cor do céu na altura do pátio, onde a borda do cenário encontra o anel.
      */
-    private static void sobNevoa(Matrix4f m, float base) {
+    private static void sobNevoa(Matrix4f m, float base, int[] chao) {
         float[] cor = RenderSystem.getShaderFogColor();
         int r = (int) (cor[0] * 255), g = (int) (cor[1] * 255), bl = (int) (cor[2] * 255);
         float patio = (float) (base - AnelHorizonte.Y_BASE);
@@ -101,10 +109,10 @@ public final class HorizonteCliente {
         BufferBuilder b = Tesselator.getInstance().begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
         for (AnelHorizonte.Quad q : ANEIS[RAIOS.length - 1]) {
             float x0 = (float) q.x0(), z0 = (float) q.z0(), x1 = (float) q.x1(), z1 = (float) q.z1();
-            b.addVertex(m, x0, base - SAIA, z0).setColor(CHAO[0], CHAO[1], CHAO[2], 255);
-            b.addVertex(m, x1, base - SAIA, z1).setColor(CHAO[0], CHAO[1], CHAO[2], 255);
-            b.addVertex(m, x1, base, z1).setColor(CHAO[0], CHAO[1], CHAO[2], 255);
-            b.addVertex(m, x0, base, z0).setColor(CHAO[0], CHAO[1], CHAO[2], 255);
+            b.addVertex(m, x0, base - SAIA, z0).setColor(chao[0], chao[1], chao[2], 255);
+            b.addVertex(m, x1, base - SAIA, z1).setColor(chao[0], chao[1], chao[2], 255);
+            b.addVertex(m, x1, base, z1).setColor(chao[0], chao[1], chao[2], 255);
+            b.addVertex(m, x0, base, z0).setColor(chao[0], chao[1], chao[2], 255);
             faixaDeNevoa(b, m, q, patio - 24, patio - 6, r, g, bl, 0, 110);
             faixaDeNevoa(b, m, q, patio - 6, patio + 4, r, g, bl, 110, 0);
         }

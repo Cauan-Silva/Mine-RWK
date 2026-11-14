@@ -79,6 +79,7 @@ public final class MineRWKClient {
         modBus.addListener((RegisterGuiLayersEvent e) -> e.registerAboveAll(CutsceneCliente.CAMADA, CutsceneCliente::desenhar));
         // O espaço do R do Cid: o céu, sem neblina, e os clarões que cobrem as trocas de dimensão (por baixo das barras).
         modBus.addListener(com.minerwk.client.vfx.EspacoCliente::registrar);
+        modBus.addListener(com.minerwk.client.arena.CeuArena::registrar);
         modBus.addListener((RegisterGuiLayersEvent e) -> e.registerBelow(CutsceneCliente.CAMADA,
                 com.minerwk.client.vfx.EspacoCliente.CAMADA, com.minerwk.client.vfx.EspacoCliente::desenhar));
         NeoForge.EVENT_BUS.addListener(com.minerwk.client.vfx.EspacoCliente::aoAbrirTela);
@@ -95,6 +96,10 @@ public final class MineRWKClient {
         NeoForge.EVENT_BUS.addListener((ClientPlayerNetworkEvent.LoggingOut e) -> com.minerwk.client.arena.Escurecer.limpar());
         // O horizonte de cada arena: o servidor diz em qual cenário o jogador está.
         com.minerwk.rede.Pacotes.aoCenarioArena = com.minerwk.client.arena.CenarioCliente::receber;
+        // A noite de Oriana antes do horizonte: o anel fica por cima da cúpula.
+        NeoForge.EVENT_BUS.addListener(com.minerwk.client.arena.NoiteOriana::aoRenderizar);
+        NeoForge.EVENT_BUS.addListener(com.minerwk.client.arena.NoiteOriana::aoCorDaNevoa);
+        NeoForge.EVENT_BUS.addListener(com.minerwk.client.arena.FumacaOriana::aoTick);
         NeoForge.EVENT_BUS.addListener(com.minerwk.client.arena.HorizonteCliente::aoRenderizar);
         NeoForge.EVENT_BUS.addListener((ClientPlayerNetworkEvent.LoggingOut e) -> com.minerwk.client.arena.CenarioCliente.limpar());
         NeoForge.EVENT_BUS.addListener(TeclasKit::aoTick);

@@ -51,6 +51,11 @@ public final class DemoVfx {
      * alto da escadaria olhando o horizonte ao sul (também com o VFX reduzido), e a volta, sem horizonte.
      */
     private static final boolean ESCOLA = MODO.equals("escola");
+    /**
+     * {@code oriana}: Oriana sob ataque, sem luta: a muralha, uma brecha, a torre em chamas, o campo do alto, o céu
+     * e o mesmo com o VFX reduzido, e a volta, sem a noite.
+     */
+    private static final boolean ORIANA = MODO.equals("oriana");
     /** {@code toji}: a luta contra o Toji: a entrada, a Nuvem, a investida, a queda com a cutscene, o Desaparecer e a fase 3. */
     private static final boolean TOJI = MODO.equals("toji");
     /** {@code zangetsu}: a luta contra o Zangetsu interior, do mundo interior à vitória, com a queda e a máscara. */
@@ -80,7 +85,7 @@ public final class DemoVfx {
     private static final boolean CID_ATOMICO = MODO.equals("cid_atomico");
     /** {@code cid_final}: o R inteiro num alvo parado, com a cutscene: a subida, o espaço, o Atomic e a volta. */
     private static final boolean CID_FINAL = MODO.equals("cid_final");
-    private static final int FIM_PREVIA = ESCOLA ? 900 : HUD ? 280 : CID ? 250 : CID_FINAL ? 470 : CID_ATOMICO ? 215 : HOLLOW_PERTO || CID_PERTO ? 272 : HOLLOW ? 330 : ZANGETSU || RAGNAROK ? 2400 : TOJI ? 520 : ARVORE ? 400 : TRAJE ? 260 : TRAJE_ICHIGO ? 300 : ICHIGO ? 350 : MUGETSU ? 360 : R_COMPLETO ? 360
+    private static final int FIM_PREVIA = ESCOLA || ORIANA ? 900 : HUD ? 280 : CID ? 250 : CID_FINAL ? 470 : CID_ATOMICO ? 215 : HOLLOW_PERTO || CID_PERTO ? 272 : HOLLOW ? 330 : ZANGETSU || RAGNAROK ? 2400 : TOJI ? 520 : ARVORE ? 400 : TRAJE ? 260 : TRAJE_ICHIGO ? 300 : ICHIGO ? 350 : MUGETSU ? 360 : R_COMPLETO ? 360
             : ENCANTAMENTO ? CARGA + 90 : ESTOURO + RoxoMaximo.TICKS_EXPLOSAO + 110;
     private static int ticks;
     private static int quadro;
@@ -114,8 +119,8 @@ public final class DemoVfx {
                 jogador.connection.sendCommand("tp @s ~150 ~12 ~");
             }
             if (ZANGETSU) jogador.connection.sendCommand("rwk despertar @s nao");
-            if (RAGNAROK) jogador.connection.sendCommand("rwk despertar @s nao");
-            if (CID_PERTO || CID || CID_ATOMICO || CID_FINAL || RAGNAROK) {
+            if (RAGNAROK || ORIANA) jogador.connection.sendCommand("rwk despertar @s nao");
+            if (CID_PERTO || CID || CID_ATOMICO || CID_FINAL || RAGNAROK || ORIANA) {
                 jogador.connection.sendCommand("rwk trocar @s cid");
                 if (CID_ATOMICO || CID_FINAL) jogador.connection.sendCommand("rwk despertar @s sim");
                 // O R precisa do alvo à vista: sempre o mesmo campo de neve aberto (o fim de cada prévia anda o jogador).
@@ -162,7 +167,11 @@ public final class DemoVfx {
 
     private static void tocarPrevia(Minecraft mc, LocalPlayer jogador, int t) {
         if (ESCOLA) {
-            previaDaEscola(mc, jogador, t);
+            previaDaArena(mc, jogador, t, "rwk toji @s", "minerwk:toji", PONTOS_DA_ESCOLA);
+            return;
+        }
+        if (ORIANA) {
+            previaDaArena(mc, jogador, t, "rwk ragnarok @s", "minerwk:ragnarok", PONTOS_DE_ORIANA);
             return;
         }
         if (HUD) {
@@ -474,12 +483,24 @@ public final class DemoVfx {
             {-4, 1, 20, 20, -3},      // o alto da escadaria, olhando a cidade ao sul
             {0, 14, 24, 0, 2},        // mais alto, para ver as três camadas de montanhas
             {0, 14, 24, 0, 2}};       // o mesmo, com o VFX reduzido
+    /** Os pontos da prévia de Oriana, do mesmo jeito. Yaw 180 olha para o norte, para a muralha. */
+    private static final float[][] PONTOS_DE_ORIANA = {
+            {0, 2, -34, 180, -4},     // o portão arrombado e a barricada
+            {-24, 3, -28, 153, -8},   // a brecha em V, com a capital queimando atrás
+            {-12, 6, -30, 160, -28},  // a torre destruída, com o fogo em cima
+            {0, 18, 46, 180, 14},     // o campo do alto, do sul para o norte: crateras, fogo, carroças, a cidade
+            {0, 2, 0, 180, -50},      // o céu da noite e o portal
+            {0, 18, 46, 180, 14}};    // o mesmo do alto, com o VFX reduzido
     private static final int TICKS_POR_PONTO = 40;
 
-    private static void previaDaEscola(Minecraft mc, LocalPlayer jogador, int t) {
+    /**
+     * A prévia de uma arena sem luta: entra pela invocação ({@code comando}), vira espectador, deixa o boss
+     * ({@code entidade}) invisível e passa pelos pontos; o último com o VFX reduzido. Depois mata o boss e espera a volta.
+     */
+    private static void previaDaArena(Minecraft mc, LocalPlayer jogador, int t, String comando, String entidade, float[][] pontos) {
         if (t == 0) {
             jogador.connection.sendCommand("gamerule sendCommandFeedback false");
-            jogador.connection.sendCommand("rwk toji @s");
+            jogador.connection.sendCommand(comando);
         }
         mc.gui.getChat().clearMessages(false);
         if (escolaEm < 0) {
@@ -490,23 +511,23 @@ public final class DemoVfx {
             centroZ = net.minecraft.util.Mth.floor(jogador.getZ()) - 16;
             // Espectador: o Toji não o vê e a câmera passa por onde for preciso; o Toji some da imagem.
             jogador.connection.sendCommand("gamemode spectator");
-            jogador.connection.sendCommand("effect give @e[type=minerwk:toji] minecraft:invisibility 999 0 true");
+            jogador.connection.sendCommand("effect give @e[type=" + entidade + "] minecraft:invisibility 999 0 true");
             mc.options.hideGui = true;
         }
         int e = t - escolaEm;
         int ponto = (e - 40) / TICKS_POR_PONTO;
-        if (e >= 40 && (e - 40) % TICKS_POR_PONTO == 0 && ponto < PONTOS_DA_ESCOLA.length) {
-            float[] p = PONTOS_DA_ESCOLA[ponto];
-            com.minerwk.client.arena.HorizonteCliente.reduzidoNaPrevia = ponto == PONTOS_DA_ESCOLA.length - 1;
-            jogador.connection.sendCommand("effect give @e[type=minerwk:toji] minecraft:invisibility 999 0 true");
+        if (e >= 40 && (e - 40) % TICKS_POR_PONTO == 0 && ponto < pontos.length) {
+            float[] p = pontos[ponto];
+            com.minerwk.client.arena.HorizonteCliente.reduzidoNaPrevia = ponto == pontos.length - 1;
+            jogador.connection.sendCommand("effect give @e[type=" + entidade + "] minecraft:invisibility 999 0 true");
             jogador.connection.sendCommand(String.format(java.util.Locale.ROOT, "tp @s %.1f %.1f %.1f %.0f %.0f",
                     centroX + p[0] + .5, com.minerwk.core.arena.CaixaArena.Y_PATIO + p[1], centroZ + p[2] + .5, p[3], p[4]));
         }
-        int fim = 40 + PONTOS_DA_ESCOLA.length * TICKS_POR_PONTO;
+        int fim = 40 + pontos.length * TICKS_POR_PONTO;
         // A vitória devolve o jogador ao mundo: o horizonte some.
         if (e == fim) {
             com.minerwk.client.arena.HorizonteCliente.reduzidoNaPrevia = false;
-            jogador.connection.sendCommand("kill @e[type=minerwk:toji]");
+            jogador.connection.sendCommand("kill @e[type=" + entidade + "]");
         }
         int volta = fim + com.minerwk.arena.ArenasServidor.TICKS_DEPOIS_DA_VITORIA + 40;
         if (e == volta) {
