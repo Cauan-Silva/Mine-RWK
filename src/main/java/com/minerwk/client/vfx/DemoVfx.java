@@ -56,6 +56,11 @@ public final class DemoVfx {
      * e o mesmo com o VFX reduzido, e a volta, sem a noite.
      */
     private static final boolean ORIANA = MODO.equals("oriana");
+    /**
+     * {@code interior}: o mundo interior sem luta: a fachada, o prédio alto, o baixo, o céu azul; depois força a
+     * fase 2 do Zangetsu e mostra a chuva chegando, também com o VFX reduzido; e a volta, sem chuva.
+     */
+    private static final boolean INTERIOR = MODO.equals("interior");
     /** {@code toji}: a luta contra o Toji: a entrada, a Nuvem, a investida, a queda com a cutscene, o Desaparecer e a fase 3. */
     private static final boolean TOJI = MODO.equals("toji");
     /** {@code zangetsu}: a luta contra o Zangetsu interior, do mundo interior à vitória, com a queda e a máscara. */
@@ -85,7 +90,7 @@ public final class DemoVfx {
     private static final boolean CID_ATOMICO = MODO.equals("cid_atomico");
     /** {@code cid_final}: o R inteiro num alvo parado, com a cutscene: a subida, o espaço, o Atomic e a volta. */
     private static final boolean CID_FINAL = MODO.equals("cid_final");
-    private static final int FIM_PREVIA = ESCOLA || ORIANA ? 900 : HUD ? 280 : CID ? 250 : CID_FINAL ? 470 : CID_ATOMICO ? 215 : HOLLOW_PERTO || CID_PERTO ? 272 : HOLLOW ? 330 : ZANGETSU || RAGNAROK ? 2400 : TOJI ? 520 : ARVORE ? 400 : TRAJE ? 260 : TRAJE_ICHIGO ? 300 : ICHIGO ? 350 : MUGETSU ? 360 : R_COMPLETO ? 360
+    private static final int FIM_PREVIA = ESCOLA || ORIANA || INTERIOR ? 900 : HUD ? 280 : CID ? 250 : CID_FINAL ? 470 : CID_ATOMICO ? 215 : HOLLOW_PERTO || CID_PERTO ? 272 : HOLLOW ? 330 : ZANGETSU || RAGNAROK ? 2400 : TOJI ? 520 : ARVORE ? 400 : TRAJE ? 260 : TRAJE_ICHIGO ? 300 : ICHIGO ? 350 : MUGETSU ? 360 : R_COMPLETO ? 360
             : ENCANTAMENTO ? CARGA + 90 : ESTOURO + RoxoMaximo.TICKS_EXPLOSAO + 110;
     private static int ticks;
     private static int quadro;
@@ -118,7 +123,7 @@ public final class DemoVfx {
                 jogador.connection.sendCommand("rwk despertar @s nao");
                 jogador.connection.sendCommand("tp @s ~150 ~12 ~");
             }
-            if (ZANGETSU) jogador.connection.sendCommand("rwk despertar @s nao");
+            if (ZANGETSU || INTERIOR) jogador.connection.sendCommand("rwk despertar @s nao");
             if (RAGNAROK || ORIANA) jogador.connection.sendCommand("rwk despertar @s nao");
             if (CID_PERTO || CID || CID_ATOMICO || CID_FINAL || RAGNAROK || ORIANA) {
                 jogador.connection.sendCommand("rwk trocar @s cid");
@@ -126,7 +131,7 @@ public final class DemoVfx {
                 // O R precisa do alvo à vista: sempre o mesmo campo de neve aberto (o fim de cada prévia anda o jogador).
                 jogador.connection.sendCommand(CID_FINAL ? "tp @s 170.26 75 -97.67" : "tp @s ~150 ~12 ~");
             }
-            if (TRAJE_ICHIGO || ICHIGO || MUGETSU || ZANGETSU || HOLLOW) {
+            if (TRAJE_ICHIGO || ICHIGO || MUGETSU || ZANGETSU || HOLLOW || INTERIOR) {
                 jogador.connection.sendCommand("rwk trocar @s ichigo");
                 jogador.connection.sendCommand("tp @s ~150 ~12 ~");
             }
@@ -172,6 +177,10 @@ public final class DemoVfx {
         }
         if (ORIANA) {
             previaDaArena(mc, jogador, t, "rwk ragnarok @s", "minerwk:ragnarok", PONTOS_DE_ORIANA);
+            return;
+        }
+        if (INTERIOR) {
+            previaDaArena(mc, jogador, t, "rwk zangetsu @s", "minerwk:zangetsu", PONTOS_DO_INTERIOR);
             return;
         }
         if (HUD) {
@@ -491,6 +500,16 @@ public final class DemoVfx {
             {0, 18, 46, 180, 14},     // o campo do alto, do sul para o norte: crateras, fogo, carroças, a cidade
             {0, 2, 0, 180, -50},      // o céu da noite e o portal
             {0, 18, 46, 180, 14}};    // o mesmo do alto, com o VFX reduzido
+    /** Os pontos da prévia do mundo interior; no quinto a prévia força a fase 2 (a chuva). Yaw −90 olha para o leste. */
+    private static final float[][] PONTOS_DO_INTERIOR = {
+            {0, 2, 22, 180, 4},       // a fachada da luta, olhando o atravessado ao norte
+            {12, 4, 0, -90, -14},     // o prédio alto, com as antenas e o letreiro
+            {-12, 2, 4, 90, 30},      // o prédio baixo lá embaixo
+            {0, 2, 0, 180, -50},      // o céu azul e as nuvens
+            {0, 2, 22, 180, 4},       // a fase 2: a chuva chegando
+            {0, 2, 22, 180, 4}};      // o mesmo, com o VFX reduzido
+    /** No mundo interior, o ponto em que a prévia força a fase 2. */
+    private static final int PONTO_DA_FASE_2 = 4;
     private static final int TICKS_POR_PONTO = 40;
 
     /**
@@ -520,6 +539,15 @@ public final class DemoVfx {
             float[] p = pontos[ponto];
             com.minerwk.client.arena.HorizonteCliente.reduzidoNaPrevia = ponto == pontos.length - 1;
             jogador.connection.sendCommand("effect give @e[type=" + entidade + "] minecraft:invisibility 999 0 true");
+            if (INTERIOR && ponto == PONTO_DA_FASE_2) {
+                // A fase 2 vem abaixo de 40% da vida: o Zangetsu veste a máscara e a chuva começa.
+                for (net.minecraft.world.entity.Entity z : mc.level.entitiesForRendering()) {
+                    if (z instanceof com.minerwk.boss.ZangetsuEntity zz) {
+                        jogador.connection.sendCommand(String.format(java.util.Locale.ROOT, "data merge entity @e[type=minerwk:zangetsu,limit=1] {Health:%.1ff}",
+                                zz.getMaxHealth() * .3f));
+                    }
+                }
+            }
             jogador.connection.sendCommand(String.format(java.util.Locale.ROOT, "tp @s %.1f %.1f %.1f %.0f %.0f",
                     centroX + p[0] + .5, com.minerwk.core.arena.CaixaArena.Y_PATIO + p[1], centroZ + p[2] + .5, p[3], p[4]));
         }

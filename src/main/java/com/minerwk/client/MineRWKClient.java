@@ -103,6 +103,11 @@ public final class MineRWKClient {
         NeoForge.EVENT_BUS.addListener(net.neoforged.bus.api.EventPriority.HIGH, false,
                 net.neoforged.neoforge.client.event.ViewportEvent.ComputeFogColor.class, com.minerwk.client.arena.NoiteOriana::aoCorDaNevoa);
         NeoForge.EVENT_BUS.addListener(com.minerwk.client.arena.FumacaOriana::aoTick);
+        NeoForge.EVENT_BUS.addListener(net.neoforged.bus.api.EventPriority.HIGH, false,
+                net.neoforged.neoforge.client.event.RenderLevelStageEvent.class, com.minerwk.client.arena.CeuInterior::aoRenderizar);
+        NeoForge.EVENT_BUS.addListener(net.neoforged.bus.api.EventPriority.HIGH, false,
+                net.neoforged.neoforge.client.event.ViewportEvent.ComputeFogColor.class, com.minerwk.client.arena.CeuInterior::aoCorDaNevoa);
+        NeoForge.EVENT_BUS.addListener(com.minerwk.client.arena.CeuInterior::aoTick);
         NeoForge.EVENT_BUS.addListener(com.minerwk.client.arena.HorizonteCliente::aoRenderizar);
         NeoForge.EVENT_BUS.addListener((ClientPlayerNetworkEvent.LoggingOut e) -> com.minerwk.client.arena.CenarioCliente.limpar());
         NeoForge.EVENT_BUS.addListener(TeclasKit::aoTick);

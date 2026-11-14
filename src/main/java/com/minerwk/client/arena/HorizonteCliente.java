@@ -33,7 +33,8 @@ public final class HorizonteCliente {
     private static final java.util.Map<String, ResourceLocation[]> FAIXAS = new java.util.HashMap<>();
     /** A cor do pé do morro perto na textura de cada cenário: a saia embaixo do anel continua o chão escuro. */
     private static final java.util.Map<String, int[]> CHAO = java.util.Map.of(CenarioArena.ESCOLA, new int[] {14, 18, 20},
-            CenarioArena.ORIANA, new int[] {10, 8, 12});
+            CenarioArena.ORIANA, new int[] {10, 8, 12}, CenarioArena.INTERIOR, new int[] {150, 168, 188},
+            CenarioArena.INTERIOR_CHUVA, new int[] {70, 78, 88});
     @SuppressWarnings("unchecked")
     private static final List<AnelHorizonte.Quad>[] ANEIS = new List[RAIOS.length];
     /** A prévia liga isto para gravar o quadro do VFX reduzido sem mexer na configuração do jogador. */
@@ -45,6 +46,11 @@ public final class HorizonteCliente {
             for (int f = 0; f < faixas.length; f++) faixas[f] = MineRWK.id("textures/ceu/horizonte_" + cenario + "_" + f + ".png");
             FAIXAS.put(cenario, faixas);
         }
+        // O mundo interior usa as mesmas faixas com e sem chuva; na chuva o anel é desenhado mais escuro.
+        ResourceLocation[] interior = new ResourceLocation[AnelHorizonte.FAIXAS];
+        for (int f = 0; f < interior.length; f++) interior[f] = MineRWK.id("textures/ceu/horizonte_interior_" + f + ".png");
+        FAIXAS.put(CenarioArena.INTERIOR, interior);
+        FAIXAS.put(CenarioArena.INTERIOR_CHUVA, interior);
         for (int i = 0; i < RAIOS.length; i++) {
             ANEIS[i] = AnelHorizonte.anel(RAIOS[i], AnelHorizonte.Y_BASE, AnelHorizonte.Y_TOPO, SEGMENTOS);
         }
@@ -65,6 +71,7 @@ public final class HorizonteCliente {
         float base = (float) (CaixaArena.Y_PATIO + AnelHorizonte.Y_BASE - camera.y);
         float topo = (float) (CaixaArena.Y_PATIO + AnelHorizonte.Y_TOPO - camera.y);
         boolean reduzido = ConfigCliente.vfxReduzido() || reduzidoNaPrevia;
+        int brilho = (int) (255 * CeuInterior.brilhoDoHorizonte());
         // Neste estágio a matriz do sistema não tem a rotação da câmera: ela vai em cada vértice.
         Matrix4f m = evento.getModelViewMatrix();
 
@@ -80,10 +87,10 @@ public final class HorizonteCliente {
                 BufferBuilder b = Tesselator.getInstance().begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX_COLOR);
                 for (AnelHorizonte.Quad q : ANEIS[camada]) {
                     if (q.faixa() != f) continue;
-                    b.addVertex(m, (float) q.x0(), base, (float) q.z0()).setUv(q.u0(), v1).setColor(255, 255, 255, 255);
-                    b.addVertex(m, (float) q.x1(), base, (float) q.z1()).setUv(q.u1(), v1).setColor(255, 255, 255, 255);
-                    b.addVertex(m, (float) q.x1(), topo, (float) q.z1()).setUv(q.u1(), v0).setColor(255, 255, 255, 255);
-                    b.addVertex(m, (float) q.x0(), topo, (float) q.z0()).setUv(q.u0(), v0).setColor(255, 255, 255, 255);
+                    b.addVertex(m, (float) q.x0(), base, (float) q.z0()).setUv(q.u0(), v1).setColor(brilho, brilho, brilho, 255);
+                    b.addVertex(m, (float) q.x1(), base, (float) q.z1()).setUv(q.u1(), v1).setColor(brilho, brilho, brilho, 255);
+                    b.addVertex(m, (float) q.x1(), topo, (float) q.z1()).setUv(q.u1(), v0).setColor(brilho, brilho, brilho, 255);
+                    b.addVertex(m, (float) q.x0(), topo, (float) q.z0()).setUv(q.u0(), v0).setColor(brilho, brilho, brilho, 255);
                 }
                 BufferUploader.drawWithShader(b.buildOrThrow());
             }
