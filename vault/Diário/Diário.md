@@ -64,3 +64,4 @@ Voltar para [[00 Início]].
 - [[2026-11-13 Escola detalhe parte 1]]
 - [[2026-11-13 Escola detalhe parte 2]]
 - [[2026-11-13 Oriana sob ataque]]: a arena do Ragnarok vira a capital sob ataque: muralha rachada com brechas, portão arrombado, torre em chamas, crateras, fogo e destroços; no céu, a noite avermelhada e a cidade queimando no horizonte
+- [[2026-11-13 Mundo interior]]: a arena do Zangetsu vira o mundo interior do mangá: céu azul com nuvens, prédios deitados até o horizonte, janelas acesas, antenas e letreiros; a máscara traz o céu cinza e a chuva

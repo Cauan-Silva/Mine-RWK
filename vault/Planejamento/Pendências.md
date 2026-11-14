@@ -24,6 +24,12 @@ Voltar para [[00 Início]].
 - Gojo (revisão 09/11, menores que ficaram): o Roxo pode derrubar plantas vizinhas (o `BreakEvent` para mods de proteção entrou em 09/11, no Gojo peso); o Vermelho atravessa parede fina encostada no rosto; bola de fogo e crânio de Wither voltam a acelerar no Infinito (o dano é cancelado mesmo assim); TNT sem dono passa pelo Infinito; sobram até 2 ticks de Infinito e 5 de Paralisia depois de morrer. Corrigidos na revisão: efeitos acabam ao mudar de dimensão; golpes não atingem pets, montaria nem projéteis do próprio Gojo; Paralisia não cancela Espinhos nem dano em si mesmo; ícone da Paralisia escondido (falta textura).
 
 ## Para testar no jogo
+- Mundo interior (13/11, [[2026-11-13 Mundo interior]]):
+  - **A máscara:** o céu fica cinza e chove ao mesmo tempo que ela aparece.
+  - **A chuva não vaza:** depois da vitória, de morrer na luta, de sair do jogo lá dentro e voltar, e na Escola, em Oriana e no mundo normal.
+  - **Sair e voltar no meio da fase 2:** a chuva continua?
+  - **O céu e o horizonte** com distância de renderização 8 e 16, e com o VFX reduzido.
+  - **Os céus dos golpes:** o Roxo Máximo e o Mugetsu dentro do mundo interior ficam por cima do azul?
 - Oriana sob ataque (13/11, [[2026-11-13 Oriana sob ataque]]):
   - **O fogo:** continua igual depois de alguns minutos, sem se espalhar nem queimar nada. Ele queima quem encosta, mas só fica nas beiradas.
   - **A muralha:** dá para olhar a cidade pelas brechas e pelo portão, mas não dá para sair da caixa.
