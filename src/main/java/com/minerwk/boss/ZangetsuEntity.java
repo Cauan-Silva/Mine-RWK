@@ -555,6 +555,8 @@ public final class ZangetsuEntity extends Monster implements GeoEntity {
         particulas(ParticleTypes.LARGE_SMOKE, getX(), getY() + 1, getZ(), 24, .4, .8, .4, .03);
         barra.setColor(BossEvent.BossBarColor.RED);
         avisar(dono, "mensagem.minerwk.zangetsu.mascara");
+        // No mundo interior, a máscara traz a chuva: o céu escurece e chove no cliente de quem luta.
+        if (dono != null) com.minerwk.arena.ArenasServidor.trocarCenario(dono, com.minerwk.rede.CenarioArena.INTERIOR_CHUVA);
     }
 
     // --- A queda de quem invocou ---

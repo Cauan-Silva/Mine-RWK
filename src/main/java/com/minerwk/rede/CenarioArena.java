@@ -14,6 +14,8 @@ import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 public record CenarioArena(String cenario) implements CustomPacketPayload {
     public static final String ESCOLA = "escola";
     public static final String INTERIOR = "interior";
+    /** O mundo interior na fase 2 do Zangetsu: o céu escurece e chove (só no cliente de quem luta). */
+    public static final String INTERIOR_CHUVA = "interior_chuva";
     public static final String ORIANA = "oriana";
     public static final String NENHUM = "";
 

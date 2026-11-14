@@ -258,6 +258,8 @@ public final class TestesZangetsu {
                 .thenWaitUntil(() -> helper.assertTrue(z.fase() == 2, "esperando a segunda fase"))
                 .thenExecute(() -> helper.assertTrue(z.golpe() == null, "enquanto veste a máscara ele não ataca"))
                 .thenWaitUntil(() -> helper.assertTrue(z.mascarado(), "a máscara aparece no rosto"))
+                .thenExecute(() -> helper.assertTrue(com.minerwk.rede.CenarioArena.INTERIOR_CHUVA.equals(
+                        com.minerwk.arena.ArenasServidor.cenarioEnviado(jogador.getUUID())), "a fase 2 manda a chuva"))
                 .thenExecute(z::discard)
                 .thenSucceed();
     }

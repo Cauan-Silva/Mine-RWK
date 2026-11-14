@@ -295,8 +295,18 @@ public final class ArenasServidor {
         CENARIOS_ENVIADOS.put(jogador.getUUID(), cenario);
     }
 
+    /**
+     * Troca o cenário de quem está numa arena (a fase 2 do Zangetsu traz a chuva): a vaga guarda o novo, para quem
+     * sair e voltar ao jogo, e o cliente recebe na hora. Sem vaga (um boss invocado fora da arena), só o pacote.
+     */
+    public static void trocarCenario(ServerPlayer jogador, String cenario) {
+        Arena a = ARENAS.get(jogador.getUUID());
+        if (a != null) a.cenario = cenario;
+        mandarCenario(jogador, cenario);
+    }
+
     /** O último cenário mandado a este jogador (null se nenhum). */
-    static String cenarioEnviado(UUID jogador) {
+    public static String cenarioEnviado(UUID jogador) {
         return CENARIOS_ENVIADOS.get(jogador);
     }
 
