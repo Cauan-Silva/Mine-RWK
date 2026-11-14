@@ -29,7 +29,10 @@ public final class PlantaEscola {
         /** Por fora e no jardim. */
         CERCA_ESCURA, AGUA, VITORIA_REGIA, CASCALHO, PEDRA_MUSGO, FOLHA_CEREJEIRA, TRONCO_CEREJEIRA, BAMBU, SINO,
         /** Bancos e degraus de madeira, pelo lado para onde sobem. */
-        ESCADA_MADEIRA_N, ESCADA_MADEIRA_S, ESCADA_MADEIRA_L, ESCADA_MADEIRA_O
+        ESCADA_MADEIRA_N, ESCADA_MADEIRA_S, ESCADA_MADEIRA_L, ESCADA_MADEIRA_O,
+        /** De Oriana sob ataque: o fogo e a base dele, o chão queimado, a muralha gasta e os estandartes. */
+        NETHERRACK, FOGO, FOGUEIRA, TERRA_QUEIMADA, PEDRA_NEGRA, BRASA, TIJOLO_RACHADO, TIJOLO_MUSGO, LA_VERMELHA,
+        TRONCO_QUEIMADO
     }
 
     public record Bloco(int dx, int dy, int dz, Material material) {

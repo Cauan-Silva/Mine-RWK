@@ -57,12 +57,92 @@ class PlantaOrianaTest {
     void aMuralhaFechaONorteEOPortalFicaNoCeu() {
         Map<String, Material> mapa = porPosicao();
         for (int dx = -CaixaArena.MEIA; dx <= CaixaArena.MEIA; dx++) {
-            assertNotNull(mapa.get(dx + ",6," + PlantaOriana.MURALHA_DE), "a muralha não tem brecha em " + dx);
+            assertNotNull(mapa.get(dx + ",3," + PlantaOriana.MURALHA_DE), "a muralha não tem brecha em " + dx);
         }
-        assertEquals(Material.MADEIRA_ESCURA, mapa.get("0,2," + (PlantaOriana.MURALHA_ATE - 1)), "o portão fechado");
+        assertNotNull(mapa.get("0,2," + (PlantaOriana.MURALHA_ATE - 1)), "o portão fechado");
         assertEquals(Material.PORTAL_NEGRO, mapa.get("0," + PlantaOriana.PORTAL_DY + "," + PlantaOriana.PORTAL_DZ));
         assertEquals(Material.PORTAL_ROXO,
                 mapa.get((PlantaOriana.PORTAL_RAIO - 1) + "," + PlantaOriana.PORTAL_DY + "," + PlantaOriana.PORTAL_DZ));
         assertTrue(PlantaOriana.PORTAL_DY - PlantaOriana.PORTAL_RAIO > PlantaOriana.TORRE_TOPO + 1, "acima das torres");
+    }
+
+    private static boolean naTorre(int dx) {
+        for (int x : PlantaOriana.TORRES) if (Math.abs(dx - x) <= PlantaOriana.MEIA_TORRE) return true;
+        return false;
+    }
+
+    @Test
+    void aMuralhaNaoDeixaPassar() {
+        Map<String, Material> mapa = porPosicao();
+        for (int dx = -CaixaArena.MEIA; dx <= CaixaArena.MEIA; dx++) {
+            boolean fechada = false;
+            for (int dz = PlantaOriana.MURALHA_DE; dz <= PlantaOriana.MURALHA_ATE && !fechada; dz++) {
+                boolean cheia = true;
+                for (int dy = 0; dy <= 3; dy++) cheia &= mapa.get(dx + "," + dy + "," + dz) != null;
+                fechada = cheia;
+            }
+            assertTrue(fechada, "dá para passar pela muralha em dx " + dx);
+        }
+    }
+
+    @Test
+    void aMuralhaTemBrechasEmV() {
+        Map<String, Material> mapa = porPosicao();
+        for (int x : PlantaOriana.BRECHAS) {
+            for (int dz = PlantaOriana.MURALHA_DE; dz <= PlantaOriana.MURALHA_ATE; dz++) {
+                assertNull(mapa.get(x + "," + PlantaOriana.MURALHA_TOPO + "," + dz), "a brecha em " + x + " não abre no topo");
+                assertNotNull(mapa.get(x + "," + (PlantaOriana.FUNDO_DA_BRECHA - 1) + "," + dz), "a brecha em " + x + " desce demais");
+            }
+            assertNotNull(mapa.get((x + PlantaOriana.MEIA_BRECHA + 1) + "," + PlantaOriana.MURALHA_TOPO + "," + PlantaOriana.MURALHA_ATE),
+                    "a brecha em " + x + " é larga demais");
+        }
+    }
+
+    @Test
+    void aMuralhaEstaRachada() {
+        int total = 0, gastos = 0, queimados = 0;
+        for (Bloco b : CENARIO) {
+            if (b.dz() < PlantaOriana.MURALHA_DE || b.dz() > PlantaOriana.MURALHA_ATE || b.dy() < 0 || naTorre(b.dx())) continue;
+            total++;
+            if (b.material() == Material.TIJOLO_RACHADO || b.material() == Material.TIJOLO_MUSGO) gastos++;
+            if (b.material() == Material.PEDRA_NEGRA && b.dz() == PlantaOriana.MURALHA_ATE) queimados++;
+        }
+        double parte = gastos / (double) total;
+        assertTrue(parte >= .15 && parte <= .45, "rachados e com musgo: " + parte);
+        assertTrue(queimados >= 20, "marcas de queimado na face de dentro: " + queimados);
+    }
+
+    @Test
+    void aTorreDestruidaPerdeuOTelhado() {
+        boolean fogo = false;
+        for (Bloco b : CENARIO) {
+            if (Math.abs(b.dx() - PlantaOriana.TORRE_DESTRUIDA) > PlantaOriana.MEIA_TORRE) continue;
+            if (b.dz() < PlantaOriana.MURALHA_DE - PlantaOriana.MEIA_TORRE || b.dz() > PlantaOriana.MURALHA_ATE + PlantaOriana.MEIA_TORRE) continue;
+            assertTrue(b.material() != Material.TELHA, "a torre destruída ainda tem telhado: " + b);
+            fogo |= b.material() == Material.FOGO && b.dy() > PlantaOriana.TORRE_TOPO - 8;
+        }
+        assertTrue(fogo, "a torre destruída pega fogo em cima");
+        for (int x : PlantaOriana.TORRES) {
+            if (x == PlantaOriana.TORRE_DESTRUIDA) continue;
+            assertTrue(CENARIO.stream().anyMatch(b -> b.material() == Material.LA_VERMELHA
+                    && Math.abs(b.dx() - x) <= PlantaOriana.MEIA_TORRE + 1), "a torre de " + x + " sem estandarte");
+        }
+    }
+
+    @Test
+    void oPortaoArrombadoContinuaFechado() {
+        Map<String, Material> mapa = porPosicao();
+        boolean folha = false;
+        for (int dx = -2; dx <= 2; dx++) {
+            for (int dz = PlantaOriana.MURALHA_ATE + 1; dz <= PlantaOriana.MURALHA_ATE + 3; dz++) {
+                folha |= mapa.get(dx + ",0," + dz) == Material.MADEIRA_ESCURA;
+            }
+        }
+        assertTrue(folha, "a folha do portão caída à frente do vão");
+        for (int dx = -PlantaOriana.MEIA_ESTRADA; dx <= PlantaOriana.MEIA_ESTRADA; dx++) {
+            for (int dy = 0; dy <= 3; dy++) {
+                assertNotNull(mapa.get(dx + "," + dy + "," + (PlantaOriana.MURALHA_ATE - 1)), "a barricada tem buraco em " + dx + ", " + dy);
+            }
+        }
     }
 }

@@ -64,6 +64,16 @@ CORES = {
     "ESCADA_MADEIRA_S": (66, 44, 24),
     "ESCADA_MADEIRA_L": (66, 44, 24),
     "ESCADA_MADEIRA_O": (66, 44, 24),
+    "NETHERRACK": (110, 44, 40),
+    "FOGO": (240, 140, 40),
+    "FOGUEIRA": (200, 110, 40),
+    "TERRA_QUEIMADA": (80, 58, 40),
+    "PEDRA_NEGRA": (38, 34, 40),
+    "BRASA": (200, 80, 20),
+    "TIJOLO_RACHADO": (112, 112, 112),
+    "TIJOLO_MUSGO": (100, 114, 92),
+    "LA_VERMELHA": (160, 36, 36),
+    "TRONCO_QUEIMADO": (52, 40, 28),
 }
 CEU = (236, 190, 140)
 MEIA = 50          # a caixa vai de -50 a +50

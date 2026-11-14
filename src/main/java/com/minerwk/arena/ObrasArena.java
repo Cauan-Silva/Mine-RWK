@@ -209,6 +209,16 @@ public final class ObrasArena {
             case ESCADA_MADEIRA_S -> escadaMadeira(Direction.SOUTH);
             case ESCADA_MADEIRA_L -> escadaMadeira(Direction.EAST);
             case ESCADA_MADEIRA_O -> escadaMadeira(Direction.WEST);
+            case NETHERRACK -> Blocks.NETHERRACK.defaultBlockState();
+            case FOGO -> Blocks.FIRE.defaultBlockState();
+            case FOGUEIRA -> Blocks.CAMPFIRE.defaultBlockState();
+            case TERRA_QUEIMADA -> Blocks.COARSE_DIRT.defaultBlockState();
+            case PEDRA_NEGRA -> Blocks.BLACKSTONE.defaultBlockState();
+            case BRASA -> Blocks.MAGMA_BLOCK.defaultBlockState();
+            case TIJOLO_RACHADO -> Blocks.CRACKED_STONE_BRICKS.defaultBlockState();
+            case TIJOLO_MUSGO -> Blocks.MOSSY_STONE_BRICKS.defaultBlockState();
+            case LA_VERMELHA -> Blocks.RED_WOOL.defaultBlockState();
+            case TRONCO_QUEIMADO -> Blocks.DARK_OAK_WOOD.defaultBlockState();
         };
     }
 
