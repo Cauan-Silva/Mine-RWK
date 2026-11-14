@@ -24,6 +24,12 @@ Voltar para [[00 Início]].
 - Gojo (revisão 09/11, menores que ficaram): o Roxo pode derrubar plantas vizinhas (o `BreakEvent` para mods de proteção entrou em 09/11, no Gojo peso); o Vermelho atravessa parede fina encostada no rosto; bola de fogo e crânio de Wither voltam a acelerar no Infinito (o dano é cancelado mesmo assim); TNT sem dono passa pelo Infinito; sobram até 2 ticks de Infinito e 5 de Paralisia depois de morrer. Corrigidos na revisão: efeitos acabam ao mudar de dimensão; golpes não atingem pets, montaria nem projéteis do próprio Gojo; Paralisia não cancela Espinhos nem dano em si mesmo; ícone da Paralisia escondido (falta textura).
 
 ## Para testar no jogo
+- Oriana sob ataque (13/11, [[2026-11-13 Oriana sob ataque]]):
+  - **O fogo:** continua igual depois de alguns minutos, sem se espalhar nem queimar nada. Ele queima quem encosta, mas só fica nas beiradas.
+  - **A muralha:** dá para olhar a cidade pelas brechas e pelo portão, mas não dá para sair da caixa.
+  - **O Ragnarok:** voa e faz a investida sem bater em nada novo. A brasa das crateras machuca de leve quem pisa: incomoda na luta?
+  - **A noite e a cidade:** só aparecem em Oriana, nunca na Escola, no mundo interior ou no mundo normal. As nuvens continuam na Escola.
+  - **Distância de renderização** 8 e 16, e com o VFX reduzido.
 - Recuo do I Am Atomic (12/11, [[2026-11-12 Cid Atomic sistema solar]]):
   - **Com a cutscene:** depois do "atomic", a Terra sai de baixo, vira uma bola e um ponto entre os planetas, com as órbitas e o ponto roxo pulsando; o pulso final abre no branco. Algum salto no começo do recuo? O sistema cabe na tela?
   - **Sem a cutscene** (`cutscenes = false`, e o alvo quando é jogador): o céu como antes; a esfera roxa cresce, e no pulso (junto com o último estouro do som) dá um clarão e volta a crescer até o branco. O trecho entre a esfera parar e o pulso ficou parado demais?

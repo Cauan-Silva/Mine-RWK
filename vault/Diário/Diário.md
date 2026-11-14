@@ -63,3 +63,4 @@ Voltar para [[00 Início]].
 - [[2026-11-12 Cid Atomic sistema solar]]: no recuo do I Am Atomic a Terra vira uma bola e depois um ponto entre os planetas do sistema solar, com o clarão roxo pulsando nela; o estouro passa a 6,5 s
 - [[2026-11-13 Escola detalhe parte 1]]
 - [[2026-11-13 Escola detalhe parte 2]]
+- [[2026-11-13 Oriana sob ataque]]: a arena do Ragnarok vira a capital sob ataque: muralha rachada com brechas, portão arrombado, torre em chamas, crateras, fogo e destroços; no céu, a noite avermelhada e a cidade queimando no horizonte
