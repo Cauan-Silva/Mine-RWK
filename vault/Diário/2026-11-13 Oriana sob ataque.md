@@ -40,6 +40,23 @@ Voltar para [[Diário]]. Spec e plano: [[2026-11-13 Oriana sob ataque]]. Branch 
 - GameTest `orianaNaoPerdeBlocosComOFogo`. Os 131 passam.
 - Na primeira rodada da tarefa 2, o servidor de testes caiu de novo por causa do Toji (pacote de animação do GeckoLib). Na segunda passou. É a mesma instabilidade de antes, sem relação com Oriana.
 
+## Revisão final (revisor separado)
+A primeira leitura disse "não está pronto": um achado crítico, um importante e seis menores. Corrigidos:
+- **Crítico: dava para atravessar a brecha.**
+  - **O furo:** o entulho subia até a altura 3 e o fundo do V ficava na 4. Um pulo levava para trás da muralha, onde o jogador ficava preso e a luta travava. O teste antigo olhava só até a altura 3.
+  - **A correção:** o entulho baixou, com o topo na 2, e a camada de trás do V virou uma barreira invisível (material `BARREIRA`), que deixa ver a cidade mas segura até quem pula alto com um kit.
+  - **O teste:** `ninguemChegaAtrasDaMuralhaAndandoEPulando` anda pela arena a partir da entrada, subindo um bloco e caindo de qualquer altura. Ele falhou antes, em (30, 4, −48), e passa agora.
+- **Importante: a noite de Oriana cobria os efeitos dos golpes.**
+  - **O que acontecia:** a cúpula pintava por cima do céu escuro do Roxo Máximo e do Mugetsu, e a névoa dela sobrescrevia a do domínio.
+  - **A correção:** a noite agora roda antes, com prioridade alta, e não mexe na névoa debaixo d'água.
+  - **Sem teste automático,** porque são eventos de desenho do cliente. Vai para Pendências.
+- **Menores, corrigidos junto, no mesmo arquivo:** as fagulhas agora aparecem de longe, e a fumaça segue a opção de partículas do jogador.
+- **Menores, deixados para depois:**
+  - a cúpula é montada a cada quadro, mas poderia ser montada uma vez só;
+  - **as brasas no meio do campo machucam quem pisa:** foi pedido do spec, e é preciso perguntar ao autor;
+  - o teste de jogo do fogo não pega fogo novo nascendo fora da planta (quem segura é o teste da distância);
+  - o fim da investida do Ragnarok pode pousar dentro de destroços de 1 bloco nas beiradas.
+
 ## Prévia
 `previas/oriana_ataque.gif` e a folha `previas/oriana_ataque.png` (`./gradlew runClientDemo -Pdemo=oriana`). A planta vista de cima: `python ferramentas/previa_arena.py oriana` gera `previas/arena_oriana.png`.
 

@@ -27,14 +27,19 @@ public final class FumacaOriana {
         if (mc.level == null || mc.player == null || mc.isPaused() || !NoiteOriana.ativa()) return;
         CaixaArena caixa = CaixaArena.daPosicao(mc.player.getX(), mc.player.getZ());
         boolean reduzido = ConfigCliente.vfxReduzido() || HorizonteCliente.reduzidoNaPrevia;
+        // A opção de partículas do jogador também vale: no mínimo, uma fonte em cada quatro.
+        net.minecraft.client.ParticleStatus particulas = mc.options.particles().get();
         for (int[] f : FONTES) {
             if (reduzido && ACASO.nextBoolean()) continue;
+            if (particulas == net.minecraft.client.ParticleStatus.DECREASED && ACASO.nextBoolean()) continue;
+            if (particulas == net.minecraft.client.ParticleStatus.MINIMAL && ACASO.nextInt(4) != 0) continue;
             double x = caixa.centroX() + f[0] + .5 + ACASO.nextGaussian() * 1.5;
             double y = CaixaArena.Y_PATIO + f[2] + ACASO.nextDouble();
             double z = caixa.centroZ() + f[1] + .5 + ACASO.nextGaussian() * 1.5;
-            mc.level.addAlwaysVisibleParticle(ParticleTypes.CAMPFIRE_COSY_SMOKE, true, x, y, z, 0, .07, 0);
+            mc.level.addParticle(ParticleTypes.CAMPFIRE_COSY_SMOKE, true, x, y, z, 0, .07, 0);
             if (ACASO.nextInt(3) == 0) {
-                mc.level.addParticle(ParticleTypes.LAVA, x, y, z, 0, 0, 0);
+                // Forçada: sem isso a fagulha some a mais de 32 blocos, e a muralha fica a mais de 50 do centro.
+                mc.level.addParticle(ParticleTypes.LAVA, true, x, y, z, 0, 0, 0);
             }
         }
     }

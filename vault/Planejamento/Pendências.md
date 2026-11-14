@@ -30,6 +30,8 @@ Voltar para [[00 Início]].
   - **O Ragnarok:** voa e faz a investida sem bater em nada novo. A brasa das crateras machuca de leve quem pisa: incomoda na luta?
   - **A noite e a cidade:** só aparecem em Oriana, nunca na Escola, no mundo interior ou no mundo normal. As nuvens continuam na Escola.
   - **Distância de renderização** 8 e 16, e com o VFX reduzido.
+  - **Os céus dos golpes:** o Roxo Máximo, o domínio do Gojo e o Mugetsu dentro de Oriana. O céu e a névoa escurecem por cima da noite?
+  - **A investida do Ragnarok** perto das carroças e da muralha: ele pousa dentro de algum destroço?
 - Recuo do I Am Atomic (12/11, [[2026-11-12 Cid Atomic sistema solar]]):
   - **Com a cutscene:** depois do "atomic", a Terra sai de baixo, vira uma bola e um ponto entre os planetas, com as órbitas e o ponto roxo pulsando; o pulso final abre no branco. Algum salto no começo do recuo? O sistema cabe na tela?
   - **Sem a cutscene** (`cutscenes = false`, e o alvo quando é jogador): o céu como antes; a esfera roxa cresce, e no pulso (junto com o último estouro do som) dá um clarão e volta a crescer até o branco. O trecho entre a esfera parar e o pulso ficou parado demais?

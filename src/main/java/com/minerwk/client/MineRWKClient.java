@@ -96,9 +96,12 @@ public final class MineRWKClient {
         NeoForge.EVENT_BUS.addListener((ClientPlayerNetworkEvent.LoggingOut e) -> com.minerwk.client.arena.Escurecer.limpar());
         // O horizonte de cada arena: o servidor diz em qual cenário o jogador está.
         com.minerwk.rede.Pacotes.aoCenarioArena = com.minerwk.client.arena.CenarioCliente::receber;
-        // A noite de Oriana antes do horizonte: o anel fica por cima da cúpula.
-        NeoForge.EVENT_BUS.addListener(com.minerwk.client.arena.NoiteOriana::aoRenderizar);
-        NeoForge.EVENT_BUS.addListener(com.minerwk.client.arena.NoiteOriana::aoCorDaNevoa);
+        // A noite de Oriana antes de tudo o que pinta o céu e a névoa (prioridade alta): o horizonte, o céu escuro
+        // do Roxo Máximo e do Mugetsu e a névoa do domínio caem por cima dela.
+        NeoForge.EVENT_BUS.addListener(net.neoforged.bus.api.EventPriority.HIGH, false,
+                net.neoforged.neoforge.client.event.RenderLevelStageEvent.class, com.minerwk.client.arena.NoiteOriana::aoRenderizar);
+        NeoForge.EVENT_BUS.addListener(net.neoforged.bus.api.EventPriority.HIGH, false,
+                net.neoforged.neoforge.client.event.ViewportEvent.ComputeFogColor.class, com.minerwk.client.arena.NoiteOriana::aoCorDaNevoa);
         NeoForge.EVENT_BUS.addListener(com.minerwk.client.arena.FumacaOriana::aoTick);
         NeoForge.EVENT_BUS.addListener(com.minerwk.client.arena.HorizonteCliente::aoRenderizar);
         NeoForge.EVENT_BUS.addListener((ClientPlayerNetworkEvent.LoggingOut e) -> com.minerwk.client.arena.CenarioCliente.limpar());

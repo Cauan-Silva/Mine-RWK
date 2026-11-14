@@ -144,19 +144,24 @@ public final class PlantaOriana {
         for (int dy = 1; dy <= 4; dy++) por(blocos, MEIA_ESTRADA, dy, MURALHA_ATE, Material.MADEIRA_ESCURA);
     }
 
-    /** Uma brecha em V, cortada do topo até {@link #FUNDO_DA_BRECHA}, com o entulho caído do lado de dentro. */
+    /**
+     * Uma brecha em V, cortada do topo até {@link #FUNDO_DA_BRECHA}, com o entulho caído do lado de dentro. A camada
+     * de trás do V é uma barreira invisível: vê-se a cidade, mas ninguém passa, nem com um kit que pula alto. O
+     * entulho fica baixo (topo na altura 2): do alto dele o fundo da brecha está dois blocos acima, e não se alcança.
+     */
     private static void brecha(Map<Long, Bloco> blocos, int x) {
         int altura = MURALHA_TOPO + 1 - FUNDO_DA_BRECHA;
         for (int dy = FUNDO_DA_BRECHA; dy <= MURALHA_TOPO + 1; dy++) {
             int meia = MEIA_BRECHA * (dy - FUNDO_DA_BRECHA) / altura;
             for (int dx = x - meia; dx <= x + meia; dx++) {
-                for (int dz = MURALHA_DE; dz <= MURALHA_ATE; dz++) tirar(blocos, dx, dy, dz);
+                for (int dz = MURALHA_DE + 1; dz <= MURALHA_ATE; dz++) tirar(blocos, dx, dy, dz);
+                por(blocos, dx, dy, MURALHA_DE, Material.BARREIRA);
             }
         }
         // O entulho: um monte de pedra e cascalho que desce da muralha para o campo.
         for (int dx = x - MEIA_BRECHA - 1; dx <= x + MEIA_BRECHA + 1; dx++) {
             for (int dz = MURALHA_ATE + 1; dz <= MURALHA_ATE + 4; dz++) {
-                int alto = 3 - (dz - MURALHA_ATE - 1) - Math.abs(dx - x) / 2;
+                int alto = 2 - (dz - MURALHA_ATE - 1) - Math.abs(dx - x) / 2;
                 for (int dy = 0; dy < alto; dy++) {
                     por(blocos, dx, dy, dz, acaso(dx, dy, dz, 6) < .4 ? Material.CASCALHO : tijolo(dx, dy, dz));
                 }

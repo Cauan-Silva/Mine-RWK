@@ -77,6 +77,7 @@ CORES = {
     "TIJOLO_MUSGO": (100, 114, 92),
     "LA_VERMELHA": (160, 36, 36),
     "TRONCO_QUEIMADO": (52, 40, 28),
+    "BARREIRA": (236, 190, 140),
 }
 CEU = (236, 190, 140)
 MEIA = 50          # a caixa vai de -50 a +50

@@ -219,6 +219,7 @@ public final class ObrasArena {
             case TIJOLO_MUSGO -> Blocks.MOSSY_STONE_BRICKS.defaultBlockState();
             case LA_VERMELHA -> Blocks.RED_WOOL.defaultBlockState();
             case TRONCO_QUEIMADO -> Blocks.DARK_OAK_WOOD.defaultBlockState();
+            case BARREIRA -> Blocks.BARRIER.defaultBlockState();
         };
     }
 

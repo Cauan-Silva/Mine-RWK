@@ -38,7 +38,8 @@ public final class NoiteOriana {
 
     /** A cor da névoa, a do horizonte: a borda do cenário some na noite. */
     public static void aoCorDaNevoa(ViewportEvent.ComputeFogColor evento) {
-        if (!ativa()) return;
+        // Debaixo d'água ou na lava, a névoa do jogo fica.
+        if (!ativa() || evento.getCamera().getFluidInCamera() != net.minecraft.world.level.material.FogType.NONE) return;
         evento.setRed(HORIZONTE[0] / 255f);
         evento.setGreen(HORIZONTE[1] / 255f);
         evento.setBlue(HORIZONTE[2] / 255f);

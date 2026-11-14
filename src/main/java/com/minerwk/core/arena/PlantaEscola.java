@@ -32,7 +32,9 @@ public final class PlantaEscola {
         ESCADA_MADEIRA_N, ESCADA_MADEIRA_S, ESCADA_MADEIRA_L, ESCADA_MADEIRA_O,
         /** De Oriana sob ataque: o fogo e a base dele, o chão queimado, a muralha gasta e os estandartes. */
         NETHERRACK, FOGO, FOGUEIRA, TERRA_QUEIMADA, PEDRA_NEGRA, BRASA, TIJOLO_RACHADO, TIJOLO_MUSGO, LA_VERMELHA,
-        TRONCO_QUEIMADO
+        TRONCO_QUEIMADO,
+        /** Invisível e firme: fecha a brecha da muralha sem tapar a vista. */
+        BARREIRA
     }
 
     public record Bloco(int dx, int dy, int dz, Material material) {

@@ -11,7 +11,10 @@ import com.minerwk.core.boss.RagnarokBoss;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayDeque;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
@@ -92,8 +95,12 @@ class PlantaOrianaTest {
     void aMuralhaTemBrechasEmV() {
         Map<String, Material> mapa = porPosicao();
         for (int x : PlantaOriana.BRECHAS) {
+            assertEquals(Material.BARREIRA, mapa.get(x + "," + PlantaOriana.MURALHA_TOPO + "," + PlantaOriana.MURALHA_DE),
+                    "a camada de trás da brecha é uma barreira invisível");
             for (int dz = PlantaOriana.MURALHA_DE; dz <= PlantaOriana.MURALHA_ATE; dz++) {
-                assertNull(mapa.get(x + "," + PlantaOriana.MURALHA_TOPO + "," + dz), "a brecha em " + x + " não abre no topo");
+                if (dz > PlantaOriana.MURALHA_DE) {
+                    assertNull(mapa.get(x + "," + PlantaOriana.MURALHA_TOPO + "," + dz), "a brecha em " + x + " não abre no topo");
+                }
                 assertNotNull(mapa.get(x + "," + (PlantaOriana.FUNDO_DA_BRECHA - 1) + "," + dz), "a brecha em " + x + " desce demais");
             }
             assertNotNull(mapa.get((x + PlantaOriana.MEIA_BRECHA + 1) + "," + PlantaOriana.MURALHA_TOPO + "," + PlantaOriana.MURALHA_ATE),
@@ -201,5 +208,54 @@ class PlantaOrianaTest {
         Files.createDirectories(saida.getParent());
         Files.writeString(saida, s);
         assertTrue(Files.size(saida) > 0);
+    }
+
+    /** O que o jogador atravessa: o ar e as chamas. */
+    private static boolean livre(Map<String, Material> mapa, int x, int y, int z) {
+        Material m = mapa.get(x + "," + y + "," + z);
+        return m == null || m == Material.FOGO;
+    }
+
+    /** Onde dá para ficar em pé: chão firme embaixo e duas casas livres. */
+    private static boolean emPe(Map<String, Material> mapa, int x, int y, int z) {
+        return !livre(mapa, x, y - 1, z) && livre(mapa, x, y, z) && livre(mapa, x, y + 1, z);
+    }
+
+    /**
+     * Andando e pulando a partir da entrada do jogador, ninguém chega atrás da muralha. Sobe um bloco por vez (nunca
+     * em cima de muro ou cerca, que são mais altos), e desce de qualquer altura.
+     */
+    @Test
+    void ninguemChegaAtrasDaMuralhaAndandoEPulando() {
+        Map<String, Material> mapa = porPosicao();
+        ArrayDeque<int[]> fila = new ArrayDeque<>();
+        Set<String> visto = new HashSet<>();
+        fila.add(new int[] {0, 0, 16});
+        visto.add("0,0,16");
+        int[][] passos = {{1, 0}, {-1, 0}, {0, 1}, {0, -1}};
+        while (!fila.isEmpty()) {
+            int[] c = fila.poll();
+            assertTrue(c[2] > PlantaOriana.MURALHA_DE, "o jogador chega atrás da muralha em " + c[0] + ", " + c[1] + ", " + c[2]);
+            for (int[] p : passos) {
+                int x = c[0] + p[0], z = c[2] + p[1];
+                if (Math.abs(x) > CaixaArena.MEIA || Math.abs(z) > CaixaArena.MEIA) continue;
+                // No mesmo nível, um acima (com a cabeça livre antes de pular) ou caindo até o chão.
+                int y = -1;
+                if (emPe(mapa, x, c[1], z)) {
+                    y = c[1];
+                } else if (emPe(mapa, x, c[1] + 1, z) && livre(mapa, c[0], c[1] + 2, c[2])) {
+                    Material degrau = mapa.get(x + "," + c[1] + "," + z);
+                    if (degrau != Material.MURO && degrau != Material.CERCA_ESCURA) y = c[1] + 1;
+                } else if (livre(mapa, x, c[1], z) && livre(mapa, x, c[1] + 1, z)) {
+                    for (int d = c[1] - 1; d >= -1; d--) {
+                        if (emPe(mapa, x, d, z)) {
+                            y = d;
+                            break;
+                        }
+                    }
+                }
+                if (y >= 0 && visto.add(x + "," + y + "," + z)) fila.add(new int[] {x, y, z});
+            }
+        }
     }
 }
