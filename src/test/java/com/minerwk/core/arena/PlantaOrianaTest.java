@@ -8,6 +8,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import com.minerwk.core.arena.PlantaEscola.Bloco;
 import com.minerwk.core.arena.PlantaEscola.Material;
 import com.minerwk.core.boss.RagnarokBoss;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -144,5 +147,59 @@ class PlantaOrianaTest {
                 assertNotNull(mapa.get(dx + "," + dy + "," + (PlantaOriana.MURALHA_ATE - 1)), "a barricada tem buraco em " + dx + ", " + dy);
             }
         }
+    }
+
+    @Test
+    void oFogoNaoSeEspalha() {
+        Map<String, Material> mapa = porPosicao();
+        int noCampo = 0;
+        for (Bloco f : CENARIO) {
+            if (f.material() != Material.FOGO) continue;
+            assertEquals(Material.NETHERRACK, mapa.get(f.dx() + "," + (f.dy() - 1) + "," + f.dz()), "fogo sem netherrack embaixo: " + f);
+            for (Bloco b : CENARIO) {
+                if (!PlantaOriana.INFLAMAVEIS.contains(b.material())) continue;
+                int dy = b.dy() - f.dy();
+                assertTrue(Math.abs(b.dx() - f.dx()) > 3 || Math.abs(b.dz() - f.dz()) > 3 || dy < -1 || dy > 5,
+                        "o fogo em " + f + " pega em " + b);
+            }
+            if (f.dz() > PlantaOriana.MURALHA_ATE + 3) noCampo++;
+        }
+        assertTrue(noCampo >= 8 && noCampo <= 16, "focos de fogo no campo: " + noCampo);
+    }
+
+    @Test
+    void oCampoTemCraterasEDestrocos() {
+        int brasas = 0, queimado = 0, fogueiras = 0;
+        for (Bloco b : CENARIO) {
+            if (b.dy() == -1 && b.material() == Material.BRASA) brasas++;
+            if (b.dy() == -1 && (b.material() == Material.TERRA_QUEIMADA || b.material() == Material.PEDRA_NEGRA)) queimado++;
+            if (b.material() == Material.FOGUEIRA) fogueiras++;
+            if ((b.material() == Material.FENO || b.material() == Material.BARRIL) && b.dy() >= 0) {
+                assertTrue(Math.abs(b.dx()) > 30 || Math.abs(b.dz()) > 30, "destroço no meio livre: " + b);
+            }
+        }
+        assertTrue(brasas >= 4, "brasas no chão: " + brasas);
+        assertTrue(queimado >= 60, "chão queimado: " + queimado);
+        assertTrue(fogueiras >= 2, "fogueiras: " + fogueiras);
+        assertTrue(CENARIO.stream().anyMatch(b -> b.material() == Material.FENO), "feno espalhado");
+        assertTrue(CENARIO.stream().anyMatch(b -> b.material() == Material.BARRIL), "barris espalhados");
+        long queimadas = CENARIO.stream().filter(b -> b.material() == Material.TRONCO_QUEIMADO && b.dy() == 0).count();
+        assertTrue(queimadas >= 6, "árvores queimadas: " + queimadas);
+        long verdes = CENARIO.stream().filter(b -> b.material() == Material.TRONCO && b.dy() == 0 && b.dz() > 0).count();
+        assertTrue(verdes >= 2, "árvores ainda verdes ao sul: " + verdes);
+        assertTrue(CENARIO.stream().noneMatch(b -> b.material() == Material.TRONCO && b.dz() <= 0), "ao norte, só árvores queimadas");
+    }
+
+    /** Escreve a planta em texto para o script de prévia: {@code python ferramentas/previa_arena.py oriana}. */
+    @Test
+    void despejaAPlantaParaAPrevia() throws IOException {
+        StringBuilder s = new StringBuilder();
+        for (Bloco b : CENARIO) {
+            s.append(b.dx()).append(' ').append(b.dy()).append(' ').append(b.dz()).append(' ').append(b.material()).append('\n');
+        }
+        Path saida = Path.of("build", "arena_oriana.txt");
+        Files.createDirectories(saida.getParent());
+        Files.writeString(saida, s);
+        assertTrue(Files.size(saida) > 0);
     }
 }

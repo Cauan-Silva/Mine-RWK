@@ -4,15 +4,18 @@ Lê build/arena.txt, que o teste PlantaEscolaTest.despejaAPlantaParaAPrevia escr
 (./gradlew test --tests "*PlantaEscola*"), e desenha previas/arena.png com três vistas:
 de cima, de frente (olhando para o norte, como o jogador ao entrar) e de lado.
 
-Uso: python ferramentas/previa_arena.py
+Uso: python ferramentas/previa_arena.py [oriana]
+Com "oriana", lê build/arena_oriana.txt (o PlantaOrianaTest escreve) e desenha previas/arena_oriana.png.
 """
 from pathlib import Path
 
 from PIL import Image, ImageDraw
 
 RAIZ = Path(__file__).resolve().parent.parent
-ENTRADA = RAIZ / "build" / "arena.txt"
-SAIDA = RAIZ / "previas" / "arena.png"
+import sys
+_SUFIXO = "_" + sys.argv[1] if len(sys.argv) > 1 else ""
+ENTRADA = RAIZ / "build" / f"arena{_SUFIXO}.txt"
+SAIDA = RAIZ / "previas" / f"arena{_SUFIXO}.png"
 
 CORES = {
     "PEDRA": (112, 112, 112),

@@ -38,6 +38,15 @@ public final class PlantaOriana {
     public static final Set<Material> INFLAMAVEIS = EnumSet.of(Material.MADEIRA_ESCURA, Material.TRONCO, Material.FOLHA,
             Material.FENO, Material.LA_VERMELHA, Material.CERCA_ESCURA, Material.BARRIL, Material.TRONCO_QUEIMADO);
 
+    /** As crateras: x, z, raio e se a borda é erguida (só nas beiradas, longe do meio livre). */
+    private static final int[][] CRATERAS = {{-12, -14, 3, 0}, {14, 8, 4, 0}, {-6, 20, 2, 0}, {22, -20, 3, 0},
+            {-38, -30, 4, 1}, {36, 26, 3, 1}};
+    /** Os focos de fogo, em netherrack, nas beiradas do campo, longe de tudo o que pega fogo. */
+    private static final int[][] FOCOS = {{-46, -36}, {46, -36}, {-26, -40}, {26, -40}, {-47, -10}, {47, -12}, {-46, 18},
+            {46, 16}, {-14, 45}, {14, 46}, {-44, 44}, {44, 44}};
+    /** As fogueiras perto das carroças viradas. */
+    private static final int[][] FOGUEIRAS = {{-35, 18}, {37, -3}, {-15, 41}};
+
     private PlantaOriana() {
     }
 
@@ -50,15 +59,25 @@ public final class PlantaOriana {
                 por(blocos, dx, -2, dz, Material.PEDRA);
             }
         }
+        chaoQueimado(blocos);
+        for (int[] c : CRATERAS) cratera(blocos, c[0], c[1], c[2], c[3] == 1);
         muralha(blocos);
         for (int x : TORRES) torre(blocos, x);
-        // Lanternas na beira da estrada, longe do meio da luta, e árvores só nas beiradas do campo.
-        for (int dz : new int[] {-40, 40}) {
-            for (int dx : new int[] {-6, 6}) poste(blocos, dx, dz);
-        }
-        for (int[] p : new int[][] {{-42, -22}, {42, -22}, {-45, 4}, {45, 4}, {-40, 30}, {40, 30}, {-28, 44}, {28, 44}}) {
-            arvore(blocos, p[0], p[1]);
-        }
+        pedrasCaidas(blocos);
+        // Lanternas na beira da estrada, longe do meio da luta; uma delas caiu.
+        poste(blocos, -6, -40);
+        poste(blocos, -6, 40);
+        poste(blocos, 6, 40);
+        posteTombado(blocos, 6, -40);
+        // As árvores só nas beiradas: as do norte queimaram, as duas do sul ainda têm folhas.
+        for (int[] p : new int[][] {{-42, -22}, {42, -22}, {-45, 4}, {45, 4}, {-40, 30}, {40, 30}}) arvoreQueimada(blocos, p[0], p[1]);
+        for (int[] p : new int[][] {{-28, 44}, {28, 44}}) arvore(blocos, p[0], p[1]);
+        carroca(blocos, -38, 14, true);
+        carroca(blocos, 40, -8, false);
+        carroca(blocos, -20, 38, true);
+        for (int lado : new int[] {-1, 1}) barricada(blocos, lado);
+        for (int[] f : FOGUEIRAS) por(blocos, f[0], 0, f[1], Material.FOGUEIRA);
+        for (int[] f : FOCOS) foco(blocos, f[0], f[1]);
         portal(blocos);
         return new ArrayList<>(blocos.values());
     }
@@ -207,5 +226,101 @@ public final class PlantaOriana {
                 por(blocos, dx, PORTAL_DY + dy, PORTAL_DZ, d <= PORTAL_MIOLO ? Material.PORTAL_NEGRO : Material.PORTAL_ROXO);
             }
         }
+    }
+
+    /** Manchas de chão queimado pelo gramado e falhas na estrada. */
+    private static void chaoQueimado(Map<Long, Bloco> blocos) {
+        for (int dx = -BORDA; dx <= BORDA; dx++) {
+            for (int dz = -BORDA; dz <= BORDA; dz++) {
+                double r = acaso(dx, -1, dz, 10);
+                if (Math.abs(dx) <= MEIA_ESTRADA) {
+                    if (r < .12) por(blocos, dx, -1, dz, r < .06 ? Material.CASCALHO : Material.TERRA_QUEIMADA);
+                } else if (acaso(Math.floorDiv(dx, 4), 0, Math.floorDiv(dz, 4), 11) < .16 && r < .7) {
+                    por(blocos, dx, -1, dz, r < .15 ? Material.PEDRA_NEGRA : Material.TERRA_QUEIMADA);
+                }
+            }
+        }
+    }
+
+    /** Uma cratera no chão: o miolo em brasa, um anel de pedra negra e a borda de terra queimada. */
+    private static void cratera(Map<Long, Bloco> blocos, int x, int z, int raio, boolean erguida) {
+        for (int dx = -raio - 1; dx <= raio + 1; dx++) {
+            for (int dz = -raio - 1; dz <= raio + 1; dz++) {
+                double d = Math.sqrt(dx * dx + dz * dz);
+                if (d <= Math.max(1, raio * .35)) {
+                    por(blocos, x + dx, -1, z + dz, Material.BRASA);
+                } else if (d <= raio * .7) {
+                    por(blocos, x + dx, -1, z + dz, Material.PEDRA_NEGRA);
+                } else if (d <= raio) {
+                    por(blocos, x + dx, -1, z + dz, Material.TERRA_QUEIMADA);
+                } else if (erguida && d <= raio + 1 && acaso(x + dx, 0, z + dz, 12) < .8) {
+                    por(blocos, x + dx, 0, z + dz, Material.TERRA_QUEIMADA);
+                }
+            }
+        }
+    }
+
+    /** Pedras caídas da muralha no campo, até 6 blocos dela, fora da estrada e das brechas. */
+    private static void pedrasCaidas(Map<Long, Bloco> blocos) {
+        for (int dx = -BORDA; dx <= BORDA; dx++) {
+            if (Math.abs(dx) <= MEIA_ESTRADA + 1) continue;
+            boolean naBrecha = false;
+            for (int x : BRECHAS) naBrecha |= Math.abs(dx - x) <= MEIA_BRECHA + 1;
+            if (naBrecha) continue;
+            for (int dz = MURALHA_ATE + 1; dz <= MURALHA_ATE + 6; dz++) {
+                double r = acaso(dx, 0, dz, 13);
+                if (r > .07) continue;
+                por(blocos, dx, 0, dz, tijolo(dx, 0, dz));
+                if (r < .02) por(blocos, dx, 1, dz, tijolo(dx, 1, dz));
+            }
+        }
+    }
+
+    /** Um poste derrubado: o muro deitado no chão, rumo ao leste, e a lanterna caída na ponta. */
+    private static void posteTombado(Map<Long, Bloco> blocos, int dx, int dz) {
+        for (int k = 0; k <= 2; k++) por(blocos, dx + k, 0, dz, Material.MURO);
+        por(blocos, dx + 3, 0, dz, Material.LANTERNA);
+    }
+
+    /** Uma árvore queimada: o tronco escuro sem folha, de altura variada, com dois galhos curtos e quebrados. */
+    private static void arvoreQueimada(Map<Long, Bloco> blocos, int x, int z) {
+        int altura = 3 + (int) (acaso(x, 0, z, 14) * 3);
+        for (int dy = 0; dy <= altura; dy++) por(blocos, x, dy, z, Material.TRONCO_QUEIMADO);
+        int[][] lados = {{1, 0}, {-1, 0}, {0, 1}, {0, -1}};
+        int a = (int) (acaso(x, 1, z, 15) * 4);
+        int[] g1 = lados[a], g2 = lados[(a + 2) % 4];
+        por(blocos, x + g1[0], altura - 1, z + g1[1], Material.TRONCO_QUEIMADO);
+        por(blocos, x + 2 * g1[0], altura, z + 2 * g1[1], Material.TRONCO_QUEIMADO);
+        por(blocos, x + g2[0], altura - 2, z + g2[1], Material.TRONCO_QUEIMADO);
+    }
+
+    /** Uma carroça virada: o leito de tábuas de cabeça para baixo, as rodas para cima, e a carga espalhada. */
+    private static void carroca(Map<Long, Bloco> blocos, int x, int z, boolean deitadaEmX) {
+        int ax = deitadaEmX ? 1 : 0, az = deitadaEmX ? 0 : 1;
+        for (int k = -1; k <= 1; k++) {
+            for (int l = 0; l <= 1; l++) por(blocos, x + ax * k + az * l, 0, z + az * k + ax * l, Material.MADEIRA_ESCURA);
+        }
+        for (int k : new int[] {-1, 1}) {
+            for (int l : new int[] {0, 1}) por(blocos, x + ax * k + az * l, 1, z + az * k + ax * l, Material.CERCA_ESCURA);
+        }
+        // A carga: feno e barris rolaram para a frente da carroça.
+        por(blocos, x + 2 * ax - az, 0, z + 2 * az - ax, Material.FENO);
+        por(blocos, x + 3 * ax - az, 0, z + 3 * az - ax, Material.FENO);
+        por(blocos, x - 2 * ax + 2 * az, 0, z - 2 * az + 2 * ax, Material.BARRIL);
+    }
+
+    /** Uma barricada de tábuas e cercas na frente do portão, de um lado da estrada. */
+    private static void barricada(Map<Long, Bloco> blocos, int lado) {
+        for (int k = 10; k <= 16; k++) {
+            int dz = -39 + (k % 3 == 0 ? 1 : 0);
+            por(blocos, lado * k, 0, dz, Material.MADEIRA_ESCURA);
+            if (k % 2 == 0) por(blocos, lado * k, 1, dz, Material.CERCA_ESCURA);
+        }
+    }
+
+    /** Um foco de fogo: o netherrack no lugar do chão, que queima para sempre, e as chamas em cima. */
+    private static void foco(Map<Long, Bloco> blocos, int x, int z) {
+        por(blocos, x, -1, z, Material.NETHERRACK);
+        por(blocos, x, 0, z, Material.FOGO);
     }
 }

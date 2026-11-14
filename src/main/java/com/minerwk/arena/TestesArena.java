@@ -242,6 +242,26 @@ public final class TestesArena {
         });
     }
 
+    @GameTest(template = "vazio", batch = "arena_40", timeoutTicks = 400)
+    public static void orianaNaoPerdeBlocosComOFogo(GameTestHelper helper) {
+        ServerLevel arena = garantirDimensao(helper.getLevel().getServer());
+        CaixaArena caixa = CaixaArena.daVaga(63);
+        BlockPos centro = new BlockPos(caixa.centroX(), CaixaArena.Y_PATIO, caixa.centroZ());
+        List<PlantaEscola.Bloco> planta = com.minerwk.core.arena.PlantaOriana.cenario();
+        long[] prontoEm = {-1};
+        ObrasArena.montar(arena, caixa, planta, () -> prontoEm[0] = arena.getGameTime());
+        // Dez segundos de fogo queimando: nenhum bloco da planta pode sumir nem virar outro.
+        helper.succeedWhen(() -> {
+            helper.assertTrue(prontoEm[0] >= 0 && arena.getGameTime() - prontoEm[0] >= 200, "esperando o fogo queimar");
+            for (PlantaEscola.Bloco b : planta) {
+                BlockPos p = centro.offset(b.dx(), b.dy(), b.dz());
+                helper.assertTrue(arena.getBlockState(p).is(ObrasArena.estado(b.material()).getBlock()),
+                        "o fogo mexeu em " + b + ": " + arena.getBlockState(p));
+            }
+            ObrasArena.apagar(arena, caixa, () -> { });
+        });
+    }
+
     @GameTest(template = "vazio", batch = "arena_27", timeoutTicks = 400)
     public static void cenarioEscolaAoChegarEVazioAoVoltar(GameTestHelper helper) {
         ServerPlayer jogador = jogador(helper);
