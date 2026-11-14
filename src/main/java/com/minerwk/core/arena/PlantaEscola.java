@@ -34,7 +34,9 @@ public final class PlantaEscola {
         NETHERRACK, FOGO, FOGUEIRA, TERRA_QUEIMADA, PEDRA_NEGRA, BRASA, TIJOLO_RACHADO, TIJOLO_MUSGO, LA_VERMELHA,
         TRONCO_QUEIMADO,
         /** Invisível e firme: fecha a brecha da muralha sem tapar a vista. */
-        BARREIRA
+        BARREIRA,
+        /** Do mundo interior: a luz das janelas acesas, o vidro claro, as antenas e os letreiros. */
+        JANELA_ACESA, VIDRO_CLARO, GRADE_FERRO, PARA_RAIOS, LETREIRO_VERMELHO, LETREIRO_AMARELO
     }
 
     public record Bloco(int dx, int dy, int dz, Material material) {

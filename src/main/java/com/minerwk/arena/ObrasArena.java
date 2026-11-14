@@ -220,6 +220,12 @@ public final class ObrasArena {
             case LA_VERMELHA -> Blocks.RED_WOOL.defaultBlockState();
             case TRONCO_QUEIMADO -> Blocks.DARK_OAK_WOOD.defaultBlockState();
             case BARREIRA -> Blocks.BARRIER.defaultBlockState();
+            case JANELA_ACESA -> Blocks.OCHRE_FROGLIGHT.defaultBlockState();
+            case VIDRO_CLARO -> Blocks.LIGHT_GRAY_STAINED_GLASS.defaultBlockState();
+            case GRADE_FERRO -> Blocks.IRON_BARS.defaultBlockState();
+            case PARA_RAIOS -> Blocks.LIGHTNING_ROD.defaultBlockState();
+            case LETREIRO_VERMELHO -> Blocks.RED_CONCRETE.defaultBlockState();
+            case LETREIRO_AMARELO -> Blocks.YELLOW_CONCRETE.defaultBlockState();
         };
     }
 
